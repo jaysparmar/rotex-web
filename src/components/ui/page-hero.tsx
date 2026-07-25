@@ -12,7 +12,13 @@ type PageHeroProps = {
   children?: React.ReactNode;
 };
 
+const SEGMENT_LABEL_OVERRIDES: Record<string, string> = {
+  about: "About Us",
+  awards: "Awards & Recognition",
+};
+
 function slugToLabel(slug: string): string {
+  if (SEGMENT_LABEL_OVERRIDES[slug]) return SEGMENT_LABEL_OVERRIDES[slug];
   return slug
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
