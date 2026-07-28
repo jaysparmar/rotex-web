@@ -103,13 +103,13 @@ const GLOBAL_CONFIG: PrismaJson.GlobalConfigData = {
       {
         id: "nav_005",
         label: "Stay Informed",
-        href: "/news",
+        href: "/news-updates",
         enabled: true,
         megaMenu: {
           type: "flat",
           columns: [
             { groups: [{ heading: "Blogs", href: "/blogs", description: "Expert insights for modern industries" }] },
-            { groups: [{ heading: "News & Updates", href: "/news", description: "Update with Latest Trends & Technology" }] },
+            { groups: [{ heading: "News & Updates", href: "/news-updates", description: "Update with Latest Trends & Technology" }] },
             { groups: [{ heading: "Case Studies", href: "/case-studies", description: "Update with Latest Trends & Technology" }] },
           ],
           image: "/mega-menu/stay-informed.png",
@@ -194,7 +194,7 @@ const GLOBAL_CONFIG: PrismaJson.GlobalConfigData = {
         source: null,
         links: [
           { label: "Blogs", href: "/blogs" },
-          { label: "News & Updates", href: "/news" },
+          { label: "News & Updates", href: "/news-updates" },
           { label: "Case Studies", href: "/case-studies" },
         ],
       },
@@ -387,8 +387,8 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
       heading: { title: "Resources" },
       tabs: [
         { id: "case-studies", label: "Case Studies", cta: { label: "Read All Case Studies", href: "/case-studies" }, resourceIds: [] as string[] },
-        { id: "news", label: "News & Updates", cta: { label: "View All News", href: "/news" }, resourceIds: [] as string[] },
-        { id: "blogs", label: "Blogs", cta: { label: "Read All Blogs", href: "/blog" }, resourceIds: [] as string[] },
+        { id: "news", label: "News & Updates", cta: { label: "View All News", href: "/news-updates" }, resourceIds: [] as string[] },
+        { id: "blogs", label: "Blogs", cta: { label: "Read All Blogs", href: "/blogs" }, resourceIds: [] as string[] },
       ],
     },
   },
