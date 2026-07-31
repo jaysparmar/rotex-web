@@ -62,7 +62,7 @@ export function AboutStorySection({
     <section className="bg-white py-14 lg:py-20">
       <div className="container flex flex-col">
 
-        <div className="flex flex-col gap-10 lg:flex-row justify-between lg:gap-20">
+        <div className="flex flex-col gap-10 lg:flex-row justify-betweenalso  lg:gap-20">
           {/* Text */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}

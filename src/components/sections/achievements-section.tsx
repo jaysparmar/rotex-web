@@ -155,11 +155,11 @@ export function AchievementsSection({
               className="flex flex-col items-center gap-4 text-center"
             >
               <div className="flex items-center justify-center gap-3 lg:gap-4">
-                <LaurelLeaf className="hidden sm:block shrink-0" />
+                <LaurelLeaf className="shrink-0" />
                 <div className="h-32 w-52 lg:h-36 lg:w-60 shrink-0">
                   <AchievementBadge badge={a.badge} />
                 </div>
-                <LaurelLeaf flipped className="hidden sm:block shrink-0" />
+                <LaurelLeaf flipped className="shrink-0" />
               </div>
               <p className="text-stone-500 font-montserrat font-medium text-sm leading-6 max-w-xs">{a.text}</p>
             </motion.div>

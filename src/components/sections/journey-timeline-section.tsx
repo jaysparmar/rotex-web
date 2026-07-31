@@ -112,7 +112,7 @@ const defaultMilestones: Milestone[] = [
 ];
 
 export function JourneyTimelineSection({
-  heading = "Rotex: A Journey of Innovation & Excellence",
+  heading = "Built Beyond Standards",
   milestones = defaultMilestones,
 }: JourneyTimelineSectionProps) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -178,11 +178,11 @@ export function JourneyTimelineSection({
 
   return (
     <section className="bg-neutral-100 py-14 lg:py-20 overflow-hidden">
-      <div className="container relative mb-10 lg:mb-14">
-        <h2 className="text-center text-stone-900 font-montserrat font-medium text-2xl lg:text-3xl leading-8 lg:leading-10">
+      <div className="container mb-10 lg:mb-14 flex items-center justify-between gap-4">
+        <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-3xl leading-8 lg:leading-10">
           {heading}
         </h2>
-        <div className="hidden lg:flex items-center gap-5 absolute right-0 lg:right-5 top-1/2 -translate-y-1/2">
+        <div className="flex items-center gap-3.5 lg:gap-5 shrink-0">
           <button
             onClick={() => scroll("left")}
             aria-label="Previous"
@@ -216,8 +216,8 @@ export function JourneyTimelineSection({
               <motion.div
                 key={m.year}
                 ref={(el) => { cardRefs.current[i] = el; }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.04 }}
                 className="w-80 shrink-0 snap-center flex flex-col gap-5"
@@ -242,7 +242,7 @@ export function JourneyTimelineSection({
                 </div>
                 <div
                   className={cn(
-                    "size-2.5 rounded-full transition-colors duration-200",
+                    "relative z-10 size-2.5 rounded-full transition-colors duration-200",
                     isActive ? "bg-red-600" : "bg-neutral-200"
                   )}
                 />
