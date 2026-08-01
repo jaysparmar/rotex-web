@@ -5,6 +5,7 @@ import { Field, TextField, TextAreaField, RepeaterItem, FieldGrid } from "@/comp
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FlatImageField } from "@/components/admin/flat-image-field";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 type IndustryOption = { id: string; name: string; subIndustries: { id: string; name: string }[] };
 
@@ -114,22 +115,78 @@ function IndustriesPicker({ navIndex, industries }: { navIndex: number; industri
     }
   }
 
+  // Reorder just the industry-level entries within selectedIds — this is what controls
+  // the mega menu's display order, since the site sorts groups by position in selectedIds.
+  function moveIndustry(industryId: string, direction: -1 | 1) {
+    const current: string[] = form.getValues(`${base}.selectedIds`) ?? [];
+    const positions: number[] = [];
+    current.forEach((id, i) => {
+      if (industries.some((ind) => ind.id === id)) positions.push(i);
+    });
+    const idsAtPositions = positions.map((i) => current[i]);
+    const idx = idsAtPositions.indexOf(industryId);
+    const swapWith = idx + direction;
+    if (idx === -1 || swapWith < 0 || swapWith >= idsAtPositions.length) return;
+    [idsAtPositions[idx], idsAtPositions[swapWith]] = [idsAtPositions[swapWith], idsAtPositions[idx]];
+    const next = [...current];
+    positions.forEach((pos, i) => {
+      next[pos] = idsAtPositions[i];
+    });
+    form.setValue(`${base}.selectedIds`, next);
+  }
+
+  // Show checked industries first, in their configured order, then unchecked ones.
+  const orderedIndustries = [...industries].sort((a, b) => {
+    const aChecked = selected.includes(a.id);
+    const bChecked = selected.includes(b.id);
+    if (aChecked && bChecked) return selected.indexOf(a.id) - selected.indexOf(b.id);
+    if (aChecked) return -1;
+    if (bChecked) return 1;
+    return 0;
+  });
+  const checkedIndustryIds = orderedIndustries.filter((i) => selected.includes(i.id)).map((i) => i.id);
+
   return (
     <div className="space-y-1 rounded-lg border border-border">
       {industries.length === 0 && (
         <p className="p-4 text-sm text-muted-foreground">No industries yet. Add some on the Industries page first.</p>
       )}
-      {industries.map((industry) => {
+      {orderedIndustries.map((industry) => {
         const industryChecked = selected.includes(industry.id);
+        const orderIdx = checkedIndustryIds.indexOf(industry.id);
         return (
           <div key={industry.id} className="border-b border-border p-4 last:border-b-0">
-            <label className="flex items-center gap-2.5">
-              <Checkbox
-                checked={industryChecked}
-                onCheckedChange={(checked) => toggleIndustry(industry, checked === true)}
-              />
-              <span className="text-sm font-medium">{industry.name}</span>
-            </label>
+            <div className="flex items-center gap-2.5">
+              <label className="flex flex-1 items-center gap-2.5">
+                <Checkbox
+                  checked={industryChecked}
+                  onCheckedChange={(checked) => toggleIndustry(industry, checked === true)}
+                />
+                <span className="text-sm font-medium">{industry.name}</span>
+              </label>
+              {industryChecked && (
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-label="Move up"
+                    disabled={orderIdx === 0}
+                    onClick={() => moveIndustry(industry.id, -1)}
+                    className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
+                  >
+                    <ChevronUp className="size-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Move down"
+                    disabled={orderIdx === checkedIndustryIds.length - 1}
+                    onClick={() => moveIndustry(industry.id, 1)}
+                    className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
+                  >
+                    <ChevronDown className="size-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
             {industryChecked && industry.subIndustries.length > 0 && (
               <div className="mt-2 ml-6 space-y-1.5">
                 {industry.subIndustries.map((sub) => (

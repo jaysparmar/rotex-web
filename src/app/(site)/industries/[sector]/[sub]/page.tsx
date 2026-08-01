@@ -15,6 +15,7 @@ import automativeBg from "@/assets/Images/breadcurmbBackgrounds/automative_bg.pn
 import railBg       from "@/assets/Images/breadcurmbBackgrounds/rail_bg.jpg";
 import aerospaceBg  from "@/assets/Images/breadcurmbBackgrounds/aerospace_bg.jpg";
 import machineBg    from "@/assets/Images/breadcurmbBackgrounds/machine_bg.jpg";
+import defaultBg    from "@/assets/Images/breadcurmbBackgrounds/default_bg.jpg";
 
 const BG_MAP: Record<string, StaticImageData> = {
   oil:        oilBg,
@@ -23,6 +24,7 @@ const BG_MAP: Record<string, StaticImageData> = {
   rail:       railBg,
   aerospace:  aerospaceBg,
   machine:    machineBg,
+  process:    defaultBg,
 };
 
 type Props = { params: Promise<{ sector: string; sub: string }> };

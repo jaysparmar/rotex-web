@@ -5,12 +5,17 @@ import { IndustryList } from "@/components/admin/industries/industry-list";
 export default async function AdminIndustriesPage() {
   const industries = await prisma.industry.findMany({
     orderBy: { createdAt: "asc" },
-    include: { _count: { select: { subIndustries: true } } },
+    include: {
+      subIndustries: {
+        orderBy: { createdAt: "asc" },
+        select: { id: true, name: true, slug: true },
+      },
+    },
   });
 
-  const rows = industries.map(({ _count, ...industry }) => ({
+  const rows = industries.map((industry) => ({
     ...industry,
-    subIndustryCount: _count.subIndustries,
+    subIndustryCount: industry.subIndustries.length,
   }));
 
   return (

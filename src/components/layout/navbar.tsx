@@ -14,6 +14,20 @@ type CategorySwitcherMenu = PrismaJson.CategorySwitcherMenu;
 type FlatMenu = PrismaJson.FlatMenu;
 type NavItem = PrismaJson.NavItem;
 
+// Pages not built yet — render as disabled text instead of a broken link.
+const DISABLED_HREFS = new Set(["/join/partner-sales-tools"]);
+
+function chunk<T>(items: T[], size: number): T[][] {
+  if (items.length <= size) return [items];
+  const columnCount = Math.ceil(items.length / size);
+  const perColumn = Math.ceil(items.length / columnCount);
+  const columns: T[][] = [];
+  for (let i = 0; i < items.length; i += perColumn) {
+    columns.push(items.slice(i, i + perColumn));
+  }
+  return columns;
+}
+
 // ─── Category Switcher Panel (Products) ──────────────────────────────────────
 
 function CategorySwitcherPanel({
@@ -87,17 +101,16 @@ function CategorySwitcherPanel({
       <Link
         href={config.cta.href}
         onClick={onClose}
-        className="w-96 shrink-0 px-10 py-10 flex flex-col justify-end"
-        style={{
-          background:
-            "radial-gradient(circle at 145% 88%, #fdba74 6%, #fdba74 13%, #ea580c 67%)",
-        }}
+        className="w-96 shrink-0 px-10 py-10 flex flex-col justify-end bg-gradient-mega-cta"
       >
         <div className="flex items-end gap-4">
           <span className="text-white text-2xl font-medium font-montserrat leading-8 flex-1">
             {config.cta.text}
           </span>
-          <IoChevronDownOutline className="-rotate-90 text-white shrink-0" size={24} />
+          <IoChevronDownOutline
+            className="-rotate-90 text-white shrink-0"
+            size={24}
+          />
         </div>
       </Link>
     </div>
@@ -118,130 +131,157 @@ function FlatMegaMenuPanel({
   onClose: () => void;
 }) {
   const defaultImage =
-    config.image ?? config.columns.flatMap((c) => c.groups).find((g) => g.image)?.image;
-  const [hoveredImage, setHoveredImage] = useState<string | undefined>(defaultImage);
+    config.image ??
+    config.columns.flatMap((c) => c.groups).find((g) => g.image)?.image;
+  const [hoveredImage, setHoveredImage] = useState<string | undefined>(
+    defaultImage,
+  );
 
   return (
     <div
-      className="fixed top-20 lg:top-24 left-0 right-0 z-61 bg-white border-b border-stone-300 shadow-lg flex min-h-72"
+      className="fixed top-20 lg:top-24 left-0 right-0 z-61 bg-white border-b border-stone-300 shadow-lg"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {/* Content columns */}
-      <div className="flex-1 flex gap-10 px-20 py-10">
-        {config.columns.map((col, colIdx) => (
-          <div key={colIdx} className={`flex flex-col gap-11 shrink-0${col.className ? ` ${col.className}` : ""}`}>
-            {col.groups.map((group) => (
-              <div
-                key={group.heading}
-                className="flex flex-col gap-2.5"
-                onMouseEnter={() => group.image && setHoveredImage(group.image)}
-                onMouseLeave={() => setHoveredImage(defaultImage)}
-              >
-                {/* Heading */}
-                {group.href ? (
-                  <Link
-                    href={group.href}
-                    onClick={onClose}
-                    className="text-stone-900 text-base font-semibold font-montserrat leading-6 hover:text-red-600 transition-colors"
-                  >
-                    {group.heading}
-                  </Link>
-                ) : (
-                  <span className="text-stone-900 text-base font-semibold font-montserrat leading-6">
-                    {group.heading}
-                  </span>
-                )}
-
-                {/* Description (e.g. About Us cards) */}
-                {group.description && (
-                  <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">
-                    {group.description}
-                  </p>
-                )}
-
-                {/* Flat items */}
-                {group.items && group.items.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    {group.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={onClose}
-                        className="text-stone-500 text-base font-medium font-montserrat leading-6 hover:text-stone-900 transition-colors"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-
-                {/* Two sub-columns (e.g. Process Industries) */}
-                {group.itemColumns && (
-                  <div className="flex gap-8">
-                    {group.itemColumns.map((subCol, i) => (
-                      <div key={i} className="flex flex-col gap-2">
-                        {subCol.map((item) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={onClose}
-                            className="text-stone-500 text-base font-medium font-montserrat leading-6 hover:text-stone-900 transition-colors"
-                          >
-                            {item.label}
-                          </Link>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-
-      {/* Right: CTA gradient or image */}
-      {config.cta ? (
-        <Link
-          href={config.cta.href}
-          onClick={onClose}
-          className="w-96 shrink-0 px-10 py-10 flex flex-col justify-end"
-          style={{
-            background:
-              "radial-gradient(circle at 145% 88%, #fdba74 6%, #fdba74 13%, #ea580c 67%)",
-          }}
-        >
-          <div className="flex items-end gap-4">
-            <span className="text-white text-2xl font-medium font-montserrat leading-8 flex-1">
-              {config.cta.text}
-            </span>
-            <IoChevronDownOutline className="-rotate-90 text-white shrink-0" size={24} />
-          </div>
-        </Link>
-      ) : hoveredImage ? (
-        <div className="w-96 shrink-0 relative overflow-hidden">
-          <AnimatePresence mode="sync">
-            <motion.div
-              key={hoveredImage}
-              className="absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+      <div className="flex items-stretch">
+        {/* Content columns */}
+        <div className="flex gap-10 py-10 container-left-pad">
+          {config.columns.map((col, colIdx) => (
+            <div
+              key={colIdx}
+              className={`flex flex-col gap-11 shrink-0${col.className ? ` ${col.className}` : ""}`}
             >
-              <Image src={hoveredImage} alt={config.imageCaption ?? ""} fill className="object-cover" sizes="384px" unoptimized />
-            </motion.div>
-          </AnimatePresence>
-          {config.imageCaption && hoveredImage === defaultImage && (
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-5">
-              <span className="text-white text-lg font-semibold font-montserrat leading-5">
-                {config.imageCaption}
-              </span>
+              {col.groups.map((group) => (
+                <div
+                  key={group.heading}
+                  className="flex flex-col gap-2.5"
+                  onMouseEnter={() =>
+                    group.image && setHoveredImage(group.image)
+                  }
+                  onMouseLeave={() => setHoveredImage(defaultImage)}
+                >
+                  {/* Heading */}
+                  {group.href && DISABLED_HREFS.has(group.href) ? (
+                    <span className="text-stone-400 text-base font-semibold font-montserrat leading-6 cursor-not-allowed">
+                      {group.heading}{" "}
+                      <span className="text-xs font-medium normal-case">
+                        (Coming soon)
+                      </span>
+                    </span>
+                  ) : group.href ? (
+                    <Link
+                      href={group.href}
+                      onClick={onClose}
+                      className="text-stone-900 text-base font-semibold font-montserrat leading-6 hover:text-red-600 transition-colors"
+                    >
+                      {group.heading}
+                    </Link>
+                  ) : (
+                    <span className="text-stone-900 text-base font-semibold font-montserrat leading-6">
+                      {group.heading}
+                    </span>
+                  )}
+
+                  {/* Description (e.g. About Us cards) */}
+                  {group.description && (
+                    <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">
+                      {group.description}
+                    </p>
+                  )}
+
+                  {/* Flat items — split into sub-columns of max 6 when the list runs long */}
+                  {group.items && group.items.length > 0 && (
+                    <div className="flex gap-8">
+                      {chunk(group.items, 6).map((col, colIdx) => (
+                        <div key={colIdx} className="flex flex-col gap-2">
+                          {col.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              onClick={onClose}
+                              className="text-stone-500 text-base font-medium font-montserrat leading-6 hover:text-stone-900 transition-colors"
+                            >
+                              {item.label}
+                            </Link>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Two sub-columns (e.g. Process Industries) */}
+                  {group.itemColumns && (
+                    <div className="flex gap-8">
+                      {group.itemColumns.map((subCol, i) => (
+                        <div key={i} className="flex flex-col gap-2">
+                          {subCol.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              onClick={onClose}
+                              className="text-stone-500 text-base font-medium font-montserrat leading-6 hover:text-stone-900 transition-colors"
+                            >
+                              {item.label}
+                            </Link>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+          ))}
         </div>
-      ) : null}
+
+        {/* Right: CTA gradient or image */}
+        {config.cta ? (
+          <Link
+            href={config.cta.href}
+            onClick={onClose}
+            className="w-96 shrink-0 min-h-72 ml-auto px-10 py-10 flex flex-col justify-end bg-gradient-mega-cta"
+          >
+            <div className="flex items-end gap-4">
+              <span className="text-white text-2xl font-medium font-montserrat leading-8 flex-1">
+                {config.cta.text}
+              </span>
+              <IoChevronDownOutline
+                className="-rotate-90 text-white shrink-0"
+                size={24}
+              />
+            </div>
+          </Link>
+        ) : hoveredImage ? (
+          <div className="w-115 h-87.5 shrink-0 self-start ml-auto relative overflow-hidden">
+            <AnimatePresence mode="sync">
+              <motion.div
+                key={hoveredImage}
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                <Image
+                  src={hoveredImage}
+                  alt={config.imageCaption ?? ""}
+                  fill
+                  className="object-cover"
+                  sizes="350px"
+                  unoptimized
+                />
+              </motion.div>
+            </AnimatePresence>
+            {config.imageCaption && hoveredImage === defaultImage && (
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-5">
+                <span className="text-white text-lg font-semibold font-montserrat leading-5">
+                  {config.imageCaption}
+                </span>
+              </div>
+            )}
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -317,7 +357,11 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
       .then((json) => {
         if (cancelled) return;
         const slides = json?.data?.slides;
-        setHeroActive(Boolean(json?.data?.enabled) && Array.isArray(slides) && slides.length > 0);
+        setHeroActive(
+          Boolean(json?.data?.enabled) &&
+            Array.isArray(slides) &&
+            slides.length > 0,
+        );
       })
       .catch(() => {
         if (!cancelled) setHeroActive(false);
@@ -357,7 +401,8 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
         className="fixed top-0 left-0 right-0 z-50"
         initial={false}
         animate={{
-          backgroundColor: !transparent || scrolled ? "#201D1D" : "rgba(13,13,13,0)",
+          backgroundColor:
+            !transparent || scrolled ? "#201D1D" : "rgba(13,13,13,0)",
         }}
         transition={{ duration: DURATION, ease: EASE }}
       >
@@ -383,7 +428,10 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
                 transition={{ duration: LOGO_DURATION, ease: EASE }}
               />
             ) : (
-              <Link href={config.logo.href} className="hidden lg:flex items-center mr-6">
+              <Link
+                href={config.logo.href}
+                className="hidden lg:flex items-center mr-6"
+              >
                 <Image
                   src={config.logo.src}
                   alt={config.logo.alt}
@@ -404,17 +452,17 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
                   }
                   onMouseLeave={scheduleClose}
                 >
-                  <Link href={item.href} className="flex items-center gap-0.5 group">
-                    <span
-                      className={`text-sm font-medium font-montserrat whitespace-nowrap transition-colors duration-150 ${
-                        activeMenu === item.id
-                          ? "text-white"
-                          : "text-stone-300 group-hover:text-white"
-                      }`}
-                    >
-                      {item.label}
-                    </span>
-                    {item.megaMenu && (
+                  {item.megaMenu ? (
+                    <span className="flex items-center gap-0.5 group cursor-default select-none">
+                      <span
+                        className={`text-sm font-medium font-montserrat whitespace-nowrap transition-colors duration-150 ${
+                          activeMenu === item.id
+                            ? "text-white"
+                            : "text-stone-300 group-hover:text-white"
+                        }`}
+                      >
+                        {item.label}
+                      </span>
                       <IoChevronDownOutline
                         size={14}
                         className={`transition-all duration-150 shrink-0 ${
@@ -423,8 +471,23 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
                             : "text-stone-300 group-hover:text-white"
                         }`}
                       />
-                    )}
-                  </Link>
+                    </span>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="flex items-center gap-0.5 group"
+                    >
+                      <span
+                        className={`text-sm font-medium font-montserrat whitespace-nowrap transition-colors duration-150 ${
+                          activeMenu === item.id
+                            ? "text-white"
+                            : "text-stone-300 group-hover:text-white"
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+                    </Link>
+                  )}
                 </div>
               ))}
             </div>
@@ -439,7 +502,9 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
             >
               <IoSearchOutline size={22} />
             </button>
-            <GradientButton href={config.header.cta.href}>{config.header.cta.label}</GradientButton>
+            <GradientButton href={config.header.cta.href}>
+              {config.header.cta.label}
+            </GradientButton>
           </div>
 
           {/* Mobile */}
@@ -484,12 +549,18 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
                     >
                       {item.label}
                       {item.megaMenu && (
-                        <IoChevronDownOutline size={14} className="text-white/60" />
+                        <IoChevronDownOutline
+                          size={14}
+                          className="text-white/60"
+                        />
                       )}
                     </Link>
                   ))}
                   <div className="mt-4">
-                    <GradientButton href={config.header.cta.href} className="w-full">
+                    <GradientButton
+                      href={config.header.cta.href}
+                      className="w-full"
+                    >
                       {config.header.cta.label}
                     </GradientButton>
                   </div>

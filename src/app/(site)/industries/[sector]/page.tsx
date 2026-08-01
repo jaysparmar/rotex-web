@@ -11,7 +11,7 @@ export default async function IndustryPage({ params }: Props) {
   if (!industry) notFound();
 
   const firstSub = industry.subIndustries[0];
-  if (!firstSub) notFound();
+  if (!firstSub) return null;
 
   redirect(`/industries/${sector}/${firstSub.slug}`);
 }

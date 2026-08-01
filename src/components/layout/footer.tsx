@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 import { SOCIAL_PLATFORM_MAP } from "@/lib/social-platforms";
 import bg from "@/assets/footer_bg.svg";
 
+// Pages not built yet — render as disabled text instead of a broken link.
+const DISABLED_HREFS = new Set(["/privacy", "/terms"]);
+
 const FOOTER_GRADIENT = `
   radial-gradient(
     circle at 57% 150%,
@@ -128,15 +131,21 @@ export function Footer({ config }: { config: PrismaJson.GlobalConfigData }) {
             <p className="text-stone-300 text-xs font-medium font-montserrat">{footer.legal.copyright}</p>
             {footer.legal.links.length > 0 && (
               <div className="flex items-center gap-4">
-                {footer.legal.links.map((l) => (
-                  <Link
-                    key={l.href}
-                    href={l.href}
-                    className="text-stone-300 text-xs font-medium font-montserrat hover:text-white transition-colors"
-                  >
-                    {l.label}
-                  </Link>
-                ))}
+                {footer.legal.links.map((l) =>
+                  DISABLED_HREFS.has(l.href) ? (
+                    <span key={l.href} className="text-stone-500 text-xs font-medium font-montserrat cursor-not-allowed">
+                      {l.label}
+                    </span>
+                  ) : (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      className="text-stone-300 text-xs font-medium font-montserrat hover:text-white transition-colors"
+                    >
+                      {l.label}
+                    </Link>
+                  )
+                )}
               </div>
             )}
           </div>

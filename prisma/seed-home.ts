@@ -39,11 +39,11 @@ const GLOBAL_CONFIG: PrismaJson.GlobalConfigData = {
                   ],
                 },
                 {
-                  heading: "Power",
-                  href: "/industries/power",
+                  heading: "Power Generation",
+                  href: "/industries/power-generation",
                   items: [
-                    { label: "Thermal Power", href: "/industries/power/thermal" },
-                    { label: "Nuclear Power", href: "/industries/power/nuclear" },
+                    { label: "Thermal", href: "/industries/power-generation/thermal" },
+                    { label: "Hydro", href: "/industries/power-generation/hydro" },
                   ],
                 },
               ],
@@ -51,20 +51,19 @@ const GLOBAL_CONFIG: PrismaJson.GlobalConfigData = {
             {
               groups: [
                 {
-                  heading: "Process Industries",
-                  href: "/industries/process",
+                  heading: "Automotive",
+                  href: "/industries/automotive",
                   items: [
-                    { label: "Fertilizer", href: "/industries/process/fertilizer" },
-                    { label: "Chemicals", href: "/industries/process/chemicals" },
-                    { label: "Cement", href: "/industries/process/cement" },
-                    { label: "Food & Beverages", href: "/industries/process/food-beverages" },
-                    { label: "Paper & Pulp", href: "/industries/process/paper-pulp" },
-                    { label: "Pharmaceuticals", href: "/industries/process/pharmaceuticals" },
-                    { label: "Paints", href: "/industries/process/paints" },
-                    { label: "Textiles", href: "/industries/process/textiles" },
-                    { label: "Water Management", href: "/industries/process/water-management" },
-                    { label: "Metal & Mining", href: "/industries/process/metal-mining" },
-                    { label: "Tyre", href: "/industries/process/tyre" },
+                    { label: "Assembly", href: "/industries/automotive/assembly" },
+                    { label: "Paint Shop", href: "/industries/automotive/paint-shop" },
+                  ],
+                },
+                {
+                  heading: "Rail",
+                  href: "/industries/rail",
+                  items: [
+                    { label: "Infrastructure", href: "/industries/rail/infrastructure" },
+                    { label: "Rolling Stock", href: "/industries/rail/rolling-stock" },
                   ],
                 },
               ],
@@ -72,13 +71,18 @@ const GLOBAL_CONFIG: PrismaJson.GlobalConfigData = {
             {
               groups: [
                 {
-                  heading: "Machine Solutions",
-                  href: "/industries/machine-solutions",
-                  items: [{ label: "Fire Fighting System", href: "/industries/machine-solutions/fire-fighting" }],
+                  heading: "Aerospace",
+                  href: "/industries/aerospace",
+                  items: [{ label: "Ground Support", href: "/industries/aerospace/ground-support" }],
                 },
-                { heading: "Automotive", href: "/industries/automotive" },
-                { heading: "Rail", href: "/industries/rail" },
-                { heading: "Aerospace & Defence", href: "/industries/aerospace-defence" },
+                {
+                  heading: "Industrial Machinery",
+                  href: "/industries/industrial-machinery",
+                  items: [
+                    { label: "Packaging Machinery", href: "/industries/industrial-machinery/packaging-machinery" },
+                    { label: "Process Machinery", href: "/industries/industrial-machinery/process-machinery" },
+                  ],
+                },
               ],
             },
           ],
@@ -274,7 +278,7 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
             "Engineered precise solutions that reduce downtime, enhance safety, and ensure uninterrupted operations across critical industry applications.",
           media: { type: "video", src: "https://cdn.rotex.com/hero/slide-1.mp4" },
           cta_buttons: [
-            { label: "Explore Solutions", href: "/solutions" },
+            { label: "Explore Solutions", href: "/industries" },
             { label: "Download Zero Downtime Blueprint", href: "/downloads" },
           ],
         },

@@ -91,6 +91,7 @@
   /* ── Gradients (exact from style guide) ── */
   --gradient-orange-radial: radial-gradient(circle at 50% 0%, #ff9a00 0%, #f86a00 14%, #f03900 28%, #c31d00 44.5%, #ac0e00 52.75%, #950000 61%, #700000 67.5%, #4b0000 74%, #250000 80.5%, #130000 83.75%, #000000 87%);
   --gradient-text: radial-gradient(circle at 50% 0%, #f2cc81 6%, #f2ca7d 13%, #f4c671 19%, #f6be5d 26%, #f8b341 32%, #fca51e 39%, #fea00f 41%, #ff9a00 43%, #f86a00 55%, #f03900 67%);
+  --gradient-mega-cta: radial-gradient(circle at 145% 88%, #f2cc81 6%, #f2ca7d 13%, #f4c671 19%, #f6be5d 26%, #f8b341 32%, #fca51e 39%, #ff9a00 43%, #f86a00 55%, #f03900 67%);
   --gradient-decorative: radial-gradient(circle at 50% 50%, #ff9a00 0%, #f03900 20%, #950000 61%, #000000 87%);
   --gradient-dark-overlay: linear-gradient(to bottom, rgba(0,0,0,0) 33.923%, #000000 100%);
   --gradient-warm-orange: linear-gradient(to bottom right, #ff9a00, #f86a00, #ef3e23);
@@ -304,9 +305,32 @@
   animation-play-state: paused;
 }
 
+/* ── Animatable radial gradient position (Contact Us button hover) ── */
+@property --gx {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 45%;
+}
+@property --gy {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -21%;
+}
+.gradient-btn {
+  background: radial-gradient(circle at var(--gx) var(--gy), #ff9a00 0%, #f03900 35%, #950000 70%, #000000 100%);
+  transition: --gx 500ms ease, --gy 500ms ease;
+}
+.gradient-btn:hover {
+  --gx: 88%;
+  --gy: 24%;
+}
+
 /* ── Gradient utilities ── */
   .bg-gradient-orange-radial {
     background: var(--gradient-orange-radial);
+  }
+  .bg-gradient-mega-cta {
+    background: var(--gradient-mega-cta);
   }
   .bg-gradient-decorative {
     background: var(--gradient-decorative);

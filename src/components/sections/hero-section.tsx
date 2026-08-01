@@ -51,7 +51,7 @@ const defaultSlides: Slide[] = [
       "Engineered precise solutions that reduce downtime, enhance safety, and ensure uninterrupted operations across critical industry applications.",
     media: { type: "video", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
     cta_buttons: [
-      { label: "EXPLORE SOLUTIONS", href: "/solutions" },
+      { label: "EXPLORE SOLUTIONS", href: "/industries" },
       { label: "DOWNLOAD 'ZERO DOWNTIME BLUE PRINT'", href: "/downloads" },
     ],
   },

@@ -1,10 +1,28 @@
 
 import { prisma } from "@/lib/prisma";
 
-function chunk<T>(items: T[], parts: number): T[][] {
-  const result: T[][] = Array.from({ length: parts }, () => []);
-  items.forEach((item, i) => result[i % parts].push(item));
-  return result;
+// Fills columns left-to-right in the given order (no shuffling), grouping items by a
+// weight so a heavy group (e.g. one with many sub-items) naturally lands alone in its
+// own column instead of getting split evenly across columns.
+function packByWeight<T>(items: T[], weight: (item: T) => number, parts: number): T[][] {
+  const totalWeight = items.reduce((sum, item) => sum + weight(item), 0);
+  const target = totalWeight / parts;
+  const columns: T[][] = [];
+  let current: T[] = [];
+  let currentWeight = 0;
+
+  for (const item of items) {
+    const itemWeight = weight(item);
+    if (currentWeight > 0 && currentWeight + itemWeight > target * 1.15 && columns.length < parts - 1) {
+      columns.push(current);
+      current = [];
+      currentWeight = 0;
+    }
+    current.push(item);
+    currentWeight += itemWeight;
+  }
+  columns.push(current);
+  return columns;
 }
 
 async function resolveIndustriesMenu(source: PrismaJson.MegaMenuSource): Promise<PrismaJson.FlatMenu> {
@@ -17,19 +35,25 @@ async function resolveIndustriesMenu(source: PrismaJson.MegaMenuSource): Promise
       image: true,
       subIndustries: { select: { id: true, name: true, slug: true } },
     },
-    orderBy: { name: "asc" },
   });
 
-  const groups: PrismaJson.FlatGroup[] = industries.map((industry) => ({
+  // Preserve the order the admin picked things in (selectedIds order), not DB/alphabetical order.
+  const byOrder = (aId: string, bId: string) => source.selectedIds.indexOf(aId) - source.selectedIds.indexOf(bId);
+  const orderedIndustries = [...industries].sort((a, b) => byOrder(a.id, b.id));
+
+  const groups: PrismaJson.FlatGroup[] = orderedIndustries.map((industry) => ({
     heading: industry.name,
     href: `/industries/${industry.slug}`,
     image: industry.image ?? undefined,
     items: industry.subIndustries
       .filter((sub) => source.selectedIds.includes(sub.id))
+      .sort((a, b) => byOrder(a.id, b.id))
       .map((sub) => ({ label: sub.name, href: `/industries/${industry.slug}/${sub.slug}` })),
   }));
 
-  const columns: PrismaJson.FlatColumn[] = chunk(groups, 3).map((groupChunk) => ({ groups: groupChunk }));
+  const columns: PrismaJson.FlatColumn[] = packByWeight(groups, (g) => 1 + (g.items?.length ?? 0), 3).map(
+    (groupChunk) => ({ groups: groupChunk })
+  );
 
   return {
     type: "flat",
