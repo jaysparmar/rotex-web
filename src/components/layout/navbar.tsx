@@ -16,7 +16,7 @@ type FlatMenu = PrismaJson.FlatMenu;
 type NavItem = PrismaJson.NavItem;
 
 // Pages not built yet — render as disabled text instead of a broken link.
-const DISABLED_HREFS = new Set(["/join/partner-sales-tools"]);
+const DISABLED_HREFS = new Set<string>([]);
 
 function chunk<T>(items: T[], size: number): T[][] {
   if (items.length <= size) return [items];

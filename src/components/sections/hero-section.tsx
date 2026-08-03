@@ -117,7 +117,7 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
                 letterSpacing: "-1.3px",
               }}
             >
-              <span className="text-gradient-hero">{titleLead}</span>
+              <span className="">{titleLead}</span>
               {titleRest && <span className="block lg:inline lg:ml-2">{titleRest}</span>}
             </h1>
 

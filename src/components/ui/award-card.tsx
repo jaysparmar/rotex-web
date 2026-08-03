@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import type { StaticImageData } from "next/image";
 import { Award } from "lucide-react";
@@ -10,22 +9,17 @@ export type AwardCardProps = {
   year: string;
   title: string;
   description: string;
+  /* Third-party page for this award — opens in a new tab. */
+  url?: string;
   image?: StaticImageData | string;
   className?: string;
 };
 
-export function AwardCard({ slug, year, title, description, image, className }: AwardCardProps) {
-  return (
-    <Link
-      href={`/about/awards/${slug}`}
-      className={cn(
-        "flex flex-col h-121.75 bg-stone-100 rounded-2xl outline outline-1 -outline-offset-1 outline-neutral-200",
-        "shadow-[0px_3px_0px_0px_rgba(239,62,35,1)] overflow-hidden",
-        className
-      )}
-    >
+export function AwardCard({ year, title, description, url, image, className }: AwardCardProps) {
+  const body = (
+    <>
       {/* Image / placeholder */}
-      <div className="relative w-full h-56 shrink-0 bg-stone-200 flex items-center justify-center">
+      <div className="relative w-full h-56 shrink-0 bg-stone-200 flex items-center justify-center overflow-hidden">
         {image ? (
           <Image src={image} alt={title} fill className="object-cover" sizes="400px" />
         ) : (
@@ -43,11 +37,33 @@ export function AwardCard({ slug, year, title, description, image, className }: 
           <p className="text-stone-900 text-sm font-medium font-montserrat leading-6">{description}</p>
         </div>
 
-        <span className="inline-flex w-fit items-center gap-2.5 px-5 py-3 bg-white rounded-full">
-          <span className="text-orange-600 text-base font-medium font-montserrat leading-7">View Details</span>
-          <RotexArrow size={8} />
+        <span className="inline-flex w-fit items-center gap-2.5 px-5 py-3 bg-white rounded-[45px] transition-colors duration-200 group-hover:bg-red-600">
+          <span className="text-red-600 text-base font-medium font-montserrat leading-7 transition-colors duration-200 group-hover:text-white">
+            View Details
+          </span>
+          <RotexArrow size={8} color="currentColor" className="text-red-600 transition-colors duration-200 group-hover:text-white" />
         </span>
       </div>
-    </Link>
+    </>
+  );
+
+  /* The red under-stroke is a hover-only accent. It's always a 3px bottom border
+     so the card never changes height — it just starts out transparent.
+     Hover also tints the card stone-100 → rose-100 and inverts the pill to red. */
+  const shell = cn(
+    "group flex flex-col h-121.75 bg-stone-100 rounded-2xl overflow-hidden",
+    "border border-neutral-200 border-b-[3px] border-b-transparent",
+    "transition-colors duration-200 hover:bg-rose-100 hover:border-b-[#EE3E23]",
+    className
+  );
+
+  // With no third-party URL there is nowhere to send the visitor, so the card
+  // renders as static content instead of linking to a route that doesn't exist.
+  if (!url) return <div className={shell}>{body}</div>;
+
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className={shell}>
+      {body}
+    </a>
   );
 }

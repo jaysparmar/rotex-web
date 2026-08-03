@@ -221,6 +221,8 @@ const GLOBAL_CONFIG: PrismaJson.GlobalConfigData = {
       address: "Rotex Industries, Mumbai, India",
     },
   },
+  // Read server-side only (see src/lib/partner-tools.ts). Override with PARTNER_TOOLS_PASSWORD.
+  partnerTools: { password: "Rotex@2626" },
 };
 
 const PARTNERS: { id: string; name: string; logo: string }[] = [

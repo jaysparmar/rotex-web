@@ -85,6 +85,8 @@ declare global {
         legal: { copyright: string; links: FooterLink[] };
         contact: { email: string; phone: string; address: string };
       };
+      /* Gate for /join/partner-sales-tools. Read server-side only. */
+      partnerTools?: { password: string };
     };
 
     type AdminConfigData = {

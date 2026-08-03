@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import Image from "next/image";
 import { Globe } from "lucide-react";
@@ -8,35 +9,50 @@ import bg from "@/assets/footer_bg.svg";
 // Pages not built yet — render as disabled text instead of a broken link.
 const DISABLED_HREFS = new Set(["/privacy", "/terms"]);
 
-/* Figma "Radial Gradient": origin at 57% 162%, four stops —
-   #FF9A00 → #F03900 (21%) → #950000 → #000000 */
+/* Figma: bg-radial-[at_57%_162%] from-amber-500 via-orange-600 28% to-black 87%
+   Origin pulled to 50%: Figma's 57% is near-centre on its 1440px frame, but the
+   footer is full-bleed, so 57% pushed the circle right and left the top-right
+   corner red while the top-left went black. At 50% both corners sit the same
+   distance out and reach black together.
+   `ellipse` rather than `circle` so the radii scale with the box — a circle sized
+   to the farthest corner overshoots on wide viewports and washes the ramp out. */
 const FOOTER_GRADIENT = `
   radial-gradient(
-    circle at 57% 162%,
+    ellipse at 50% 162%,
     #ff9a00 0%,
-    #f03900 21%,
-    #950000 45%,
-    #000000 100%
+    #950000 28%,
+    #000000 87%
   )
 `.trim();
 
 export function Footer({ config }: { config: PrismaJson.GlobalConfigData }) {
   const { logo, footer } = config;
-  const columns = footer.columns.filter((c) => c.enabled !== false);
+  const columns = footer.columns.filter(
+    (c) => c.enabled !== false && c.links.length > 0
+  );
+
+  // Desktop: the trailing four groups pair up into two stacked columns; anything
+  // before them stands alone. Slicing from the end survives a hidden lead column.
+  const pairCount = Math.min(4, columns.length - (columns.length % 2));
+  const leadColumns = columns.slice(0, columns.length - pairCount);
+  const stackedPairs: (typeof columns)[] = [];
+  for (let i = columns.length - pairCount; i < columns.length; i += 2) {
+    stackedPairs.push(columns.slice(i, i + 2));
+  }
 
   return (
     <footer
       className="relative overflow-hidden"
-      style={{ background: FOOTER_GRADIENT, minHeight: "764px" }}
+      style={{ background: FOOTER_GRADIENT, minHeight: "650px" }}
     >
       {/* Decorative background SVG */}
       <Image
         src={bg.src}
         alt=""
-        width={746}
-        height={746}
+        width={650}
+        height={650}
         aria-hidden="true"
-        className="absolute pointer-events-none select-none right-0 bottom-0 w-[400px] h-[400px] lg:w-[746px] lg:h-[746px]"
+        className="absolute pointer-events-none select-none right-0 bottom-0 w-[400px] h-[400px] lg:w-[650px] lg:h-[650px]"
       />
 
       <div className="container relative z-10 flex flex-col">
@@ -105,10 +121,22 @@ export function Footer({ config }: { config: PrismaJson.GlobalConfigData }) {
             </p>
           </div>
 
-          {/* Link columns */}
-          <div className="mt-40.5 pb-10 flex justify-between items-start gap-8">
-            {columns.map((col) => (
+          {/* Link columns — Figma pairs the last four groups into two stacked
+              columns (Company over Join Us, Resources over Stay Informed) and
+              leaves everything before them as single columns. Counting from the
+              end keeps that shape when a leading column (e.g. Products) is
+              hidden for having no links. */}
+          <div className="mt-20 pb-10 flex justify-between items-start gap-8">
+            {leadColumns.map((col) => (
               <FooterColumn key={col.id} heading={col.heading} links={col.links} />
+            ))}
+
+            {stackedPairs.map((pair, i) => (
+              <div key={pair[0]?.id ?? i} className="flex flex-col items-start gap-10">
+                {pair.map((col) => (
+                  <FooterColumn key={col.id} heading={col.heading} links={col.links} />
+                ))}
+              </div>
             ))}
 
             {footer.social.length > 0 && (

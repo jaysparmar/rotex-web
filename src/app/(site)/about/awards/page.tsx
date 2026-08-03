@@ -1,34 +1,44 @@
 "use client";
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { AwardCard, type AwardCardProps } from "@/components/ui/award-card";
 import { AwardsHeroSection } from "@/components/sections/awards-hero-section";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // ── Dummy data ────────────────────────────────────────────────────────────────
 
+/*
+  There is no /about/awards/[slug] route — each card links out to the awarding
+  body's own page. For now every card points at the same placeholder; swap in
+  the real third-party links when they're available.
+*/
+const AWARD_URL = "https://rotex.ezzystack.com/";
+
 const ALL_AWARDS: AwardCardProps[] = [
   {
     slug: "rail-analysis-innovation-100-2025",
+    url: AWARD_URL,
     year: "2025",
     title: "Rail Analysis Innovation-100 (2025 Edition)",
     description: 'Featured as one of the "100 Innovative Companies in the Rail Sector of India".',
   },
   {
     slug: "2nd-best-display-of-products-award-2025",
+    url: AWARD_URL,
     year: "2025",
     title: "2nd Best Display of Products Award",
     description:
-      "Retex wins the 2nd Prize for Best Product Display at Dahej Industrial Expo 2025 for the second consecutive year.",
+      "Rotex wins the 2nd Prize for Best Product Display at Dahej Industrial Expo 2025 for the second consecutive year.",
   },
   {
     slug: "zed-bronze-certificate-unit-2-2025",
+    url: AWARD_URL,
     year: "2025",
     title: "Bronze Certificate (Unit-II)",
     description: "Quality and compliance recognition for the manufacturing unit.",
   },
   {
     slug: "1st-runner-up-isq-tops-convention-2025",
+    url: AWARD_URL,
     year: "2025",
     title: "1st Runner-Up at ISQ TOPS Convention 2025",
     description:
@@ -36,18 +46,21 @@ const ALL_AWARDS: AwardCardProps[] = [
   },
   {
     slug: "leaders-of-tomorrow-awards-season-11-2024",
+    url: AWARD_URL,
     year: "2024",
     title: "Leaders of Tomorrow Awards (Season 11)",
     description: "Winner in the Automobiles & OEM Category for exceptional contributions to the SME sector.",
   },
   {
     slug: "2nd-best-display-of-products-award-2024",
+    url: AWARD_URL,
     year: "2024",
     title: "2nd Best Display of Products Award",
     description: "Recognition for innovation and quality in showcasing engineering solutions at the Dahej Industrial Expo 2024.",
   },
   {
     slug: "cii-design-excellence-award-2022",
+    url: AWARD_URL,
     year: "2022",
     title: "CII Design Excellence Award 2022",
     description: 'Sub-category winner for "Automobile Accessory Design" under Mobility Design for the Rotex Tyre Inflation System (RTIS).',
@@ -78,21 +91,7 @@ export default function AwardsPage() {
     <div>
       <AwardsHeroSection />
 
-      {/* Breadcrumb */}
-      <div className="container pt-5">
-        <nav className="flex items-center gap-4" aria-label="Breadcrumb">
-          <Link href="/" className="text-stone-500 text-sm font-bold font-montserrat uppercase leading-5 tracking-wide hover:text-stone-700 transition-colors">
-            Home
-          </Link>
-          <span className="text-stone-500 text-sm font-bold font-montserrat uppercase leading-5 tracking-wide">/</span>
-          <Link href="/about" className="text-stone-500 text-sm font-bold font-montserrat uppercase leading-5 tracking-wide hover:text-stone-700 transition-colors">
-            About us
-          </Link>
-          <span className="text-stone-500 text-sm font-bold font-montserrat uppercase leading-5 tracking-wide">/</span>
-          <span className="text-red-600 text-sm font-bold font-montserrat uppercase leading-5 tracking-wide">Awards &amp; Recognition</span>
-        </nav>
-      </div>
-
+      {/* Breadcrumb now lives inside AwardsHeroSection */}
       <div className="container py-12 flex flex-col gap-8">
         {/* Filter bar */}
         <div className="flex justify-end items-center gap-5">
