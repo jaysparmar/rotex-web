@@ -219,9 +219,18 @@
   }
 }
 
-/* Orange → dark brand gradient, clipped to the text. Was a flat #201d1d, which
-   made every heading using it render as plain near-black. */
+/* Section headings — flat near-black despite the legacy "gradient" name.
+   For an actual orange gradient on text use .text-gradient-highlight. */
 @utility text-gradient-orange-dark {
+  color: #201d1d;
+  /* explicit reset — a stale -webkit-text-fill-color would render the text
+     transparent regardless of `color` */
+  -webkit-text-fill-color: currentColor;
+  background: none;
+}
+
+/* Emphasised words inside a dark heading (e.g. the Redefining tagline). */
+@utility text-gradient-highlight {
   background: var(--gradient-bright-to-dark);
   -webkit-background-clip: text;
   background-clip: text;
@@ -372,6 +381,11 @@
     background-clip: text;
   }
   .text-gradient-orange-dark {
+    color: #201d1d;
+    -webkit-text-fill-color: currentColor;
+    background: none;
+  }
+  .text-gradient-highlight {
     background: var(--gradient-bright-to-dark);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

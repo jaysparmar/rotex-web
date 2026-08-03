@@ -123,7 +123,7 @@ export function RedefiningSection({
         <div className="flex lg:hidden flex-col items-start gap-10">
           <h3 className="font-montserrat font-medium text-stone-900 text-2xl leading-8">
             {tagline.prefix} <br />
-            <span className="text-gradient-orange-dark">{tagline.highlight}</span> {tagline.suffix}
+            <span className="text-gradient-highlight">{tagline.highlight}</span> {tagline.suffix}
           </h3>
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-9 w-full max-w-80">
@@ -144,7 +144,7 @@ export function RedefiningSection({
           {/* Left tagline */}
           <h3 className="font-montserrat font-normal text-stone-900 text-3xl lg:text-4xl leading-10 lg:shrink-0">
             {tagline.prefix} <br />
-            <span className="text-gradient-orange-dark">{tagline.highlight}</span> {tagline.suffix}
+            <span className="text-gradient-highlight">{tagline.highlight}</span> {tagline.suffix}
           </h3>
 
           {/* Stats grid */}
