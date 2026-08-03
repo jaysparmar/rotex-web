@@ -182,7 +182,7 @@ export function ContactFormSection() {
 
           <button
             type="submit"
-            className="w-full px-6 py-3.5 bg-orange-600 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-orange-700 transition-colors duration-150"
+            className="w-full px-6 py-3.5 bg-orange-600 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-900 transition-colors duration-150"
           >
             Submit all details
           </button>

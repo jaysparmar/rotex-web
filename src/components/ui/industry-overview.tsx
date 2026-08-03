@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 type IndustryStat = { value: string; suffix?: string; label: string };
 
@@ -45,16 +46,17 @@ export function IndustryOverview({ sectionTitle, overview, stats }: IndustryOver
           </h2>
 
           <div className="flex flex-col gap-1.5">
-            <motion.div
-              initial={false}
-              animate={{ height: expanded ? "auto" : "5.25rem" }}
-              transition={{ duration: 0.45, ease: [0.04, 0.62, 0.23, 0.98] }}
-              className="overflow-hidden"
+            {/* line-clamp, not a fixed height — 5.25rem is 3.5 lines at the
+                mobile 24px leading, so the copy was cut through a line. Clamping
+                by line count stays exact at every leading. */}
+            <p
+              className={cn(
+                "text-neutral-300 text-sm lg:text-[15px] font-normal font-montserrat leading-6 lg:leading-7",
+                !expanded && "line-clamp-3"
+              )}
             >
-              <p className="text-neutral-300 text-sm lg:text-[15px] font-normal font-montserrat leading-6 lg:leading-7">
-                {overview}
-              </p>
-            </motion.div>
+              {overview}
+            </p>
 
             <motion.button
               onClick={() => setExpanded((e) => !e)}
@@ -78,14 +80,14 @@ export function IndustryOverview({ sectionTitle, overview, stats }: IndustryOver
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              className="flex flex-col gap-1.5 lg:gap-4 items-center lg:items-start"
+              className="flex flex-col gap-1.5 lg:gap-4 items-start"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.5, delay: i * 0.15 }}
             >
               <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-              <p className="text-stone-500 text-base font-normal font-montserrat uppercase leading-6 text-center lg:text-left">
+              <p className="text-stone-500 text-base font-normal font-montserrat uppercase leading-6 text-left">
                 {stat.label}
               </p>
             </motion.div>

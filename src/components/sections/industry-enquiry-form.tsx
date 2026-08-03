@@ -1,9 +1,10 @@
 "use client";
 import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { HexIcon } from "@/components/ui/hex-icon";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 
@@ -39,6 +40,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<FormData>({
@@ -69,17 +71,17 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
     <section className="bg-white py-12 lg:py-[120px]">
       <div className="container flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-[163px]">
 
-        {/* Left info panel — desktop only */}
-        <div className="hidden lg:flex w-[487px] shrink-0 flex-col gap-8">
-          <div className="flex flex-col gap-4">
-            <h2 className="text-neutral-950 text-3xl font-medium font-montserrat leading-10">
+        {/* Left info panel — same title, copy and steps at every breakpoint */}
+        <div className="flex lg:w-[487px] shrink-0 flex-col gap-5 lg:gap-8">
+          <div className="flex flex-col gap-3 lg:gap-4">
+            <h2 className="text-gradient-orange-dark text-2xl lg:text-3xl font-medium font-montserrat leading-8 lg:leading-10">
               Find the Right Solution for Your Industry
             </h2>
-            <p className="text-stone-500 text-base font-medium font-montserrat leading-6">
+            <p className="text-stone-500 text-sm lg:text-base font-medium font-montserrat leading-5 lg:leading-6">
               Connect with specialists for product support based on your industry, application, and operating requirements.
             </p>
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 lg:gap-4">
             {[
               "Tell us your industry and application needs.",
               "Submit your enquiry for product guidance.",
@@ -87,19 +89,17 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
               "Receive support from Rotex product specialists.",
               "Fill the form to start your product enquiry.",
             ].map((step) => (
-              <div key={step} className="flex items-start gap-3">
-                <HexIcon size={14} className="mt-1" />
-                <p className="flex-1 text-stone-900 text-base font-medium font-montserrat leading-6">{step}</p>
+              <div key={step} className="flex items-start gap-1 lg:gap-3">
+                {/* 24px box holding a 12px glyph, so the mark tops out with the copy */}
+                <span className="size-6 shrink-0 flex items-start justify-center pt-1.75 lg:pt-1">
+                  <HexIcon size={12} />
+                </span>
+                <p className="flex-1 text-stone-900 text-sm lg:text-base font-medium font-montserrat leading-5 lg:leading-6">
+                  {step}
+                </p>
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Mobile heading */}
-        <div className="lg:hidden">
-          <h2 className="text-amber-500 text-2xl font-medium font-montserrat leading-8">
-            Speak to our Engineer
-          </h2>
         </div>
 
         {/* Form card */}
@@ -112,21 +112,23 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
           </Field>
 
           <Field label="Enquiry Type" error={errors.enquiryType?.message}>
-            <SelectWrapper hasError={!!errors.enquiryType}>
-              <select {...register("enquiryType")} className={selectCls}>
-                <option value="">Enquiry Type</option>
-                {ENQUIRY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-              </select>
-            </SelectWrapper>
+            <FormSelect
+              control={control}
+              name="enquiryType"
+              placeholder="Enquiry Type"
+              options={ENQUIRY_TYPES}
+              hasError={!!errors.enquiryType}
+            />
           </Field>
 
           <Field label="Product" error={errors.product?.message}>
-            <SelectWrapper hasError={!!errors.product}>
-              <select {...register("product")} className={selectCls}>
-                <option value="">Select Product</option>
-                {PRODUCTS.map((p) => <option key={p} value={p}>{p}</option>)}
-              </select>
-            </SelectWrapper>
+            <FormSelect
+              control={control}
+              name="product"
+              placeholder="Select Product"
+              options={PRODUCTS}
+              hasError={!!errors.product}
+            />
           </Field>
 
           {/* Phone — full width on mobile, half on desktop (side by side with Email) */}
@@ -156,12 +158,13 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
           {/* Country + City */}
           <div className="flex flex-col gap-5 lg:flex-row">
             <Field label="Country" error={errors.country?.message} className="flex-1">
-              <SelectWrapper hasError={!!errors.country}>
-                <select {...register("country")} className={selectCls}>
-                  <option value="">Select Country</option>
-                  {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </SelectWrapper>
+              <FormSelect
+                control={control}
+                name="country"
+                placeholder="Select Country"
+                options={COUNTRIES}
+                hasError={!!errors.country}
+              />
             </Field>
 
             <Field label="City" error={errors.city?.message} className="flex-1">
@@ -219,7 +222,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full px-6 py-3.5 bg-stone-900 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 whitespace-nowrap hover:bg-stone-800 transition-colors duration-150 disabled:opacity-60"
+              className="w-full px-6 py-3.5 bg-stone-900 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 whitespace-nowrap hover:bg-primary transition-colors duration-150 disabled:opacity-60"
             >
               {isSubmitting ? "Sending…" : "Send Enquiry"}
             </button>
@@ -237,7 +240,6 @@ const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
 // stone-400 (#a8a29e), not neutral-400 — the theme overrides neutral-400 to a dark #4a5565
 const placeholderCls = "text-sm font-medium font-montserrat leading-5 placeholder:text-stone-400";
-const selectCls = "w-full appearance-none bg-transparent text-sm font-medium font-montserrat leading-5 text-stone-400 outline-none cursor-pointer";
 
 function inputCls(hasError: boolean) {
   return `w-full h-11 px-3 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 outline-none ${hasError ? "outline-red-400" : "outline-gray-200"}`;
@@ -257,14 +259,47 @@ function Field({
   );
 }
 
-function SelectWrapper({ children, hasError }: { children: React.ReactNode; hasError: boolean }) {
+/*
+  The shared custom Select (same component the Awards filter and admin forms use)
+  instead of a native <select>, so the popup is styled consistently. Bridged into
+  react-hook-form with Controller since it isn't a native input.
+*/
+function FormSelect({
+  control,
+  name,
+  placeholder,
+  options,
+  hasError,
+}: {
+  control: Control<FormData>;
+  name: "enquiryType" | "product" | "country";
+  placeholder: string;
+  options: string[];
+  hasError: boolean;
+}) {
   return (
-    <div className={`relative w-full h-11 px-3 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 flex items-center ${hasError ? "outline-red-400" : "outline-gray-200"}`}>
-      {children}
-      <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-        <ChevronDown />
-      </span>
-    </div>
+    <Controller
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v ?? "")}>
+          <SelectTrigger
+            className={`w-full h-11 px-3 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat leading-5 text-stone-900 data-placeholder:text-stone-400 ${
+              hasError ? "outline-red-400" : "outline-gray-200"
+            }`}
+          >
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((o) => (
+              <SelectItem key={o} value={o}>
+                {o}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+    />
   );
 }
 

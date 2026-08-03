@@ -26,30 +26,36 @@ export function NewsUpdatesHeroSection() {
         <SimpleBreadcrumb current="News & Updates" />
 
         <div className="flex flex-col lg:flex-row justify-between items-start gap-10">
-          <h1 className="w-full lg:w-96 text-gradient-orange-dark text-4xl font-normal font-montserrat leading-10 shrink-0">
+          <h1 className="w-full lg:w-96 text-gradient-orange-dark text-2xl lg:text-4xl font-normal font-montserrat leading-8 lg:leading-10 shrink-0">
             News & Updates You Can&apos;t Miss
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Figma mobile: one card per row, 40px apart; two-up from sm */}
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-10 sm:gap-5">
             {highlighted.map((post) => (
               <Link
                 key={post.slug}
                 href={`/news-updates/${post.slug}`}
-                className="group w-80 p-5 rounded-xl outline-1 -outline-offset-1 outline-neutral-200 flex flex-col gap-5"
+                className="group w-full p-5 bg-white rounded-xl outline-1 -outline-offset-1 outline-neutral-200 flex flex-col gap-5"
               >
-                <div className="self-stretch flex justify-between items-start">
-                  <span className="relative w-44 h-24 rounded-lg overflow-hidden shrink-0">
+                {/* Figma: thumbnail beside the arrow — 208×94 mobile, 171×94 desktop */}
+                <div className="self-stretch flex justify-between items-start gap-3">
+                  <span className="relative w-52 lg:w-44 h-24 rounded-lg overflow-hidden shrink-0">
                     <Image src={post.image} alt={post.title} fill className="object-cover" />
                   </span>
-                  <span className="size-8 rounded-full bg-red-600 flex items-center justify-center text-white group-hover:rotate-45 transition-transform duration-300">
+                  {/* brand orange (#ee3e23), not red-600 (#dc2626) which reads too dark */}
+                  <span className="size-10 lg:size-8 shrink-0 rounded-full bg-primary flex items-center justify-center text-white group-hover:rotate-45 transition-transform duration-300">
                     <ArrowUpRight />
                   </span>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-neutral-400 text-sm font-semibold font-montserrat uppercase leading-5">
+                  {/* stone-400 (#a8a29e) — the theme overrides neutral-400 to a dark #4a5565 */}
+                  <span className="text-stone-400 text-sm font-semibold font-montserrat uppercase leading-6 lg:leading-5">
                     {post.date}
                   </span>
-                  <h3 className="text-stone-900 text-lg font-medium font-montserrat leading-6">{post.title}</h3>
+                  <h3 className="text-stone-900 text-base lg:text-lg font-medium font-montserrat leading-6">
+                    {post.title}
+                  </h3>
                 </div>
               </Link>
             ))}

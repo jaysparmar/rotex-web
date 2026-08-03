@@ -73,8 +73,26 @@ function WhyChooseDesktop({ whyChoose }: Omit<Props, "industryName">) {
 
   return (
     <motion.div ref={wrapperRef} style={{ height: wrapperH }} className="relative">
-      <div className="sticky top-24 h-[792px] overflow-hidden">
-        <Image src={industryFaqBg} alt="" fill priority className="object-cover object-center" />
+      {/* bg matches the artwork's right-edge pixel (#11070c) so the fill
+          continues it seamlessly where the image ends on wide viewports */}
+      <div className="sticky top-24 h-[792px] overflow-hidden bg-[#11070c]">
+        {/* Figma places the artwork at 2427×1618, offset left -43 / top -487
+            inside the 1440×792 frame. Expressed as percentages of the frame so
+            the same crop holds at any viewport width:
+              width 2427/1440 = 168.54%   left -43/1440 = -2.99%
+              top  -487/792   = -61.49%   (height auto keeps the 1.5 aspect) */}
+        {/* sizes="170vw" because the artwork renders at 168.54% of the frame —
+            without it Next serves a viewport-width variant and the browser
+            upscales it, which reads as blur. */}
+        <Image
+          src={industryFaqBg}
+          alt=""
+          priority
+          quality={90}
+          sizes="170vw"
+          className="absolute max-w-none pointer-events-none select-none"
+          style={{ width: "168.54%", height: "auto", left: "-2.99%", top: "-61.49%" }}
+        />
         <div className="container relative z-10 h-full flex items-start pt-[120px] gap-16">
           <div className="w-96 shrink-0">
             <h2 className="text-white text-4xl font-medium font-montserrat leading-12">
@@ -108,7 +126,9 @@ function WhyChooseMobile({ whyChoose }: Omit<Props, "industryName">) {
       <div className="relative z-10 container py-12 flex flex-col gap-8">
         <h2 className="text-white text-2xl font-medium font-montserrat leading-8">
           {whyChoose.title}{" "}
-          <span className="text-orange-300">{whyChoose.highlight}</span>
+          {/* same gradient as desktop — was a flat amber, so the highlight
+              changed colour between breakpoints */}
+          <span className="text-gradient-hero">{whyChoose.highlight}</span>
         </h2>
         <div className="flex flex-col gap-4">
           {whyChoose.cards.map((card, i) => (

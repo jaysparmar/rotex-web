@@ -9,14 +9,14 @@ export function SimpleBreadcrumb({ current }: SimpleBreadcrumbProps) {
     <nav className="flex items-center gap-3" aria-label="Breadcrumb">
       <Link
         href="/"
-        className="text-zinc-800 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide hover:text-red-600 transition-colors"
+        className="text-zinc-800 text-sm font-semibold font-montserrat leading-5 hover:text-red-600 transition-colors"
       >
         Home
       </Link>
-      <span className="text-zinc-800 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
+      <span className="text-zinc-800 text-sm font-semibold font-montserrat leading-5">
         /
       </span>
-      <span className="text-red-600 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
+      <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">
         {current}
       </span>
     </nav>

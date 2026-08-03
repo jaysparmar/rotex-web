@@ -75,7 +75,7 @@ export function CareerFormSection() {
   const [fileName, setFileName] = useState<string>();
 
   return (
-    <section className="bg-white py-14 lg:py-20">
+    <section id="form" className="scroll-mt-24 lg:scroll-mt-32 bg-white py-14 lg:py-20">
       <div className="container flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16">
         {/* Left copy */}
         <div className="lg:w-121.75 lg:shrink-0 flex flex-col gap-14">
@@ -183,7 +183,7 @@ export function CareerFormSection() {
           <button
             type="submit"
             disabled
-            className="w-full px-6 py-3.5 bg-orange-600 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3.5 bg-orange-600 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-900 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Submit all details
           </button>

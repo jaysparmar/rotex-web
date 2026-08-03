@@ -59,7 +59,8 @@ export function SupplierBenefitsSection({
   heading = "Become a Supplier",
   description = "Join our supply chain and grow with a partner focused on quality, long-term relationships, and continuous capability development.",
   stats = STATS,
-  cta = { label: "Apply as a Supplier", href: "/join/supplier#form" },
+  // same-document fragment — a full route href makes Next re-run the router
+  cta = { label: "Apply as a Supplier", href: "#form" },
 }: SupplierBenefitsSectionProps) {
   return (
     <section className="bg-white py-14 lg:py-20">
@@ -88,7 +89,10 @@ export function SupplierBenefitsSection({
         </div>
 
         {/* Right: gradient benefits card */}
-        <div className="lg:w-118.25 lg:shrink-0 p-10 bg-radial-[at_-27%_55%] from-amber-500 via-orange-600 via-28% to-black to-87% rounded-xl flex flex-col justify-between gap-10">
+        {/* Figma "Gradient/Orange to Black Radial" — the shared token uses the
+            brand hexes (#ff9a00 → #f03900 → #950000 → #000000); the Tailwind
+            amber-500/orange-600 pair it replaced are off-brand approximations. */}
+        <div className="lg:w-118.25 lg:shrink-0 p-10 bg-gradient-orange-black-radial rounded-xl flex flex-col justify-between gap-10">
           <ul className="flex flex-col gap-4">
             {BENEFITS.map((b) => (
               <li key={b} className="flex items-start gap-3">
@@ -100,7 +104,7 @@ export function SupplierBenefitsSection({
 
           <Link
             href={cta.href}
-            className="inline-flex w-fit items-center justify-center gap-3.5 px-6 py-3.5 rounded-full bg-white text-stone-900 font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-stone-100 transition-colors duration-150"
+            className="inline-flex w-fit items-center justify-center gap-3.5 px-6 py-3.5 rounded-full bg-white text-stone-900 font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-primary hover:text-white transition-colors duration-200"
           >
             {cta.label}
           </Link>

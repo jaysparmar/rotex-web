@@ -35,14 +35,14 @@ export function AboutHeroSection({ title, description, children }: AboutHeroSect
         >
           <Link
             href="/"
-            className="text-white text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide hover:text-zinc-200 transition-colors"
+            className="text-white text-sm font-semibold font-montserrat leading-5 hover:text-zinc-200 transition-colors"
           >
             Home
           </Link>
-          <span className="text-white text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
+          <span className="text-white text-sm font-semibold font-montserrat leading-5">
             /
           </span>
-          <span className="text-red-600 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
+          <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">
             About Us
           </span>
         </nav>

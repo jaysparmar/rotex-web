@@ -35,9 +35,11 @@ export function IndustryTabs({ sectorSlug, subIndustries }: Props) {
   }, [subSlug]);
 
   return (
-    <div className="sticky top-16 lg:top-24 z-20 bg-white shadow-[0px_2px_4px_0px_rgba(31,31,31,0.05)]">
+    <div className="sticky top-20 lg:top-24 z-20 bg-white shadow-[0px_2px_4px_0px_rgba(31,31,31,0.05)]">
       <div className="container">
-        <div className="flex items-end gap-0.5 lg:gap-1 overflow-x-auto no-scrollbar border-b border-stone-200">
+        {/* Mobile: spread across the full width like the Resources tabs.
+            Desktop: left-aligned, scrolling if the sector has many sub-industries. */}
+        <div className="flex items-end justify-between lg:justify-start gap-0.5 lg:gap-1 overflow-x-auto no-scrollbar border-b border-stone-200">
           {subIndustries.map((sub) => {
             const isActive = sub.slug === activeSlug;
             return (
@@ -45,7 +47,7 @@ export function IndustryTabs({ sectorSlug, subIndustries }: Props) {
                 key={sub.slug}
                 href={`/industries/${sectorSlug}/${sub.slug}`}
                 scroll={false}
-                className={`shrink-0 px-2 py-4 lg:px-2.5 lg:py-6 border-b-2 -mb-px text-sm lg:text-lg font-semibold font-montserrat leading-5 whitespace-nowrap transition-colors duration-150 ${
+                className={`shrink-0 p-2.5 lg:px-2.5 lg:py-6 border-b-2 -mb-px text-sm lg:text-lg font-semibold font-montserrat leading-5 lg:leading-6 whitespace-nowrap transition-colors duration-150 ${
                   isActive
                     ? "border-red-600 text-red-600"
                     : "border-transparent text-stone-900 hover:text-red-600"

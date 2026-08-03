@@ -48,13 +48,20 @@ export function CaseStudiesHeroSection() {
                 </span>
               </div>
 
-              <span className="absolute top-5 right-5 size-10 rounded-full bg-red-600 flex items-center justify-center text-white group-hover:rotate-45 transition-transform duration-300">
+              {/* brand orange (#ee3e23) — red-600 (#dc2626) reads too dark */}
+              <span className="absolute top-5 right-5 size-10 rounded-full bg-primary flex items-center justify-center text-white group-hover:rotate-45 transition-transform duration-300">
                 <ArrowUpRight />
               </span>
 
-              <h3 className="relative z-10 text-white text-lg font-medium font-montserrat leading-6">
-                {post.title}
-              </h3>
+              <div className="relative z-10 flex flex-col gap-3">
+                <h3 className="text-white text-lg font-medium font-montserrat leading-6">
+                  {post.title}
+                </h3>
+                <span className="inline-flex items-center gap-2 text-white text-sm font-semibold font-montserrat uppercase leading-5 group-hover:text-primary transition-colors duration-200">
+                  Read case study
+                  <ArrowUpRight />
+                </span>
+              </div>
             </Link>
           ))}
         </div>

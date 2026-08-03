@@ -2,6 +2,8 @@
 import { useMemo, useState } from "react";
 import { ResourceCard } from "@/components/ui/resource-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { ResourcePost } from "@/lib/resources-data";
 
 type ResourcesGridSectionProps = {
@@ -10,40 +12,86 @@ type ResourcesGridSectionProps = {
   basePath: string;
 };
 
-const PAGE_SIZE = 3;
+// 9 per page — Load More appends another 9.
+const PAGE_SIZE = 9;
 const ALL = "All";
 
-function FilterSelect({
-  value,
+/* Mobile: tight auto-width pills so all three fit one row at 375px.
+   Desktop: wider fixed boxes. */
+const TRIGGER_CLS =
+  "shrink-0 w-auto lg:w-48 px-2.5 lg:px-3 py-2 lg:py-0 lg:h-11 flex items-center justify-between gap-1.5 lg:gap-2 bg-stone-100 rounded-md text-stone-900 text-xs lg:text-sm font-medium font-montserrat leading-5 whitespace-nowrap cursor-pointer";
+
+function ChevronDown() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="shrink-0">
+      <path d="M2 4L6 8L10 4" stroke="#1c1917" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* Multi-select filter — an empty selection means "all". */
+function MultiFilter({
+  label,
+  selected,
   onChange,
   options,
-  placeholder,
 }: {
-  value: string;
-  onChange: (v: string) => void;
+  label: string;
+  selected: string[];
+  onChange: (next: string[]) => void;
   options: string[];
-  placeholder: string;
 }) {
+  const summary =
+    selected.length === 0 ? label : selected.length === 1 ? selected[0] : `${selected.length} selected`;
+
+  const toggle = (opt: string, checked: boolean) =>
+    onChange(checked ? [...selected, opt] : selected.filter((o) => o !== opt));
+
   return (
-    <Select value={value} onValueChange={(v) => onChange(v ?? ALL)}>
-      <SelectTrigger className="w-auto h-auto px-3 py-2 bg-stone-100 rounded-md border-0 gap-5 text-stone-900 text-sm font-medium font-montserrat">
-        <SelectValue placeholder={placeholder} />
+    <Popover>
+      <PopoverTrigger className={TRIGGER_CLS}>
+        <span className="truncate">{summary}</span>
+        <ChevronDown />
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-56 p-2 flex flex-col gap-0.5">
+        <label className="flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-stone-100 cursor-pointer">
+          <Checkbox checked={selected.length === 0} onCheckedChange={() => onChange([])} />
+          <span className="text-sm font-medium font-montserrat text-stone-900">{label}</span>
+        </label>
+        {options.map((opt) => (
+          <label
+            key={opt}
+            className="flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-stone-100 cursor-pointer"
+          >
+            <Checkbox
+              checked={selected.includes(opt)}
+              onCheckedChange={(c) => toggle(opt, c === true)}
+            />
+            <span className="text-sm font-medium font-montserrat text-stone-900">{opt}</span>
+          </label>
+        ))}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function SortSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <Select value={value} onValueChange={(v) => onChange((v as string) ?? "Newest")}>
+      <SelectTrigger className={`${TRIGGER_CLS} border-0`}>
+        <SelectValue placeholder="Sort" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={ALL}>{placeholder}</SelectItem>
-        {options.map((opt) => (
-          <SelectItem key={opt} value={opt}>
-            {opt}
-          </SelectItem>
-        ))}
+        <SelectItem value="Newest">Newest</SelectItem>
+        <SelectItem value="Oldest">Oldest</SelectItem>
       </SelectContent>
     </Select>
   );
 }
 
 export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGridSectionProps) {
-  const [product, setProduct] = useState(ALL);
-  const [industry, setIndustry] = useState(ALL);
+  const [product, setProduct] = useState<string[]>([]);
+  const [industry, setIndustry] = useState<string[]>([]);
   const [sort, setSort] = useState<"Newest" | "Oldest">("Newest");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
@@ -51,8 +99,11 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
   const industries = useMemo(() => Array.from(new Set(posts.map((p) => p.industry))), [posts]);
 
   const filteredPosts = useMemo(() => {
+    // An empty selection means "all", so nothing is filtered out.
     let list = posts.filter(
-      (p) => (product === ALL || p.product === product) && (industry === ALL || p.industry === industry)
+      (p) =>
+        (product.length === 0 || product.includes(p.product)) &&
+        (industry.length === 0 || industry.includes(p.industry))
     );
     list = [...list].sort((a, b) => {
       const diff = new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -64,25 +115,36 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
   const visiblePosts = filteredPosts.slice(0, visibleCount);
   const hasMore = visibleCount < filteredPosts.length;
 
-  const resetAndSet = (setter: (v: string) => void) => (v: string) => {
-    setter(v);
-    setVisibleCount(PAGE_SIZE);
-  };
+  const resetAndSet =
+    (setter: (v: string[]) => void) =>
+    (v: string[]) => {
+      setter(v);
+      setVisibleCount(PAGE_SIZE);
+    };
 
   return (
     <section className="py-12 lg:py-16">
       <div className="container flex flex-col gap-6">
-        <h2 className="text-stone-900 text-3xl font-normal font-montserrat leading-10">{heading}</h2>
+        <h2 className="text-stone-900 text-2xl lg:text-3xl font-normal font-montserrat leading-8 lg:leading-10">
+          {heading}
+        </h2>
 
-        <div className="flex justify-end items-center gap-3">
-          <FilterSelect value={product} onChange={resetAndSet(setProduct)} options={products} placeholder="All Product" />
-          <FilterSelect value={industry} onChange={resetAndSet(setIndustry)} options={industries} placeholder="Industry" />
-          <FilterSelect
-            value={sort}
-            onChange={(v) => setSort(v as "Newest" | "Oldest")}
-            options={["Newest", "Oldest"]}
-            placeholder="Sort"
+        {/* nowrap + horizontal scroll keeps the three filters on one line even if
+            a label is long; lg re-enables wrapping and right-alignment */}
+        <div className="flex flex-nowrap lg:flex-wrap justify-start lg:justify-end items-center gap-2 lg:gap-3 overflow-x-auto no-scrollbar lg:overflow-visible">
+          <MultiFilter
+            label="All Products"
+            selected={product}
+            onChange={resetAndSet(setProduct)}
+            options={products}
           />
+          <MultiFilter
+            label="All Industries"
+            selected={industry}
+            onChange={resetAndSet(setIndustry)}
+            options={industries}
+          />
+          <SortSelect value={sort} onChange={(v) => setSort(v as "Newest" | "Oldest")} />
         </div>
 
         {visiblePosts.length > 0 ? (
@@ -98,10 +160,11 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
       </div>
 
       {hasMore && (
-        <div className="w-full h-28 bg-white flex justify-center items-center">
+        <div className="container h-28 bg-white flex justify-center items-center">
+          {/* full-width on mobile per Figma, content-width on desktop */}
           <button
             onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-            className="px-6 py-3.5 bg-white rounded-[47px] shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] outline-[0.5px] -outline-offset-1 outline-red-600 text-red-600 text-sm font-bold font-montserrat uppercase leading-5 hover:bg-red-600 hover:text-white transition-colors duration-150 overflow-hidden"
+            className="w-full lg:w-auto px-6 py-3.5 bg-white rounded-[47px] shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] outline-[0.5px] -outline-offset-1 outline-red-600 text-red-600 text-sm font-bold font-montserrat uppercase leading-5 hover:bg-red-600 hover:text-white transition-colors duration-150 overflow-hidden"
           >
             Load More
           </button>

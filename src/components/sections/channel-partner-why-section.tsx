@@ -43,9 +43,10 @@ export function ChannelPartnerWhySection({
 }: ChannelPartnerWhySectionProps) {
   return (
     <section className="bg-stone-50 py-14 lg:py-20">
+      {/* Figma: heading and cards split the row 50/50, card capped at 522px */}
       <div className="container flex flex-col gap-10 lg:flex-row lg:gap-16">
         {/* Heading — pinned while cards scroll past */}
-        <div className="lg:w-96 lg:shrink-0">
+        <div className="lg:w-1/2 lg:shrink-0">
           <div className="lg:sticky lg:top-32 flex flex-col gap-3">
             <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
               {heading}
@@ -57,7 +58,7 @@ export function ChannelPartnerWhySection({
         </div>
 
         {/* Stacking cards */}
-        <div className="flex-1 flex flex-col gap-8">
+        <div className="flex-1 lg:max-w-130.5 flex flex-col gap-8">
           {cards.map((card, i) => (
             <div
               key={card.title}

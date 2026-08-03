@@ -6,7 +6,7 @@ type AwardsHeroSectionProps = {
 };
 
 const crumbClass =
-  "text-subtext text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide";
+  "text-subtext text-sm font-semibold font-montserrat leading-5";
 
 export function AwardsHeroSection({
   title = "Awards & Recognition",
@@ -25,7 +25,7 @@ export function AwardsHeroSection({
             About Us
           </Link>
           <span className={crumbClass}>/</span>
-          <span className="text-red-600 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
+          <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">
             Awards &amp; Recognition
           </span>
         </nav>

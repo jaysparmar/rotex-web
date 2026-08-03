@@ -93,7 +93,9 @@
 
   /* ── Gradients (exact from style guide) ── */
   --gradient-orange-radial: radial-gradient(circle at 50% 0%, #ff9a00 0%, #f86a00 14%, #f03900 28%, #c31d00 44.5%, #ac0e00 52.75%, #950000 61%, #700000 67.5%, #4b0000 74%, #250000 80.5%, #130000 83.75%, #000000 87%);
-  --gradient-text: radial-gradient(circle at 50% 0%, #f2cc81 6%, #f2ca7d 13%, #f4c671 19%, #f6be5d 26%, #f8b341 32%, #fca51e 39%, #fea00f 41%, #ff9a00 43%, #f86a00 55%, #f03900 67%);
+  /* Linear, not radial: a radial from 50% 0% is symmetric left-to-right, so the
+     text read orange → yellow → orange. Runs orange → yellow once, left to right. */
+  --gradient-text: linear-gradient(to right, #f03900 0%, #f86a00 12%, #ff9a00 26%, #fca51e 40%, #f8b341 54%, #f6be5d 68%, #f4c671 82%, #f2cc81 100%);
   --gradient-mega-cta: radial-gradient(circle at 145% 88%, #f2cc81 6%, #f2ca7d 13%, #f4c671 19%, #f6be5d 26%, #f8b341 32%, #fca51e 39%, #ff9a00 43%, #f86a00 55%, #f03900 67%);
   /* Figma "Gradient/yellow graident" — 8 stops, origin at 111% 64% */
   --gradient-yellow: radial-gradient(circle at 111% 64%, #f2cc81 6%, #f2ca7d 13%, #f4c671 19%, #f6be5d 26%, #f8b341 32%, #fca51e 39%, #ff9a00 43%, #f03900 67%);

@@ -19,7 +19,8 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
       <div className="container flex flex-col gap-10">
         <PostBreadcrumb typeLabel={typeLabel} typeHref={typeHref} title={post.title} />
 
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-end dowgap-14">
+        {/* was `dowgap-14` — a typo Tailwind ignored, so content and sidebar touched */}
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-end gap-10 lg:gap-20">
           <div className="w-full lg:w-157.5 shrink-0 flex flex-col gap-10">
             {/* Header */}
             <div className="flex flex-col gap-4">
@@ -51,7 +52,12 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
 
               {detail.sections.map((section) => (
                 <div key={section.heading} className="flex flex-col gap-5">
-                  <h2 id={section.heading} className="text-zinc-800 text-2xl font-medium font-montserrat leading-8">
+                  {/* scroll-mt clears the fixed navbar, so an anchor jump doesn't
+                      park the heading underneath it */}
+                  <h2
+                    id={section.heading}
+                    className="scroll-mt-24 lg:scroll-mt-32 text-zinc-800 text-2xl font-medium font-montserrat leading-8"
+                  >
                     {section.heading}
                   </h2>
                   <p className="text-stone-500 text-base font-medium font-montserrat leading-6">
@@ -106,9 +112,9 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
               <div className="flex justify-between items-center">
                 <span className="text-zinc-800 text-sm font-medium font-montserrat leading-5">Share:</span>
                 <div className="flex items-center gap-3.5">
-                  <FaFacebookF className="size-4 text-zinc-800" />
-                  <FaXTwitter className="size-4 text-zinc-800" />
                   <FaLinkedinIn className="size-4 text-zinc-800" />
+                  <FaXTwitter className="size-4 text-zinc-800" />
+                  <FaFacebookF className="size-4 text-zinc-800" />
                 </div>
               </div>
             </div>
