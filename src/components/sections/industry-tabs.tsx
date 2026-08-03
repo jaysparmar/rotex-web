@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 type TabItem = { slug: string; name: string };
@@ -11,7 +12,27 @@ type Props = {
 
 export function IndustryTabs({ sectorSlug, subIndustries }: Props) {
   const pathname = usePathname();
-  const activeSlug = pathname.split("/").pop() ?? "";
+
+  // /industries/<sector>/<sub>? — the sub segment is absent on the main sector page.
+  const subSlug = pathname.split("/").filter(Boolean)[2];
+  // With no sub in the URL the first tab still reads as selected, since the
+  // sector page renders that sub-sector's content.
+  const activeSlug = subSlug ?? subIndustries[0]?.slug;
+
+  useEffect(() => {
+    // Arriving at the bare sector page starts at the top of the hero. Next.js
+    // preserves scroll position across the shared (site) layout, so a click from
+    // halfway down the home page would otherwise land mid-page.
+    if (!subSlug) {
+      window.scrollTo({ top: 0, behavior: "auto" });
+      return;
+    }
+    // The URL names a sub-sector — jump to its content instead.
+    document.getElementById("industry-sub-content")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [subSlug]);
 
   return (
     <div className="sticky top-16 lg:top-24 z-20 bg-white shadow-[0px_2px_4px_0px_rgba(31,31,31,0.05)]">
@@ -23,6 +44,7 @@ export function IndustryTabs({ sectorSlug, subIndustries }: Props) {
               <Link
                 key={sub.slug}
                 href={`/industries/${sectorSlug}/${sub.slug}`}
+                scroll={false}
                 className={`shrink-0 px-2 py-4 lg:px-2.5 lg:py-6 border-b-2 -mb-px text-sm lg:text-lg font-semibold font-montserrat leading-5 whitespace-nowrap transition-colors duration-150 ${
                   isActive
                     ? "border-red-600 text-red-600"

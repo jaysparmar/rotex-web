@@ -55,7 +55,8 @@ export function MissionVisionSection({
 
   return (
     <section className="bg-neutral-100 py-14 lg:py-20">
-      <div className="container grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+      {/* Figma: two 522px cards with a 20px gutter = 1064px, centred in the container */}
+      <div className="container mx-auto max-w-266 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-5">
         {cards.map((card, i) => (
           <motion.div
             key={card.title}

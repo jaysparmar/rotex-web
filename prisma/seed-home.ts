@@ -391,7 +391,7 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
       heading: { title: "Resources" },
       tabs: [
         { id: "case-studies", label: "Case Studies", cta: { label: "Read All Case Studies", href: "/case-studies" }, resourceIds: [] as string[] },
-        { id: "news", label: "News & Updates", cta: { label: "View All News", href: "/news-updates" }, resourceIds: [] as string[] },
+        { id: "news", label: "News & Updates", cta: { label: "View All News & Updates", href: "/news-updates" }, resourceIds: [] as string[] },
         { id: "blogs", label: "Blogs", cta: { label: "Read All Blogs", href: "/blogs" }, resourceIds: [] as string[] },
       ],
     },

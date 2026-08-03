@@ -119,7 +119,7 @@ export function TrustedCountriesBanner({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-stone-900 font-montserrat font-medium text-2xl lg:text-3xl leading-8 lg:leading-10 max-w-xl"
+          className="self-start lg:self-auto text-left lg:text-center text-stone-900 font-montserrat font-medium text-2xl lg:text-3xl leading-8 lg:leading-10 max-w-xl"
         >
           {title}
         </motion.h2>

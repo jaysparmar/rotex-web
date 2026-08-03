@@ -135,7 +135,7 @@ function AchievementBadge({ badge }: { badge: Achievement["badge"] }) {
 export function AchievementsSection({
   heading = "What We Achieved So Far",
   achievements = defaultAchievements,
-  cta = { label: "See More of Our Wins", href: "/awards" },
+  cta = { label: "See More of Our Wins", href: "/about/awards" },
 }: AchievementsSectionProps) {
   return (
     <section className="bg-white py-14 lg:py-20">
@@ -169,7 +169,7 @@ export function AchievementsSection({
         <div className="flex justify-center mt-10 lg:mt-14">
           <Link
             href={cta.href}
-            className="inline-flex justify-center items-center gap-3.5 px-6 py-3.5 rounded-full bg-stone-900 text-white font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-stone-800 transition-colors duration-150"
+            className="w-full lg:w-auto inline-flex justify-center items-center gap-3.5 px-6 py-3.5 rounded-[47px] lg:rounded-full bg-stone-900 text-white font-montserrat font-bold lg:font-semibold text-sm uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-primary transition-colors duration-150"
           >
             {cta.label}
           </Link>

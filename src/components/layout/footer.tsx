@@ -8,14 +8,15 @@ import bg from "@/assets/footer_bg.svg";
 // Pages not built yet — render as disabled text instead of a broken link.
 const DISABLED_HREFS = new Set(["/privacy", "/terms"]);
 
+/* Figma "Radial Gradient": origin at 57% 162%, four stops —
+   #FF9A00 → #F03900 (21%) → #950000 → #000000 */
 const FOOTER_GRADIENT = `
   radial-gradient(
-    circle at 57% 150%,
+    circle at 57% 162%,
     #ff9a00 0%,
-    #f03900 18%,
-    #950000 38%,
-    #110101 62%,
-    #000000 85%
+    #f03900 21%,
+    #950000 45%,
+    #000000 100%
   )
 `.trim();
 
@@ -40,8 +41,8 @@ export function Footer({ config }: { config: PrismaJson.GlobalConfigData }) {
 
       <div className="container relative z-10 flex flex-col">
 
-        {/* ── MOBILE ── */}
-        <div className="flex flex-col gap-10 pt-16 pb-10 lg:hidden">
+        {/* ── MOBILE ── Figma: 320px content block, centred in the viewport */}
+        <div className="w-full max-w-80 mx-auto flex flex-col gap-10 pt-16 pb-10 lg:hidden">
 
           {/* Logo + tagline */}
           <div className="flex flex-col gap-2.5">
@@ -128,7 +129,7 @@ export function Footer({ config }: { config: PrismaJson.GlobalConfigData }) {
         {/* Legal */}
         {(footer.legal.copyright || footer.legal.links.length > 0) && (
           <div className="flex flex-col gap-3 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:justify-between">
-            <p className="text-stone-300 text-xs font-medium font-montserrat">{footer.legal.copyright}</p>
+            <p className="text-subtext text-xs font-medium font-montserrat">{footer.legal.copyright}</p>
             {footer.legal.links.length > 0 && (
               <div className="flex items-center gap-4">
                 {footer.legal.links.map((l) =>
@@ -140,7 +141,7 @@ export function Footer({ config }: { config: PrismaJson.GlobalConfigData }) {
                     <Link
                       key={l.href}
                       href={l.href}
-                      className="text-stone-300 text-xs font-medium font-montserrat hover:text-white transition-colors"
+                      className="text-subtext text-xs font-medium font-montserrat hover:text-white transition-colors"
                     >
                       {l.label}
                     </Link>
@@ -166,7 +167,8 @@ function FooterColumn({
 }) {
   if (links.length === 0) return null;
   return (
-    <div className="flex flex-col justify-start items-start gap-5">
+    // Figma: 14px between a column heading and its links on mobile
+    <div className={cn("flex flex-col justify-start items-start", compact ? "gap-3.5" : "gap-5")}>
       <p className="opacity-50 text-white text-base font-medium font-montserrat leading-6">
         {heading}
       </p>
@@ -196,7 +198,7 @@ function SocialIcon({ href, platform }: { href: string; platform: string }) {
       aria-label={platform}
       className="size-7 flex items-center justify-center text-white hover:opacity-70 transition-opacity duration-150"
     >
-      {Icon ? <Icon size={18} /> : <Globe size={18} />}
+      {Icon ? <Icon size={24} /> : <Globe size={24} />}
     </a>
   );
 }

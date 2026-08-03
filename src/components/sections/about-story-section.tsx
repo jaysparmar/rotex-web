@@ -1,5 +1,4 @@
 "use client";
-import { Fragment } from "react";
 import type { StaticImageData } from "next/image";
 import { motion } from "framer-motion";
 import { ImageView } from "@/components/ui/image-view";
@@ -59,10 +58,10 @@ export function AboutStorySection({
   videoSrc = "https://www.w3schools.com/html/mov_bbb.mp4",
 }: AboutStorySectionProps) {
   return (
-    <section className="bg-white py-14 lg:py-20">
+    <section className="bg-white pt-14 lg:pt-20 pb-6 lg:pb-8">
       <div className="container flex flex-col">
 
-        <div className="flex flex-col gap-10 lg:flex-row justify-betweenalso  lg:gap-20">
+        <div className="flex flex-col gap-10 lg:flex-row justify-between  lg:gap-20">
           {/* Text */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -74,35 +73,40 @@ export function AboutStorySection({
             <h2 className="text-stone-900 font-montserrat font-semibold text-sm uppercase leading-5">
               {heading}
             </h2>
-            <p className="text-stone-900 font-montserrat font-medium text-sm lg:text-base leading-6">
+            {/* separate <p>s so the paragraphs get real spacing, not a bare <br /> */}
+            <div className="flex flex-col gap-6">
               {paragraphs.map((p, i) => (
-                <Fragment key={i}>
-                  {i > 0 && <br />}
+                <p key={i} className="text-stone-900 font-montserrat font-medium text-sm lg:text-base leading-5 lg:leading-6">
                   {p}
-                </Fragment>
+                </p>
               ))}
-            </p>
+            </div>
           </motion.div>
 
           {/* Stats grid */}
-          <div className="lg:w-96 lg:shrink-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-x-6 gap-y-8">
-            {stats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="flex flex-col gap-1.5"
-              >
-                <p className="text-red-600 font-montserrat font-medium text-3xl leading-10">
-                  {stat.value}
-                </p>
-                <p className="text-stone-900 font-montserrat font-medium text-sm leading-5">
-                  {stat.label}
-                </p>
-              </motion.div>
-            ))}
+          <div className="lg:w-96 lg:shrink-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-x-4 gap-y-8 lg:gap-x-8 lg:gap-y-5">
+            {stats.map((stat, i) => {
+              // "10M+" → number "10M" in black, "+" in brand orange
+              const [, number, suffix] = stat.value.match(/^(.*?)(\+?)$/) ?? [, stat.value, ""];
+              return (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.08 }}
+                  className="flex flex-col gap-1"
+                >
+                  <p className="text-stone-900 font-montserrat font-medium text-3xl leading-9">
+                    {number}
+                    {suffix && <span className="text-primary">{suffix}</span>}
+                  </p>
+                  <p className="text-stone-500 font-montserrat font-medium text-sm leading-5">
+                    {stat.label}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 

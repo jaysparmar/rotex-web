@@ -22,7 +22,7 @@ function ArrowBtn({
     >
       <RotexArrow
         size={9}
-        color="#EF3E23"
+        color="#EE3E23"
         className={dir === "prev" ? "rotate-180" : undefined}
       />
     </button>
@@ -82,6 +82,11 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
   const prev = () => setIndex(i => (i - 1 + activeSlides.length) % activeSlides.length);
   const next = () => setIndex(i => (i + 1) % activeSlides.length);
 
+  // "Flow Control. Where It Matters Most." → lead sentence renders in the brand
+  // gradient, the remainder drops to its own line on mobile (Figma).
+  const [, titleLead = slide.title, titleRest = ""] =
+    slide.title.match(/^([^.]*\.)\s*(.*)$/) ?? [];
+
   return (
     <section className="relative w-full flex justify-center overflow-hidden bg-stone-900">
       {/* 1440×740 canvas — centers on wide viewports, fills narrow ones */}
@@ -95,27 +100,30 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
           <HexSlider index={index} media={slide.media} title={slide.title} />
         </div>
 
-        {/* Content block — Figma: left 80px, top 404.5px, w 669px, gap-9
+        {/* Content block — Figma: left 80px, top 404.5px, gap-9
             Mobile: relative flow with padding, offset below the fixed h-20 header (80px) + 40px gap;
-            Desktop: absolute positioned */}
-        <div className="relative lg:absolute z-30 flex flex-col gap-6 lg:gap-9 px-6 pt-30 pb-0 lg:px-0 lg:pt-0 lg:left-[80px] lg:top-[404px] lg:w-[669px]">
+            Desktop: absolute positioned, right edge pinned to the hex slider's right edge (94.51%)
+            instead of a fixed width, so the CTA row below can stretch to meet it and push the
+            arrow nav flush right — always on the same line as the buttons. */}
+        <div className="relative lg:absolute z-30 flex flex-col gap-5 lg:gap-9 px-5 pt-26 pb-0 lg:px-0 lg:pt-0 lg:left-[80px] lg:right-[5.49%] lg:top-[404px]">
 
-          <div className="flex flex-col gap-3 lg:gap-5">
-            {/* Figma: text-5xl (48px), weight 400, leading-[58px], letter-spacing -1.3px */}
+          <div className="flex flex-col gap-1 lg:gap-5">
+            {/* Figma — mobile: 24px / leading-8; desktop: 48px / leading-[58px] */}
             <h1
-              className="max-w-[597px] text-white font-normal leading-[58px]"
+              className="max-w-[597px] text-white font-normal leading-8 lg:leading-[58px]"
               style={{
                 fontFamily: "'Montserrat', sans-serif",
-                fontSize: "clamp(30px, 3.33vw, 48px)",
+                fontSize: "clamp(24px, 3.33vw, 48px)",
                 letterSpacing: "-1.3px",
               }}
             >
-              {slide.title}
+              <span className="text-gradient-hero">{titleLead}</span>
+              {titleRest && <span className="block lg:inline lg:ml-2">{titleRest}</span>}
             </h1>
 
-            {/* Figma: text-base (16px), weight 500, leading-6, color zinc-100 */}
+            {/* Figma — mobile: 12px / leading-5 / stone-300; desktop: 16px / leading-6 */}
             <p
-              className="max-w-[547px] text-zinc-100 text-base font-medium leading-6"
+              className="max-w-[547px] text-stone-300 lg:text-subtext text-xs lg:text-base font-medium leading-5 lg:leading-6"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
               {slide.description}
@@ -123,17 +131,20 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
           </div>
 
           {/* Mobile: stacked, content-width buttons */}
-          <div className="flex flex-col items-start gap-4 lg:hidden">
+          <div className="flex flex-col items-start gap-3 lg:hidden">
             {slide.cta_buttons.map((btn) => (
               <HeroOutlineBtn key={`${btn.label}-${btn.href}`} href={btn.href}>{btn.label}</HeroOutlineBtn>
             ))}
           </div>
 
-          {/* Desktop: inline buttons + arrow nav — Figma: gap-5, outline outline-1 outline-offset-[-1px] outline-stone-500 */}
-          <div className="hidden lg:flex flex-wrap items-center gap-5">
-            {slide.cta_buttons.map((btn) => (
-              <HeroOutlineBtn key={`${btn.label}-${btn.href}`} href={btn.href}>{btn.label}</HeroOutlineBtn>
-            ))}
+          {/* Desktop: buttons + arrow nav on one line, nav pushed to the far right —
+              Figma: gap-5, outline outline-1 outline-offset-[-1px] outline-stone-500 */}
+          <div className="hidden lg:flex flex-wrap items-center justify-between gap-5">
+            <div className="flex flex-wrap items-center gap-5">
+              {slide.cta_buttons.map((btn) => (
+                <HeroOutlineBtn key={`${btn.label}-${btn.href}`} href={btn.href}>{btn.label}</HeroOutlineBtn>
+              ))}
+            </div>
 
             <nav aria-label="Banner navigation" className="inline-flex items-center gap-4">
               <ArrowBtn dir="prev" onClick={prev} />

@@ -6,7 +6,7 @@ type RotexArrowProps = {
   color?: string;
 };
 
-export function RotexArrow({ className, size = 9, color = "#EF3E23" }: RotexArrowProps) {
+export function RotexArrow({ className, size = 9, color = "#EE3E23" }: RotexArrowProps) {
   return (
     <svg
       width={size}

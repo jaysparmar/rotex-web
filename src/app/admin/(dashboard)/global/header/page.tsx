@@ -7,12 +7,12 @@ export default async function AdminGlobalHeaderPage() {
   const config = record.data as PrismaJson.GlobalConfigData;
 
   const industries = await prisma.industry.findMany({
-    orderBy: { name: "asc" },
+    orderBy: { createdAt: "asc" },
     select: {
       id: true,
       name: true,
       slug: true,
-      subIndustries: { select: { id: true, name: true }, orderBy: { name: "asc" } },
+      subIndustries: { select: { id: true, name: true }, orderBy: { createdAt: "asc" } },
     },
   });
 

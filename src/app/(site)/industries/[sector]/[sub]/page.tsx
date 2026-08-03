@@ -1,31 +1,6 @@
 import { notFound } from "next/navigation";
 import { getSubIndustryDetail } from "@/lib/industries";
-import { getSelectedPartners } from "@/lib/partners";
-import { getSelectedCustomerStories } from "@/lib/customer-stories";
-import { IndustryHero } from "@/components/sections/industry-hero";
-import { TrustedLeaders } from "@/components/sections/trusted-leaders";
-import { IndustryChallengesSolutions } from "@/components/sections/industry-challenges-solutions";
-// import { IndustryProductsSwiper } from "@/components/sections/industry-products-swiper"; // TODO: re-enable once wired to the real Product catalog
-import { IndustryCustomerStories } from "@/components/sections/industry-customer-stories";
-
-import type { StaticImageData } from "next/image";
-import oilBg        from "@/assets/Images/breadcurmbBackgrounds/oil_bg.jpg";
-import powerBg      from "@/assets/Images/breadcurmbBackgrounds/power_bg.png";
-import automativeBg from "@/assets/Images/breadcurmbBackgrounds/automative_bg.png";
-import railBg       from "@/assets/Images/breadcurmbBackgrounds/rail_bg.jpg";
-import aerospaceBg  from "@/assets/Images/breadcurmbBackgrounds/aerospace_bg.jpg";
-import machineBg    from "@/assets/Images/breadcurmbBackgrounds/machine_bg.jpg";
-import defaultBg    from "@/assets/Images/breadcurmbBackgrounds/default_bg.jpg";
-
-const BG_MAP: Record<string, StaticImageData> = {
-  oil:        oilBg,
-  power:      powerBg,
-  automative: automativeBg,
-  rail:       railBg,
-  aerospace:  aerospaceBg,
-  machine:    machineBg,
-  process:    defaultBg,
-};
+import { SubIndustryContent } from "@/components/sections/sub-industry-content";
 
 type Props = { params: Promise<{ sector: string; sub: string }> };
 
@@ -37,41 +12,5 @@ export default async function IndustrySubPage({ params }: Props) {
   const result = await getSubIndustryDetail(sector, sub);
   if (!result) notFound();
 
-  const { industry, subIndustry } = result;
-  const bg = subIndustry.image ?? (industry.bgKey ? BG_MAP[industry.bgKey] : undefined);
-
-  const partners = await getSelectedPartners(subIndustry.partnerIds as unknown as string[]);
-  const logos = partners.map((p) => ({ id: p.id, src: p.logo, alt: p.name }));
-
-  const stories = await getSelectedCustomerStories(subIndustry.storyIds as unknown as string[]);
-
-  return (
-    <>
-      {bg && (
-        <IndustryHero
-          name={subIndustry.name}
-          description={subIndustry.description}
-          bg={bg}
-        />
-      )}
-
-      {logos.length > 0 && <TrustedLeaders title="Trusted by Industry leaders" logos={logos} />}
-
-      <IndustryChallengesSolutions
-        challengesTitle={subIndustry.challengesTitle}
-        challenges={subIndustry.challenges as unknown as string[]}
-        solutionsTitle={subIndustry.solutionsTitle}
-        solutionsIntro={subIndustry.solutionsIntro}
-        solutions={subIndustry.solutions as unknown as string[]}
-      />
-
-      {/* TODO: re-enable once recommended products are wired to the real Product catalog
-      <div id="recommended-products">
-        <IndustryProductsSwiper products={subIndustry.recommendedProducts as unknown as string[]} />
-      </div>
-      */}
-
-      <IndustryCustomerStories stories={stories} />
-    </>
-  );
+  return <SubIndustryContent industry={result.industry} subIndustry={result.subIndustry} />;
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import Image, { type StaticImageData } from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperClass } from "swiper";
@@ -29,17 +29,17 @@ type GallerySwiperSectionProps = {
 
 export function GallerySwiperSection({ images = defaultImages }: GallerySwiperSectionProps) {
   const swiperRef = useRef<SwiperClass | null>(null);
-  const [isBeginning, setIsBeginning] = useState(true);
-  const [isEnd, setIsEnd] = useState(false);
 
   return (
     <section className="bg-white py-14 lg:py-20">
       <div className="container">
         <div className="relative">
+          {/* No centeredSlides — the first image sits flush with the container's
+              left edge on load; loop keeps it cycling in both directions. */}
           <Swiper
             modules={[Navigation, A11y]}
-            centeredSlides
-            spaceBetween={24}
+            loop
+            spaceBetween={20}
             slidesPerView={1.08}
             breakpoints={{
               768: { slidesPerView: 1.3, spaceBetween: 28 },
@@ -47,12 +47,6 @@ export function GallerySwiperSection({ images = defaultImages }: GallerySwiperSe
             }}
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
-              setIsBeginning(swiper.isBeginning);
-              setIsEnd(swiper.isEnd);
-            }}
-            onSlideChange={(swiper) => {
-              setIsBeginning(swiper.isBeginning);
-              setIsEnd(swiper.isEnd);
             }}
             className="!overflow-visible"
           >
@@ -71,19 +65,18 @@ export function GallerySwiperSection({ images = defaultImages }: GallerySwiperSe
             ))}
           </Swiper>
 
+          {/* Always enabled — looping means there is no first or last slide */}
           <button
             aria-label="Previous photo"
-            disabled={isBeginning}
             onClick={() => swiperRef.current?.slidePrev()}
-            className="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-stone-200 transition-opacity hover:bg-stone-50 disabled:opacity-40 lg:left-6"
+            className="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-stone-200 transition-colors hover:bg-stone-50 lg:left-6"
           >
             <RotexArrow className="rotate-180" size={9} />
           </button>
           <button
             aria-label="Next photo"
-            disabled={isEnd}
             onClick={() => swiperRef.current?.slideNext()}
-            className="absolute right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-stone-200 transition-opacity hover:bg-stone-50 disabled:opacity-40 lg:right-6"
+            className="absolute right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-stone-200 transition-colors hover:bg-stone-50 lg:right-6"
           >
             <RotexArrow size={9} />
           </button>

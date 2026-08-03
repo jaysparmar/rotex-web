@@ -7,7 +7,8 @@ import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { Menu } from "lucide-react";
-import { IoSearchOutline, IoChevronDownOutline } from "react-icons/io5";
+import { IoChevronDownOutline } from "react-icons/io5";
+import { SearchIcon } from "@/components/ui/icons";
 import { useScrolled } from "@/hooks/use-scrolled";
 
 type CategorySwitcherMenu = PrismaJson.CategorySwitcherMenu;
@@ -500,7 +501,7 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
               className="focus:outline-none text-white/80 hover:text-white transition-colors duration-150"
               aria-label="Search"
             >
-              <IoSearchOutline size={22} />
+              <SearchIcon size={22} />
             </button>
             <GradientButton href={config.header.cta.href}>
               {config.header.cta.label}
@@ -514,7 +515,7 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
               className="focus:outline-none text-white/80 hover:text-white transition-colors duration-150"
               aria-label="Search"
             >
-              <IoSearchOutline size={22} />
+              <SearchIcon size={22} />
             </button>
 
             <Sheet>

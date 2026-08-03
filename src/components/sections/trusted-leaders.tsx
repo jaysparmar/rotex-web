@@ -34,12 +34,12 @@ export function TrustedLeaders({
   logos = defaultLogos,
 }: TrustedLeadersProps) {
   return (
-    <section className={primary ? "bg-white border-t border-b border-stone-100 py-10 lg:py-0 lg:h-64" : "bg-white border-t border-b border-stone-100 py-8 lg:py-0 lg:h-36"}>
+    <section className={primary ? "bg-white border-t py-10 lg:py-0 lg:h-64" : "bg-white border-t border-stone-100 py-8 lg:py-0 lg:h-36"}>
       <div className="container h-full flex flex-col items-center gap-5 lg:flex-row lg:gap-8">
 
         {/* Label */}
         {primary ? (
-          <p className="text-gradient-orange-dark self-stretch lg:self-auto text-center lg:text-left text-base lg:text-2xl font-montserrat font-normal leading-6 lg:leading-8 lg:whitespace-nowrap shrink-0">
+          <p className="text-stone-900 self-stretch lg:self-auto text-center lg:text-left text-base lg:text-2xl font-montserrat font-normal leading-6 lg:leading-8 lg:max-w-56 text-balance shrink-0">
             {title}
           </p>
         ) : (

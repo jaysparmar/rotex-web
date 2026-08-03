@@ -99,7 +99,8 @@ async function resolveFooterIndustriesLinks(source: PrismaJson.FooterColumnSourc
   const industries = await prisma.industry.findMany({
     where: { id: { in: source.selectedIds } },
     select: { name: true, slug: true },
-    orderBy: { name: "asc" },
+    // Match the canonical industry order used by the admin list and /api/v1/industries.
+    orderBy: { createdAt: "asc" },
   });
   return industries.map((industry) => ({ label: industry.name, href: `/industries/${industry.slug}` }));
 }

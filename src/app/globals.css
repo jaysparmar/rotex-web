@@ -54,11 +54,14 @@
   --color-brand-200: #ffd1a3;
   --color-brand-300: #ffb875;
   --color-brand-400: #ff9a00;
-  --color-brand-500: #ef3e23;   /* PRIMARY */
+  --color-brand-500: #ee3e23;   /* PRIMARY */
   --color-brand-600: #c31d00;
   --color-brand-700: #950000;
   --color-brand-800: #700000;
   --color-brand-900: #4b0000;
+
+  /* ── Semantic text ── */
+  --color-subtext: #f1f1f1;   /* Figma: Gray/Gray 200 — descriptions & subtitles */
 
   /* ── Neutral / UI Palette ── */
   --color-neutral-50:  #ffffff;
@@ -93,10 +96,12 @@
   --gradient-text: radial-gradient(circle at 50% 0%, #f2cc81 6%, #f2ca7d 13%, #f4c671 19%, #f6be5d 26%, #f8b341 32%, #fca51e 39%, #fea00f 41%, #ff9a00 43%, #f86a00 55%, #f03900 67%);
   --gradient-mega-cta: radial-gradient(circle at 145% 88%, #f2cc81 6%, #f2ca7d 13%, #f4c671 19%, #f6be5d 26%, #f8b341 32%, #fca51e 39%, #ff9a00 43%, #f86a00 55%, #f03900 67%);
   --gradient-decorative: radial-gradient(circle at 50% 50%, #ff9a00 0%, #f03900 20%, #950000 61%, #000000 87%);
+  /* Figma "Gradient/Orange to Black Radial" — origin off the left edge at -27% 55% */
+  --gradient-orange-black-radial: radial-gradient(circle at -27% 55%, #ff9a00 0%, #f03900 28%, #950000 61%, #000000 87%);
   --gradient-dark-overlay: linear-gradient(to bottom, rgba(0,0,0,0) 33.923%, #000000 100%);
-  --gradient-warm-orange: linear-gradient(to bottom right, #ff9a00, #f86a00, #ef3e23);
-  --gradient-deep-orange: linear-gradient(to bottom right, #ef3e23, #c31d00, #950000);
-  --gradient-bright-to-dark: linear-gradient(to bottom right, #ff9a00, #ef3e23, #201d1d);
+  --gradient-warm-orange: linear-gradient(to bottom right, #ff9a00, #f86a00, #ee3e23);
+  --gradient-deep-orange: linear-gradient(to bottom right, #ee3e23, #c31d00, #950000);
+  --gradient-bright-to-dark: linear-gradient(to bottom right, #ff9a00, #ee3e23, #201d1d);
 }
 
 :root {
@@ -106,8 +111,8 @@
   --card-foreground: #201d1d;
   --popover: #ffffff;
   --popover-foreground: #201d1d;
-  /* Primary = brand-500 #ef3e23 */
-  --primary: oklch(0.58 0.21 28);
+  /* Primary = brand-500 #ee3e23 */
+  --primary: #ee3e23;
   --primary-foreground: #ffffff;
   --secondary: #f5f1ef;
   --secondary-foreground: #201d1d;
@@ -118,8 +123,8 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: #f1f1f1;
   --input: #f1f1f1;
-  --ring: oklch(0.58 0.21 28);
-  --chart-1: #ef3e23;
+  --ring: #ee3e23;
+  --chart-1: #ee3e23;
   --chart-2: #ff9a00;
   --chart-3: #c31d00;
   --chart-4: #950000;
@@ -127,12 +132,12 @@
   --radius: 0.625rem;
   --sidebar: #f5f1ef;
   --sidebar-foreground: #201d1d;
-  --sidebar-primary: #ef3e23;
+  --sidebar-primary: #ee3e23;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f1f1f1;
   --sidebar-accent-foreground: #201d1d;
   --sidebar-border: #f1f1f1;
-  --sidebar-ring: oklch(0.58 0.21 28);
+  --sidebar-ring: #ee3e23;
 }
 
 .dark {
@@ -142,7 +147,7 @@
   --card-foreground: #ffffff;
   --popover: #2a2525;
   --popover-foreground: #ffffff;
-  --primary: oklch(0.58 0.21 28);
+  --primary: #ee3e23;
   --primary-foreground: #ffffff;
   --secondary: #2a2525;
   --secondary-foreground: #ffffff;
@@ -153,20 +158,20 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: rgba(255,255,255,0.08);
   --input: rgba(255,255,255,0.10);
-  --ring: oklch(0.58 0.21 28);
-  --chart-1: #ef3e23;
+  --ring: #ee3e23;
+  --chart-1: #ee3e23;
   --chart-2: #ff9a00;
   --chart-3: #c31d00;
   --chart-4: #950000;
   --chart-5: #4b0000;
   --sidebar: #2a2525;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #ef3e23;
+  --sidebar-primary: #ee3e23;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #2a2525;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255,255,255,0.08);
-  --sidebar-ring: oklch(0.58 0.21 28);
+  --sidebar-ring: #ee3e23;
 }
 
 /* ── Site container — content is 1280px, centred (80px auto-margin each side at 1440px) ── */
@@ -213,10 +218,7 @@
 }
 
 @utility text-gradient-orange-dark {
-  background: linear-gradient(to right, #ff9a00 0%, #f03900 40%, #950000 75%, #201d1d 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #201d1d;
 }
 
 /* ── Typography utility classes ── */
@@ -335,6 +337,9 @@
   .bg-gradient-decorative {
     background: var(--gradient-decorative);
   }
+  .bg-gradient-orange-black-radial {
+    background: var(--gradient-orange-black-radial);
+  }
   .bg-gradient-warm-orange {
     background: var(--gradient-warm-orange);
   }
@@ -357,10 +362,7 @@
     background-clip: text;
   }
   .text-gradient-orange-dark {
-    background: linear-gradient(to right, #ff9a00 0%, #f03900 40%, #950000 75%, #201d1d 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #201d1d;
   }
   .text-gradient-orange-radial {
     background: radial-gradient(ellipse at 50% 50%, #ff9a00 0%, #f03900 20%, #950000 61%, #000000 87%);

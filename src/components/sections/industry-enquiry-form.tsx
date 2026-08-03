@@ -43,7 +43,6 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { message: `Enquiry regarding ${industryName} solutions` },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -134,8 +133,8 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
           <div className="flex flex-col gap-5 lg:flex-row">
             <div className="flex-1 flex flex-col gap-2">
               <label className={labelCls}>Phone number</label>
-              <div className={`flex bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 overflow-hidden ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
-                <div className="px-3 py-2.5 border-r border-gray-200 flex items-center gap-2 shrink-0">
+              <div className={`flex h-11 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 overflow-hidden ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
+                <div className="px-3 border-r border-gray-200 flex items-center gap-2 shrink-0">
                   <span className="text-stone-900 text-sm font-medium font-montserrat leading-5">+91</span>
                   <ChevronDown />
                 </div>
@@ -143,7 +142,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
                   {...register("phone")}
                   type="tel"
                   placeholder="Enter phone number"
-                  className="flex-1 px-4 py-2.5 bg-transparent text-sm font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none"
+                  className={`flex-1 px-3 bg-transparent ${placeholderCls} text-stone-900 outline-none`}
                 />
               </div>
               {errors.phone && <p className={errorCls}>{errors.phone.message}</p>}
@@ -185,7 +184,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
               {...register("message")}
               rows={4}
               placeholder="Your Message"
-              className={`w-full px-5 py-2 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
+              className={`w-full px-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 outline-none resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
             />
           </Field>
 
@@ -201,7 +200,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-full px-5 py-2.5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 flex items-center justify-center gap-2 text-red-600 text-xs font-semibold font-montserrat uppercase leading-5 hover:bg-gray-100 transition-colors"
+              className="w-full h-11 px-5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 flex items-center justify-center gap-2 text-red-600 text-xs font-semibold font-montserrat uppercase leading-5 hover:bg-gray-100 transition-colors"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 4l3-3 3 3M1 10v1.5A1.5 1.5 0 002.5 13h9A1.5 1.5 0 0013 11.5V10" stroke="#dc2626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               {fileName ?? "Upload File"}
@@ -220,7 +219,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full lg:w-40 px-6 py-3.5 bg-stone-900 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-800 transition-colors duration-150 disabled:opacity-60"
+              className="w-full px-6 py-3.5 bg-stone-900 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 whitespace-nowrap hover:bg-stone-800 transition-colors duration-150 disabled:opacity-60"
             >
               {isSubmitting ? "Sending…" : "Send Enquiry"}
             </button>
@@ -236,10 +235,12 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
 
 const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
-const selectCls = "w-full appearance-none bg-transparent text-sm font-medium font-montserrat text-neutral-400 outline-none cursor-pointer";
+// stone-400 (#a8a29e), not neutral-400 — the theme overrides neutral-400 to a dark #4a5565
+const placeholderCls = "text-sm font-medium font-montserrat leading-5 placeholder:text-stone-400";
+const selectCls = "w-full appearance-none bg-transparent text-sm font-medium font-montserrat leading-5 text-stone-400 outline-none cursor-pointer";
 
 function inputCls(hasError: boolean) {
-  return `w-full px-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none ${hasError ? "outline-red-400" : "outline-gray-200"}`;
+  return `w-full h-11 px-3 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 outline-none ${hasError ? "outline-red-400" : "outline-gray-200"}`;
 }
 
 function Field({
@@ -258,7 +259,7 @@ function Field({
 
 function SelectWrapper({ children, hasError }: { children: React.ReactNode; hasError: boolean }) {
   return (
-    <div className={`relative w-full px-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 flex items-center ${hasError ? "outline-red-400" : "outline-gray-200"}`}>
+    <div className={`relative w-full h-11 px-3 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 flex items-center ${hasError ? "outline-red-400" : "outline-gray-200"}`}>
       {children}
       <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
         <ChevronDown />

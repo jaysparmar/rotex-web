@@ -16,7 +16,7 @@ export function CareerHeroSection({
       <div className="container relative">
         {/* Breadcrumb */}
         <nav className="relative z-10 flex items-center gap-2 mb-10 lg:mb-16" aria-label="Breadcrumb">
-          <Link href="/" className="text-zinc-100 text-sm font-medium font-montserrat hover:text-white transition-colors">
+          <Link href="/" className="text-subtext text-sm font-medium font-montserrat hover:text-white transition-colors">
             Home
           </Link>
           <span className="text-zinc-500 text-sm font-medium font-montserrat">/</span>

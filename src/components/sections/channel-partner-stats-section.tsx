@@ -49,7 +49,7 @@ function StatValue({ value }: { value: string }) {
   return (
     <span ref={ref}>
       <motion.span>{rounded}</motion.span>
-      {suffix && <span className="text-red-600">{suffix}</span>}
+      {suffix && <span className="text-primary">{suffix}</span>}
     </span>
   );
 }

@@ -48,20 +48,21 @@ export function GrowWithRotexSection({
                 fillRule="evenodd"
                 clipRule="evenodd"
                 d="M-38.3602 19.3555L-160.902 230.304C-167.699 242.288 -167.699 257.026 -160.902 268.69L-38.3602 479.97C-31.2657 491.64 -18.6216 499 -5.02585 499L240.038 499C254.233 499 266.581 491.634 273.36 479.97L395.902 268.69C402.699 257.026 402.699 242.282 395.902 230.304L273.36 19.3555C266.575 7.37824 254.233 0 240.038 0L-5.02585 0C-18.6154 0 -31.2595 7.37824 -38.3602 19.3555Z"
-                fill="#EF3E23"
+                fill="#EE3E23"
               />
             </svg>
-            <div className="relative flex flex-col gap-4">
-              <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
+            <div className="relative flex flex-col gap-2.5 lg:gap-4">
+              <h2 className="text-stone-900 font-montserrat font-semibold lg:font-medium text-xl lg:text-4xl leading-7 lg:leading-10">
                 {title}
               </h2>
-              <p className="text-stone-500 font-montserrat font-medium text-sm lg:text-base leading-6 max-w-96">
+              <p className="text-stone-500 font-montserrat font-medium text-sm lg:text-base leading-5 lg:leading-6 max-w-96">
                 {description}
               </p>
             </div>
+            {/* Figma mobile: full-width h-12 pill */}
             <Link
               href={cta.href}
-              className="relative inline-flex w-fit items-center justify-center gap-3.5 rounded-full bg-orange-600 px-6 py-3.5 text-white font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-orange-700 transition-colors duration-200"
+              className="relative inline-flex w-full lg:w-fit h-12 lg:h-auto items-center justify-center gap-3.5 rounded-[100px] bg-orange-600 px-6 lg:py-3.5 text-white font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-orange-700 transition-colors duration-200"
             >
               {cta.label}
             </Link>

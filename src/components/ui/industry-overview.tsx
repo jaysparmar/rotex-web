@@ -18,9 +18,9 @@ function AnimatedCounter({ value, suffix }: { value: string; suffix?: string }) 
   }, [isInView, count, numeric]);
 
   return (
-    <span ref={ref} className="text-black text-4xl lg:text-6xl font-normal font-montserrat leading-tight lg:leading-14.25">
+    <span ref={ref} className="text-stone-900 text-3xl font-normal font-montserrat leading-10">
       <motion.span>{rounded}</motion.span>
-      {suffix && <span className="text-red-600">{suffix}</span>}
+      {suffix && <span className="text-primary">{suffix}</span>}
     </span>
   );
 }
@@ -35,30 +35,30 @@ export function IndustryOverview({ sectionTitle, overview, stats }: IndustryOver
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <section className="border-b border-stone-200">
+    <section>
       <div className="container py-10 lg:py-14 flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-16">
 
         {/* Title + body + read more */}
         <div className="flex-1 flex flex-col gap-4">
-          <h2 className="text-stone-900 text-2xl lg:text-4xl font-normal font-montserrat leading-8 lg:leading-10">
+          <h2 className="text-neutral-500 text-xl lg:text-3xl font-normal font-montserrat leading-8 lg:leading-11">
             {sectionTitle}
           </h2>
 
           <div className="flex flex-col gap-1.5">
             <motion.div
               initial={false}
-              animate={{ height: expanded ? "auto" : "4.5rem" }}
+              animate={{ height: expanded ? "auto" : "5.25rem" }}
               transition={{ duration: 0.45, ease: [0.04, 0.62, 0.23, 0.98] }}
               className="overflow-hidden"
             >
-              <p className="text-zinc-800 text-sm lg:text-base font-medium font-montserrat leading-5 lg:leading-6">
+              <p className="text-neutral-300 text-sm lg:text-[15px] font-normal font-montserrat leading-6 lg:leading-7">
                 {overview}
               </p>
             </motion.div>
 
             <motion.button
               onClick={() => setExpanded((e) => !e)}
-              className="text-left text-neutral-400 text-sm lg:text-lg font-medium font-montserrat leading-5 lg:leading-6 hover:text-neutral-600 transition-colors duration-150"
+              className="text-left text-stone-400 text-sm lg:text-base font-normal font-montserrat leading-5 lg:leading-6 hover:text-stone-600 transition-colors duration-150"
               whileTap={{ scale: 0.97 }}
             >
               <motion.span
@@ -85,7 +85,7 @@ export function IndustryOverview({ sectionTitle, overview, stats }: IndustryOver
               transition={{ duration: 0.5, delay: i * 0.15 }}
             >
               <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-              <p className="text-zinc-900 text-xs lg:text-sm font-medium font-montserrat uppercase leading-4 lg:leading-5 text-center lg:text-left">
+              <p className="text-stone-500 text-base font-normal font-montserrat uppercase leading-6 text-center lg:text-left">
                 {stat.label}
               </p>
             </motion.div>

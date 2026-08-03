@@ -29,7 +29,12 @@ export function ArticleCard({ image, title, href, className }: ArticleCardProps)
     <Link
       href={href}
       className={cn(
-        "group flex flex-col rounded-[20px] overflow-hidden bg-stone-100 outline-1 -outline-offset-1 outline-stone-200",
+        // Mobile has no hover, so it rests in the Figma "active" look: stone-100
+        // fill, orange bottom stroke, dark arrow. Desktop rests plain and
+        // transitions into that look on hover.
+        "group flex flex-col rounded-xl lg:rounded-[20px] overflow-hidden bg-stone-100 lg:bg-white outline-1 -outline-offset-1 outline-stone-200",
+        "border-b-[2.62px] border-orange-600 lg:border-b-4 lg:border-transparent transition-colors duration-200",
+        "lg:hover:bg-stone-100 lg:hover:border-orange-600",
         className
       )}
     >
@@ -42,14 +47,14 @@ export function ArticleCard({ image, title, href, className }: ArticleCardProps)
           containerClassName="w-full h-full"
           className="object-cover"
         />
-        <div className="absolute top-4 right-4 size-10 rounded-full bg-white flex items-center justify-center text-stone-800 shadow-sm group-hover:bg-red-600 group-hover:text-white transition-colors duration-200">
+        <div className="absolute top-4 right-4 size-10 rounded-full bg-stone-900 text-white lg:bg-white lg:text-stone-800 flex items-center justify-center shadow-sm lg:group-hover:bg-stone-900 lg:group-hover:text-white transition-colors duration-200">
           <ArrowUpRight />
         </div>
       </div>
 
-      {/* Title below image */}
-      <div className="px-6 pt-4 pb-6">
-        <h3 className="text-stone-900 font-montserrat font-medium text-base leading-6">
+      {/* Title below image — Figma mobile: 14px / leading-5 */}
+      <div className="px-4 pt-3.5 pb-4 lg:px-6 lg:pt-4 lg:pb-6">
+        <h3 className="text-stone-900 font-montserrat font-medium text-sm lg:text-base leading-5 lg:leading-6">
           {title}
         </h3>
       </div>

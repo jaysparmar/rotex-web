@@ -1,7 +1,7 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useMotionValue, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValue, useScroll, useTransform } from "framer-motion";
 import { HexIcon } from "@/components/ui/hex-icon";
 import industryFaqBg from "@/assets/Images/industry/industry-faq-bg.jpg";
 
@@ -16,50 +16,28 @@ type Props = {
   };
 };
 
-// ── Shared accordion card ─────────────────────────────────────────────────────
+// ── Shared card — title and description are always visible, no toggle ─────────
 
-function AccordionCard({
+function WhyChooseCardItem({
   card,
-  isOpen,
-  onToggle,
   titleClass = "text-xl leading-7",
 }: {
   card: WhyChooseCard;
-  isOpen: boolean;
-  onToggle: () => void;
   titleClass?: string;
 }) {
   return (
-    <div className="w-full bg-white rounded-lg overflow-hidden">
-      <button
-        onClick={onToggle}
-        className="w-full p-5 flex items-start justify-between gap-4 text-left"
-        aria-expanded={isOpen}
-      >
-        <span className={`text-stone-900 font-medium font-montserrat ${titleClass}`}>
+    <div className="relative w-full bg-white rounded-lg p-5 overflow-hidden">
+      <div className="flex flex-col gap-5 pr-8">
+        <h3 className={`text-stone-900 font-medium font-montserrat ${titleClass}`}>
           {card.title}
-        </span>
-        {/* Hex rotates 90° when open */}
-        <div className={`mt-1 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`}>
-          <HexIcon size={14} />
-        </div>
-      </button>
-
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="overflow-hidden"
-          >
-            <p className="px-5 pb-5 text-stone-500 text-sm font-medium font-montserrat leading-5">
-              {card.description}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </h3>
+        <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">
+          {card.description}
+        </p>
+      </div>
+      <div className="absolute top-3 right-3">
+        <HexIcon size={14} />
+      </div>
     </div>
   );
 }
@@ -67,10 +45,6 @@ function AccordionCard({
 // ── Desktop: sticky scroll version ───────────────────────────────────────────
 
 function WhyChooseDesktop({ whyChoose }: Omit<Props, "industryName">) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  const toggle = (i: number) => setOpenIndex((prev) => (prev === i ? null : i));
-
   const wrapperRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const scrollDist = useMotionValue(300);
@@ -103,9 +77,9 @@ function WhyChooseDesktop({ whyChoose }: Omit<Props, "industryName">) {
         <Image src={industryFaqBg} alt="" fill priority className="object-cover object-center" />
         <div className="container relative z-10 h-full flex items-start pt-[120px] gap-16">
           <div className="w-96 shrink-0">
-            <h2 className="text-white text-4xl font-medium font-montserrat leading-10">
+            <h2 className="text-white text-4xl font-medium font-montserrat leading-12">
               {whyChoose.title}{" "}
-              <span className="text-gradient-orange-dark">{whyChoose.highlight}</span>
+              <span className="text-gradient-hero">{whyChoose.highlight}</span>
             </h2>
           </div>
 
@@ -113,12 +87,7 @@ function WhyChooseDesktop({ whyChoose }: Omit<Props, "industryName">) {
             <div className="h-[552px] overflow-hidden">
               <motion.div ref={cardsRef} style={{ y }} className="flex flex-col gap-3">
                 {whyChoose.cards.map((card, i) => (
-                  <AccordionCard
-                    key={i}
-                    card={card}
-                    isOpen={openIndex === i}
-                    onToggle={() => toggle(i)}
-                  />
+                  <WhyChooseCardItem key={i} card={card} />
                 ))}
               </motion.div>
             </div>
@@ -133,10 +102,6 @@ function WhyChooseDesktop({ whyChoose }: Omit<Props, "industryName">) {
 // ── Mobile: simple stacked version ───────────────────────────────────────────
 
 function WhyChooseMobile({ whyChoose }: Omit<Props, "industryName">) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  const toggle = (i: number) => setOpenIndex((prev) => (prev === i ? null : i));
-
   return (
     <div className="relative overflow-hidden">
       <Image src={industryFaqBg} alt="" fill priority className="object-cover object-center" />
@@ -147,13 +112,7 @@ function WhyChooseMobile({ whyChoose }: Omit<Props, "industryName">) {
         </h2>
         <div className="flex flex-col gap-4">
           {whyChoose.cards.map((card, i) => (
-            <AccordionCard
-              key={i}
-              card={card}
-              isOpen={openIndex === i}
-              onToggle={() => toggle(i)}
-              titleClass="text-base leading-6"
-            />
+            <WhyChooseCardItem key={i} card={card} titleClass="text-base leading-6" />
           ))}
         </div>
       </div>

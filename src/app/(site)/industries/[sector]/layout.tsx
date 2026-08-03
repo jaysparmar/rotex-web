@@ -53,13 +53,22 @@ export default async function IndustrySectorLayout({ children, params }: Props) 
         stats={industry.stats as unknown as { value: string; suffix?: string; label: string }[]}
       />
 
-      <IndustryTabs
-        sectorSlug={sector}
-        subIndustries={industry.subIndustries}
-      />
+      {/* This wrapper is the sticky tab bar's containing block: the bar stays
+          pinned while sub-sector content scrolls under it, then scrolls away
+          with this div once the Why Choose section below is reached. */}
+      <div>
+        <IndustryTabs
+          sectorSlug={sector}
+          subIndustries={industry.subIndustries}
+        />
 
-      {/* Changes on sub-sector navigation */}
-      {children}
+        {/* Changes on sub-sector navigation — scroll target for tab clicks and for
+            landing directly on a /[sub] URL. scroll-mt clears the fixed navbar
+            plus the sticky tab bar. */}
+        <div id="industry-sub-content" className="scroll-mt-30 lg:scroll-mt-44">
+          {children}
+        </div>
+      </div>
 
       {/* Fixed — sector-level, stays below all sub-sector content */}
       <WhyChooseSection

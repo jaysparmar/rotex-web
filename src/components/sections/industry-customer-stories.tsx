@@ -16,7 +16,7 @@ export function IndustryCustomerStories({ stories }: Props) {
   if (!stories.length) return null;
 
   return (
-    <section className="bg-white py-8 lg:py-10 border-t border-stone-100">
+    <section className="bg-white pt-10 lg:pt-16 pb-14 lg:pb-24 border-t border-stone-100">
       <div className="container flex flex-col gap-8 lg:gap-10">
         <div className="flex items-center justify-between">
           <h3 className="text-stone-900 text-xl lg:text-2xl font-medium font-montserrat leading-7 lg:leading-8">

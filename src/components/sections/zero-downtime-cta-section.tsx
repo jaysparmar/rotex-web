@@ -1,9 +1,11 @@
-import Link from "next/link";
+import { PillButton } from "@/components/ui/pill-button";
 
 type ZeroDowntimeCtaSectionProps = {
   title?: string;
   description?: string;
 };
+
+const CTA_SHADOW = "shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)]";
 
 export function ZeroDowntimeCtaSection({
   title = "Ready to engineer Zero Downtime into your plant?",
@@ -11,28 +13,35 @@ export function ZeroDowntimeCtaSection({
 }: ZeroDowntimeCtaSectionProps) {
   return (
     <section className="py-16 lg:py-20">
-      <div className="container">
-        <div className="relative rounded-2xl overflow-hidden bg-linear-to-br from-red-600 via-red-900 to-neutral-950 py-12 px-6 lg:py-14 lg:px-10">
-          <h2 className="text-white font-montserrat font-semibold text-2xl lg:text-[32px] leading-tight mb-4 max-w-2xl">
-            {title}
-          </h2>
-          <p className="text-white/80 font-montserrat text-sm lg:text-[15px] leading-6 mb-8 max-w-2xl">
-            {description}
-          </p>
+      {/* Figma: 1064px card, 56px padding, 30px radius, orange→black radial */}
+      <div className="container mx-auto max-w-266">
+        <div className="rounded-[30px] overflow-hidden bg-gradient-orange-black-radial p-8 lg:p-14 flex flex-col gap-8 lg:gap-10">
+          <div className="flex flex-col gap-3">
+            <h2 className="text-white font-montserrat font-medium text-2xl lg:text-3xl leading-8 lg:leading-10">
+              {title}
+            </h2>
+            <p className="text-subtext font-montserrat font-medium text-sm lg:text-base leading-6 lg:max-w-176.5">
+              {description}
+            </p>
+          </div>
 
-          <div className="flex flex-wrap gap-4">
-            <Link
+          <div className="flex flex-wrap items-center gap-4 lg:gap-5">
+            <PillButton
               href="/contact"
-              className="inline-flex justify-center items-center gap-3.5 px-6 py-3.5 rounded-full bg-white text-red-600 font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-stone-100 transition-colors duration-200"
+              tone="lightOrange"
+              size="md"
+              className={`font-bold ${CTA_SHADOW}`}
             >
               Book Free Consultation
-            </Link>
-            <Link
+            </PillButton>
+            <PillButton
               href="/downloads"
-              className="inline-flex justify-center items-center gap-3.5 px-6 py-3.5 rounded-full ring-1 ring-inset ring-white text-white font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-white/10 transition-colors duration-200"
+              tone="dark"
+              size="md"
+              className={`font-bold outline-1 -outline-offset-1 outline-primary ${CTA_SHADOW}`}
             >
               Download N2W Framework
-            </Link>
+            </PillButton>
           </div>
         </div>
       </div>

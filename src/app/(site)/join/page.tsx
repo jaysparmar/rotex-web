@@ -27,11 +27,11 @@ export default function JoinPage() {
           <nav className="flex items-center gap-3" aria-label="Breadcrumb">
             <Link
               href="/"
-              className="text-neutral-200 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide hover:text-white transition-colors"
+              className="text-subtext text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide hover:text-white transition-colors"
             >
               Home
             </Link>
-            <span className="text-neutral-200 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">/</span>
+            <span className="text-subtext text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">/</span>
             <span className="text-red-600 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">Join Rotex</span>
           </nav>
 

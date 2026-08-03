@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus } from "lucide-react";
 import { ImageView } from "@/components/ui/image-view";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
 import { cn } from "@/lib/utils";
@@ -16,46 +15,45 @@ type Industry = {
 };
 
 type IndustriesSectionProps = {
-  heading?: { title: string; subtitle: string };
-  industries?: Industry[];
+  heading: { title: string; subtitle: string };
+  industries: Industry[];
 };
 
-const defaultHeading = {
-  title: "Built Around Your Industry",
-  subtitle:
-    "Tailored solutions designed to meet the operational demands of your sector — ensuring precision, reliability, and long-term performance.",
-};
+/* Figma: 24×24, 1.5px round-capped strokes in #201D1D — minus when open, plus when closed */
+function ToggleIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      className="shrink-0"
+      aria-hidden="true"
+    >
+      <path d="M20 12H4" stroke="#201D1D" strokeWidth="1.5" strokeLinecap="round" />
+      {!open && <path d="M12 4V20" stroke="#201D1D" strokeWidth="1.5" strokeLinecap="round" />}
+    </svg>
+  );
+}
 
-const defaultIndustries: Industry[] = [
-  {
-    id: "oil-gas",
-    slug: "oil-gas",
-    name: "Oil and Gas",
-    description:
-      "The Hidden Reason 73% of Oil & Gas Plants Shutdowns Are Actually Preventable (And Why Most Plants Still Don't Know This)",
-    image: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200&q=80",
-  },
-];
-
-export function IndustriesSection({
-  heading = defaultHeading,
-  industries = defaultIndustries,
-}: IndustriesSectionProps) {
+export function IndustriesSection({ heading, industries }: IndustriesSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const active = industries[activeIndex] ?? industries[0];
-
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
+  if (!heading || !industries?.length) return null;
+
+  const active = industries[activeIndex] ?? industries[0];
+
   return (
-    <section className="bg-zinc-100 py-16 lg:py-28">
+    <section className="bg-zinc-100 py-14 lg:py-28">
       <div className="container   ">
 
-        {/* Heading + subtext */}
-        <div className="flex flex-col gap-2 mb-8 lg:hidden">
-          <h2 className="text-gradient-orange-dark font-montserrat font-normal leading-10 text-3xl">
+        {/* Heading + subtext — Figma mobile: black, font-medium, 24px/leading-8 */}
+        <div className="flex flex-col gap-3 mb-11 lg:hidden">
+          <h2 className="text-stone-900 font-montserrat font-medium leading-8 text-2xl">
             {heading.title}
           </h2>
-          <p className="text-zinc-500 text-sm font-medium font-montserrat leading-6">
+          <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">
             {heading.subtitle}
           </p>
         </div>
@@ -68,19 +66,10 @@ export function IndustriesSection({
               <div key={industry.id} className="border-b border-stone-300">
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className={cn(
-                    "w-full flex items-center justify-between gap-3 py-4 text-left font-montserrat font-medium text-base leading-8 transition-colors duration-150",
-                    isOpen ? "text-primary" : "text-stone-900"
-                  )}
+                  className="w-full flex items-center justify-between gap-3 py-5 text-left text-stone-900 font-montserrat font-medium text-xl leading-8"
                 >
                   {industry.name}
-                  <Plus
-                    size={18}
-                    className={cn(
-                      "shrink-0 transition-transform duration-200",
-                      isOpen ? "rotate-45 text-primary" : "text-stone-500"
-                    )}
-                  />
+                  <ToggleIcon open={isOpen} />
                 </button>
 
                 <AnimatePresence initial={false}>
@@ -92,34 +81,29 @@ export function IndustriesSection({
                       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="relative rounded-2xl overflow-hidden aspect-4/3 mb-4">
-                        <ImageView
-                          fill
-                          src={industry.image}
-                          alt={industry.name}
-                          containerClassName="w-full h-full"
-                          className="object-cover"
-                        />
-                        <div className="absolute inset-0 bg-linear-to-b from-black/0 to-black pointer-events-none" />
-
-                        <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-4 z-10">
-                          <div>
-                            <h3 className="text-zinc-100 font-montserrat font-medium text-xl uppercase leading-8 mb-2">
-                              {industry.name}
-                            </h3>
-                            <p className="text-zinc-100 text-sm font-medium font-montserrat leading-6">
-                              {industry.description}
-                            </p>
-                          </div>
-
-                          <Link
-                            href={`/industries/${industry.slug}`}
-                            className="w-full flex items-center justify-center gap-2.5 px-5 py-3 rounded-[45px] bg-white text-orange-600 font-montserrat font-medium text-base leading-7 hover:bg-primary hover:text-white transition-colors duration-150"
-                          >
-                            Explore
-                            <RotexArrow size={8} color="currentColor" />
-                          </Link>
+                      {/* Figma: image, then the copy in black, then the button — stacked */}
+                      <div className="pb-5 flex flex-col gap-4">
+                        <div className="relative rounded-xl overflow-hidden aspect-334/224">
+                          <ImageView
+                            fill
+                            src={industry.image}
+                            alt={industry.name}
+                            containerClassName="w-full h-full"
+                            className="object-cover"
+                          />
                         </div>
+
+                        <p className="text-stone-900 text-sm font-medium font-montserrat leading-5">
+                          {industry.description}
+                        </p>
+
+                        <Link
+                          href={`/industries/${industry.slug}`}
+                          className="w-full flex items-center justify-center gap-2.5 px-5 py-3 rounded-[45px] bg-white text-primary font-montserrat font-medium text-base leading-7 hover:bg-primary hover:text-white transition-colors duration-150"
+                        >
+                          Explore
+                          <RotexArrow size={8} color="currentColor" />
+                        </Link>
                       </div>
                     </motion.div>
                   )}
@@ -153,7 +137,7 @@ export function IndustriesSection({
                     "shrink-0 text-left py-0.5 px-4 border-l-2 font-montserrat font-medium text-xl leading-8 transition-all duration-150 whitespace-normal",
                     i === activeIndex
                       ? "border-primary text-primary"
-                      : "border-stone-300 text-stone-900 hover:text-primary hover:border-primary"
+                      : "border-transparent text-stone-900 hover:text-primary hover:border-primary"
                   )}
                 >
                   {industry.name}
@@ -194,6 +178,7 @@ export function IndustriesSection({
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active.id + "-text"}
+                  className="flex-1 min-w-0"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
@@ -202,7 +187,7 @@ export function IndustriesSection({
                   <h3 className="text-zinc-100 font-montserrat font-medium text-2xl lg:text-3xl uppercase leading-10 mb-2">
                     {active.name}
                   </h3>
-                  <p className="text-zinc-100 text-sm lg:text-base font-medium font-montserrat leading-6 max-w-sm">
+                  <p className="text-subtext text-sm lg:text-base font-medium font-montserrat leading-6 max-w-2xl">
                     {active.description}
                   </p>
                 </motion.div>

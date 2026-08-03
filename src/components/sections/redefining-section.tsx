@@ -119,19 +119,20 @@ export function RedefiningSection({
         </div>
 
         {/* Bottom: tagline + stats — mobile */}
-        <div className="flex lg:hidden flex-col items-center gap-10">
-          <h3 className="text-center font-montserrat font-normal text-stone-900 text-2xl leading-8">
+        {/* Figma mobile: everything left-aligned, tagline font-medium, numbers leading-8 */}
+        <div className="flex lg:hidden flex-col items-start gap-10">
+          <h3 className="font-montserrat font-medium text-stone-900 text-2xl leading-8">
             {tagline.prefix} <br />
             <span className="text-gradient-orange-dark">{tagline.highlight}</span> {tagline.suffix}
           </h3>
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-9 w-full max-w-80">
             {visibleStats.map(({ id, value, suffix, label, format_comma }, i) => (
-              <div key={id ?? `${label}-${i}`} className="flex flex-col items-center gap-1.5">
-                <p className="text-stone-900 text-center font-montserrat font-medium text-2xl leading-10">
-                  <Counter raw={value} suffix={suffix} comma={format_comma} suffixClassName="text-red-600" />
+              <div key={id ?? `${label}-${i}`} className="flex flex-col items-start gap-1.5">
+                <p className="text-stone-900 font-montserrat font-medium text-2xl leading-8">
+                  <Counter raw={value} suffix={suffix} comma={format_comma} suffixClassName="text-primary" />
                 </p>
-                <p className="text-stone-500 text-center font-montserrat font-medium text-sm leading-5">{label}</p>
+                <p className="text-stone-500 font-montserrat font-medium text-sm leading-5">{label}</p>
               </div>
             ))}
           </div>
@@ -152,8 +153,8 @@ export function RedefiningSection({
               <div key={rowIndex} className="grid grid-cols-3 gap-6">
                 {row.map(({ id, value, suffix, label, format_comma }, i) => (
                   <div key={id ?? `${label}-${i}`} className="flex flex-col gap-1.5">
-                    <p className="text-red-600 font-montserrat font-medium text-2xl lg:text-3xl leading-10">
-                      <Counter raw={value} suffix={suffix} comma={format_comma} />
+                    <p className="text-stone-900 font-montserrat font-medium text-2xl lg:text-3xl leading-10">
+                      <Counter raw={value} suffix={suffix} comma={format_comma} suffixClassName="text-primary" />
                     </p>
                     <p className="text-stone-900 font-montserrat font-medium text-xs lg:text-sm leading-5">{label}</p>
                   </div>

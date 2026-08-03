@@ -22,9 +22,13 @@ type TrustedWorldMapProps = {
 
 function TrustedWorldMap({ rotateLng = -55, rotateLat = -18 }: TrustedWorldMapProps) {
   return (
+    // Square viewBox with radius 380 centred at 400,400 — the globe spans 20..780
+    // on both axes, so nothing is clipped at the left, right or top edge.
     <ComposableMap
       projection="geoOrthographic"
-      projectionConfig={{ scale: 480, rotate: [rotateLng, rotateLat, 0] }}
+      width={800}
+      height={800}
+      projectionConfig={{ scale: 380, rotate: [rotateLng, rotateLat, 0] }}
       className="w-full h-full"
     >
       <Sphere id="globe-sphere" fill="#F5F5F6" stroke="none" strokeWidth={0} />
@@ -49,10 +53,10 @@ function TrustedWorldMap({ rotateLng = -55, rotateLat = -18 }: TrustedWorldMapPr
 
       {pins.map((pin) => (
         <Marker key={pin.name} coordinates={pin.coordinates}>
-          <circle r={5} fill="#EF3E23" stroke="#fff" strokeWidth={1.5} />
-          <foreignObject x={-70} y={-30} width={140} height={20} className="pointer-events-none overflow-visible">
+          <circle r={5} fill="#EE3E23" stroke="#fff" strokeWidth={1.5} />
+          <foreignObject x={-100} y={-34} width={200} height={26} className="pointer-events-none overflow-visible">
             <div className="flex justify-center">
-              <span className="whitespace-nowrap rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold font-montserrat text-red-600">
+              <span className="whitespace-nowrap rounded bg-white/90 px-2 py-0.5 text-sm font-semibold font-montserrat text-red-600">
                 {pin.name}
               </span>
             </div>

@@ -6,7 +6,7 @@ type HexIconProps = {
   className?: string;
 };
 
-export function HexIcon({ size = 14, color = "#EF3E23", className }: HexIconProps) {
+export function HexIcon({ size = 14, color = "#EE3E23", className }: HexIconProps) {
   return (
     <svg
       width={size}

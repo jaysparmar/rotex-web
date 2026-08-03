@@ -118,6 +118,9 @@ export function JourneyTimelineSection({
   const trackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  // Mirrors activeIndex so the autoplay timer can read it without re-subscribing.
+  const activeRef = useRef(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -140,6 +143,7 @@ export function JourneyTimelineSection({
             closest = i;
           }
         });
+        activeRef.current = closest;
         setActiveIndex(closest);
       });
     };
@@ -169,6 +173,17 @@ export function JourneyTimelineSection({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Autoplay — advances one milestone at a time and wraps, paused while the
+  // visitor is hovering or touching the track.
+  useEffect(() => {
+    if (paused || milestones.length < 2) return;
+    const id = setInterval(() => {
+      scrollToIndex((activeRef.current + 1) % milestones.length);
+    }, 3500);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paused, milestones.length]);
+
   const scroll = (dir: "left" | "right") => {
     const next = dir === "right"
       ? Math.min(activeIndex + 1, milestones.length - 1)
@@ -177,12 +192,14 @@ export function JourneyTimelineSection({
   };
 
   return (
-    <section className="bg-neutral-100 py-14 lg:py-20 overflow-hidden">
+    // zinc-100 (#f4f4f5), not neutral-100 — the theme overrides neutral-100 to a near-white #f9fafb
+    <section className="bg-zinc-100 py-14 lg:py-20 overflow-hidden">
       <div className="container mb-10 lg:mb-14 flex items-center justify-between gap-4">
         <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-3xl leading-8 lg:leading-10">
           {heading}
         </h2>
-        <div className="flex items-center gap-3.5 lg:gap-5 shrink-0">
+        {/* Arrows are mobile-only — desktop relies on autoplay + drag scroll */}
+        <div className="flex lg:hidden items-center gap-3.5 shrink-0">
           <button
             onClick={() => scroll("left")}
             aria-label="Previous"
@@ -205,9 +222,14 @@ export function JourneyTimelineSection({
         ref={trackRef}
         className="no-scrollbar overflow-x-auto scroll-smooth snap-x snap-mandatory"
         style={{ scrollbarWidth: "none", paddingInline: "max(1.25rem, calc(50% - 160px))" }}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={() => setPaused(true)}
+        onTouchEnd={() => setPaused(false)}
       >
         <div className="relative inline-flex gap-10">
-          {/* Timeline rule — sits at the dot row, scrolls together with the cards */}
+          {/* Timeline rule — runs through the dot row; each dot is z-10 with a
+              background-coloured ring so it reads as sitting on the line. */}
           <div className="absolute inset-x-0 top-27.75 h-px bg-neutral-200" aria-hidden="true" />
 
           {milestones.map((m, i) => {
@@ -220,9 +242,9 @@ export function JourneyTimelineSection({
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.04 }}
-                className="w-80 shrink-0 snap-center flex flex-col gap-5"
+                className="w-64 lg:w-80 shrink-0 snap-center flex flex-col items-center text-center gap-5"
               >
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col items-center gap-1.5 w-full">
                   <p
                     className={cn(
                       "font-montserrat font-semibold text-base leading-6 transition-colors duration-200",
@@ -242,7 +264,7 @@ export function JourneyTimelineSection({
                 </div>
                 <div
                   className={cn(
-                    "relative z-10 size-2.5 rounded-full transition-colors duration-200",
+                    "relative z-10 size-2.5 rounded-full ring-4 ring-zinc-100 transition-colors duration-200",
                     isActive ? "bg-red-600" : "bg-neutral-200"
                   )}
                 />

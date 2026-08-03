@@ -58,7 +58,7 @@ export function AboutValuesSection({
 
   return (
     <section className="bg-white py-14 lg:py-20">
-      <div className="container flex flex-col gap-10 lg:flex-row lg:gap-16">
+      <div className="container flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16">
 
         {/* Heading */}
         <div className="lg:w-96 lg:shrink-0">
@@ -66,14 +66,14 @@ export function AboutValuesSection({
             <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
               {heading}
             </h2>
-            <p className="mt-3 text-stone-900 font-montserrat font-medium text-sm lg:text-base leading-6">
+            <p className="mt-2 lg:mt-3 text-stone-500 lg:text-stone-900 font-montserrat font-medium text-sm lg:text-base leading-5 lg:leading-6">
               {subheading}
             </p>
           </div>
         </div>
 
-        {/* Values accordion — one item open at a time */}
-        <div className="flex-1 flex flex-col">
+        {/* Values accordion — one item open at a time. Figma: 630px wide */}
+        <div className="flex-1 lg:max-w-157.5 flex flex-col">
           {values.map((v, i) => {
             const isOpen = openIndex === i;
             return (
@@ -88,14 +88,14 @@ export function AboutValuesSection({
                 <button
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? -1 : i)}
-                  className="w-full py-5 flex items-center justify-between gap-4 text-left"
+                  className="w-full py-3 lg:py-5 flex items-center justify-between gap-4 text-left"
                   aria-expanded={isOpen}
                 >
                   <span className="flex items-center gap-3">
                     <HexIcon size={14} />
                     <span
                       className={cn(
-                        "font-montserrat font-medium text-lg lg:text-xl leading-6 lg:leading-7",
+                        "font-montserrat font-medium text-base lg:text-lg leading-6",
                         isOpen ? "text-red-600" : "text-stone-900"
                       )}
                     >
@@ -114,7 +114,7 @@ export function AboutValuesSection({
                       transition={{ duration: 0.25, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
-                      <p className="pb-5 pl-7 text-stone-500 font-montserrat font-medium text-sm lg:text-base leading-6">
+                      <p className="pb-5 text-stone-500 font-montserrat font-medium text-sm leading-5">
                         {v.description}
                       </p>
                     </motion.div>

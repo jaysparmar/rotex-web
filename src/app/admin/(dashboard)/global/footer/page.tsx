@@ -7,7 +7,7 @@ export default async function AdminGlobalFooterPage() {
   const config = record.data as PrismaJson.GlobalConfigData;
 
   const industries = await prisma.industry.findMany({
-    orderBy: { name: "asc" },
+    orderBy: { createdAt: "asc" },
     select: { id: true, name: true },
   });
 
