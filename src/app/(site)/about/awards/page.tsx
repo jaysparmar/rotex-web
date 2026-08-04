@@ -20,6 +20,7 @@ const ALL_AWARDS: AwardCardProps[] = [
     year: "2025",
     title: "Rail Analysis Innovation-100 (2025 Edition)",
     description: 'Featured as one of the "100 Innovative Companies in the Rail Sector of India".',
+    image: "/media/awards/1.jpg",
   },
   {
     slug: "2nd-best-display-of-products-award-2025",
@@ -28,6 +29,7 @@ const ALL_AWARDS: AwardCardProps[] = [
     title: "2nd Best Display of Products Award",
     description:
       "Rotex wins the 2nd Prize for Best Product Display at Dahej Industrial Expo 2025 for the second consecutive year.",
+    image: "/media/awards/2.jpg",
   },
   {
     slug: "zed-bronze-certificate-unit-2-2025",
@@ -35,6 +37,7 @@ const ALL_AWARDS: AwardCardProps[] = [
     year: "2025",
     title: "Bronze Certificate (Unit-II)",
     description: "Quality and compliance recognition for the manufacturing unit.",
+    image: "/media/awards/3.jpg",
   },
   {
     slug: "1st-runner-up-isq-tops-convention-2025",
@@ -43,6 +46,7 @@ const ALL_AWARDS: AwardCardProps[] = [
     title: "1st Runner-Up at ISQ TOPS Convention 2025",
     description:
       '1st Runner-Up at the National-Level Indian Society for Quality (ISQ) Competition for the "Aarambh" Case Study.',
+    image: "/media/awards/4.jpg",
   },
   {
     slug: "leaders-of-tomorrow-awards-season-11-2024",
@@ -50,6 +54,7 @@ const ALL_AWARDS: AwardCardProps[] = [
     year: "2024",
     title: "Leaders of Tomorrow Awards (Season 11)",
     description: "Winner in the Automobiles & OEM Category for exceptional contributions to the SME sector.",
+    image: "/media/awards/5.jpg",
   },
   {
     slug: "2nd-best-display-of-products-award-2024",
@@ -57,6 +62,7 @@ const ALL_AWARDS: AwardCardProps[] = [
     year: "2024",
     title: "2nd Best Display of Products Award",
     description: "Recognition for innovation and quality in showcasing engineering solutions at the Dahej Industrial Expo 2024.",
+    image: "/media/awards/6.jpg",
   },
   {
     slug: "cii-design-excellence-award-2022",
@@ -64,6 +70,7 @@ const ALL_AWARDS: AwardCardProps[] = [
     year: "2022",
     title: "CII Design Excellence Award 2022",
     description: 'Sub-category winner for "Automobile Accessory Design" under Mobility Design for the Rotex Tyre Inflation System (RTIS).',
+    image: "/media/awards/7.jpg",
   },
 ];
 

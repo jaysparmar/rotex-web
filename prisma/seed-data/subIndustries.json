@@ -1,0 +1,796 @@
+[
+  {
+    "id": "cmrkzybji00055scdz22qdpxb",
+    "slug": "upstream",
+    "name": "Upstream",
+    "description": "Upstream oil & gas operations take place in some of the harshest and most safety-critical environments, from onshore wellheads and gathering systems to offshore platforms and remote production facilities. Reliable process automation is essential to keep production running and operators safe.",
+    "image": "/uploads/1785827797338-f0ilfb.png",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8"
+    ],
+    "challengesTitle": "Process Challenges in Upstream Operation",
+    "solutionsTitle": "Rotex Solutions for Upstream Applications",
+    "solutionsIntro": "Rotex offers reliable process automation engineered for the harshest and most safety-critical operating environments, delivering:",
+    "challenges": [
+      "Reliable performance in extreme temperatures, pressures, and hazardous atmospheres",
+      "Accurate process control under variable well conditions",
+      "Safe and dependable emergency shutdown (ESD) performance across remote and offshore locations",
+      "Compliance with strict environmental and safety standards"
+    ],
+    "solutions": [
+      "Rugged construction for harsh upstream environments",
+      "Fast, reliable response for ESD and process safety duty",
+      "Accurate, repeatable control across production and gathering systems",
+      "Safety-certified components with complete documentation",
+      "Engineering expertise built on decades of upstream experience"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Angle Seat Valve",
+      "Actuators",
+      "Positioners",
+      "Automotive Solutions"
+    ],
+    "industryId": "cmrkzyavj00005scdwm5lcbcx",
+    "createdAt": "2026-07-14T18:40:44.526Z"
+  },
+  {
+    "id": "cmrkzyc33000a5scdrnn7dtv9",
+    "slug": "midstream",
+    "name": "Midstream",
+    "description": "Midstream oil & gas operations move and store hydrocarbons across vast networks from pipelines and pumping stations to storage terminals and LNG facilities. Reliable process automation is essential to maintain safe, continuous, and efficient transportation. ",
+    "image": "/uploads/1785827835886-txcado.png",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_004",
+      "partner_003",
+      "partner_005",
+      "partner_006",
+      "partner_007",
+      "partner_008"
+    ],
+    "storyIds": [
+      "cmrkzybo400065scd75j2fwdg",
+      "cmrkzybrq00075scdceaah5gp",
+      "cmrkzybvz00085scdd0s3cduj",
+      "cmrkzyc0i00095scdk5663now"
+    ],
+    "challengesTitle": "Process Challenges in Midstream Operation",
+    "solutionsTitle": "Rotex Solutions for Midstream Applications",
+    "solutionsIntro": "From pipelines to tank farms, Rotex automation is engineered to keep midstream operations moving safely and reliably with",
+    "challenges": [
+      "Reliable operation across long, remote, and often unmanned pipeline networks",
+      "Safe handling of high-pressure transmission and emergency shutdown",
+      "Accurate flow, pressure, and level control across transfer operations",
+      "Protection against leaks, overpressure, and environmental risk",
+      "Compliance with stringent pipeline and storage safety standards"
+    ],
+    "solutions": [
+      "Rugged components designed for remote and unmanned operation",
+      "Fast, fail-safe response for ESD and pipeline protection",
+      "Accurate control for flow regulation, pressure management, and tank farm operations",
+      "Safety-certified and weather-resistant construction",
+      "Proven reliability across pipelines, terminals, and storage facilities"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators",
+      "Positioners",
+      "Angle Seat Valve"
+    ],
+    "industryId": "cmrkzyavj00005scdwm5lcbcx",
+    "createdAt": "2026-07-14T18:40:45.231Z"
+  },
+  {
+    "id": "cmrkzyche000f5scd6obtqngr",
+    "slug": "downstream",
+    "name": "Downstream",
+    "description": "Downstream oil & gas operations transform crude into refined products through complex, high-throughput processes, from refining and petrochemicals to product blending and distribution. Reliable process automation is essential to maintain product quality, plant safety, and operational efficiency. ",
+    "image": "/uploads/1785827860291-zhmb6n.png",
+    "partnerIds": [
+      "partner_001",
+      "partner_003",
+      "partner_002",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007",
+      "partner_008"
+    ],
+    "storyIds": [
+      "cmrkzyc5r000b5scdkppy9ytm",
+      "cmrkzyc84000c5scdpubiemr0",
+      "cmrkzycb6000d5scd4pmqhof0",
+      "cmrkzycdr000e5scd7l78hzlm"
+    ],
+    "challengesTitle": "Process Challenges in Downstream Operation",
+    "solutionsTitle": "Rotex Solutions for Downstream Applications",
+    "solutionsIntro": "Inside the refinery and across petrochemical operations, Rotex automation is built for the precision, throughput, and safety downstream demands offering:",
+    "challenges": [
+      "Precise control across high-temperature, high-pressure refining processes",
+      "Reliable performance with corrosive and hazardous media",
+      "Continuous operation through long, demanding production cycles",
+      "Tight environmental and emissions compliance",
+      "Safe shutdown and start-up of critical process units"
+    ],
+    "solutions": [
+      "Robust construction for high-temperature, high-pressure service",
+      "Accurate, repeatable control for refining and petrochemical processes",
+      "Reliable response for emergency shutdown and process safety duty",
+      "Materials and certifications suited to aggressive and hazardous media",
+      "Long-term reliability backed by complete documentation and engineering support"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Angle Seat Valve",
+      "Actuators",
+      "Positioners",
+      "Automotive Solutions"
+    ],
+    "industryId": "cmrkzyavj00005scdwm5lcbcx",
+    "createdAt": "2026-07-14T18:40:45.746Z"
+  },
+  {
+    "id": "cmrkzyd14000l5scd6ut42q6k",
+    "slug": "thermal",
+    "name": "Thermal Power",
+    "description": "Thermal power stations require uninterrupted steam and fuel control across boilers, turbines, and condensers operating at extreme temperatures and pressures.",
+    "image": "/uploads/1785830005572-h1f6ck.png",
+    "partnerIds": [],
+    "storyIds": [
+      "cmrkzycou000h5scdpei1927u",
+      "cmrkzycr7000i5scd09noozge",
+      "cmrkzycu8000j5scdgwftit7b",
+      "cmrkzycyg000k5scdlsmegbn4"
+    ],
+    "challengesTitle": "Process Challenges in  Thermal Power Industry",
+    "solutionsTitle": "Rotex Solutions for  Thermal Power Industry",
+    "solutionsIntro": "Rotex automation is built for the temperatures, pressures, and continuous duty thermal power generation demands delivering: ",
+    "challenges": [
+      "Reliable operation in high-temperature, high-pressure steam systems",
+      "Heavy-duty actuation for large boiler, turbine, and isolation valves",
+      "Continuous service across long, uninterrupted generation cycles",
+      "Accurate control of fuel, air, and feedwater flow",
+      "Stringent compliance with emissions and safety regulations"
+    ],
+    "solutions": [
+      "Heavy-duty actuators sized for large boiler and turbine valves",
+      "High-temperature, high-pressure construction for steam service",
+      "Accurate control for combustion, draft, and feedwater regulation",
+      "Fast, reliable response for ESD and turbine trip duty",
+      "Long-life designs that minimize maintenance and outage time"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators",
+      "Positioners"
+    ],
+    "industryId": "cmrkzyclw000g5scdtompk27g",
+    "createdAt": "2026-07-14T18:40:46.456Z"
+  },
+  {
+    "id": "cd5556dfa7396400a876b068b",
+    "slug": "fertilizer",
+    "name": "Fertilizer",
+    "description": "Fertilizer manufacturing operates under highly demanding process conditions involving high-pressure reactions, corrosive chemicals, and continuous production cycles. From ammonia and urea synthesis to downstream processing and storage, automation systems must support safety, process stability, and uninterrupted plant performance.",
+    "image": "/uploads/1785828081887-q6obgd.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007",
+      "partner_008"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg",
+      "cmrkzybrq00075scdceaah5gp",
+      "cmrkzybvz00085scdd0s3cduj"
+    ],
+    "challengesTitle": "Process Challenges in Fertilizer Industry",
+    "solutionsTitle": "Rotex Solutions for Fertilizer Industry",
+    "solutionsIntro": "From ammonia plants to urea production units, Rotex automation delivers the reliability and control fertilizer operations demand with:",
+    "challenges": [
+      "Reliable operation under high-pressure and high-temperature process conditions",
+      "Resistance to corrosive chemicals and aggressive  process media",
+      "Precise control for ammonia, urea, and other fertilizer production processes",
+      "Continuous performance across long production cycles with minimal downtime",
+      "Rapid response during abnormal conditions and emergency shutdown scenarios",
+      "Compliance with strict safety and environmental regulations"
+    ],
+    "solutions": [
+      "Corrosion-resistant solenoid valves for aggressive chemical environments",
+      "Robust actuators designed for demanding process applications",
+      "Precision positioners for accurate and stable flow control",
+      "Emergency High Flow systems for immediate response during shutdown scenarios",
+      "Reliable performance that supports plant safety, consistency, and efficiency"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Angle Seat Valve",
+      "Actuators"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "cdff73d7582d545f081a3de93",
+    "slug": "chemicals",
+    "name": "Chemicals",
+    "description": "Chemical manufacturing handles aggressive media, complex reactions, and zero tolerance for failure - from bulk and commodity chemicals to specialty and fine chemical production. Reliable process automation is essential to maintain safety, product quality, and continuous operation across every batch and continuous process. ",
+    "image": "/uploads/1785828055407-vcp4yy.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_004",
+      "partner_003",
+      "partner_005",
+      "partner_006",
+      "partner_007",
+      "partner_008"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg"
+    ],
+    "challengesTitle": "Process Challenges in Chemicals Industry",
+    "solutionsTitle": "Rotex Solutions for Chemicals Industry",
+    "solutionsIntro": "Rotex automation is engineered for the rigors of chemical processing, providing: ",
+    "challenges": [
+      "Reliable operation with corrosive, toxic, and abrasive media",
+      "Safe, precise control at high temperatures and pressures",
+      "Hazardous area compliance across plant systems",
+      "Consistent batch quality across reactor and distillation operations",
+      "Leak prevention and stringent emissions compliance"
+    ],
+    "solutions": [
+      "Robust construction with materials suited to  aggressive media",
+      "Safety-certified design for hazardous areas and critical loops",
+      "Accurate, repeatable control across reactors, columns, and storage",
+      "Fast, reliable response for emergency shutdown duty",
+      "Complete documentation supporting plant certification and audits"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators",
+      "Positioners"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c80d7f47e18cd48a9985a2183",
+    "slug": "cement",
+    "name": "Cement",
+    "description": "Cement manufacturing runs on continuous, large-scale operations - from raw material handling and clinker production to grinding and packaging. Equipment must withstand abrasive dust, high temperatures, and round-the-clock duty, where downtime at any stage cascades through the entire plant. ",
+    "image": "/uploads/1785828036867-ziujo8.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007",
+      "partner_008",
+      "partner_009"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8"
+    ],
+    "challengesTitle": "Process Challenges in Cement Industry",
+    "solutionsTitle": "Rotex Solutions for Cement Industry",
+    "solutionsIntro": "Rotex automation is built for the scale and severity of cement plant operations, providing:",
+    "challenges": [
+      "Reliable operation in abrasive, dust-heavy environments",
+      "Heavy-duty actuation for large dampers, gates, and isolation valves",
+      "Continuous service across kiln, raw mill, and cement mill systems",
+      "Accurate control for fuel firing and process gas regulation",
+      "Long service life with minimal maintenance in harsh conditions"
+    ],
+    "solutions": [
+      "Heavy-duty actuators sized for large dampers and process valves",
+      "Rugged construction for abrasive and high-temperature environments",
+      "Reliable performance across raw mill, kiln, and cement mill stages",
+      "Accurate control for combustion, gas flow, and process regulation",
+      "Long-life designs that reduce maintenance and downtime"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c83fd82602b9f42b98887c78f",
+    "slug": "food-beverages",
+    "name": "Food & Beverages",
+    "description": "Food and beverage manufacturing combines hygienic process requirements with high-throughput, multi-product operations from dairy and brewing to bakery, confectionery, and beverage filling. Process automation must support food safety, batch consistency, and frequent changeovers without  slowing production. ",
+    "image": "/uploads/1785828141923-77bc47.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007",
+      "partner_009",
+      "partner_008"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg"
+    ],
+    "challengesTitle": "Process Challenges in Food & Beverage Industry",
+    "solutionsTitle": "Rotex Solutions for Food & Beverage Industry",
+    "solutionsIntro": "From dairy plants to beverage lines, Rotex automation delivers the hygiene and reliability food and beverage production demands with: ",
+    "challenges": [
+      "Hygienic design suitable for food-contact and clean utility lines",
+      "Reliable performance through repeated cleaning and sterilization (CIP/SIP) cycles",
+      "Fast, accurate control for filling, dosing, and  product changeover",
+      "Batch consistency across multiple product lines and recipes",
+      "Compliance with food safety regulations and audit requirements"
+    ],
+    "solutions": [
+      "Hygienic-design components for food-grade and clean utility service",
+      "Fast, high-cycle actuation for filling, blending,  and changeover",
+      "Accurate, repeatable control for consistent batch quality",
+      "Robust performance through frequent CIP/SIP cycles",
+      "Complete documentation supporting food safety compliance"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Angle Seat Valve"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c59857d170e5844879b51069b",
+    "slug": "paper-pulp",
+    "name": "Paper & Pulp",
+    "description": "Paper and pulp mills are among the most demanding process environments  - combining high temperatures, corrosive chemicals, large valves, and 24/7 operation across pulping, bleaching, and paper-making stages. Reliable process automation is essential to maintain throughput, quality, and equipment life. ",
+    "image": "/uploads/1785828200652-0q2ij1.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg",
+      "cmrkzybrq00075scdceaah5gp"
+    ],
+    "challengesTitle": "Process Challenges in Paper & Pulp Industry",
+    "solutionsTitle": "Rotex Solutions for Paper & Pulp Industry",
+    "solutionsIntro": "Rotex automation is engineered for the scale and severity of paper and pulp operations, providing: ",
+    "challenges": [
+      "Reliable operation in wet, corrosive, and high-temperature environments",
+      "Heavy-duty actuation for large process and recovery valves",
+      "Continuous service across pulping, bleaching, and paper machine systems",
+      "Accurate control for stock flow, dilution, and  chemical dosing",
+      "Long service life under aggressive media exposure",
+      "Continuous exposure to moisture and steam can impact equipment durability and operational reliability",
+      "Pulp processing involves fibrous media and slurry applications that require dependable valve operation"
+    ],
+    "solutions": [
+      "Heavy-duty products built for large valves and continuous service",
+      "Corrosion-resistant materials suited to bleach and  chemical exposure",
+      "Accurate, repeatable control for stock and chemical  flow regulation",
+      "Reliable performance across pulping, bleaching, and recovery loops",
+      "Long-life designs that minimize maintenance in harsh conditions",
+      "Reliable automation for humid and high-moisture environments"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators",
+      "Angle Seat Valve"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c6521b2b00a1448269ade2301",
+    "slug": "pharmaceuticals",
+    "name": "Pharmaceuticals",
+    "description": "Pharmaceutical manufacturing operates in one of the most controlled and quality-critical environments in the world. From API production to formulation, sterile processing, and packaging, every stage must meet strict regulatory standards while maintaining absolute batch consistency. ",
+    "image": "/uploads/1785828219911-dticyj.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg",
+      "cmrkzybrq00075scdceaah5gp"
+    ],
+    "challengesTitle": "Process Challenges in Pharmaceutical Industry",
+    "solutionsTitle": "Rotex Solutions for Pharmaceutical Industry",
+    "solutionsIntro": "Rotex builds process automation purpose-engineered for the demands of pharmaceutical manufacturing, delivering:",
+    "challenges": [
+      "Maintaining sterility across repeated cleaning and sterilization cycles",
+      "Eliminating contamination risk in critical fluid paths",
+      "Precise control during sensitive batch operations",
+      "Auditable position feedback for regulated environments",
+      "Uninterrupted uptime without compromising validation timelines"
+    ],
+    "solutions": [
+      "Accurate, repeatable, and easy-to-validate control",
+      "Robust hygienic design for clean utilities and sterile lines",
+      "Fast, reliable response across high-cycle CIP/SIP systems",
+      "Seamless integration with modern plant control systems",
+      "Complete documentation to accelerate qualification and validation"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Positioners",
+      "Actuators"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c174c2472c2d54f50a873b6d5",
+    "slug": "paints",
+    "name": "Paints",
+    "description": "Paint and coatings manufacturing relies on accurate, batch-driven processes that handle flammable solvents, viscous fluids, and frequent product changeovers. Process automation must support recipe accuracy, color consistency, and safe operation across mixing, milling, and filling. ",
+    "image": "/uploads/1785828180082-smystu.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg"
+    ],
+    "challengesTitle": "Process Challenges in Paints Industry",
+    "solutionsTitle": "Rotex Solutions for Paints Industry",
+    "solutionsIntro": "Rotex automation is built for the precision and safety paint and coatings manufacturing demands offering:",
+    "challenges": [
+      "Safe handling of flammable solvents and hazardous-area compliance",
+      "Accurate dosing and batching for recipe and color consistency",
+      "Reliable performance with viscous and abrasive media",
+      "Frequent product changeover and equipment cleaning",
+      "Continuous operation across mixing, dispersing, and filling stages"
+    ],
+    "solutions": [
+      "Safety-certified components for hazardous area operation",
+      "Accurate, repeatable control for batching and dosing",
+      "Robust actuation for viscous and abrasive media handling",
+      "Fast response for product changeover and clean-up cycles",
+      "Reliable performance backed by complete documentation"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Angle Seat Valve"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "cfd449d930461445b87915a00",
+    "slug": "textiles",
+    "name": "Textiles",
+    "description": "Textile manufacturing spans multiple wet and dry process stages like dyeing, finishing, printing, and washing, each with specific demands on steam, water, and chemical control. Process automation must deliver fast, accurate, and repeatable performance across high-cycle operations.",
+    "image": "/uploads/1785828237186-pk3gp1.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg",
+      "cmrkzybrq00075scdceaah5gp"
+    ],
+    "challengesTitle": "Process Challenges in Textiles Industry",
+    "solutionsTitle": "Rotex Solutions for Textiles Industry",
+    "solutionsIntro": "From dyeing to finishing, Rotex automation delivers the speed and precision textile manufacturing requires with: ",
+    "challenges": [
+      "Reliable control of steam, hot water, and process utilities",
+      "Accurate dye and chemical dosing for color and finish consistency",
+      "Fast cycle times across high-frequency on/off operations",
+      "Performance in humid, high-temperature processing environments",
+      "Continuous operation across multiple production stages"
+    ],
+    "solutions": [
+      "Fast, high-cycle actuation for steam and utility control",
+      "Accurate, repeatable control for chemical and dye dosing",
+      "Robust construction for humid and high-temperature environments",
+      "Reliable performance across washing, dyeing, and finishing stages",
+      "Long-life designs supporting continuous production cycles"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c5862502174e04abe89a540c9",
+    "slug": "water-management",
+    "name": "Water Management",
+    "description": "Water and wastewater treatment operations rely on consistent, large-scale flow control across raw water intake, treatment, distribution, and effluent management. Process automation must perform reliably with low to medium pressures, corrosive media, and demanding regulatory requirements. ",
+    "image": "/uploads/1785828268507-gckwiz.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_007",
+      "partner_006",
+      "partner_008"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg"
+    ],
+    "challengesTitle": "Process Challenges in Textiles Industry",
+    "solutionsTitle": "Rotex Solutions for Textiles Industry",
+    "solutionsIntro": "From dyeing to finishing, Rotex automation delivers the speed and precision textile manufacturing requires with: ",
+    "challenges": [
+      "Reliable control of steam, hot water, and process utilities",
+      "Accurate dye and chemical dosing for color and finish consistency",
+      "Fast cycle times across high-frequency on/off operations",
+      "Performance in humid, high-temperature processing environments",
+      "Continuous operation across multiple production stages"
+    ],
+    "solutions": [
+      "Fast, high-cycle actuation for steam and utility control",
+      "Accurate, repeatable control for chemical and dye dosing",
+      "Robust construction for humid and high-temperature environments",
+      "Reliable performance across washing, dyeing, and finishing stages",
+      "Long-life designs supporting continuous production cycles"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators",
+      "Angle Seat Valve"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c3e4ad0bd89384706813b50e9",
+    "slug": "metal-mining",
+    "name": "Metal & Mining",
+    "description": "Metals and mining operations run on heavy-duty processes from ore extraction and beneficiation to smelting, refining, and metal production. Equipment faces abrasive slurries, large valve sizes, high temperatures, and continuous service, where reliability directly drives output. ",
+    "image": "/uploads/1785828163122-tyxzsm.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_005",
+      "partner_004",
+      "partner_006",
+      "partner_007",
+      "partner_008"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg"
+    ],
+    "challengesTitle": "Process Challenges in Metals & Mining Industry",
+    "solutionsTitle": "Rotex Solutions for  Metals & Mining Industry",
+    "solutionsIntro": "Rotex automation is engineered for the severity and scale of metals and mining operations, providing:",
+    "challenges": [
+      "Heavy-duty actuation for large slurry and isolation valves",
+      "Reliable operation with abrasive, corrosive, and heavy media",
+      "High-temperature performance across smelting  and refining",
+      "Continuous service in dusty, humid, and harsh environments",
+      "Long service life with minimal maintenance downtime"
+    ],
+    "solutions": [
+      "Heavy-duty products built for large valves and slurry service",
+      "Rugged construction for abrasive and corrosive media exposure",
+      "Reliable performance across mineral processing and refining",
+      "Accurate control for flotation, leaching, and concentrate handling",
+      "Long-life designs that withstand the harshest plant conditions"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c4d7e3d6faef445df967a01ae",
+    "slug": "tyre",
+    "name": "Tyre",
+    "description": "Tyre manufacturing depends on precise control of steam, hot water, and curing operations from mixing and extrusion to molding and curing. Process automation must deliver fast, repeatable performance to maintain product quality and production throughput.",
+    "image": "/uploads/1785828251444-5ne1wg.jpg",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007",
+      "partner_008"
+    ],
+    "storyIds": [
+      "cmrkzyb1900015scd1t0ywbka",
+      "cmrkzyb7j00025scd8n74i4f9",
+      "cmrkzybcd00035scd0kw934lh",
+      "cmrkzybf100045scduicnoes8",
+      "cmrkzybo400065scd75j2fwdg",
+      "cmrkzybrq00075scdceaah5gp"
+    ],
+    "challengesTitle": "Process Challenges in Tyre Industry",
+    "solutionsTitle": "Rotex Solutions for Tyre Industry",
+    "solutionsIntro": "Rotex automation is built for the precision and cycle demands of tyre manufacturing, delivering:",
+    "challenges": [
+      "Reliable control of steam and hot water at curing temperatures",
+      "Fast, high-cycle actuation for press and mold operations",
+      "Accurate temperature and pressure control across curing cycles",
+      "Continuous operation across multi-stage production lines",
+      "Long service life in high-temperature, high-humidity environments"
+    ],
+    "solutions": [
+      "Fast, high-cycle components for press and mold control",
+      "Robust construction for steam and high-temperature service",
+      "Accurate, repeatable control for curing and process regulation",
+      "Reliable performance across continuous production operations",
+      "Long-life designs that withstand demanding plant conditions"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators",
+      "Positioners"
+    ],
+    "industryId": "ca2a9b2633c55470f94d8482e",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c4ba5cc74a4b84afeb87dfbcf",
+    "slug": "fire-fighting",
+    "name": "Fire Fighting System",
+    "description": "Fire fighting systems depend on instant activation, controlled response, and absolute reliability during emergency conditions. Valves and actuators must perform immediately under pressure, without delay or failure.",
+    "image": "/uploads/1785829486984-ul7rfi.png",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006",
+      "partner_007",
+      "partner_008",
+      "partner_009",
+      "partner_010"
+    ],
+    "storyIds": [],
+    "challengesTitle": "Process Challenges in Fire Fighting System",
+    "solutionsTitle": "Rotex Solutions for Fire Fighting System",
+    "solutionsIntro": "Rotex automation is built for fast response and safety-critical operation, delivering:",
+    "challenges": [
+      "Immediate valve actuation during emergency conditions",
+      "Reliable operation under high-pressure water and foam circuits",
+      "Fail-safe performance for critical fire protection applications",
+      "Consistent response across industrial, commercial, and infrastructure systems",
+      "Long standby life with dependable activation when required",
+      "Safe control of deluge, sprinkler, hydrant, and suppression networks"
+    ],
+    "solutions": [
+      "Fast-acting solenoid valves for instant system activation",
+      "Reliable actuators for controlled opening and closing operations",
+      "Fail-safe EHFs for emergency shutdown and protection circuits",
+      "Robust construction for pressure-intensive fire safety environments",
+      "Consistent performance across water, foam, and pneumatic control systems",
+      "Low-maintenance designs for long standby and emergency readiness",
+      "Dependable operation across industrial, commercial, and infrastructure facilities"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators"
+    ],
+    "industryId": "c44f029487fea4efe8f275ee0",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  },
+  {
+    "id": "c81a4f0d5cf97444cb3e0e3e7",
+    "slug": "nuclear",
+    "name": "Nuclear Power",
+    "description": "Nuclear power plants require the highest levels of safety certification and fail-safe reliability for reactor coolant, containment, and emergency shutdown systems.",
+    "image": "/uploads/1785830164508-nbg01r.png",
+    "partnerIds": [
+      "partner_001",
+      "partner_002",
+      "partner_003",
+      "partner_004",
+      "partner_005",
+      "partner_006"
+    ],
+    "storyIds": [],
+    "challengesTitle": "Process Challenges in Nuclear Power Industry",
+    "solutionsTitle": "Rotex Solutions for  Nuclear Power Industry",
+    "solutionsIntro": "Rotex delivers process automation engineered to meet the safety, quality, and traceability demands of nuclear power, with: ",
+    "challenges": [
+      "Compliance with stringent nuclear safety and quality standards",
+      "Reliable operation in radiation-exposed and seismic environments",
+      "Heavy-duty actuation for safety-critical isolation valves",
+      "Long service life with minimal maintenance access",
+      "Complete material and test traceability for every component"
+    ],
+    "solutions": [
+      "Safety-certified construction for nuclear-grade applications",
+      "Robust materials suited to radiation and seismic exposure",
+      "Heavy-duty actuation for primary and secondary loop service",
+      "Full traceability of material certificates, test reports, qualification packs",
+      "Engineering support across qualification, validation, and commissioning"
+    ],
+    "recommendedProducts": [
+      "Solenoid Valve",
+      "Actuators",
+      "Positioners"
+    ],
+    "industryId": "cmrkzyclw000g5scdtompk27g",
+    "createdAt": "2026-08-01T10:52:03.258Z"
+  }
+]

@@ -1,0 +1,357 @@
+[
+  {
+    "id": "global",
+    "data": {
+      "logo": {
+        "src": "/logo.svg",
+        "alt": "Rotex",
+        "href": "/"
+      },
+      "header": {
+        "nav": [
+          {
+            "id": "nav_001",
+            "label": "Products",
+            "href": "/products",
+            "enabled": true,
+            "megaMenu": null
+          },
+          {
+            "id": "nav_002",
+            "label": "Industries",
+            "href": "/industries",
+            "enabled": true,
+            "megaMenuSource": {
+              "type": "industries",
+              "selectedIds": [
+                "cmrkzyavj00005scdwm5lcbcx",
+                "cmrkzybji00055scdz22qdpxb",
+                "cmrkzyc33000a5scdrnn7dtv9",
+                "cmrkzyche000f5scd6obtqngr",
+                "cmrkzyclw000g5scdtompk27g",
+                "cmrkzyd14000l5scd6ut42q6k",
+                "c81a4f0d5cf97444cb3e0e3e7",
+                "ca2a9b2633c55470f94d8482e",
+                "cd5556dfa7396400a876b068b",
+                "cdff73d7582d545f081a3de93",
+                "c80d7f47e18cd48a9985a2183",
+                "c83fd82602b9f42b98887c78f",
+                "c59857d170e5844879b51069b",
+                "c6521b2b00a1448269ade2301",
+                "c174c2472c2d54f50a873b6d5",
+                "cfd449d930461445b87915a00",
+                "c5862502174e04abe89a540c9",
+                "c3e4ad0bd89384706813b50e9",
+                "c4d7e3d6faef445df967a01ae",
+                "c44f029487fea4efe8f275ee0",
+                "c4ba5cc74a4b84afeb87dfbcf",
+                "cmrkzydhe000r5scd9y3u6utk",
+                "cmrkzyefh00125scd4nspqw7y",
+                "cmrkzyg0y001d5scdvawj382i"
+              ],
+              "image": "/mega-menu/industries.png"
+            }
+          },
+          {
+            "id": "nav_003",
+            "label": "About Us",
+            "href": "/about",
+            "enabled": true,
+            "megaMenu": {
+              "type": "flat",
+              "columns": [
+                {
+                  "groups": [
+                    {
+                      "heading": "Who we are",
+                      "href": "/about",
+                      "description": "Our mission and Story"
+                    }
+                  ]
+                },
+                {
+                  "groups": [
+                    {
+                      "heading": "Awards",
+                      "href": "/about/awards",
+                      "description": "Milestones of Excellence and Trust"
+                    }
+                  ]
+                }
+              ],
+              "image": "/mega-menu/about.png"
+            }
+          },
+          {
+            "id": "nav_004",
+            "label": "Downloads",
+            "href": "/downloads",
+            "enabled": true,
+            "megaMenu": null
+          },
+          {
+            "id": "nav_005",
+            "label": "Stay Informed",
+            "href": "/news-updates",
+            "enabled": true,
+            "megaMenu": {
+              "type": "flat",
+              "columns": [
+                {
+                  "groups": [
+                    {
+                      "heading": "Blogs",
+                      "href": "/blogs",
+                      "description": "Expert insights for modern industries"
+                    }
+                  ]
+                },
+                {
+                  "groups": [
+                    {
+                      "heading": "News & Updates",
+                      "href": "/news-updates",
+                      "description": "Update with Latest Trends & Technology"
+                    }
+                  ]
+                },
+                {
+                  "groups": [
+                    {
+                      "heading": "Case Studies",
+                      "href": "/case-studies",
+                      "description": "Update with Latest Trends & Technology"
+                    }
+                  ]
+                }
+              ],
+              "image": "/mega-menu/stay-informed.png",
+              "imageCaption": "ISRO's Mahendragiri Facility"
+            }
+          },
+          {
+            "id": "nav_006",
+            "label": "Join Us",
+            "href": "/join",
+            "enabled": true,
+            "megaMenu": {
+              "type": "flat",
+              "columns": [
+                {
+                  "className": "w-52",
+                  "groups": [
+                    {
+                      "heading": "Become a Channel Partner",
+                      "href": "/join/channel-partner",
+                      "description": "Collaborate to drive shared industrial growth"
+                    }
+                  ]
+                },
+                {
+                  "className": "w-52",
+                  "groups": [
+                    {
+                      "heading": "Become a Supplier",
+                      "href": "/join/supplier",
+                      "description": "Supply certified components for reliable operations"
+                    }
+                  ]
+                },
+                {
+                  "className": "w-32",
+                  "groups": [
+                    {
+                      "heading": "Career",
+                      "href": "/join/career",
+                      "description": "Be a Part of Our Growth"
+                    }
+                  ]
+                },
+                {
+                  "className": "w-44",
+                  "groups": [
+                    {
+                      "heading": "Partner Sales Tools",
+                      "href": "/join/partner-sales-tools",
+                      "description": "Partner-Ready Sales Resources"
+                    }
+                  ]
+                }
+              ],
+              "cta": {
+                "text": "Submit your details to Become a Channel Partner",
+                "href": "/join/channel-partner"
+              }
+            }
+          }
+        ],
+        "cta": {
+          "label": "Contact Us",
+          "href": "/contact"
+        }
+      },
+      "footer": {
+        "tagline": "Engineering For the Future",
+        "columns": [
+          {
+            "id": "col_001",
+            "heading": "Products",
+            "enabled": false,
+            "source": null,
+            "links": [
+              {
+                "label": "Solenoid Valves",
+                "href": "/products/solenoid-valve"
+              },
+              {
+                "label": "Angle Seat Valves",
+                "href": "/products/angle-seat-valve"
+              },
+              {
+                "label": "Automotive solutions",
+                "href": "/products/automotive-solutions"
+              },
+              {
+                "label": "Actuators",
+                "href": "/products/actuators"
+              },
+              {
+                "label": "Positioners",
+                "href": "/products/positioners"
+              }
+            ]
+          },
+          {
+            "id": "col_002",
+            "heading": "Industries",
+            "enabled": true,
+            "source": {
+              "type": "industries",
+              "selectedIds": [
+                "cmrkzyavj00005scdwm5lcbcx",
+                "cmrkzyclw000g5scdtompk27g",
+                "cmrkzydhe000r5scd9y3u6utk",
+                "cmrkzyefh00125scd4nspqw7y",
+                "cmrkzyg0y001d5scdvawj382i",
+                "cmrkzygvc001j5scdjsn53e8d"
+              ]
+            },
+            "links": []
+          },
+          {
+            "id": "col_003",
+            "heading": "Company",
+            "enabled": true,
+            "source": null,
+            "links": [
+              {
+                "label": "Who we are",
+                "href": "/about"
+              },
+              {
+                "label": "Awards",
+                "href": "/about/awards"
+              }
+            ]
+          },
+          {
+            "id": "col_004",
+            "heading": "Join Us",
+            "enabled": true,
+            "source": null,
+            "links": [
+              {
+                "label": "Become a Distributor",
+                "href": "/join/channel-partner"
+              },
+              {
+                "label": "Become a Supplier",
+                "href": "/join/supplier"
+              },
+              {
+                "label": "Career",
+                "href": "/join/career"
+              }
+            ]
+          },
+          {
+            "id": "col_005",
+            "heading": "Resources",
+            "enabled": true,
+            "source": null,
+            "links": [
+              {
+                "label": "Downloads",
+                "href": "/downloads"
+              }
+            ]
+          },
+          {
+            "id": "col_006",
+            "heading": "Stay Informed",
+            "enabled": true,
+            "source": null,
+            "links": [
+              {
+                "label": "Blogs",
+                "href": "/blogs"
+              },
+              {
+                "label": "News & Updates",
+                "href": "/news-updates"
+              },
+              {
+                "label": "Case Studies",
+                "href": "/case-studies"
+              }
+            ]
+          }
+        ],
+        "social": [
+          {
+            "id": "soc_001",
+            "platform": "linkedin",
+            "href": "https://linkedin.com/company/rotex"
+          },
+          {
+            "id": "soc_002",
+            "platform": "instagram",
+            "href": "https://instagram.com/rotex"
+          },
+          {
+            "id": "soc_003",
+            "platform": "facebook",
+            "href": "https://facebook.com/rotex"
+          },
+          {
+            "id": "soc_1784561935661",
+            "platform": "whatsapp",
+            "href": "https://web.whatsapp.com/"
+          }
+        ],
+        "legal": {
+          "copyright": "© 2026 Rotex. All rights reserved.",
+          "links": [
+            {
+              "label": "Privacy Policy",
+              "href": "/privacy"
+            },
+            {
+              "label": "Terms of Use",
+              "href": "/terms"
+            }
+          ]
+        },
+        "contact": {
+          "email": "info@rotex.com",
+          "phone": "+91 22 0000 0000",
+          "address": "Rotex Industries, Mumbai, India"
+        }
+      },
+      "partnerTools": {
+        "password": "Rotex@2626"
+      }
+    },
+    "updatedAt": "2026-08-03T09:07:32.204Z"
+  }
+]

@@ -1,0 +1,460 @@
+[
+  {
+    "key": "hero",
+    "enabled": true,
+    "order": 1,
+    "data": {
+      "slides": [
+        {
+          "id": "slide_001",
+          "published": true,
+          "title": "Flow Control.  Where It Matters Most.",
+          "description": "Engineered precise solutions that reduce downtime, enhance safety, and ensure uninterrupted operations across critical industry applications.",
+          "media": {
+            "type": "video",
+            "src": "/uploads/1785827604746-k7ofg0.mp4",
+            "alt": ""
+          },
+          "cta_buttons": [
+            {
+              "label": "Explore Products ",
+              "href": "/products"
+            }
+          ]
+        },
+        {
+          "id": "slide_002",
+          "published": true,
+          "title": "Precision Engineered For Critical Industries.",
+          "description": "Over four decades of expertise delivering valve solutions trusted by the world's most demanding sectors.",
+          "media": {
+            "type": "image",
+            "src": "/uploads/1785839104733-ruft5f.jpg",
+            "alt": "Rotex valve installation in oil refinery"
+          },
+          "cta_buttons": [
+            {
+              "label": "View Products",
+              "href": "/products"
+            },
+            {
+              "label": "Contact Us",
+              "href": "/contact"
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-08-04T10:25:07.186Z"
+  },
+  {
+    "key": "partners",
+    "enabled": true,
+    "order": 2,
+    "data": {
+      "title": "Trusted by Industry Leaders",
+      "partnerIds": [
+        "partner_001",
+        "partner_002",
+        "partner_003",
+        "partner_004",
+        "partner_005",
+        "partner_006",
+        "partner_007",
+        "partner_008",
+        "partner_009",
+        "partner_010",
+        "partner_011",
+        "partner_012",
+        "partner_013",
+        "partner_014",
+        "partner_015",
+        "partner_016",
+        "partner_017",
+        "partner_018"
+      ]
+    },
+    "updatedAt": "2026-08-04T09:58:37.295Z"
+  },
+  {
+    "key": "redefining",
+    "enabled": true,
+    "order": 3,
+    "data": {
+      "heading": {
+        "title": "Redefining Flow Performance",
+        "subtitle": "A new chapter shaped by precision engineering, advanced capabilities, and a commitment to solving the most demanding industrial challenges."
+      },
+      "media": {
+        "type": "video",
+        "src": "/uploads/1785828464287-sl8es0.mp4"
+      },
+      "tagline": {
+        "prefix": "Leading Flow",
+        "highlight": "Intelligence",
+        "suffix": "Since 1967"
+      },
+      "stats": [
+        {
+          "id": "stat_001",
+          "value": 33,
+          "suffix": "",
+          "label": "Utility Patents",
+          "format_comma": false,
+          "published": true
+        },
+        {
+          "id": "stat_002",
+          "value": 83,
+          "suffix": "+",
+          "label": "Countries Served Worldwide",
+          "format_comma": false,
+          "published": true
+        },
+        {
+          "id": "stat_003",
+          "value": 21,
+          "suffix": "+",
+          "label": "International Certifications",
+          "format_comma": false,
+          "published": true
+        },
+        {
+          "id": "stat_004",
+          "value": 80,
+          "suffix": "+",
+          "label": "Global Distributors",
+          "format_comma": false,
+          "published": true
+        },
+        {
+          "id": "stat_005",
+          "value": 9000,
+          "suffix": "+",
+          "label": "Customers",
+          "format_comma": true,
+          "published": true
+        },
+        {
+          "id": "stat_006",
+          "value": 6000,
+          "suffix": "+",
+          "label": "Customised Solutions Developed",
+          "format_comma": true,
+          "published": true
+        }
+      ]
+    },
+    "updatedAt": "2026-08-04T09:59:13.728Z"
+  },
+  {
+    "key": "industries",
+    "enabled": true,
+    "order": 4,
+    "data": {
+      "heading": {
+        "title": "Engineered For Your Role",
+        "subtitle": "Choose your industry profile to connect with experts faster. Access the right products, catalogues, certifications, and guides."
+      },
+      "industries": [
+        {
+          "id": "ind_001",
+          "published": true,
+          "slug": "oil-gas",
+          "label": "Oil and Gas",
+          "title": "OIL AND GAS",
+          "description": "The Hidden Reason 73% of Oil & Gas Plants Shutdowns Are Actually Preventable (And Why Most Plants Still Don't Know This)",
+          "image": {
+            "src": "https://rotex.ezzystack.com/uploads/1785829895674-u8pebo.png",
+            "alt": "Oil and gas refinery"
+          }
+        },
+        {
+          "id": "ind_002",
+          "published": true,
+          "slug": "process",
+          "label": "Process",
+          "title": "PROCESS",
+          "description": "Why Some Process Plants Experience Fewer Instrumentation Failures Than Others. The difference is rarely maintenance alone.",
+          "image": {
+            "src": "https://rotex.ezzystack.com/uploads/1785830370030-9ie7pp.jpg",
+            "alt": "Industrial process plant"
+          }
+        },
+        {
+          "id": "ind_003",
+          "published": true,
+          "slug": "power",
+          "label": "Power",
+          "title": "POWER",
+          "description": "When Continuous Operation Is Non-Negotiable. Built for demanding power and nuclear environments where reliability matters most.",
+          "image": {
+            "src": "https://rotex.ezzystack.com/uploads/1785830311544-bkj5iy.jpg",
+            "alt": "Power generation facility"
+          }
+        },
+        {
+          "id": "ind_004",
+          "published": true,
+          "slug": "rail",
+          "label": "Rail",
+          "title": "RAIL",
+          "description": "Secret Key to Win Global Railway Tenders consistently. Unlock the tricks global OEM teams use to win tenders.",
+          "image": {
+            "src": "https://rotex.ezzystack.com/uploads/1785830445168-yqwm2k.jpg",
+            "alt": "Rail infrastructure"
+          }
+        },
+        {
+          "id": "ind_005",
+          "published": true,
+          "slug": "machine-solution",
+          "label": "Machine Solution",
+          "title": "MACHINE SOLUTION",
+          "description": "Most OEMs believe customers choose machines based on specifications, speed, or price. But in reality, Customers stay loyal to OEMs that feel difficult to replace. Discover how to build engineering confidence for your customers.",
+          "image": {
+            "src": "https://rotex.ezzystack.com/uploads/1785830378852-co6ong.jpg",
+            "alt": "Industrial machinery"
+          }
+        },
+        {
+          "id": "ind_006",
+          "published": true,
+          "slug": "aerospace",
+          "label": "Aerospace & Defence",
+          "title": "AEROSPACE & DEFENCE",
+          "description": "In Aerospace & Defense, One Millisecond Can Decide Mission Success. Discover the engineering factors that quietly affect switching consistency, response accuracy, and long-term mission reliability in high-demand environments.",
+          "image": {
+            "src": "https://rotex.ezzystack.com/uploads/1785830355066-6ut7b5.jpg",
+            "alt": "Aerospace manufacturing"
+          }
+        },
+        {
+          "id": "ind_007",
+          "published": true,
+          "slug": "automotive",
+          "label": "Automotive",
+          "title": "AUTOMOTIVE",
+          "description": "Why Some Automotive Platforms Perform Better Under Pressure. The difference often starts deep inside the system architecture.",
+          "image": {
+            "src": "https://rotex.ezzystack.com/uploads/1785830295457-tqkxfo.jpg",
+            "alt": "Automotive production line"
+          }
+        }
+      ]
+    },
+    "updatedAt": "2026-08-04T10:00:36.703Z"
+  },
+  {
+    "key": "products",
+    "enabled": false,
+    "order": 5,
+    "data": {
+      "heading": {
+        "title": "Engineered Flow Control Systems"
+      },
+      "cta": {
+        "label": "View All Products",
+        "href": "/products"
+      },
+      "products": [
+        {
+          "id": "prod_001",
+          "published": true,
+          "slug": "solenoid-valve",
+          "name": "Solenoid Valve",
+          "description": "The Component Inside Valves That Cannot Fail",
+          "image": {
+            "src": "https://cdn.rotex.com/products/solenoid-valve.png",
+            "alt": "Solenoid Valve"
+          }
+        },
+        {
+          "id": "prod_002",
+          "published": true,
+          "slug": "angle-seat-valve",
+          "name": "Angle Seat Valve",
+          "description": "Durable flow control for demanding needs",
+          "image": {
+            "src": "https://cdn.rotex.com/products/angle-seat-valve.png",
+            "alt": "Angle Seat Valve"
+          }
+        },
+        {
+          "id": "prod_003",
+          "published": true,
+          "slug": "actuators",
+          "name": "Actuators",
+          "description": "Powerful mechanical devices for valve movement",
+          "image": {
+            "src": "https://cdn.rotex.com/products/actuators.png",
+            "alt": "Actuators"
+          }
+        },
+        {
+          "id": "prod_004",
+          "published": true,
+          "slug": "positioners",
+          "name": "Positioners",
+          "description": "Precise, digital control for valve positioning",
+          "image": {
+            "src": "https://cdn.rotex.com/products/positioners.png",
+            "alt": "Positioners"
+          }
+        },
+        {
+          "id": "prod_005",
+          "published": true,
+          "slug": "controllers",
+          "name": "Controllers",
+          "description": "Smart process control for industrial systems",
+          "image": {
+            "src": "https://cdn.rotex.com/products/controllers.png",
+            "alt": "Controllers"
+          }
+        },
+        {
+          "id": "prod_006",
+          "published": true,
+          "slug": "sensors",
+          "name": "Sensors",
+          "description": "Accurate measurement for critical processes",
+          "image": {
+            "src": "https://cdn.rotex.com/products/sensors.png",
+            "alt": "Sensors"
+          }
+        },
+        {
+          "id": "prod_007",
+          "published": true,
+          "slug": "automation",
+          "name": "Automation Systems",
+          "description": "End-to-end automation for flow operations",
+          "image": {
+            "src": "https://cdn.rotex.com/products/automation.png",
+            "alt": "Automation Systems"
+          }
+        }
+      ]
+    },
+    "updatedAt": "2026-07-20T15:37:52.899Z"
+  },
+  {
+    "key": "certifications",
+    "enabled": true,
+    "order": 6,
+    "data": {
+      "title": "Globally Certified. Universally Trusted.",
+      "description": "Recognised and certified by leading global standards bodies and industry partners.",
+      "partnerIds": [
+        "cmsehywiy00003xknxgbt37kw",
+        "cmsehzbtn00013xknascfokr0",
+        "cmsehzi2w00023xknhob98zpf",
+        "cmsehzsgo00033xknoc7toiou",
+        "cmsei02l600043xknf8z5ra8c",
+        "cmsei09lx00053xkn5furumx9",
+        "cmsei0gqw00063xknynwthrth",
+        "cmsei0nm000073xknv56649rl",
+        "cmsei0tog00083xkny64964fo",
+        "cmsei0zd900093xknh3dayr3u"
+      ]
+    },
+    "updatedAt": "2026-08-04T10:12:35.703Z"
+  },
+  {
+    "key": "customer-stories",
+    "enabled": true,
+    "order": 7,
+    "data": {
+      "heading": {
+        "title": "Customer Stories",
+        "subtitle": "Trusted across industries, proven in action"
+      },
+      "storyIds": [
+        "cmrkzyb1900015scd1t0ywbka",
+        "cmrkzyb7j00025scd8n74i4f9",
+        "cmrkzybcd00035scd0kw934lh",
+        "cmrkzybf100045scduicnoes8",
+        "cmrkzybo400065scd75j2fwdg",
+        "cmrkzybrq00075scdceaah5gp",
+        "cmrkzybvz00085scdd0s3cduj",
+        "cmrkzyc0i00095scdk5663now",
+        "cmrkzyc5r000b5scdkppy9ytm",
+        "cmrkzyc84000c5scdpubiemr0",
+        "cmrkzycb6000d5scd4pmqhof0",
+        "cmrkzycdr000e5scd7l78hzlm"
+      ]
+    },
+    "updatedAt": "2026-08-04T10:01:32.359Z"
+  },
+  {
+    "key": "resources",
+    "enabled": true,
+    "order": 8,
+    "data": {
+      "heading": {
+        "title": "Learn, Explore, and Stay Updated"
+      },
+      "tabs": [
+        {
+          "id": "case-studies",
+          "label": "Case Studies",
+          "cta": {
+            "label": "Read All Case Studies",
+            "href": "/case-studies"
+          },
+          "resourceIds": [
+            "cmrtar1aq0001dmlef5keexma",
+            "cmrtar1ar0002dmlemnt9mv9z",
+            "cmrtar1an0000dmlef96iivmu"
+          ]
+        },
+        {
+          "id": "news",
+          "label": "News & Updates",
+          "cta": {
+            "label": "View All News & Updates",
+            "href": "/news-updates"
+          },
+          "resourceIds": [
+            "cmrtar1as0003dmlezx92f775",
+            "cmrtar1au0005dmlea745qaju",
+            "cmrtar1at0004dmleovypmc9g"
+          ]
+        },
+        {
+          "id": "blogs",
+          "label": "Blogs",
+          "cta": {
+            "label": "Read All Blogs",
+            "href": "/blogs"
+          },
+          "resourceIds": [
+            "cmrtar1ax0008dmleia886f4q",
+            "cmrtar1aw0007dmlerdqgafj9",
+            "cmrtar1av0006dmle7hlyeinc"
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-08-04T10:01:53.629Z"
+  },
+  {
+    "key": "cta",
+    "enabled": true,
+    "order": 9,
+    "data": {
+      "background_image": {
+        "src": "https://cdn.rotex.com/cta/cta-bg.jpg",
+        "alt": "CTA background"
+      },
+      "title": "Let’s Solve Your Next Challenge",
+      "subtitle": "Connect with our experts to find the right solution for your application.",
+      "cta": {
+        "label": "Book My Free Consultation",
+        "href": "/contact"
+      }
+    },
+    "updatedAt": "2026-08-04T10:02:41.453Z"
+  }
+]

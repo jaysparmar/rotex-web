@@ -7,31 +7,37 @@ const CARDS: WhyCard[] = [
     title: "Purpose-driven engineering",
     description:
       "At Rotex, every solution is built to solve real industrial challenges. Work here directly contributes to systems that improve reliability, safety, and efficiency across industries.",
+    image: "/media/career/1.png",
   },
   {
     title: "Ownership from day one",
     description:
       "We believe in trusting people early. You are encouraged to take responsibility, make decisions, and learn through real projects rather than passive observation.",
+    image: "/media/career/2.png",
   },
   {
     title: "Continuous learning culture",
     description:
       "Growth is part of the work, not separate from it. Teams learn by building, experimenting, and improving together in a structured and supportive environment.",
+    image: "/media/career/3.png",
   },
   {
     title: "Precision in everything we do",
     description:
       "Attention to detail defines our approach. From design to execution, every step is guided by accuracy, quality, and system-level thinking.",
+    image: "/media/career/4.png",
   },
   {
     title: "Collaborative environment",
     description:
       "We work as one team across functions. Ideas are shared openly, feedback is valued, and collaboration drives better outcomes.",
+    image: "/media/career/5.png",
   },
   {
     title: "Impact that matters",
     description:
       "The work you do here goes beyond screens and systems. It supports industries that power everyday life, making your contribution meaningful and visible.",
+    image: "/media/career/6.png",
   },
 ];
 

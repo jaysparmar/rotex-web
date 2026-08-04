@@ -60,7 +60,7 @@ export function CareerValuesSection({
           {values.map((v) => (
             <div key={v.title} className="flex flex-col justify-between gap-4">
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-gradient-hero font-montserrat font-semibold text-xl leading-7">{v.title}</h3>
+                <h3 className="text-gradient-orange-black-radial font-montserrat font-semibold text-xl leading-7">{v.title}</h3>
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-zinc-100">
                   {v.icon}
                 </div>

@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { execSync } from "node:child_process";
+import path from "node:path";
 
 const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL!.replace(/^file:/, ""),
@@ -19,6 +21,15 @@ async function main() {
   });
 
   console.log(`Admin user ready: ${email}`);
+
+  await prisma.$disconnect();
+
+  // Real client content (industries, home page, partners, etc.) — kept as a
+  // separate script/db connection so it can also be run standalone.
+  execSync("npx tsx prisma/seed-content.ts", {
+    stdio: "inherit",
+    cwd: path.join(__dirname, ".."),
+  });
 }
 
 main()
