@@ -161,6 +161,14 @@ model HomeSection {
   updatedAt DateTime @updatedAt
 }
 
+model AboutSection {
+  key       String   @id
+  enabled   Boolean  @default(true)
+  order     Int
+  data      Json
+  updatedAt DateTime @updatedAt
+}
+
 model CustomerStory {
   id        String   @id @default(cuid())
   quote     String
