@@ -13,7 +13,7 @@ import railBg from "@/assets/Images/breadcurmbBackgrounds/rail_bg.jpg";
 import oilBg from "@/assets/Images/breadcurmbBackgrounds/oil_bg.jpg";
 import aerospaceBg from "@/assets/Images/breadcurmbBackgrounds/aerospace_bg.jpg";
 
-type GalleryImage = { src: StaticImageData; alt: string };
+type GalleryImage = { src: StaticImageData | string; alt: string };
 
 const defaultImages: GalleryImage[] = [
   { src: railBg, alt: "Rotex team at the manufacturing facility" },
@@ -59,6 +59,7 @@ export function GallerySwiperSection({ images = defaultImages }: GallerySwiperSe
                     fill
                     className="object-cover"
                     sizes="(min-width: 1024px) 60vw, (min-width: 768px) 75vw, 90vw"
+                    unoptimized={typeof img.src === "string"}
                   />
                 </div>
               </SwiperSlide>
