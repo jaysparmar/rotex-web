@@ -5,12 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { LayoutDashboard, Package, Factory, Home, Settings, Handshake, Quote, Mail, BookOpen } from "lucide-react";
+import { LayoutDashboard, Package, Factory, Home, Info, Settings, Handshake, Quote, Mail, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/home", label: "Home Page", icon: Home },
+  { href: "/admin/about", label: "About Page", icon: Info },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/industries", label: "Industries", icon: Factory },
   { href: "/admin/partners", label: "Partners", icon: Handshake },
