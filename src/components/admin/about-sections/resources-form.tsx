@@ -55,7 +55,11 @@ export function ResourcesForm({
               </FieldGrid>
               <TextField label="CTA Href" {...form.register(`tabs.${i}.cta.href`)} />
 
-              <ResourcePicker tabIndex={i} typeId={field.id} options={allResources.filter((r) => r.type === field.id)} />
+              <ResourcePicker
+                tabIndex={i}
+                typeId={initialData.tabs[i].id}
+                options={allResources.filter((r) => r.type === initialData.tabs[i].id)}
+              />
             </div>
           ))}
         </div>
