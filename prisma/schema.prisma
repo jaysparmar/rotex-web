@@ -169,6 +169,15 @@ model AboutSection {
   updatedAt DateTime @updatedAt
 }
 
+model MediaAsset {
+  id        String   @id @default(cuid())
+  url       String
+  type      String
+  filename  String
+  alt       String?
+  createdAt DateTime @default(now())
+}
+
 model CustomerStory {
   id        String   @id @default(cuid())
   quote     String
