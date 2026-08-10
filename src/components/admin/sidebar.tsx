@@ -45,6 +45,7 @@ const NAV_ITEMS = [
   { href: "/admin/media", label: "Media Library", icon: Images },
   { href: "/admin/awards", label: "Awards", icon: Award },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/categories", label: "Categories", icon: Layers },
   { href: "/admin/industries", label: "Industries", icon: Factory },
   { href: "/admin/partners", label: "Partners", icon: Handshake },
   { href: "/admin/countries", label: "Countries", icon: Globe },
