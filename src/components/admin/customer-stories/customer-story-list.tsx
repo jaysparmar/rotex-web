@@ -10,7 +10,7 @@ import { CustomerStoryFormDialog } from "@/components/admin/customer-stories/cus
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { deleteCustomerStory, toggleCustomerStoryPublished } from "@/app/admin/(dashboard)/customer-stories/actions";
 
-type Story = { id: string; quote: string; author: string; company: string; image: string; published: boolean };
+type Story = { id: string; quote: string; author: string; company: string; image: string; mediaType: string; published: boolean };
 
 export function CustomerStoryList({ stories }: { stories: Story[] }) {
   const [pending, startTransition] = useTransition();
@@ -61,7 +61,9 @@ export function CustomerStoryList({ stories }: { stories: Story[] }) {
         {stories.map((story) => (
           <div key={story.id} className="flex items-center gap-4 p-4">
             <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-              {story.image && (
+              {story.image && story.mediaType === "video" ? (
+                <video src={story.image} className="size-full object-cover" muted />
+              ) : story.image ? (
                 <Image
                   src={story.image}
                   alt={story.author}
@@ -70,7 +72,7 @@ export function CustomerStoryList({ stories }: { stories: Story[] }) {
                   className="size-full object-cover"
                   unoptimized
                 />
-              )}
+              ) : null}
             </div>
 
             <div className="min-w-0 flex-1">

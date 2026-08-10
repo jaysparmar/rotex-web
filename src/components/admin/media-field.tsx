@@ -11,13 +11,17 @@ export function MediaField({
   name,
   mediaType,
   showAlt = true,
+  defaultMode = "link",
+  previewFit = "cover",
 }: {
   name: string;
   mediaType: "image" | "video";
   showAlt?: boolean;
+  defaultMode?: "link" | "upload";
+  previewFit?: "cover" | "contain";
 }) {
   const form = useFormContext();
-  const [mode, setMode] = useState<"link" | "upload">("link");
+  const [mode, setMode] = useState<"link" | "upload">(defaultMode);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string>();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -117,12 +121,12 @@ export function MediaField({
       )}
 
       {src && (
-        <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+        <div className={cn("overflow-hidden rounded-lg border border-border bg-muted/30", previewFit === "contain" && "p-4")}>
           {mediaType === "image" ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={src} alt="" className="h-32 w-full object-cover" />
+            <img src={src} alt="" className={cn("h-32 w-full", previewFit === "contain" ? "object-contain" : "object-cover")} />
           ) : (
-            <video src={src} className="h-32 w-full object-cover" muted />
+            <video src={src} className={cn("h-32 w-full", previewFit === "contain" ? "object-contain" : "object-cover")} muted />
           )}
         </div>
       )}

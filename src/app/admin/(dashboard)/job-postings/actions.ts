@@ -3,7 +3,20 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-type JobPostingInput = { company: string; title: string; category: string; location: string; tag: string; published: boolean };
+type JobPostingInput = {
+  company: string;
+  title: string;
+  category: string;
+  location: string;
+  tag: string;
+  employmentType: string;
+  workMode: string;
+  aboutRole: string;
+  whatYouDo: string[];
+  whatWeLookFor: string[];
+  whatYouGet: { icon: string; label: string }[];
+  published: boolean;
+};
 
 function revalidateJobPostings() {
   revalidatePath("/admin/job-postings");
@@ -11,8 +24,9 @@ function revalidateJobPostings() {
 }
 
 export async function createJobPosting(data: JobPostingInput) {
-  await prisma.jobPosting.create({ data });
+  const created = await prisma.jobPosting.create({ data });
   revalidateJobPostings();
+  return created;
 }
 
 export async function updateJobPosting(id: string, data: JobPostingInput) {

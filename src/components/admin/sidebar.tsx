@@ -26,6 +26,7 @@ import {
   Truck,
   FileText,
   Download,
+  Wrench,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,7 @@ const PAGE_ITEMS = [
   { href: "/admin/channel-partner", label: "Channel Partner Page", icon: Handshake },
   { href: "/admin/career", label: "Career Page", icon: Briefcase },
   { href: "/admin/supplier", label: "Supplier Page", icon: Truck },
+  { href: "/admin/partner-sales-tools", label: "Partner Sales Tools", icon: Wrench },
 ];
 
 const NAV_ITEMS = [

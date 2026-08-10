@@ -51,6 +51,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
     setSubmitError(undefined);
 
     const body = new FormData();
+    body.append("source", "industry");
     body.append("industryName", industryName);
     for (const [key, value] of Object.entries(data)) {
       if (value !== undefined) body.append(key, value);

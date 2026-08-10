@@ -3,15 +3,14 @@
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
-import { TextField, TextAreaField, SelectField, AddButton, RepeaterItem } from "@/components/admin/form-fields";
+import { TextField, TextAreaField, AddButton, RepeaterItem } from "@/components/admin/form-fields";
+import { MediaField } from "@/components/admin/media-field";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveCareerSection } from "@/app/admin/(dashboard)/career/actions";
-import { VALUE_ICON_OPTIONS } from "@/lib/career-value-icons";
 
 type Value = { icon: string; title: string; description: string };
-type FormValues = { enabled: boolean; heading: string; description: string; values: Value[] };
-
-const ICON_SELECT_OPTIONS = VALUE_ICON_OPTIONS.map((o) => ({ value: o.key, label: o.label }));
+type ValueInput = { icon: { src: string }; title: string; description: string };
+type FormValues = { enabled: boolean; heading: string; description: string; values: ValueInput[] };
 
 export function CareerValuesForm({
   initialEnabled,
@@ -20,12 +19,23 @@ export function CareerValuesForm({
   initialEnabled: boolean;
   initialData: { heading: string; description: string; values: Value[] };
 }) {
-  const form = useForm<FormValues>({ defaultValues: { enabled: initialEnabled, ...initialData } });
+  const form = useForm<FormValues>({
+    defaultValues: {
+      enabled: initialEnabled,
+      heading: initialData.heading,
+      description: initialData.description,
+      values: initialData.values.map((v) => ({ ...v, icon: { src: v.icon } })),
+    },
+  });
   const valuesArray = useFieldArray({ control: form.control, name: "values" });
   const { pending, error, success, run } = useSaveAction();
 
   function onSubmit(values: FormValues) {
-    const { enabled, ...data } = values;
+    const { enabled, values: formValues, ...rest } = values;
+    const data = {
+      ...rest,
+      values: formValues.map((v) => ({ icon: v.icon.src, title: v.title, description: v.description })),
+    };
     run(async () => {
       try {
         await saveCareerSection("values", { enabled, data });
@@ -45,16 +55,18 @@ export function CareerValuesForm({
         <TextAreaField label="Description" {...form.register("description")} />
 
         <div className="space-y-3">
-          {valuesArray.fields.map((field, i) => (
-            <RepeaterItem key={field.id} title={form.watch(`values.${i}.title`) || `Value ${i + 1}`} onRemove={() => valuesArray.remove(i)}>
-              <SelectField label="Icon" options={ICON_SELECT_OPTIONS} defaultValue={field.icon} {...form.register(`values.${i}.icon`)} />
-              <TextField label="Title" {...form.register(`values.${i}.title`)} />
-              <TextAreaField label="Description" {...form.register(`values.${i}.description`)} />
-            </RepeaterItem>
-          ))}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {valuesArray.fields.map((field, i) => (
+              <RepeaterItem key={field.id} title={form.watch(`values.${i}.title`) || `Value ${i + 1}`} onRemove={() => valuesArray.remove(i)}>
+                <MediaField name={`values.${i}.icon`} mediaType="image" showAlt={false} defaultMode="upload" previewFit="contain" />
+                <TextField label="Title" {...form.register(`values.${i}.title`)} />
+                <TextAreaField label="Description" {...form.register(`values.${i}.description`)} />
+              </RepeaterItem>
+            ))}
+          </div>
           <AddButton
             label="Add Value"
-            onClick={() => valuesArray.append({ icon: VALUE_ICON_OPTIONS[0].key, title: "", description: "" })}
+            onClick={() => valuesArray.append({ icon: { src: "" }, title: "", description: "" })}
           />
         </div>
 

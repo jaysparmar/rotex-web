@@ -20,7 +20,7 @@ type MapData = {
 };
 type StoriesData = {
   heading: { title: string; subtitle: string };
-  stories: { id: string; quote: string; author: string; company: string; image: string }[];
+  stories: { id: string; quote: string; author: string; company: string; image: string; mediaType?: string }[];
 };
 type FormData = {
   headingPrefix: string;

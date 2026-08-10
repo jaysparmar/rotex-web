@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { CustomerStoryCard } from "@/components/ui/customer-story-card";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
 
-type Story = { id: string; quote: string; author: string; company: string; image: string };
+type Story = { id: string; quote: string; author: string; company: string; image: string; mediaType?: string };
 
 type CustomerStoriesSectionProps = {
   heading?: { title: string; subtitle: string };
@@ -85,7 +85,7 @@ export function CustomerStoriesSection({
           {stories.map((story) => (
             <div key={story.id} className="w-full lg:w-auto shrink-0 snap-center">
               <CustomerStoryCard
-                media={{ type: "image", src: story.image }}
+                media={{ type: story.mediaType === "video" ? "video" : "image", src: story.image }}
                 quote={story.quote}
                 author={story.author}
                 company={story.company}

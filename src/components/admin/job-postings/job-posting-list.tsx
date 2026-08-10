@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { JobPostingFormDialog } from "@/components/admin/job-postings/job-posting-form-dialog";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { deleteJobPosting, toggleJobPostingPublished } from "@/app/admin/(dashboard)/job-postings/actions";
 
@@ -18,6 +18,7 @@ type JobPosting = {
   tag: string;
   published: boolean;
 };
+
 
 export function JobPostingList({ jobs }: { jobs: JobPosting[] }) {
   const [pending, startTransition] = useTransition();
@@ -51,14 +52,12 @@ export function JobPostingList({ jobs }: { jobs: JobPosting[] }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <JobPostingFormDialog
-          trigger={
-            <Button size="sm" className="gap-1.5">
-              <Plus className="size-3.5" />
-              Add Job Posting
-            </Button>
-          }
-        />
+        <Link href="/admin/job-postings/new">
+          <Button size="sm" className="gap-1.5">
+            <Plus className="size-3.5" />
+            Add Job Posting
+          </Button>
+        </Link>
       </div>
 
       <div className="divide-y divide-border rounded-lg border border-border">
@@ -84,14 +83,11 @@ export function JobPostingList({ jobs }: { jobs: JobPosting[] }) {
               onCheckedChange={(v) => handleTogglePublished(job, v)}
             />
 
-            <JobPostingFormDialog
-              job={job}
-              trigger={
-                <Button variant="ghost" size="icon-sm">
-                  <Pencil className="size-3.5" />
-                </Button>
-              }
-            />
+            <Link href={`/admin/job-postings/${job.id}`}>
+              <Button variant="ghost" size="icon-sm">
+                <Pencil className="size-3.5" />
+              </Button>
+            </Link>
 
             <Button variant="ghost" size="icon-sm" disabled={pending} onClick={() => setToDelete(job)}>
               <Trash2 className="size-3.5 text-destructive" />

@@ -24,8 +24,9 @@ export type ResourceInput = {
 
 export async function createResource(data: ResourceInput) {
   const slug = data.slug.trim() ? slugify(data.slug) : slugify(data.title);
-  await prisma.resource.create({ data: { ...data, slug } });
+  const created = await prisma.resource.create({ data: { ...data, slug } });
   revalidateResources();
+  return created;
 }
 
 export async function updateResource(id: string, data: ResourceInput) {

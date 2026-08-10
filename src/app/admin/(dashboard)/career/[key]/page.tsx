@@ -27,6 +27,14 @@ export default async function AdminCareerSectionPage({ params }: { params: Promi
   const data = section.data as never;
   const label = LABELS[key] ?? key;
 
+  const allMedia =
+    key === "gallery"
+      ? await prisma.mediaAsset.findMany({
+          orderBy: { createdAt: "desc" },
+          select: { id: true, url: true, type: true, filename: true, alt: true },
+        })
+      : [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -39,7 +47,13 @@ export default async function AdminCareerSectionPage({ params }: { params: Promi
 
       {key === "hero" && <CareerHeroForm {...meta} initialData={data} />}
       {key === "values" && <CareerValuesForm {...meta} initialData={data} />}
-      {key === "gallery" && <CareerGalleryForm {...meta} initialData={data} />}
+      {key === "gallery" && (
+        <CareerGalleryForm
+          {...meta}
+          initialData={data}
+          allMedia={allMedia.map((a) => ({ ...a, type: a.type as "image" | "video" }))}
+        />
+      )}
       {key === "why" && <CareerWhyForm {...meta} initialData={data} />}
       {key === "positions" && <CareerPositionsForm {...meta} initialData={data} />}
       {key === "form" && <CareerFormSectionForm {...meta} initialData={data} />}

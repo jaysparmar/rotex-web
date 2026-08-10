@@ -26,7 +26,7 @@ type CertificationsData = {
 };
 type CustomerStoriesData = {
   heading: { title: string; subtitle: string };
-  stories: { id: string; quote: string; author: string; company: string; image: string }[];
+  stories: { id: string; quote: string; author: string; company: string; image: string; mediaType?: string }[];
 };
 type RedefiningData = {
   heading: { title: string; subtitle: string };

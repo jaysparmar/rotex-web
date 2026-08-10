@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "JobPosting" ADD COLUMN "employmentType" TEXT NOT NULL DEFAULT 'Full-time';
+ALTER TABLE "JobPosting" ADD COLUMN "workMode" TEXT NOT NULL DEFAULT 'On-site';
+ALTER TABLE "JobPosting" ADD COLUMN "aboutRole" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "JobPosting" ADD COLUMN "whatYouDo" TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE "JobPosting" ADD COLUMN "whatWeLookFor" TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE "JobPosting" ADD COLUMN "whatYouGet" TEXT NOT NULL DEFAULT '[]';

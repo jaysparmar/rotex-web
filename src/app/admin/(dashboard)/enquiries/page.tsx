@@ -14,7 +14,7 @@ export default async function AdminEnquiriesPage() {
         <div>
           <h1 className="text-2xl font-semibold">Enquiries</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Customer enquiries submitted from each industry&apos;s page, grouped by industry.
+            Submissions from the industry enquiry forms, the Contact page, and Supplier applications.
           </p>
         </div>
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Enquiries" }]} />

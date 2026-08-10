@@ -4,32 +4,32 @@ type ValueCard = { icon: string; title: string; description: string };
 
 const VALUES: ValueCard[] = [
   {
-    icon: "trending-up",
+    icon: "/icons/values/trending-up.svg",
     title: "Where Growth Comes Together",
     description: "Personal ambitions and career goals align to create meaningful and long-term professional growth.",
   },
   {
-    icon: "lightbulb",
+    icon: "/icons/values/lightbulb.svg",
     title: "Driven by Innovation",
     description: "We foster an environment that encourages new ideas, creative thinking, and continuous improvement.",
   },
   {
-    icon: "rotate-ccw",
+    icon: "/icons/values/rotate-ccw.svg",
     title: "Learning Through Experience",
     description: "Mistakes are treated as opportunities to learn, improve, and grow stronger with every challenge.",
   },
   {
-    icon: "badge-check",
+    icon: "/icons/values/badge-check.svg",
     title: "Values-Led Culture",
     description: "A system-driven approach guided by integrity, respect, and care in everything we do.",
   },
   {
-    icon: "users",
+    icon: "/icons/values/users.svg",
     title: "Built on Teamwork & Customer Focus",
     description: "Collaboration and a strong customer-first mindset shape how we work and deliver value.",
   },
   {
-    icon: "target",
+    icon: "/icons/values/target.svg",
     title: "Growth Through Challenges",
     description: "We encourage curiosity, learning, and the drive to take on challenges that push boundaries.",
   },
@@ -62,7 +62,7 @@ export function CareerValuesSection({
               <div className="flex items-start justify-between gap-3">
                 <h3 className="text-gradient-orange-black-radial font-montserrat font-semibold text-xl leading-7">{v.title}</h3>
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-zinc-100">
-                  <ValueIcon iconKey={v.icon} />
+                  <ValueIcon icon={v.icon} />
                 </div>
               </div>
               <p className="text-stone-900 font-montserrat font-normal text-base leading-6">{v.description}</p>

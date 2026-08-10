@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { apiSuccess, apiError } from "@/lib/api-response";
 
 const schema = z.object({
+  source: z.enum(["industry", "supplier", "contact"]).default("industry"),
   industryName: z.string().min(1),
   fullName: z.string().min(2),
   enquiryType: z.string().min(1),
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
 
   const parsed = schema.safeParse({
+    source: formData.get("source") || undefined,
     industryName: formData.get("industryName"),
     fullName: formData.get("fullName"),
     enquiryType: formData.get("enquiryType"),

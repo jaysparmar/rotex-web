@@ -2,15 +2,12 @@
 
 import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
-import { FileVideo } from "lucide-react";
-import Image from "next/image";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
-import { Switch } from "@/components/ui/switch";
+import { GalleryMediaPicker, type PickerMediaAsset } from "@/components/admin/gallery-media-picker";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveAboutSection } from "@/app/admin/(dashboard)/about/actions";
 
-type MediaAsset = { id: string; url: string; type: "image" | "video"; filename: string; alt: string | null };
-type FormValues = { enabled: boolean; mediaIds: string[] };
+type FormValues = { enabled: boolean; mediaIds: string[]; sizes: Record<string, "wide" | "narrow"> };
 
 export function GalleryForm({
   initialEnabled,
@@ -18,19 +15,19 @@ export function GalleryForm({
   allMedia,
 }: {
   initialEnabled: boolean;
-  initialData: { mediaIds: string[] };
-  allMedia: MediaAsset[];
+  initialData: { mediaIds: string[]; sizes?: Record<string, "wide" | "narrow"> };
+  allMedia: PickerMediaAsset[];
 }) {
   const form = useForm<FormValues>({
-    defaultValues: { enabled: initialEnabled, mediaIds: initialData.mediaIds ?? [] },
+    defaultValues: {
+      enabled: initialEnabled,
+      mediaIds: initialData.mediaIds ?? [],
+      sizes: initialData.sizes ?? {},
+    },
   });
   const { pending, error, success, run } = useSaveAction();
-  const selected = form.watch("mediaIds");
-
-  function toggle(id: string, checked: boolean) {
-    const current = form.getValues("mediaIds");
-    form.setValue("mediaIds", checked ? [...current, id] : current.filter((m) => m !== id));
-  }
+  const mediaIds = form.watch("mediaIds");
+  const sizes = form.watch("sizes");
 
   function onSubmit(values: FormValues) {
     const { enabled, ...data } = values;
@@ -51,36 +48,24 @@ export function GalleryForm({
         <SectionMeta />
 
         <p className="text-xs text-muted-foreground">
-          Pick which images/videos from the Media Library show in the About gallery. Upload new files on the{" "}
+          Pick which images/videos from the Media Library show in the About gallery, and drag their order with the
+          arrows below. Upload new files on the{" "}
           <a href="/admin/media" className="underline">Media Library</a> page first.
         </p>
 
-        <div className="space-y-1 rounded-lg border border-border">
-          <span className="block p-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Gallery Media ({selected.length} selected)
-          </span>
-          {allMedia.length === 0 && (
-            <p className="p-4 text-sm text-muted-foreground">
-              No media uploaded yet. Add some on the Media Library page first.
-            </p>
-          )}
-          {allMedia.map((asset) => (
-            <div key={asset.id} className="flex items-center gap-4 border-t border-border p-4">
-              <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                {asset.type === "image" ? (
-                  <Image src={asset.url} alt={asset.alt ?? ""} width={48} height={48} className="size-full object-cover" unoptimized />
-                ) : (
-                  <FileVideo className="size-5 text-muted-foreground" />
-                )}
-              </div>
-              <span className="flex-1 truncate text-sm font-medium">{asset.filename}</span>
-              <Switch
-                checked={selected.includes(asset.id)}
-                onCheckedChange={(v) => toggle(asset.id, v)}
-              />
-            </div>
-          ))}
-        </div>
+        {allMedia.length === 0 ? (
+          <p className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
+            No media uploaded yet. Add some on the Media Library page first.
+          </p>
+        ) : (
+          <GalleryMediaPicker
+            allMedia={allMedia}
+            selectedIds={mediaIds}
+            sizes={sizes}
+            onChangeSelected={(ids) => form.setValue("mediaIds", ids)}
+            onChangeSizes={(next) => form.setValue("sizes", next)}
+          />
+        )}
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>

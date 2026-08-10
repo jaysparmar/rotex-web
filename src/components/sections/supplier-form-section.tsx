@@ -136,6 +136,7 @@ export function SupplierFormSection({
     setSubmitError(undefined);
 
     const body = new FormData();
+    body.append("source", "supplier");
     body.append("industryName", data.otherIndustriesServed?.trim() || data.industriesServed);
     body.append("fullName", data.fullName);
     body.append("enquiryType", data.businessType);

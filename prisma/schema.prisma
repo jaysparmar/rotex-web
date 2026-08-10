@@ -225,6 +225,7 @@ model CustomerStory {
   author    String
   company   String
   image     String
+  mediaType String   @default("image") // "image" | "video"
   published Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -250,6 +251,7 @@ model Resource {
 
 model Enquiry {
   id           String   @id @default(cuid())
+  source       String   @default("industry") // "industry" | "supplier" | "contact"
   industryName String
   fullName     String
   enquiryType  String
@@ -274,15 +276,24 @@ model CareerSection {
 }
 
 model JobPosting {
-  id        String   @id @default(cuid())
-  company   String
-  title     String
-  category  String
-  location  String
-  tag       String
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  company        String
+  title          String
+  category       String
+  location       String
+  tag            String
+  employmentType String   @default("Full-time")
+  workMode       String   @default("On-site")
+  aboutRole      String   @default("")
+  /// [StringList]
+  whatYouDo      Json     @default("[]")
+  /// [StringList]
+  whatWeLookFor  Json     @default("[]")
+  /// [JobPerks]
+  whatYouGet     Json     @default("[]")
+  published      Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model JobApplication {
@@ -308,6 +319,14 @@ model SupplierSection {
   updatedAt DateTime @updatedAt
 }
 
+model PartnerToolsSection {
+  key       String   @id
+  enabled   Boolean  @default(true)
+  order     Int
+  data      Json
+  updatedAt DateTime @updatedAt
+}
+
 model DownloadItem {
   id                     String   @id @default(cuid())
   tab                    String
@@ -317,6 +336,7 @@ model DownloadItem {
   fileSizeLabel          String   @default("")
   fileUrl                String
   image                  String
+  
   product                String   @default("")
   subCategory            String   @default("")
   productCertificateType String   @default("")

@@ -2,8 +2,8 @@ import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
-import { FaFacebookF, FaXTwitter, FaLinkedinIn } from "react-icons/fa6";
 import { PostBreadcrumb } from "@/components/ui/post-breadcrumb";
+import { PostShareButtons } from "@/components/ui/post-share-buttons";
 import { getResourceTags, formatResourceDate, type ResourceItem } from "@/lib/resource-types";
 import { extractToc, slugifyHeading } from "@/lib/markdown-toc";
 
@@ -154,11 +154,7 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
               <div className="h-px bg-stone-300" />
               <div className="flex justify-between items-center">
                 <span className="text-zinc-800 text-sm font-medium font-montserrat leading-5">Share:</span>
-                <div className="flex items-center gap-3.5">
-                  <FaLinkedinIn className="size-4 text-zinc-800" />
-                  <FaXTwitter className="size-4 text-zinc-800" />
-                  <FaFacebookF className="size-4 text-zinc-800" />
-                </div>
+                <PostShareButtons title={post.title} />
               </div>
             </div>
           </aside>

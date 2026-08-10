@@ -2,13 +2,14 @@
 
 import { useMemo, useState, useTransition } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { ResourceFormDialog, RESOURCE_TYPES } from "@/components/admin/resources/resource-form-dialog";
+import { RESOURCE_TYPES } from "@/components/admin/resources/resource-edit-form";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { deleteResource, toggleResourcePublished } from "@/app/admin/(dashboard)/resources/actions";
 
@@ -94,14 +95,12 @@ export function ResourceList({ resources }: { resources: Resource[] }) {
           ))}
         </div>
 
-        <ResourceFormDialog
-          trigger={
-            <Button size="sm" className="gap-1.5">
-              <Plus className="size-3.5" />
-              Add Resource
-            </Button>
-          }
-        />
+        <Link href={typeFilter === "all" ? "/admin/resources/new" : `/admin/resources/new?type=${typeFilter}`}>
+          <Button size="sm" className="gap-1.5">
+            <Plus className="size-3.5" />
+            Add Resource
+          </Button>
+        </Link>
       </div>
 
       <div className="divide-y divide-border rounded-lg border border-border">
@@ -137,14 +136,11 @@ export function ResourceList({ resources }: { resources: Resource[] }) {
               onCheckedChange={(v) => handleTogglePublished(resource, v)}
             />
 
-            <ResourceFormDialog
-              resource={resource}
-              trigger={
-                <Button variant="ghost" size="icon-sm">
-                  <Pencil className="size-3.5" />
-                </Button>
-              }
-            />
+            <Link href={`/admin/resources/${resource.id}`}>
+              <Button variant="ghost" size="icon-sm">
+                <Pencil className="size-3.5" />
+              </Button>
+            </Link>
 
             <Button
               variant="ghost"

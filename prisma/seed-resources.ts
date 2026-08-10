@@ -190,6 +190,88 @@ The redesign followed an internal root-cause analysis that traced a majority of 
 
 The new spool design is being rolled into the standard product line across applicable valve series.`,
   },
+  {
+    type: "blogs",
+    slug: "flow-control-oil-gas",
+    title: "Flow Control in the Oil & Gas Industry: Challenges and Solutions",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
+    product: "Solenoid Valve",
+    industry: "Oil & Gas",
+    extraTags: ["Flow Control", "Upstream"],
+    content: `Flow control in oil and gas operations sits at the intersection of process efficiency and safety — a poorly specified valve doesn't just cost throughput, it can become the weak point in an emergency shutdown chain.
+
+## The Core Challenges
+
+Upstream and midstream facilities push valves through conditions few other industries demand simultaneously: high-pressure sour gas, abrasive slurries, and wide ambient temperature swings on unmanned platforms.
+
+- **Corrosive media** — H2S and CO2 content demands NACE-compliant materials, not standard trims
+- **Remote operation** — unmanned platforms need valves that fail to a safe state without local intervention
+- **Pressure cycling** — repeated high-differential cycling accelerates seat wear far faster than steady-state service
+
+## Engineering Solutions
+
+1. Material selection driven by media analysis, not a generic corrosion allowance
+2. Fail-safe actuation (spring-return or fail-closed) specified at the P&ID stage, not retrofitted
+3. Third-party API 6D or API 598 testing before the valve ever reaches site
+
+## Choosing the Right Partner
+
+A supplier who understands sour service metallurgy and can produce mill certificates on demand is worth more than a marginally lower unit price — rework and NDT failures on site cost far more than the valve itself.
+
+## Conclusion
+
+Flow control decisions made at the design stage determine whether a facility's shutdown systems are trustworthy years later. Specify for the worst case, not the average day.`,
+  },
+  {
+    type: "case-studies",
+    slug: "solenoid-valve-classification",
+    title: "Solenoid Valve Classification: The Engineering Logic Behind Reliable Automation Systems",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+    product: "Solenoid Valve",
+    industry: "Process Industries",
+    extraTags: ["Classification", "Engineering"],
+    content: `A systems integrator serving multiple process industries needed a single reference framework to specify solenoid valves consistently across projects, instead of re-deriving requirements from scratch for every client.
+
+## The Challenge
+
+Without a shared classification system, engineers were specifying valves by brand and part number rather than by function — direct-acting vs. pilot-operated, normally open vs. normally closed — leading to mismatched replacements and inconsistent BOMs across sites.
+
+## The Approach
+
+Rotex worked with the integrator's engineering team to build a classification matrix grounded in three variables: operating principle (direct vs. pilot-operated), port configuration (2-way, 3-way, 5-way), and default state (NO/NC). Every valve in the integrator's catalog was mapped against this matrix.
+
+## The Outcome
+
+- A standardized specification sheet reused across all new project quotes
+- Reduced valve mis-selection incidents during commissioning by a significant margin
+- Faster onboarding for new engineers, who now reference one framework instead of tribal knowledge
+
+## Conclusion
+
+Classification isn't academic — it's the difference between a spec sheet an engineer can trust and one that needs a phone call to verify.`,
+  },
+  {
+    type: "news",
+    slug: "global-expansion",
+    title: "Rotex Expands Global Distribution Network Across 15 New Markets",
+    image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80",
+    product: "Solenoid Valve",
+    industry: "Industrial Automation",
+    extraTags: ["Expansion", "Distribution"],
+    content: `Rotex has expanded its global distribution network into 15 new markets, extending local stocking and technical support to customers across regions previously served only through export channels.
+
+## What's New
+
+The expansion adds authorized distribution partners across new geographies, each stocking core valve and actuator lines locally to cut lead times on standard configurations.
+
+## Why It Matters
+
+Customers in newly added regions previously faced multi-week shipping windows for replacement parts. Local stocking through the expanded network brings that down to days for the most commonly ordered items.
+
+## What's Next
+
+Rotex plans to extend local technical training programs to each new distribution partner over the coming quarters, ensuring first-line support is available close to the customer, not just inventory.`,
+  },
 ];
 
 async function main() {

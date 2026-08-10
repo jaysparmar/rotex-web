@@ -23,12 +23,12 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
       heading: "Life at Rotex",
       description: "A culture built on learning, collaboration, and continuous improvement, where people grow while creating meaningful impact.",
       values: [
-        { icon: "trending-up", title: "Where Growth Comes Together", description: "Personal ambitions and career goals align to create meaningful and long-term professional growth." },
-        { icon: "lightbulb", title: "Driven by Innovation", description: "We foster an environment that encourages new ideas, creative thinking, and continuous improvement." },
-        { icon: "rotate-ccw", title: "Learning Through Experience", description: "Mistakes are treated as opportunities to learn, improve, and grow stronger with every challenge." },
-        { icon: "badge-check", title: "Values-Led Culture", description: "A system-driven approach guided by integrity, respect, and care in everything we do." },
-        { icon: "users", title: "Built on Teamwork & Customer Focus", description: "Collaboration and a strong customer-first mindset shape how we work and deliver value." },
-        { icon: "target", title: "Growth Through Challenges", description: "We encourage curiosity, learning, and the drive to take on challenges that push boundaries." },
+        { icon: "/icons/values/trending-up.svg", title: "Where Growth Comes Together", description: "Personal ambitions and career goals align to create meaningful and long-term professional growth." },
+        { icon: "/icons/values/lightbulb.svg", title: "Driven by Innovation", description: "We foster an environment that encourages new ideas, creative thinking, and continuous improvement." },
+        { icon: "/icons/values/rotate-ccw.svg", title: "Learning Through Experience", description: "Mistakes are treated as opportunities to learn, improve, and grow stronger with every challenge." },
+        { icon: "/icons/values/badge-check.svg", title: "Values-Led Culture", description: "A system-driven approach guided by integrity, respect, and care in everything we do." },
+        { icon: "/icons/values/users.svg", title: "Built on Teamwork & Customer Focus", description: "Collaboration and a strong customer-first mindset shape how we work and deliver value." },
+        { icon: "/icons/values/target.svg", title: "Growth Through Challenges", description: "We encourage curiosity, learning, and the drive to take on challenges that push boundaries." },
       ],
     },
   },
@@ -84,12 +84,62 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
   },
 ];
 
-const JOBS: { company: string; title: string; category: string; location: string; tag: string }[] = [
-  { company: "Rotex Automation Limited", title: "Quality Assurance Engineer", category: "Engineering", location: "Vadodara, India", tag: "Solenoid Valves" },
-  { company: "Rotex Manufacturers & Engineers Pvt. Ltd.", title: "Design Engineer – Automation Systems", category: "Marketing", location: "Bangalore, India", tag: "Actuators" },
-  { company: "Rotex Automation Limited", title: "Production Engineer", category: "Engineering", location: "Mumbai, India", tag: "Solenoid Valves" },
-  { company: "Rotex Automation Limited", title: "Sales Engineer – Industrial Solutions", category: "Engineering", location: "Mumbai, India", tag: "Solenoid Valves" },
-  { company: "Rotex Automation Limited", title: "Service & Support Engineer", category: "Engineering", location: "Mumbai, India", tag: "Solenoid Valves" },
+type JobSeed = {
+  company: string;
+  title: string;
+  category: string;
+  location: string;
+  tag: string;
+  employmentType?: string;
+  workMode?: string;
+  aboutRole?: string;
+  whatYouDo?: string[];
+  whatWeLookFor?: string[];
+  whatYouGet?: { icon: string; label: string }[];
+};
+
+const JOBS: JobSeed[] = [
+  {
+    company: "Rotex Automation Limited",
+    title: "Quality Assurance Engineer",
+    category: "Engineering",
+    location: "Vadodara, India",
+    tag: "Solenoid Valves",
+    employmentType: "Full-time",
+    workMode: "Hybrid",
+    aboutRole:
+      "Lead the design and development of next-generation instrumentation systems for critical fluid control applications. Work directly with R&D to push the boundaries of precision engineering.",
+    whatYouDo: [
+      "Design and validate instrumentation systems for high-pressure valve assemblies",
+      "Collaborate with manufacturing to ensure design feasibility and quality",
+      "Lead testing protocols for SIL3-rated safety systems",
+      "Mentor junior engineers and contribute to technical documentation",
+      "Interface with clients to understand application-specific requirements",
+    ],
+    whatWeLookFor: [
+      "7+ years experience in instrumentation engineering, preferably in process control",
+      "Strong understanding of ISA standards and functional safety (SIL)",
+      "Experience with CAD tools (SolidWorks, AutoCAD)",
+      "Excellent problem-solving and communication skills",
+      "Bachelor's or Master's in Instrumentation/Electronics Engineering",
+    ],
+    whatYouGet: [
+      { icon: "dollar-sign", label: "Competitive Pay" },
+      { icon: "building", label: "Health Cover" },
+      { icon: "graduation-cap", label: "L&D Budget" },
+      { icon: "plane", label: "Travel Opps" },
+    ],
+  },
+];
+
+// The gallery admin picker selects from the Media Library, so the seeded
+// static gallery images need a matching MediaAsset row or they show up as
+// "0 selected" and get wiped on the next save.
+const GALLERY_MEDIA = [
+  { url: "/media/career/gallery/1.png", filename: "1.png", alt: "Rotex team at the manufacturing facility" },
+  { url: "/media/career/gallery/2.png", filename: "2.png", alt: "Precision machining on the factory floor" },
+  { url: "/media/career/gallery/3.png", filename: "3.png", alt: "Rotex team at the manufacturing facility" },
+  { url: "/media/career/gallery/4.png", filename: "4.png", alt: "Valve testing on the shop floor" },
 ];
 
 async function main() {
@@ -101,6 +151,14 @@ async function main() {
     });
   }
   console.log(`Seeded ${SECTIONS.length} career sections.`);
+
+  for (const media of GALLERY_MEDIA) {
+    const existing = await prisma.mediaAsset.findFirst({ where: { url: media.url } });
+    if (!existing) {
+      await prisma.mediaAsset.create({ data: { ...media, type: "image" } });
+    }
+  }
+  console.log(`Registered ${GALLERY_MEDIA.length} career gallery media assets.`);
 
   const existingJobs = await prisma.jobPosting.count();
   if (existingJobs === 0) {

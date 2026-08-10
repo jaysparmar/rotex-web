@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Upload, Loader2, FileVideo, Trash2 } from "lucide-react";
+import { Upload, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { uploadAndRegisterMedia, deleteMediaAsset, type MediaAssetDTO } from "@/lib/media-upload";
 
 export function MediaLibraryClient({ initialAssets }: { initialAssets: MediaAssetDTO[] }) {
   const [assets, setAssets] = useState(initialAssets);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [toDelete, setToDelete] = useState<MediaAssetDTO | null>(null);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -24,8 +26,10 @@ export function MediaLibraryClient({ initialAssets }: { initialAssets: MediaAsse
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this media asset? This cannot be undone.")) return;
+  async function confirmDelete() {
+    if (!toDelete) return;
+    const id = toDelete.id;
+    setToDelete(null);
     setDeletingId(id);
     try {
       await deleteMediaAsset(id);
@@ -59,7 +63,16 @@ export function MediaLibraryClient({ initialAssets }: { initialAssets: MediaAsse
                 {asset.type === "image" ? (
                   <Image src={asset.url} alt={asset.alt ?? asset.filename} fill className="object-cover" unoptimized />
                 ) : (
-                  <FileVideo className="size-8 text-muted-foreground" />
+                  <>
+                    <video src={`${asset.url}#t=0.1`} className="size-full object-cover" muted playsInline preload="metadata" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                      <div className="flex size-8 items-center justify-center rounded-full bg-black/50">
+                        <svg viewBox="0 0 24 24" className="size-4 fill-white ml-0.5">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
               <div className="flex items-center justify-between gap-2">
@@ -69,7 +82,7 @@ export function MediaLibraryClient({ initialAssets }: { initialAssets: MediaAsse
                   variant="ghost"
                   size="icon-sm"
                   disabled={deletingId === asset.id}
-                  onClick={() => handleDelete(asset.id)}
+                  onClick={() => setToDelete(asset)}
                 >
                   <Trash2 className="size-3.5" />
                 </Button>
@@ -78,6 +91,15 @@ export function MediaLibraryClient({ initialAssets }: { initialAssets: MediaAsse
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={toDelete !== null}
+        onOpenChange={(open) => !open && setToDelete(null)}
+        title="Delete media asset"
+        description={`Delete "${toDelete?.filename}"? This cannot be undone.`}
+        onConfirm={confirmDelete}
+        pending={deletingId !== null}
+      />
     </div>
   );
 }

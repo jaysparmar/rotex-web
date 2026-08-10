@@ -3,6 +3,7 @@ import { useState } from "react";
 import { MapPin } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
+import { JobDetailSheet } from "@/components/sections/job-detail-sheet";
 import { cn } from "@/lib/utils";
 
 type Job = {
@@ -12,14 +13,27 @@ type Job = {
   category: string;
   location: string;
   tag: string;
+  employmentType: string;
+  workMode: string;
+  aboutRole: string;
+  whatYouDo: string[];
+  whatWeLookFor: string[];
+  whatYouGet: { icon: string; label: string }[];
 };
 
 type CareerOpenPositionsSectionProps = {
   heading?: string;
   jobs?: Job[];
+  experienceOptions?: string[];
+  positionOptions?: string[];
 };
 
-export function CareerOpenPositionsSection({ heading = "Open Positions", jobs = [] }: CareerOpenPositionsSectionProps) {
+export function CareerOpenPositionsSection({
+  heading = "Open Positions",
+  jobs = [],
+  experienceOptions,
+  positionOptions,
+}: CareerOpenPositionsSectionProps) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [company, setCompany] = useState("");
 
@@ -93,13 +107,20 @@ export function CareerOpenPositionsSection({ heading = "Open Positions", jobs = 
                     </div>
                   </div>
 
-                  <a
-                    href="#form"
-                    className="inline-flex w-fit shrink-0 items-center gap-2.5 pr-2.5 text-red-600 font-montserrat font-medium text-sm leading-6 hover:opacity-80 transition-opacity"
-                  >
-                    Apply Now
-                    <RotexArrow size={7} />
-                  </a>
+                  <JobDetailSheet
+                    job={job}
+                    experienceOptions={experienceOptions}
+                    positionOptions={positionOptions}
+                    trigger={
+                      <button
+                        type="button"
+                        className="inline-flex w-fit shrink-0 items-center gap-2.5 pr-2.5 text-red-600 font-montserrat font-medium text-sm leading-6 hover:opacity-80 transition-opacity"
+                      >
+                        View More
+                        <RotexArrow size={7} />
+                      </button>
+                    }
+                  />
                 </div>
 
                 {job.tag && (

@@ -6,7 +6,7 @@ import "swiper/css/navigation";
 import { CustomerStoryCard } from "@/components/ui/customer-story-card";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
 
-type CustomerStory = { quote: string; author: string; company: string; image: string };
+type CustomerStory = { quote: string; author: string; company: string; image: string; mediaType?: string };
 
 type Props = {
   stories: CustomerStory[];
@@ -43,7 +43,7 @@ export function IndustryCustomerStories({ stories }: Props) {
           {stories.map((story, i) => (
             <SwiperSlide key={i} className="!w-[85vw] lg:!w-[578px]">
               <CustomerStoryCard
-                media={{ type: "image", src: story.image }}
+                media={{ type: story.mediaType === "video" ? "video" : "image", src: story.image }}
                 quote={story.quote}
                 author={story.author}
                 company={story.company}

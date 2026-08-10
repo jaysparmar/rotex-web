@@ -9,15 +9,21 @@ function revalidateStories() {
   revalidatePath("/industries", "layout");
 }
 
-export async function createCustomerStory(data: { quote: string; author: string; company: string; image: string; published: boolean }) {
+type CustomerStoryInput = {
+  quote: string;
+  author: string;
+  company: string;
+  image: string;
+  mediaType: string;
+  published: boolean;
+};
+
+export async function createCustomerStory(data: CustomerStoryInput) {
   await prisma.customerStory.create({ data });
   revalidateStories();
 }
 
-export async function updateCustomerStory(
-  id: string,
-  data: { quote: string; author: string; company: string; image: string; published: boolean }
-) {
+export async function updateCustomerStory(id: string, data: CustomerStoryInput) {
   await prisma.customerStory.update({ where: { id }, data });
   revalidateStories();
 }

@@ -1,50 +1,50 @@
 "use client";
 
-import { useForm, FormProvider, useFieldArray, useFormContext } from "react-hook-form";
+import Image from "next/image";
+import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
-import { TextField, TextAreaField, FieldGrid, AddButton } from "@/components/admin/form-fields";
-import { MediaField } from "@/components/admin/media-field";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { TextField } from "@/components/admin/form-fields";
+import { Switch } from "@/components/ui/switch";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveChannelPartnerSection } from "@/app/admin/(dashboard)/channel-partner/actions";
 
-type Story = { id: string; quote: string; author: string; company: string; image: string };
-type StoryInput = { id: string; quote: string; author: string; company: string; image: { src: string } };
+type Story = { id: string; quote: string; author: string; company: string; image: string; mediaType?: string };
 type FormValues = {
   enabled: boolean;
   heading: { title: string; subtitle: string };
-  stories: StoryInput[];
+  storyIds: string[];
 };
-
-function newStory(): StoryInput {
-  return { id: `story-${Date.now()}-${Math.floor(Math.random() * 1e6)}`, quote: "", author: "", company: "", image: { src: "" } };
-}
 
 export function ChannelPartnerStoriesForm({
   initialEnabled,
   initialData,
+  allStories,
 }: {
   initialEnabled: boolean;
-  initialData: { heading: { title: string; subtitle: string }; stories: Story[] };
+  initialData: { heading: { title: string; subtitle: string }; storyIds: string[] };
+  allStories: Story[];
 }) {
   const form = useForm<FormValues>({
     defaultValues: {
       enabled: initialEnabled,
       heading: initialData.heading,
-      stories: initialData.stories.map((s) => ({ ...s, image: { src: s.image } })),
+      storyIds: initialData.storyIds ?? [],
     },
   });
-  const storiesArray = useFieldArray({ control: form.control, name: "stories" });
   const { pending, error, success, run } = useSaveAction();
+  const selected = form.watch("storyIds");
+
+  function toggle(id: string, checked: boolean) {
+    const current = form.getValues("storyIds");
+    form.setValue(
+      "storyIds",
+      checked ? [...current, id] : current.filter((s) => s !== id)
+    );
+  }
 
   function onSubmit(values: FormValues) {
-    const { enabled, stories, ...rest } = values;
-    const data = {
-      ...rest,
-      stories: stories.map((s) => ({ id: s.id, quote: s.quote, author: s.author, company: s.company, image: s.image.src })),
-    };
+    const { enabled, ...data } = values;
     run(async () => {
       try {
         await saveChannelPartnerSection("stories", { enabled, data });
@@ -60,41 +60,45 @@ export function ChannelPartnerStoriesForm({
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <SectionMeta />
-        <FieldGrid>
-          <TextField label="Heading Title" {...form.register("heading.title")} />
-          <TextField label="Heading Subtitle" {...form.register("heading.subtitle")} />
-        </FieldGrid>
+        <TextField label="Heading Title" {...form.register("heading.title")} />
+        <TextField label="Heading Subtitle" {...form.register("heading.subtitle")} />
 
-        <div className="space-y-4">
-          {storiesArray.fields.map((field, i) => (
-            <StoryItem key={field.id} index={i} onRemove={() => storiesArray.remove(i)} />
+        <div className="space-y-1 rounded-lg border border-border">
+          {allStories.length === 0 && (
+            <p className="p-4 text-sm text-muted-foreground">
+              No published customer stories yet. Add some on the Customer Stories page first.
+            </p>
+          )}
+          {allStories.map((story) => (
+            <div key={story.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
+              <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
+                {story.image && story.mediaType === "video" ? (
+                  <video src={story.image} className="size-full object-cover" muted />
+                ) : story.image ? (
+                  <Image
+                    src={story.image}
+                    alt={story.author}
+                    width={40}
+                    height={40}
+                    className="size-full object-cover"
+                    unoptimized
+                  />
+                ) : null}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{story.author}, {story.company}</p>
+                <p className="truncate text-xs text-muted-foreground">{story.quote}</p>
+              </div>
+              <Switch
+                checked={selected.includes(story.id)}
+                onCheckedChange={(v) => toggle(story.id, v)}
+              />
+            </div>
           ))}
-          <AddButton label="Add Story" onClick={() => storiesArray.append(newStory())} />
         </div>
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>
     </FormProvider>
-  );
-}
-
-function StoryItem({ index, onRemove }: { index: number; onRemove: () => void }) {
-  const form = useFormContext<FormValues>();
-
-  return (
-    <div className="space-y-4 rounded-lg border border-border p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-muted-foreground">Story {index + 1}</span>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
-          <Trash2 className="size-3.5 text-destructive" />
-        </Button>
-      </div>
-      <TextAreaField label="Quote" {...form.register(`stories.${index}.quote`)} />
-      <FieldGrid>
-        <TextField label="Author" {...form.register(`stories.${index}.author`)} />
-        <TextField label="Company" {...form.register(`stories.${index}.company`)} />
-      </FieldGrid>
-      <MediaField name={`stories.${index}.image`} mediaType="image" showAlt={false} />
-    </div>
   );
 }

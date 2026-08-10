@@ -22,10 +22,19 @@ type StoryFormValues = {
   author: string;
   company: string;
   published: boolean;
+  mediaType: "image" | "video";
   image: { src: string };
 };
 
-type Story = { id: string; quote: string; author: string; company: string; image: string; published: boolean };
+type Story = {
+  id: string;
+  quote: string;
+  author: string;
+  company: string;
+  image: string;
+  mediaType: string;
+  published: boolean;
+};
 
 export function CustomerStoryFormDialog({
   story,
@@ -41,10 +50,12 @@ export function CustomerStoryFormDialog({
       author: story?.author ?? "",
       company: story?.company ?? "",
       published: story?.published ?? true,
+      mediaType: (story?.mediaType as "image" | "video") ?? "image",
       image: { src: story?.image ?? "" },
     },
   });
   const { pending, error, run } = useSaveAction();
+  const mediaType = form.watch("mediaType");
 
   function onSubmit(values: StoryFormValues) {
     const payload = {
@@ -52,6 +63,7 @@ export function CustomerStoryFormDialog({
       author: values.author,
       company: values.company,
       published: values.published,
+      mediaType: values.mediaType,
       image: values.image.src,
     };
     run(async () => {
@@ -86,7 +98,33 @@ export function CustomerStoryFormDialog({
               <TextField label="Author" {...form.register("author", { required: true })} />
               <TextField label="Company" {...form.register("company", { required: true })} />
             </div>
-            <MediaField name="image" mediaType="image" showAlt={false} />
+            <div className="flex items-center gap-1 rounded-lg bg-muted p-1 w-fit">
+              <button
+                type="button"
+                onClick={() => {
+                  form.setValue("mediaType", "image");
+                  form.setValue("image.src", "");
+                }}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                  mediaType === "image" ? "bg-background shadow-sm" : "text-muted-foreground"
+                }`}
+              >
+                Image
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  form.setValue("mediaType", "video");
+                  form.setValue("image.src", "");
+                }}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                  mediaType === "video" ? "bg-background shadow-sm" : "text-muted-foreground"
+                }`}
+              >
+                Video
+              </button>
+            </div>
+            <MediaField name="image" mediaType={mediaType} showAlt={false} defaultMode="upload" />
             <SwitchField
               label="Published"
               checked={form.watch("published")}

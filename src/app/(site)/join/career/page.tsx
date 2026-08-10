@@ -27,7 +27,6 @@ export default async function CareerPage() {
   ]);
 
   const positionOptions = Array.from(new Set(jobRecords.map((j) => j.title)));
-  const locationOptions = Array.from(new Set(jobRecords.map((j) => j.location)));
 
   return (
     <div>
@@ -55,7 +54,15 @@ export default async function CareerPage() {
             category: j.category,
             location: j.location,
             tag: j.tag,
+            employmentType: j.employmentType,
+            workMode: j.workMode,
+            aboutRole: j.aboutRole,
+            whatYouDo: (j.whatYouDo as string[] | null) ?? [],
+            whatWeLookFor: (j.whatWeLookFor as string[] | null) ?? [],
+            whatYouGet: (j.whatYouGet as { icon: string; label: string }[] | null) ?? [],
           }))}
+          experienceOptions={form?.experienceOptions}
+          positionOptions={positionOptions}
         />
       )}
 
@@ -66,7 +73,6 @@ export default async function CareerPage() {
           benefits={form.benefits}
           experienceOptions={form.experienceOptions}
           positionOptions={positionOptions}
-          locationOptions={locationOptions}
         />
       )}
     </div>

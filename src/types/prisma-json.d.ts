@@ -109,6 +109,10 @@ declare global {
     };
 
     type ProductSpecs = Record<string, string | number | null>;
+
+    type JobPerks = { icon: string; label: string }[];
+
+    type PartnerTool = { icon: string; title: string; description: string; link: string };
   }
 }
 

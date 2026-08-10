@@ -28,12 +28,13 @@ export async function getAboutSection(key: string) {
 
   if (key === "gallery") {
     const ids = (data.mediaIds as string[]) ?? [];
+    const sizes = (data.sizes as Record<string, "wide" | "narrow">) ?? {};
     const assets = ids.length ? await prisma.mediaAsset.findMany({ where: { id: { in: ids } } }) : [];
     const byId = new Map(assets.map((a) => [a.id, a]));
     const images = ids
       .map((id) => byId.get(id))
       .filter((a): a is NonNullable<typeof a> => Boolean(a))
-      .map((a) => ({ src: a.url, alt: a.alt ?? "", type: a.type as "image" | "video" }));
+      .map((a) => ({ src: a.url, alt: a.alt ?? "", type: a.type as "image" | "video", size: sizes[a.id] ?? "wide" }));
     return apiSuccess({ enabled: section.enabled, images }, section.updatedAt);
   }
 

@@ -54,9 +54,11 @@ export function CareerWhyForm({
         <TextAreaField label="Description" {...form.register("description")} />
 
         <div className="space-y-3">
-          {cardsArray.fields.map((field, i) => (
-            <CardRow key={field.id} index={i} onRemove={() => cardsArray.remove(i)} />
-          ))}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {cardsArray.fields.map((field, i) => (
+              <CardRow key={field.id} index={i} onRemove={() => cardsArray.remove(i)} />
+            ))}
+          </div>
           <AddButton
             label="Add Card"
             onClick={() => cardsArray.append({ title: "", description: "", image: { src: "" } })}
@@ -82,7 +84,7 @@ function CardRow({ index, onRemove }: { index: number; onRemove: () => void }) {
       </div>
       <TextField label="Title" {...form.register(`cards.${index}.title`)} />
       <TextAreaField label="Description" {...form.register(`cards.${index}.description`)} />
-      <MediaField name={`cards.${index}.image`} mediaType="image" showAlt={false} />
+      <MediaField name={`cards.${index}.image`} mediaType="image" showAlt={false} previewFit="contain" />
     </div>
   );
 }

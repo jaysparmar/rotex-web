@@ -29,6 +29,7 @@ export function CustomerStoryCard({ media, quote, author, company, className }: 
             src={media.src}
             variant="light"
             containerClassName="w-full h-full"
+            showMuteToggle
           />
         ) : (
           <ImageView
