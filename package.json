@@ -9,6 +9,7 @@
     "lint": "eslint",
     "import:products": "tsx scripts/import-products.ts",
     "seed": "tsx prisma/seed.ts",
+    "seed:categories": "tsx prisma/seed-categories.ts",
     "seed:export": "tsx scripts/export-seed-data.ts"
   },
   "prisma": {
