@@ -12,7 +12,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Field, TextField, SwitchField } from "@/components/admin/form-fields";
+import { TextField, TextAreaField, FieldGrid, SwitchField, SelectField } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { slugify } from "@/lib/product-import";
@@ -30,9 +30,24 @@ type ResourceFormValues = {
   slug: string;
   published: boolean;
   image: { src: string };
+  product: string;
+  industry: string;
+  extraTags: string;
+  content: string;
 };
 
-type Resource = { id: string; type: string; title: string; slug: string; image: string; published: boolean };
+type Resource = {
+  id: string;
+  type: string;
+  title: string;
+  slug: string;
+  image: string;
+  published: boolean;
+  product: string;
+  industry: string;
+  extraTags: string[];
+  content: string;
+};
 
 export function ResourceFormDialog({
   resource,
@@ -52,6 +67,10 @@ export function ResourceFormDialog({
       slug: resource?.slug ?? "",
       published: resource?.published ?? true,
       image: { src: resource?.image ?? "" },
+      product: resource?.product ?? "",
+      industry: resource?.industry ?? "",
+      extraTags: (resource?.extraTags ?? []).join(", "),
+      content: resource?.content ?? "",
     },
   });
   const { pending, error, run } = useSaveAction();
@@ -75,6 +94,10 @@ export function ResourceFormDialog({
       slug: values.slug.trim() || slugify(values.title),
       published: values.published,
       image: values.image.src,
+      product: values.product,
+      industry: values.industry,
+      extraTags: values.extraTags.split(",").map((t) => t.trim()).filter(Boolean),
+      content: values.content,
     };
     run(async () => {
       try {
@@ -97,25 +120,19 @@ export function ResourceFormDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={trigger as React.ReactElement} />
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{resource ? "Edit Resource" : "Add Resource"}</DialogTitle>
         </DialogHeader>
 
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Field label="Type">
-              <select
-                {...form.register("type", { required: true })}
-                className="h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring"
-              >
-                {RESOURCE_TYPES.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
+            <SelectField
+              label="Type"
+              options={RESOURCE_TYPES.map((t) => ({ value: t.id, label: t.label }))}
+              defaultValue={resource?.type ?? defaultType ?? RESOURCE_TYPES[0].id}
+              {...form.register("type", { required: true })}
+            />
             <TextField
               label="Title"
               {...form.register("title", { required: true })}
@@ -127,6 +144,16 @@ export function ResourceFormDialog({
               onChange={handleSlugChange}
             />
             <MediaField name="image" mediaType="image" showAlt={false} />
+            <FieldGrid>
+              <TextField label="Product tag" {...form.register("product")} />
+              <TextField label="Industry tag" {...form.register("industry")} />
+            </FieldGrid>
+            <TextField label="Extra tags (comma separated)" {...form.register("extraTags")} />
+            <TextAreaField
+              label="Content (Markdown — supports ## headings, **bold**, links, lists, images)"
+              rows={12}
+              {...form.register("content")}
+            />
             <SwitchField
               label="Published"
               checked={form.watch("published")}

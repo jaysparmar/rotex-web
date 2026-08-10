@@ -4,11 +4,11 @@ import { ResourceCard } from "@/components/ui/resource-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { ResourcePost } from "@/lib/resources-data";
+import type { ResourceItem } from "@/lib/resource-types";
 
 type ResourcesGridSectionProps = {
   heading: string;
-  posts: ResourcePost[];
+  posts: ResourceItem[];
   basePath: string;
 };
 
@@ -95,8 +95,8 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
   const [sort, setSort] = useState<"Newest" | "Oldest">("Newest");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const products = useMemo(() => Array.from(new Set(posts.map((p) => p.product))), [posts]);
-  const industries = useMemo(() => Array.from(new Set(posts.map((p) => p.industry))), [posts]);
+  const products = useMemo(() => Array.from(new Set(posts.map((p) => p.product).filter(Boolean))), [posts]);
+  const industries = useMemo(() => Array.from(new Set(posts.map((p) => p.industry).filter(Boolean))), [posts]);
 
   const filteredPosts = useMemo(() => {
     // An empty selection means "all", so nothing is filtered out.
@@ -106,7 +106,7 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
         (industry.length === 0 || industry.includes(p.industry))
     );
     list = [...list].sort((a, b) => {
-      const diff = new Date(a.date).getTime() - new Date(b.date).getTime();
+      const diff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       return sort === "Newest" ? -diff : diff;
     });
     return list;

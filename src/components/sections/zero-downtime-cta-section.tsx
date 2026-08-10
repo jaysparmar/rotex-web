@@ -1,8 +1,12 @@
 import { PillButton } from "@/components/ui/pill-button";
 
+type CtaButton = { label: string; href: string };
+
 type ZeroDowntimeCtaSectionProps = {
   title?: string;
   description?: string;
+  ctaPrimary?: CtaButton;
+  ctaSecondary?: CtaButton;
 };
 
 const CTA_SHADOW = "shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)]";
@@ -10,6 +14,8 @@ const CTA_SHADOW = "shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)]";
 export function ZeroDowntimeCtaSection({
   title = "Ready to engineer Zero Downtime into your plant?",
   description = "The N2W Zero Downtime Consultation applies 58 years of field-validated engineering to your specific plant - and identifies the failure modes most likely to cause your next shutdown. 45 minutes. No sales content. Written analysis in 48 hours.",
+  ctaPrimary = { label: "Book Free Consultation", href: "/contact" },
+  ctaSecondary = { label: "Download N2W Framework", href: "/downloads" },
 }: ZeroDowntimeCtaSectionProps) {
   return (
     <section className="py-16 lg:py-20">
@@ -27,20 +33,20 @@ export function ZeroDowntimeCtaSection({
 
           <div className="flex flex-wrap items-center gap-4 lg:gap-5">
             <PillButton
-              href="/contact"
+              href={ctaPrimary.href}
               tone="lightOrange"
               size="md"
               className={`font-bold ${CTA_SHADOW}`}
             >
-              Book Free Consultation
+              {ctaPrimary.label}
             </PillButton>
             <PillButton
-              href="/downloads"
+              href={ctaSecondary.href}
               tone="dark"
               size="md"
               className={`font-bold outline-1 -outline-offset-1 outline-primary ${CTA_SHADOW}`}
             >
-              Download N2W Framework
+              {ctaSecondary.label}
             </PillButton>
           </div>
         </div>

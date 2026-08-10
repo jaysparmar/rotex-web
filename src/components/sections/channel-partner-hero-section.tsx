@@ -21,7 +21,7 @@ export function ChannelPartnerHeroSection({
   return (
     // Figma: 625px mobile / 600px desktop — a fixed frame, so the artwork is
     // clipped by it rather than stretching the section.
-    <section className="relative bg-stone-900 min-h-156.25 lg:min-h-0 lg:h-150 pt-28 pb-16 lg:pb-20 overflow-hidden">
+    <section className="relative bg-stone-900 min-h-156.25 lg:min-h-0 lg:h-170 pt-28 pb-16 lg:pb-20 overflow-hidden">
       {/*
         Desktop artwork. Figma places it at left 871 / top 178, 626×556 inside a
         1440×600 frame — i.e. it deliberately bleeds ~57px off the right edge and

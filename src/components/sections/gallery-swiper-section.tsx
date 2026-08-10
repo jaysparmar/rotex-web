@@ -7,13 +7,14 @@ import { Navigation, A11y } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
+import { VideoPlayer } from "@/components/ui/video-player";
 import growthImage from "@/assets/Images/aboutus/growth.png";
 import machineBg from "@/assets/Images/breadcurmbBackgrounds/machine_bg.jpg";
 import railBg from "@/assets/Images/breadcurmbBackgrounds/rail_bg.jpg";
 import oilBg from "@/assets/Images/breadcurmbBackgrounds/oil_bg.jpg";
 import aerospaceBg from "@/assets/Images/breadcurmbBackgrounds/aerospace_bg.jpg";
 
-type GalleryImage = { src: StaticImageData; alt: string };
+type GalleryImage = { src: StaticImageData | string; alt: string; type?: "image" | "video" };
 
 const defaultImages: GalleryImage[] = [
   { src: railBg, alt: "Rotex team at the manufacturing facility" },
@@ -53,13 +54,18 @@ export function GallerySwiperSection({ images = defaultImages }: GallerySwiperSe
             {images.map((img, i) => (
               <SwiperSlide key={i}>
                 <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl">
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    className="object-cover"
-                    sizes="(min-width: 1024px) 60vw, (min-width: 768px) 75vw, 90vw"
-                  />
+                  {img.type === "video" ? (
+                    <VideoPlayer src={img.src as string} controls />
+                  ) : (
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 1024px) 60vw, (min-width: 768px) 75vw, 90vw"
+                      unoptimized={typeof img.src === "string"}
+                    />
+                  )}
                 </div>
               </SwiperSlide>
             ))}

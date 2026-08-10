@@ -10,7 +10,17 @@ function revalidateResources() {
   revalidatePath("/", "layout");
 }
 
-export type ResourceInput = { type: string; title: string; slug: string; image: string; published: boolean };
+export type ResourceInput = {
+  type: string;
+  title: string;
+  slug: string;
+  image: string;
+  published: boolean;
+  product: string;
+  industry: string;
+  extraTags: string[];
+  content: string;
+};
 
 export async function createResource(data: ResourceInput) {
   const slug = data.slug.trim() ? slugify(data.slug) : slugify(data.title);

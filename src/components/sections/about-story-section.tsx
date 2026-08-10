@@ -55,7 +55,7 @@ export function AboutStorySection({
   stats = defaultStats,
   trustedLabel = "Trusted by Industry leaders",
   logos = defaultLogos,
-  videoSrc = "https://www.w3schools.com/html/mov_bbb.mp4",
+  videoSrc = "/media/about-us.mp4",
 }: AboutStorySectionProps) {
   return (
     <section className="bg-white pt-14 lg:pt-20 pb-6 lg:pb-8">
@@ -132,7 +132,7 @@ export function AboutStorySection({
                     alt={alt}
                     width={80}
                     height={28}
-                    className="object-contain"
+                    className="h-full w-auto object-contain"
                     unoptimized={typeof src === "string"}
                   />
                 </div>

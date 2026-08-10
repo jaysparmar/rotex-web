@@ -7,18 +7,14 @@ import { Navigation, A11y } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
-import growthImage from "@/assets/Images/aboutus/growth.png";
-import machineBg from "@/assets/Images/breadcurmbBackgrounds/machine_bg.jpg";
-import railBg from "@/assets/Images/breadcurmbBackgrounds/rail_bg.jpg";
-import oilBg from "@/assets/Images/breadcurmbBackgrounds/oil_bg.jpg";
 
-type GalleryImage = { src: StaticImageData; alt: string; size: "wide" | "narrow" };
+type GalleryImage = { src: StaticImageData | string; alt: string; size: "wide" | "narrow" };
 
 const defaultImages: GalleryImage[] = [
-  { src: railBg, alt: "Rotex team at the manufacturing facility", size: "wide" },
-  { src: growthImage, alt: "Precision machining on the factory floor", size: "narrow" },
-  { src: machineBg, alt: "Rotex team at the manufacturing facility", size: "wide" },
-  { src: oilBg, alt: "Valve testing on the shop floor", size: "narrow" },
+  { src: "/media/career/gallery/1.png", alt: "Rotex team at the manufacturing facility", size: "wide" },
+  { src: "/media/career/gallery/2.png", alt: "Precision machining on the factory floor", size: "narrow" },
+  { src: "/media/career/gallery/3.png", alt: "Rotex team at the manufacturing facility", size: "wide" },
+  { src: "/media/career/gallery/4.png", alt: "Valve testing on the shop floor", size: "narrow" },
 ];
 
 type CareerGallerySectionProps = {

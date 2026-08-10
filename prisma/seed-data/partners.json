@@ -1,0 +1,226 @@
+[
+  {
+    "id": "partner_001",
+    "name": "Scania",
+    "logo": "/uploads/1785828554931-xgl58s.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:33.846Z",
+    "updatedAt": "2026-08-04T07:29:17.820Z"
+  },
+  {
+    "id": "partner_002",
+    "name": "Cummins",
+    "logo": "/uploads/1785828567239-kzsdap.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:33.965Z",
+    "updatedAt": "2026-08-04T07:29:28.958Z"
+  },
+  {
+    "id": "partner_003",
+    "name": "Reliance",
+    "logo": "/uploads/1785828576854-2w8a1g.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:34.154Z",
+    "updatedAt": "2026-08-04T07:29:38.470Z"
+  },
+  {
+    "id": "partner_004",
+    "name": "Qatar Petroleum",
+    "logo": "/uploads/1785828587571-s1tz5m.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:34.282Z",
+    "updatedAt": "2026-08-04T07:29:48.671Z"
+  },
+  {
+    "id": "partner_005",
+    "name": "Petronas",
+    "logo": "/uploads/1785828597361-shktc4.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:34.422Z",
+    "updatedAt": "2026-08-04T07:29:58.437Z"
+  },
+  {
+    "id": "partner_006",
+    "name": "Shell",
+    "logo": "/uploads/1785828606934-1993r1.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:34.519Z",
+    "updatedAt": "2026-08-04T07:30:08.137Z"
+  },
+  {
+    "id": "partner_007",
+    "name": "Aurobindo",
+    "logo": "/uploads/1785828618616-5e4ljg.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:34.649Z",
+    "updatedAt": "2026-08-04T07:30:19.934Z"
+  },
+  {
+    "id": "partner_008",
+    "name": "Aramco",
+    "logo": "/uploads/1785828630585-tf6hmt.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:34.756Z",
+    "updatedAt": "2026-08-04T07:30:32.000Z"
+  },
+  {
+    "id": "partner_009",
+    "name": "Bharat Petroleum",
+    "logo": "/uploads/1785828639067-ruibmu.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:34.875Z",
+    "updatedAt": "2026-08-04T07:30:40.480Z"
+  },
+  {
+    "id": "partner_010",
+    "name": "Linde",
+    "logo": "/uploads/1785828648129-cioh16.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:34.993Z",
+    "updatedAt": "2026-08-04T07:30:49.078Z"
+  },
+  {
+    "id": "partner_011",
+    "name": "NPCIL",
+    "logo": "/uploads/1785828657327-btlzop.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:35.078Z",
+    "updatedAt": "2026-08-04T07:30:58.284Z"
+  },
+  {
+    "id": "partner_012",
+    "name": "Adnoc",
+    "logo": "/uploads/1785828671811-i6qskf.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:35.162Z",
+    "updatedAt": "2026-08-04T07:31:12.807Z"
+  },
+  {
+    "id": "partner_013",
+    "name": "Isro",
+    "logo": "/uploads/1785828681993-lkpn1d.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:35.235Z",
+    "updatedAt": "2026-08-04T07:31:23.419Z"
+  },
+  {
+    "id": "partner_014",
+    "name": "Air Liquide",
+    "logo": "/uploads/1785828691514-ofmtp3.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:35.309Z",
+    "updatedAt": "2026-08-04T07:31:32.516Z"
+  },
+  {
+    "id": "partner_015",
+    "name": "Dr. Reddy's",
+    "logo": "/uploads/1785828699026-nwfw1y.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:35.463Z",
+    "updatedAt": "2026-08-04T07:31:40.362Z"
+  },
+  {
+    "id": "partner_016",
+    "name": "GE",
+    "logo": "/uploads/1785828707205-1qgnpk.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:35.548Z",
+    "updatedAt": "2026-08-04T07:31:48.356Z"
+  },
+  {
+    "id": "partner_017",
+    "name": "Daimler",
+    "logo": "/uploads/1785828715139-wim7kq.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:35.622Z",
+    "updatedAt": "2026-08-04T07:31:56.180Z"
+  },
+  {
+    "id": "partner_018",
+    "name": "NIGC",
+    "logo": "/uploads/1785828723647-rjvfvp.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:35.696Z",
+    "updatedAt": "2026-08-04T07:32:05.120Z"
+  },
+  {
+    "id": "cmsehywiy00003xknxgbt37kw",
+    "name": "CE",
+    "logo": "/uploads/1785838219881-oogr7g.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:10:23.914Z",
+    "updatedAt": "2026-08-04T10:10:32.923Z"
+  },
+  {
+    "id": "cmsehzbtn00013xknascfokr0",
+    "name": "EX",
+    "logo": "/uploads/1785838239689-f1lfdn.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:10:43.739Z",
+    "updatedAt": "2026-08-04T10:10:43.739Z"
+  },
+  {
+    "id": "cmsehzi2w00023xknhob98zpf",
+    "name": "SIL3",
+    "logo": "/uploads/1785838249473-c0cf43.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:10:51.848Z",
+    "updatedAt": "2026-08-04T10:10:51.848Z"
+  },
+  {
+    "id": "cmsehzsgo00033xknoc7toiou",
+    "name": "IATF",
+    "logo": "/uploads/1785838263420-2t3w21.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:11:05.304Z",
+    "updatedAt": "2026-08-04T10:11:05.304Z"
+  },
+  {
+    "id": "cmsei02l600043xknf8z5ra8c",
+    "name": "inmetro",
+    "logo": "/uploads/1785838274496-qhnd4i.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:11:18.426Z",
+    "updatedAt": "2026-08-04T10:11:18.426Z"
+  },
+  {
+    "id": "cmsei09lx00053xkn5furumx9",
+    "name": "ISI",
+    "logo": "/uploads/1785838283753-x1980u.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:11:27.525Z",
+    "updatedAt": "2026-08-04T10:11:27.525Z"
+  },
+  {
+    "id": "cmsei0gqw00063xknynwthrth",
+    "name": "KOSHA",
+    "logo": "/uploads/1785838293589-3zs8y9.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:11:36.776Z",
+    "updatedAt": "2026-08-04T10:11:36.776Z"
+  },
+  {
+    "id": "cmsei0nm000073xknv56649rl",
+    "name": "PCT",
+    "logo": "/uploads/1785838302488-q2s6om.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:11:45.672Z",
+    "updatedAt": "2026-08-04T10:11:45.672Z"
+  },
+  {
+    "id": "cmsei0tog00083xkny64964fo",
+    "name": "PED",
+    "logo": "/uploads/1785838310688-cc3oo8.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:11:53.536Z",
+    "updatedAt": "2026-08-04T10:11:53.536Z"
+  },
+  {
+    "id": "cmsei0zd900093xknh3dayr3u",
+    "name": "UL",
+    "logo": "/uploads/1785838318517-exovp5.png",
+    "published": true,
+    "createdAt": "2026-08-04T10:12:00.909Z",
+    "updatedAt": "2026-08-04T10:12:00.909Z"
+  }
+]

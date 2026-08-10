@@ -3,7 +3,8 @@ import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { ResourceList } from "@/components/admin/resources/resource-list";
 
 export default async function AdminResourcesPage() {
-  const resources = await prisma.resource.findMany({ orderBy: { createdAt: "asc" } });
+  const records = await prisma.resource.findMany({ orderBy: { createdAt: "asc" } });
+  const resources = records.map((r) => ({ ...r, extraTags: (r.extraTags as string[]) ?? [] }));
 
   return (
     <div className="space-y-6">

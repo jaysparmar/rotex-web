@@ -1,12 +1,14 @@
 import { BlogsHeroSection } from "@/components/sections/blogs-hero-section";
 import { ResourcesGridSection } from "@/components/sections/resources-grid-section";
-import { RESOURCE_POSTS } from "@/lib/resources-data";
+import { getPublishedResources } from "@/lib/resources";
 
-export default function BlogsPage() {
+export default async function BlogsPage() {
+  const posts = await getPublishedResources("blogs");
+
   return (
     <div>
-      <BlogsHeroSection />
-      <ResourcesGridSection heading="All Blogs" posts={RESOURCE_POSTS} basePath="/blogs" />
+      <BlogsHeroSection featured={posts[0]} />
+      <ResourcesGridSection heading="All Blogs" posts={posts} basePath="/blogs" />
     </div>
   );
 }

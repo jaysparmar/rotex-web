@@ -1,0 +1,360 @@
+[
+  {
+    "id": "cmrkzyavj00005scdwm5lcbcx",
+    "slug": "oil-gas",
+    "name": "Oil & Gas",
+    "bgKey": "oil",
+    "image": "/uploads/1785827713590-inipc7.jpg",
+    "description": "Flow intelligence that performs where pressure, precision, and uptime are non-negotiable. From upstream volatility to downstream complexity, Rotex enables control that adapts, responds, and delivers.",
+    "sectionTitle": "Supporting the Control Points Behind Every Confident Shift",
+    "overview": "Oil and gas operations run in some of the world's most demanding and safety-critical environments across upstream wellheads, midstream pipelines, and downstream refineries. The volatile nature of hydrocarbons, combined with complex extraction and processing systems, creates conditions where even minor deviations can lead to severe operational, environmental, and financial consequences.  From offshore platforms to remote drilling sites, operations face constant challenges including extreme pressures, high temperatures, and limited accessibility. These conditions place immense stress on equipment and demand systems that can perform reliably without interruption. Downtime is not a delay it is a direct loss of safety, output, and revenue. At the same time, stringent regulatory requirements and increasing environmental scrutiny require continuous improvements in safety, control, and operational efficiency.  Rotex addresses these challenges through a systems-led approach to flow control, purpose-engineered for the demands of oil and gas. Solenoid valves, actuators, positioners, and electrohydraulic systems work together as an integrated intelligence layer within the process. This enables faster response, precise control, and fail-safe operation across upstream, midstream, and downstream environments.  The result is safer operations, improved reliability, and consistent performance helping operators run critical assets safely, efficiently, and without compromise across every stage of oil and gas production and processing.",
+    "stats": [
+      {
+        "value": "10",
+        "label": "Valves Supplied",
+        "suffix": "+"
+      },
+      {
+        "value": "7000",
+        "suffix": "+",
+        "label": "Customers served"
+      },
+      {
+        "value": "81",
+        "suffix": "+",
+        "label": "Countries served"
+      },
+      {
+        "value": "6100",
+        "suffix": "+",
+        "label": "Customised solutions"
+      },
+      {
+        "value": "30",
+        "suffix": "+",
+        "label": "Utility patents"
+      },
+      {
+        "value": "58",
+        "suffix": "+",
+        "label": "Years of Engineering Excellence"
+      }
+    ],
+    "whyChoose": {
+      "title": "Why Choose Rotex for",
+      "highlight": "Oil & Gas",
+      "cards": [
+        {
+          "title": "Precision Under Pressure",
+          "description": "Engineered for high-pressure, high-temperature applications where even the smallest deviation can have significant consequences."
+        },
+        {
+          "title": "Fail-Safe by Design",
+          "description": "With advanced EHF actuator systems and intelligent control mechanisms, safety isn't an add-on. It's embedded into every operation."
+        },
+        {
+          "title": "System-Level Responsiveness",
+          "description": "Our solutions sense, adjust, and respond dynamically to changing process conditions."
+        },
+        {
+          "title": "Relentless Customization",
+          "description": "No two flow environments are identical. Rotex solutions are tailored to your exact process, ensuring optimal performance in real-world conditions."
+        },
+        {
+          "title": "High-Cycle Reliability",
+          "description": "Built to withstand continuous operations with minimal wear, reducing downtime and extending system life."
+        },
+        {
+          "title": "Global Standards Compliance",
+          "description": "Every component meets API, ATEX, IECEx, and SIL safety standards, ensuring seamless deployment across global oil and gas operations."
+        },
+        {
+          "title": "Single-Supplier Integration",
+          "description": "From solenoid valves to full EHF actuator packages, Rotex simplifies your supply chain with fully integrated, pre-engineered solutions."
+        },
+        {
+          "title": "Field-Proven Heritage",
+          "description": "Decades of deployment across Indian and international refineries, pipelines, and offshore platforms validate our engineering approach in the most demanding environments."
+        }
+      ]
+    },
+    "createdAt": "2026-07-14T18:40:43.663Z",
+    "updatedAt": "2026-08-04T08:00:13.362Z"
+  },
+  {
+    "id": "cmrkzyclw000g5scdtompk27g",
+    "slug": "power-generation",
+    "name": "Power",
+    "bgKey": "power",
+    "image": "/uploads/1785830311544-bkj5iy.jpg",
+    "description": "Flow intelligence that enhances performance, efficiency, and control in modern machinery.",
+    "sectionTitle": "Reliable Automation for Continuous Power",
+    "overview": "Power generation underpins everything from cities and industries to hospitals and homes. Plants operate around the clock under high pressure, high temperature, and strict safety requirements, where reliability and availability directly impact grid stability and customer service. From thermal generation to nuclear, every control loop must perform with precision and unwavering dependability. Rotex engineers process automation solutions built for these critical environments delivering accurate, robust, and safety-certified control trusted by power producers and EPC partners worldwide.",
+    "stats": [
+      {
+        "value": "40",
+        "suffix": "+",
+        "label": "Power Plants Served"
+      },
+      {
+        "value": "57",
+        "suffix": "+",
+        "label": "Years of Reliability"
+      }
+    ],
+    "whyChoose": {
+      "title": "Why Choose Rotex for",
+      "highlight": "Power Generation",
+      "cards": [
+        {
+          "title": "Precision Under Pressure",
+          "description": "Engineered for high-pressure, high-temperature applications where even the smallest deviation can have significant consequences."
+        },
+        {
+          "title": "Fail-Safe by Design",
+          "description": "With advanced EHF actuator systems and intelligent control mechanisms, safety isn’t an add-on. It’s embedded into every operation"
+        },
+        {
+          "title": "System-Level Responsiveness",
+          "description": "Our solutions sense, adjust, and respond dynamically to changing process conditions."
+        },
+        {
+          "title": "Relentless Customization",
+          "description": "No two flow environments are identical. Rotex solutions are tailored to your exact process, ensuring optimal performance in real-world conditions."
+        }
+      ]
+    },
+    "createdAt": "2026-07-14T18:40:45.908Z",
+    "updatedAt": "2026-08-04T07:58:34.258Z"
+  },
+  {
+    "id": "cmrkzydhe000r5scd9y3u6utk",
+    "slug": "automotive",
+    "name": "Automotive",
+    "bgKey": "automative",
+    "image": "/uploads/1785830295457-tqkxfo.jpg",
+    "description": "Water and wastewater treatment operations rely on consistent, large-scale flow control across raw water intake, treatment, distribution, and effluent management. Process automation must perform reliably with low to medium pressures, corrosive media, and demanding regulatory requirements. ",
+    "sectionTitle": "Engineered for Speed, Precision, and Scale",
+    "overview": "The automotive industry demands systems that are highly reliable, compact, and efficient. From assembly lines to testing systems, operations depend on repeatability, speed, and seamless automation. When it comes to critical flow control applications, performance, consistency, and precision are essential.  With extensive experience across diverse automotive applications, Rotex stands out as a trusted partner. Its integrated R&D and manufacturing capabilities enable the development of advanced, application-specific solutions. Rotex has delivered patented innovations tailored to the evolving needs of the automotive sector, including auto drain valves for water fuel separators, hydrocarbon modules for DPF regeneration compliant with EURO 6 standards, and ultra-low noise solenoid valves for Level 3 ADAS sensor cleaning systems.  Supported by world-class manufacturing facilities, Rotex produces high volumes with exceptional precision, meeting stringent quality standards such as cleanliness and leak tightness.  Whatever the requirement, Rotex combines over 57 years of engineering expertise with strong design and manufacturing capabilities to deliver reliable, high-performance solenoid valve and pneumatic solutions for the automotive industry.",
+    "stats": [
+      {
+        "value": "500",
+        "suffix": "+",
+        "label": "OEM Installations"
+      },
+      {
+        "value": "57",
+        "suffix": "+",
+        "label": "Years of Reliability"
+      }
+    ],
+    "whyChoose": {
+      "title": "Why Choose Rotex for",
+      "highlight": "Automotive",
+      "cards": [
+        {
+          "title": "High-Speed Responsiveness",
+          "description": "Designed for rapid actuation in fast-moving production lines."
+        },
+        {
+          "title": "Repeatable Precision",
+          "description": "Ensures consistent performance across millions of cycles."
+        },
+        {
+          "title": "Compact and Efficient Design",
+          "description": "Fits seamlessly into space-constrained machinery and systems."
+        },
+        {
+          "title": "Automation-Ready",
+          "description": "Integrates with robotic and automated manufacturing systems."
+        }
+      ]
+    },
+    "createdAt": "2026-07-14T18:40:47.043Z",
+    "updatedAt": "2026-08-04T08:39:53.929Z"
+  },
+  {
+    "id": "cmrkzyefh00125scd4nspqw7y",
+    "slug": "rail",
+    "name": "Rail",
+    "bgKey": "rail",
+    "image": "/uploads/1785830445168-yqwm2k.jpg",
+    "description": "In rail systems, performance is measured in safety and consistency. Rotex delivers control you can depend on, engineered for safety, reliability, and continuous operation.",
+    "sectionTitle": "Control That Keeps Rail Systems Moving",
+    "overview": "\"Railways operate in environments where safety, reliability, and continuous performance are critical. Systems must function seamlessly under constant vibration, varying environmental conditions, and high-duty cycles, where even minor failures can impact operations at scale.\nRotex supports this ecosystem with precision-engineered solenoid valves and control systems that ensure dependable performance across both diesel and electric locomotives. From powering the prime movers of diesel engines to enabling accurate pantograph control in electric locomotives, Rotex solutions are built for consistency and durability. Today, a significant majority of Indian locomotives rely on Rotex for their engine solenoid valve requirements, reflecting deep trust in performance and reliability.\n\nOur solutions also contribute to safety-critical systems designed to prevent operational risks such as collisions, ensuring better control and responsiveness across rail networks. Engineered for long lifecycle performance and minimal maintenance, Rotex helps make rail travel safer, faster, and more efficient.\"",
+    "stats": [
+      {
+        "value": "200",
+        "suffix": "+",
+        "label": "Rail Projects"
+      },
+      {
+        "value": "57",
+        "suffix": "+",
+        "label": "Years of Reliability"
+      }
+    ],
+    "whyChoose": {
+      "title": "Why Choose Rotex for",
+      "highlight": "Rail",
+      "cards": [
+        {
+          "title": "High Reliability",
+          "description": "Built for safety-critical rail applications."
+        },
+        {
+          "title": "Vibration-Resistant Design",
+          "description": "Engineered for harsh operating conditions."
+        },
+        {
+          "title": "Consistent Performance",
+          "description": "Maintains accuracy across long operational cycles."
+        },
+        {
+          "title": "Fail-Safe Operation",
+          "description": "Ensures safety in critical systems."
+        }
+      ]
+    },
+    "createdAt": "2026-07-14T18:40:48.269Z",
+    "updatedAt": "2026-08-04T08:41:35.705Z"
+  },
+  {
+    "id": "cmrkzyg0y001d5scdvawj382i",
+    "slug": "aerospace",
+    "name": "Aerospace & Defence",
+    "bgKey": "aerospace",
+    "image": "/uploads/1785830355066-6ut7b5.jpg",
+    "description": "Ultra-precise, lightweight flow control for aerospace ground support, fuel handling, and hydraulic test rigs where failure is not an option.",
+    "sectionTitle": "Precision for Mission-Critical Environments",
+    "overview": "The aerospace and defence industry demands the highest levels of precision, reliability, and performance. While the number of components may be limited, each one must be engineered to exacting standards using advanced materials, rigorous validation processes, and compact, lightweight designs.  \n\nRotex understands these requirements and has been supporting the industry with high-precision flow control solutions. Our systems have contributed to multiple Indian space missions, with applications across engine testing facilities and launch infrastructure. These environments require absolute reliability, and our solutions are built to perform under the most demanding conditions.  \n\nOur capability to develop critical, application-specific valves continues to push us to innovate and deliver beyond conventional limits. The development of our CTIS system reflects this commitment to engineering excellence.  \n\nRecognized by customers such as Ashok Leyland for delivering high-performance solutions within short development timelines, Rotex combines precision engineering with speed and reliability to meet the evolving needs of the aerospace and defence sector.",
+    "stats": [
+      {
+        "value": "100",
+        "suffix": "+",
+        "label": "Aerospace Clients"
+      },
+      {
+        "value": "57",
+        "suffix": "+",
+        "label": "Years of Reliability"
+      }
+    ],
+    "whyChoose": {
+      "title": "Why Choose Rotex for",
+      "highlight": "Aerospace",
+      "cards": [
+        {
+          "title": "Traceability & Documentation",
+          "description": "Full material traceability and test documentation for every component supplied to aerospace clients."
+        },
+        {
+          "title": "Lightweight Design",
+          "description": "Optimised material selection minimises weight without compromising structural or functional integrity."
+        },
+        {
+          "title": "Zero-Leak Performance",
+          "description": "Class VI shutoff ensures zero contamination in fuel, hydraulic, and pneumatic systems."
+        },
+        {
+          "title": "Custom Engineering",
+          "description": "Application-specific solutions engineered to meet unique aerospace performance requirements."
+        }
+      ]
+    },
+    "createdAt": "2026-07-14T18:40:50.338Z",
+    "updatedAt": "2026-08-04T07:59:18.352Z"
+  },
+  {
+    "id": "ca2a9b2633c55470f94d8482e",
+    "slug": "process",
+    "name": "Process Industries",
+    "bgKey": "process",
+    "image": "/uploads/1785830370030-9ie7pp.jpg",
+    "description": "Industrial automation and fluid control solutions built for industries where consistency, control, and uptime define performance. From raw material handling to final output, every movement is engineered to respond.",
+    "sectionTitle": "Control Across Complex, Continuous Systems",
+    "overview": "Continuous process industries operate where downtime is not just a delay, it is a direct loss of productivity, safety, and revenue. From refineries and chemical plants to cement and pharmaceutical facilities, operations run under extreme conditions involving high temperatures, pressures, hazardous environments, and high-cycle requirements. Even minor inefficiencies or failures in control systems can disrupt entire production lines.  Rotex is built for these critical environments. With proven expertise across high-temperature applications exceeding 250°C, high-pressure systems up to 400 bar, and high-cycle operations running up to 20 cycles per minute, Rotex delivers reliability where it matters most. Our solenoid valves, positioners, and electro-hydraulic actuators work as an integrated system to ensure stable, responsive, and safe operations.  From enabling faster changeovers in multi-product chemical plants to optimizing air consumption in over 80 percent of cement plants, Rotex consistently enhances efficiency and performance.  With over 57 years of engineering expertise and a track record of solving more than 200 complex industrial challenges, Rotex remains the partner of choice when reliability is critical and failure is not an option.",
+    "stats": [
+      {
+        "value": "23",
+        "label": "REFINERIES IN INDIA",
+        "suffix": ""
+      },
+      {
+        "value": "57",
+        "suffix": "+",
+        "label": "YEARS OF RELIABILITY"
+      }
+    ],
+    "whyChoose": {
+      "title": "Why Choose Rotex for",
+      "highlight": "Process Industries",
+      "cards": [
+        {
+          "title": "Consistency at Scale",
+          "description": "Maintains stable flow, pressure, and temperature across continuous operations."
+        },
+        {
+          "title": "Process Stability",
+          "description": "Minimizes fluctuations that impact yield, quality, and efficiency."
+        },
+        {
+          "title": "Adaptive Control",
+          "description": "Responds to changing inputs, loads, and operating conditions in real time."
+        },
+        {
+          "title": "Built for Harsh Environments",
+          "description": "Performs reliably across abrasive media, high temperatures, and corrosive conditions."
+        }
+      ]
+    },
+    "createdAt": "2026-08-01T10:52:03.258Z",
+    "updatedAt": "2026-08-04T08:13:46.282Z"
+  },
+  {
+    "id": "c44f029487fea4efe8f275ee0",
+    "slug": "machine-solutions",
+    "name": "Machine Solutions",
+    "bgKey": "machine",
+    "image": "/uploads/1785830378852-co6ong.jpg",
+    "description": "Flow intelligence that enhances performance, efficiency, and control in modern machinery.",
+    "sectionTitle": "Purpose-Built Flow Control for Machine Solutions",
+    "overview": "Specialised machine applications — from fire fighting systems to custom fluid-handling equipment — demand flow control that is engineered for the specific duty, not adapted from a generic catalogue. Rotex works directly with machine builders and system integrators to deliver valve and actuator solutions matched exactly to the application's pressure, media, and response-time requirements.",
+    "stats": [
+      {
+        "value": "1",
+        "label": "Specialised Application",
+        "suffix": ""
+      },
+      {
+        "value": "57",
+        "suffix": "+",
+        "label": "Years of Reliability"
+      }
+    ],
+    "whyChoose": {
+      "title": "Why Choose Rotex for",
+      "highlight": "Machine Solutions",
+      "cards": [
+        {
+          "title": "Precision Under Pressure",
+          "description": "Engineered for high-pressure, high-temperature applications where even the smallest deviation can have significant consequences."
+        },
+        {
+          "title": "Fail-Safe by Design",
+          "description": "With advanced EHF actuator systems and intelligent control mechanisms, safety isn’t an add-on. It’s embedded into every operation"
+        },
+        {
+          "title": "System-Level Responsiveness",
+          "description": "Our solutions sense, adjust, and respond dynamically to changing process conditions."
+        },
+        {
+          "title": "Relentless Customization",
+          "description": "No two flow environments are identical. Rotex solutions are tailored to your exact process, ensuring optimal performance in real-world conditions."
+        }
+      ]
+    },
+    "createdAt": "2026-08-01T10:52:03.258Z",
+    "updatedAt": "2026-08-04T07:59:42.723Z"
+  }
+]

@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 
-const BENEFITS = [
+const DEFAULT_BENEFITS = [
   "Long-term partnerships built on trust and consistency",
   "Strong focus on supplier growth in capability and capacity",
   "Continuous support to improve process, efficiency, and quality",
@@ -52,6 +52,7 @@ type SupplierBenefitsSectionProps = {
   heading?: string;
   description?: string;
   stats?: Stat[];
+  benefits?: string[];
   cta?: { label: string; href: string };
 };
 
@@ -59,6 +60,7 @@ export function SupplierBenefitsSection({
   heading = "Become a Supplier",
   description = "Join our supply chain and grow with a partner focused on quality, long-term relationships, and continuous capability development.",
   stats = STATS,
+  benefits = DEFAULT_BENEFITS,
   // same-document fragment — a full route href makes Next re-run the router
   cta = { label: "Apply as a Supplier", href: "#form" },
 }: SupplierBenefitsSectionProps) {
@@ -94,7 +96,7 @@ export function SupplierBenefitsSection({
             amber-500/orange-600 pair it replaced are off-brand approximations. */}
         <div className="lg:w-118.25 lg:shrink-0 p-10 bg-gradient-orange-black-radial rounded-xl flex flex-col justify-between gap-10">
           <ul className="flex flex-col gap-4">
-            {BENEFITS.map((b) => (
+            {benefits.map((b) => (
               <li key={b} className="flex items-start gap-3">
                 <span className="mt-1.5 size-3 shrink-0 bg-neutral-200" />
                 <span className="text-white font-montserrat font-medium text-base leading-6">{b}</span>

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Resource" ADD COLUMN "product" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Resource" ADD COLUMN "industry" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Resource" ADD COLUMN "extraTags" JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE "Resource" ADD COLUMN "content" TEXT NOT NULL DEFAULT '';

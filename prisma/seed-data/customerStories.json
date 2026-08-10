@@ -1,0 +1,482 @@
+[
+  {
+    "id": "cmrkzyb1900015scd1t0ywbka",
+    "quote": "Rotex solenoid valves have been instrumental in maintaining fail-safe shutdown integrity across our offshore wellheads. Zero unplanned trips in two years.",
+    "author": "Rajesh Mehta",
+    "company": "Plant Head, Aarti Industries Ltd.",
+    "image": "/uploads/1785837160023-u8rari.png",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:43.869Z",
+    "updatedAt": "2026-08-04T09:52:42.079Z"
+  },
+  {
+    "id": "cmrkzyb7j00025scd8n74i4f9",
+    "quote": "The ESD actuator systems from Rotex gave us the confidence to extend our inspection intervals. Reliability has been outstanding in extreme conditions.",
+    "author": "Sunil Varma",
+    "company": "Operations Manager, ONGC",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:44.095Z",
+    "updatedAt": "2026-07-14T18:40:44.095Z"
+  },
+  {
+    "id": "cmrkzybcd00035scd0kw934lh",
+    "quote": "From initial specification to commissioning, the Rotex team understood our upstream requirements and delivered exactly what our process demanded.",
+    "author": "Priya Nair",
+    "company": "Instrumentation Engineer, Cairn India",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:44.269Z",
+    "updatedAt": "2026-07-14T18:40:44.269Z"
+  },
+  {
+    "id": "cmrkzybf100045scduicnoes8",
+    "quote": "We've standardised on Rotex valves across all our upstream platforms. The consistency of performance and documentation support is unmatched.",
+    "author": "Amir Khan",
+    "company": "Procurement Head, Reliance Industries",
+    "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:44.365Z",
+    "updatedAt": "2026-07-14T18:40:44.365Z"
+  },
+  {
+    "id": "cmrkzybo400065scd75j2fwdg",
+    "quote": "Rotex's high-pressure actuated valves have held up flawlessly across 1,200 km of our gas pipeline network. Leak-free performance since day one.",
+    "author": "Deepak Sharma",
+    "company": "Pipeline Integrity Manager, GAIL India",
+    "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:44.692Z",
+    "updatedAt": "2026-07-14T18:40:44.692Z"
+  },
+  {
+    "id": "cmrkzybrq00075scdceaah5gp",
+    "quote": "Remote operability was our biggest challenge at unmanned compressor stations. Rotex delivered a solution that simply works — every time.",
+    "author": "Meena Pillai",
+    "company": "Automation Lead, Petronet LNG",
+    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:44.822Z",
+    "updatedAt": "2026-07-14T18:40:44.822Z"
+  },
+  {
+    "id": "cmrkzybvz00085scdd0s3cduj",
+    "quote": "The ATEX certification and documentation package from Rotex streamlined our hazardous area compliance approval by weeks.",
+    "author": "Vikram Singh",
+    "company": "HSE Director, Indian Oil Corporation",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:44.975Z",
+    "updatedAt": "2026-07-14T18:40:44.975Z"
+  },
+  {
+    "id": "cmrkzyc0i00095scdk5663now",
+    "quote": "We evaluated five valve suppliers for our custody transfer metering stations. Rotex won on both technical merit and post-sales support.",
+    "author": "Anita Desai",
+    "company": "Project Engineer, BPCL",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:45.138Z",
+    "updatedAt": "2026-07-14T18:40:45.138Z"
+  },
+  {
+    "id": "cmrkzyc5r000b5scdkppy9ytm",
+    "quote": "Rotex high-cycle solenoid valves have run continuously in our refinery CDU for 18 months without a single failure. Exceptional uptime in a demanding environment.",
+    "author": "Sanjay Kapoor",
+    "company": "Plant Manager, Nayara Energy",
+    "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:45.327Z",
+    "updatedAt": "2026-07-14T18:40:45.327Z"
+  },
+  {
+    "id": "cmrkzyc84000c5scdpubiemr0",
+    "quote": "The SIL-certified documentation Rotex provided allowed us to pass our safety case audit without any corrective actions. A rare outcome.",
+    "author": "Lakshmi Iyer",
+    "company": "Safety Systems Engineer, HPCL",
+    "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:45.412Z",
+    "updatedAt": "2026-07-14T18:40:45.412Z"
+  },
+  {
+    "id": "cmrkzycb6000d5scd4pmqhof0",
+    "quote": "Corrosion was destroying our previous valve stock within six months. The Rotex coated series has exceeded 24 months with no visible degradation.",
+    "author": "Ravi Kumar",
+    "company": "Maintenance Head, MRPL",
+    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:45.522Z",
+    "updatedAt": "2026-07-14T18:40:45.522Z"
+  },
+  {
+    "id": "cmrkzycdr000e5scd7l78hzlm",
+    "quote": "The integrated positioner and actuator solution from Rotex gave us the precise control we needed for our cat cracker slide valves.",
+    "author": "Fiona D'Souza",
+    "company": "Process Engineer, Bharat Petroleum",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:45.615Z",
+    "updatedAt": "2026-07-14T18:40:45.615Z"
+  },
+  {
+    "id": "cmrkzycou000h5scdpei1927u",
+    "quote": "Rotex ESD actuators respond within milliseconds on turbine trip. In thermal power, that speed is the difference between a controlled shutdown and a catastrophe.",
+    "author": "Arun Joshi",
+    "company": "Turbine Engineer, NTPC",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:46.014Z",
+    "updatedAt": "2026-07-14T18:40:46.014Z"
+  },
+  {
+    "id": "cmrkzycr7000i5scd09noozge",
+    "quote": "We've been running Rotex steam solenoid valves on our boiler feed systems for over three years. Not a single unplanned outage attributable to the valves.",
+    "author": "Kavita Menon",
+    "company": "Plant Operations Lead, Adani Power",
+    "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:46.099Z",
+    "updatedAt": "2026-07-14T18:40:46.099Z"
+  },
+  {
+    "id": "cmrkzycu8000j5scdgwftit7b",
+    "quote": "The SIL compliance package was thorough and accepted by our third-party safety assessor without revision. Saved us significant time during certification.",
+    "author": "Harish Rao",
+    "company": "Safety Engineer, Tata Power",
+    "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:46.208Z",
+    "updatedAt": "2026-07-14T18:40:46.208Z"
+  },
+  {
+    "id": "cmrkzycyg000k5scdlsmegbn4",
+    "quote": "Rotex offered the widest operating temperature range we found for steam service. That headroom gives us confidence across seasonal load variations.",
+    "author": "Sunita Patil",
+    "company": "Instrumentation Manager, CESC",
+    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:46.360Z",
+    "updatedAt": "2026-07-14T18:40:46.360Z"
+  },
+  {
+    "id": "cmrkzyd42000m5scd10g3oof6",
+    "quote": "Our hydro plant is in a remote Himalayan location with no easy maintenance access. Rotex actuators have operated for two full seasons without intervention.",
+    "author": "Neeraj Bhat",
+    "company": "Site Manager, NHPC",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:46.562Z",
+    "updatedAt": "2026-07-14T18:40:46.562Z"
+  },
+  {
+    "id": "cmrkzyd7c000n5scd0r5dhu93",
+    "quote": "The corrosion-resistant valve bodies Rotex supplied for our submerged gate systems have performed beyond specification in continuous wet service.",
+    "author": "Asha Krishnan",
+    "company": "Civil & Mechanical Lead, THDC India",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:46.680Z",
+    "updatedAt": "2026-07-14T18:40:46.680Z"
+  },
+  {
+    "id": "cmrkzyd9e000o5scd4dxoebqe",
+    "quote": "Remote monitoring integration was seamless. We can now track gate actuator health from our control room 200 km away with full confidence.",
+    "author": "Rakesh Pandey",
+    "company": "SCADA Engineer, SJVN",
+    "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:46.754Z",
+    "updatedAt": "2026-07-14T18:40:46.754Z"
+  },
+  {
+    "id": "cmrkzydbf000p5scdmrlzh9x2",
+    "quote": "Rotex understood the specific challenges of run-of-river hydro applications. Their application engineering team helped us select the right solution first time.",
+    "author": "Meera Iyer",
+    "company": "Projects Director, GMR Energy",
+    "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:46.827Z",
+    "updatedAt": "2026-07-14T18:40:46.827Z"
+  },
+  {
+    "id": "cmrkzydjg000s5scdo3z78fvk",
+    "quote": "Rotex solenoid manifolds integrated into our robotic welding cells without any modification. The fast response improved our cycle time by 4%.",
+    "author": "Suresh Rao",
+    "company": "Manufacturing Engineering Head, Maruti Suzuki",
+    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:47.116Z",
+    "updatedAt": "2026-07-14T18:40:47.116Z"
+  },
+  {
+    "id": "cmrkzydlj000t5scdttr5zozw",
+    "quote": "We run 24/7 assembly lines with zero tolerance for downtime. Rotex valves have not caused a single line stop in 18 months of operation.",
+    "author": "Prabhavati Nair",
+    "company": "Production Manager, Tata Motors",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:47.191Z",
+    "updatedAt": "2026-07-14T18:40:47.191Z"
+  },
+  {
+    "id": "cmrkzydoj000u5scdupzgemil",
+    "quote": "The fieldbus-compatible valve islands from Rotex reduced our wiring effort by over 60% on our new BIW assembly line.",
+    "author": "Anand Kulkarni",
+    "company": "Automation Engineer, Mahindra & Mahindra",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:47.299Z",
+    "updatedAt": "2026-07-14T18:40:47.299Z"
+  },
+  {
+    "id": "cmrkzydr5000v5scdddyfr25p",
+    "quote": "Rotex gave us OEM pricing with tier-1 application support. That combination is rare, and it's why they're our standard valve supplier.",
+    "author": "Vijay Hegde",
+    "company": "Supply Chain Director, Bosch India",
+    "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:47.393Z",
+    "updatedAt": "2026-07-14T18:40:47.393Z"
+  },
+  {
+    "id": "cmrkzydxf000x5scd9w3jxpvt",
+    "quote": "The ATEX-certified Rotex valves handled our solvent zones without a single safety incident across three paint shop expansions.",
+    "author": "Gaurav Mehta",
+    "company": "Paint Shop Manager, Honda Cars India",
+    "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:47.619Z",
+    "updatedAt": "2026-07-14T18:40:47.619Z"
+  },
+  {
+    "id": "cmrkzye1c000y5scdlemkiz5q",
+    "quote": "Consistent finish quality depends on consistent fluid and air pressure. Rotex proportional valves delivered the repeatability our spray robots needed.",
+    "author": "Nalini Chandran",
+    "company": "Quality Head, TVS Motor Company",
+    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:47.760Z",
+    "updatedAt": "2026-07-14T18:40:47.760Z"
+  },
+  {
+    "id": "cmrkzye3p000z5scdh73ohlhw",
+    "quote": "Cleaning and maintenance in our paint booth is critical. The stainless Rotex bodies clean in place without any degradation of the seals.",
+    "author": "Vikrant Sinha",
+    "company": "Maintenance Lead, Hyundai India",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:47.845Z",
+    "updatedAt": "2026-07-14T18:40:47.845Z"
+  },
+  {
+    "id": "cmrkzye7900105scdh5y7wxab",
+    "quote": "Integration into our robotic spray cells took one day. Rotex supplied all the connection diagrams and commissioning support we needed.",
+    "author": "Divya Pillai",
+    "company": "Robotics Engineer, Toyota Kirloskar",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:47.973Z",
+    "updatedAt": "2026-07-14T18:40:47.973Z"
+  },
+  {
+    "id": "cmrkzyejm00135scdwcywzfsq",
+    "quote": "Rotex solenoid valves met EN 50155 and passed our rolling stock qualification tests on the first submission. That saved us three months of re-testing.",
+    "author": "Ramesh Iyer",
+    "company": "Rolling Stock Engineer, BEML",
+    "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:48.418Z",
+    "updatedAt": "2026-07-14T18:40:48.418Z"
+  },
+  {
+    "id": "cmrkzyeq000145scddxgpeyg2",
+    "quote": "Vibration resistance is non-negotiable on our metro carbodies. Rotex valves have operated through years of high-frequency vibration without loosening or degradation.",
+    "author": "Pooja Shah",
+    "company": "Systems Engineer, Alstom India",
+    "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:48.648Z",
+    "updatedAt": "2026-07-14T18:40:48.648Z"
+  },
+  {
+    "id": "cmrkzyew200155scdw5f933pr",
+    "quote": "The compact manifold design from Rotex fit perfectly into our limited brake control cabinet space. Installation was straightforward.",
+    "author": "Dinesh Kumar",
+    "company": "Bogey Design Lead, Wabtec India",
+    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:48.867Z",
+    "updatedAt": "2026-07-14T18:40:48.867Z"
+  },
+  {
+    "id": "cmrkzyf0k00165scdjfubt674",
+    "quote": "We extended Rotex's valve specifications across our entire fleet after a successful pilot on one fleet type. Consistency across platforms has simplified our maintenance programme.",
+    "author": "Neeta Bose",
+    "company": "Fleet Manager, Delhi Metro Rail",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:49.028Z",
+    "updatedAt": "2026-07-14T18:40:49.028Z"
+  },
+  {
+    "id": "cmrkzyfe900185scd9xvktr4a",
+    "quote": "Our trackside systems are exposed to monsoon rains, dust, and extreme summer heat. Rotex IP67-rated valves have required zero maintenance interventions in two years.",
+    "author": "Sanjay Gupta",
+    "company": "Infrastructure Manager, Indian Railways",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:49.521Z",
+    "updatedAt": "2026-07-14T18:40:49.521Z"
+  },
+  {
+    "id": "cmrkzyfkp00195scd9ak2c2fl",
+    "quote": "Corrosion was our biggest challenge for outdoor rail installations. The Rotex stainless and coated range solved it completely within budget.",
+    "author": "Mala Krishnamurthy",
+    "company": "Civil & Mechanical Head, RVNL",
+    "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:49.753Z",
+    "updatedAt": "2026-07-14T18:40:49.753Z"
+  },
+  {
+    "id": "cmrkzyfnz001a5scdunmaphf1",
+    "quote": "We manage 50+ depot valve assets across the network. The high MTBF of Rotex units has drastically reduced our unplanned maintenance callouts.",
+    "author": "Aditya Verma",
+    "company": "Depot Maintenance Head, Knorr-Bremse India",
+    "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:49.871Z",
+    "updatedAt": "2026-07-14T18:40:49.871Z"
+  },
+  {
+    "id": "cmrkzyfqy001b5scdh8zj71vb",
+    "quote": "Rotex's technical team visited our depot and specified the right valve for each trackside application. That level of support is why we chose them.",
+    "author": "Sunita Reddy",
+    "company": "Asset Manager, Pune Metro",
+    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:49.978Z",
+    "updatedAt": "2026-07-14T18:40:49.978Z"
+  },
+  {
+    "id": "cmrkzyg70001e5scdovljmghe",
+    "quote": "Full material traceability from Rotex meant our aerospace GSE qualified for defence procurement without any material verification re-runs. Significant time savings.",
+    "author": "Wing Cdr. (Retd.) Arjun Nair",
+    "company": "GSE Manager, HAL",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:50.556Z",
+    "updatedAt": "2026-07-14T18:40:50.556Z"
+  },
+  {
+    "id": "cmrkzygbi001f5scd02kujfy0",
+    "quote": "Zero-leak performance in our fuel transfer rigs is mandatory. Rotex Class VI valves have held to specification through thousands of defuelling cycles.",
+    "author": "Prashant Mehta",
+    "company": "Ground Equipment Engineer, Air India",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:50.718Z",
+    "updatedAt": "2026-07-14T18:40:50.718Z"
+  },
+  {
+    "id": "cmrkzyggc001g5scdi7bbd9s3",
+    "quote": "The lightweight Rotex valve bodies reduced our GSE cart weight below our certification limit without any compromise on pressure rating.",
+    "author": "Kavita Rao",
+    "company": "Structures & Systems Lead, DRDO",
+    "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:50.892Z",
+    "updatedAt": "2026-07-14T18:40:50.892Z"
+  },
+  {
+    "id": "cmrkzygl6001h5scdtyoce485",
+    "quote": "Rotex responded to our custom hydraulic test rig specification within a week and delivered a fully tested assembly in four weeks. Exceptional turnaround.",
+    "author": "Suresh Nambiar",
+    "company": "Test Equipment Head, ISRO",
+    "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:51.066Z",
+    "updatedAt": "2026-07-14T18:40:51.066Z"
+  },
+  {
+    "id": "cmrkzyh0a001k5scd9w7brulv",
+    "quote": "Rotex stainless hygienic valves passed our CIP validation on the first run. No seal degradation after 500 cleaning cycles — exactly what our pharma customer required.",
+    "author": "Anil Gaikwad",
+    "company": "Project Director, ACG Engineering",
+    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:51.610Z",
+    "updatedAt": "2026-07-14T18:40:51.610Z"
+  },
+  {
+    "id": "cmrkzyh3k001l5scdsd74celd",
+    "quote": "Chemical resistance was the hardest specification to meet. Rotex PTFE-seated valves have held up perfectly in our aggressive solvent dosing process.",
+    "author": "Rekha Iyengar",
+    "company": "Process Engineer, Thermax",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:51.728Z",
+    "updatedAt": "2026-07-14T18:40:51.728Z"
+  },
+  {
+    "id": "cmrkzyh7h001m5scd0uxewptr",
+    "quote": "Compact DIN rail mounting helped us pack more valve stations into our machine frame. Rotex gave us configurations no other supplier could match.",
+    "author": "Hemant Jadhav",
+    "company": "Machine Design Lead, Bajaj Process Equipment",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:51.869Z",
+    "updatedAt": "2026-07-14T18:40:51.869Z"
+  },
+  {
+    "id": "cmrkzyhas001n5scd6h0gznrg",
+    "quote": "Wide voltage compatibility meant we could ship the same machine variant to Europe and the Middle East without any valve changes. Simplified our BOM significantly.",
+    "author": "Shilpa Gokhale",
+    "company": "Export Business Head, Forbes Marshall",
+    "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:51.988Z",
+    "updatedAt": "2026-07-14T18:40:51.988Z"
+  },
+  {
+    "id": "cmrkzyhj6001p5scdjil2ap63",
+    "quote": "Rotex high-cycle valves kept pace with our 120-pack-per-minute filling line without a single jam or misfire. Production efficiency improved immediately.",
+    "author": "Nikhil Patil",
+    "company": "Production Engineer, Piramal Enterprises",
+    "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:52.290Z",
+    "updatedAt": "2026-07-14T18:40:52.290Z"
+  },
+  {
+    "id": "cmrkzyhlu001q5scd6f7m64fx",
+    "quote": "Precise dose control was our biggest quality challenge. Rotex proportional valves brought our fill weight variance within 0.2g — well inside specification.",
+    "author": "Smita Kulkarni",
+    "company": "Quality Assurance Manager, Marico",
+    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:52.386Z",
+    "updatedAt": "2026-07-14T18:40:52.386Z"
+  },
+  {
+    "id": "cmrkzyhot001r5scd4nrjdprs",
+    "quote": "The compact manifold assembly from Rotex saved 40% of our panel space on our new multi-lane sealing machine.",
+    "author": "Rahul Desai",
+    "company": "Machine Design Engineer, IMA Group India",
+    "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:52.493Z",
+    "updatedAt": "2026-07-14T18:40:52.493Z"
+  },
+  {
+    "id": "cmrkzyhrs001s5scd605a1qyi",
+    "quote": "Low-wattage coil options from Rotex helped us hit our energy-efficiency target for the machine without any functional compromise.",
+    "author": "Varsha Tendulkar",
+    "company": "Sustainability Lead, Hindustan Unilever",
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=640&q=80",
+    "published": true,
+    "createdAt": "2026-07-14T18:40:52.600Z",
+    "updatedAt": "2026-07-14T18:40:52.600Z"
+  }
+]

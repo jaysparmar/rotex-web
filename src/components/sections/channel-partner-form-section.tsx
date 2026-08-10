@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const COUNTRIES = ["United States", "India", "UAE", "Saudi Arabia", "United Kingdom", "Germany"];
-const CITIES = ["Mumbai", "Delhi", "Dubai", "London", "Berlin", "New York"];
-const BUSINESS_TYPES = ["Distributor", "Supplier", "System Integrator", "OEM Partner"];
-const INDUSTRIES = ["Oil & Gas", "Chemical", "Power", "Mining", "Industrial Automation"];
+const DEFAULT_COUNTRIES = ["United States", "India", "UAE", "Saudi Arabia", "United Kingdom", "Germany"];
+const DEFAULT_CITIES = ["Mumbai", "Delhi", "Dubai", "London", "Berlin", "New York"];
+const DEFAULT_BUSINESS_TYPES = ["Distributor", "Supplier", "System Integrator", "OEM Partner"];
+const DEFAULT_INDUSTRIES = ["Oil & Gas", "Chemical", "Power", "Mining", "Industrial Automation"];
 
 const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const inputCls = "w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none";
@@ -53,8 +53,28 @@ function ChevronDown() {
   );
 }
 
-export function ChannelPartnerFormSection() {
-  const [country, setCountry] = useState("United States");
+type ChannelPartnerFormSectionProps = {
+  headingPrefix?: string;
+  headingHighlight?: string;
+  description?: string;
+  countryOptions?: string[];
+  cityOptions?: string[];
+  businessTypeOptions?: string[];
+  industryOptions?: string[];
+  defaultCountry?: string;
+};
+
+export function ChannelPartnerFormSection({
+  headingPrefix = "Expand Your Industrial Portfolio with a",
+  headingHighlight = "Globally Trusted Manufacturer",
+  description = "Partner with Rotex to deliver high-performance fluid control solutions backed by engineering excellence, global reach, and consistent demand generation.",
+  countryOptions = DEFAULT_COUNTRIES,
+  cityOptions = DEFAULT_CITIES,
+  businessTypeOptions = DEFAULT_BUSINESS_TYPES,
+  industryOptions = DEFAULT_INDUSTRIES,
+  defaultCountry = "United States",
+}: ChannelPartnerFormSectionProps) {
+  const [country, setCountry] = useState(defaultCountry);
   const [city, setCity] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [industriesServed, setIndustriesServed] = useState("");
@@ -65,12 +85,11 @@ export function ChannelPartnerFormSection() {
         {/* Left copy */}
         <div className="lg:w-121.75 lg:shrink-0 flex flex-col gap-4">
           <h2 className="text-stone-900 text-2xl lg:text-4xl font-normal font-montserrat leading-9 lg:leading-10">
-            Expand Your Industrial Portfolio with a{" "}
-            <span className="text-gradient-orange-dark">Globally Trusted Manufacturer</span>
+            {headingPrefix}{" "}
+            <span className="text-gradient-orange-dark">{headingHighlight}</span>
           </h2>
           <p className="text-stone-500 text-base font-medium font-montserrat leading-6">
-            Partner with Rotex to deliver high-performance fluid control solutions backed by engineering excellence,
-            global reach, and consistent demand generation.
+            {description}
           </p>
         </div>
 
@@ -108,21 +127,21 @@ export function ChannelPartnerFormSection() {
 
           <div className="flex flex-col gap-5 lg:flex-row">
             <Field label="Country" className="flex-1">
-              <FormSelect placeholder="Select Country" options={COUNTRIES} value={country} onValueChange={setCountry} />
+              <FormSelect placeholder="Select Country" options={countryOptions} value={country} onValueChange={setCountry} />
             </Field>
 
             <Field label="City" className="flex-1">
-              <FormSelect placeholder="Select City" options={CITIES} value={city} onValueChange={setCity} />
+              <FormSelect placeholder="Select City" options={cityOptions} value={city} onValueChange={setCity} />
             </Field>
           </div>
 
           <div className="flex flex-col gap-5 lg:flex-row">
             <Field label="Business Type" className="flex-1">
-              <FormSelect placeholder="Business Type" options={BUSINESS_TYPES} value={businessType} onValueChange={setBusinessType} />
+              <FormSelect placeholder="Business Type" options={businessTypeOptions} value={businessType} onValueChange={setBusinessType} />
             </Field>
 
             <Field label="Industries Served" className="flex-1">
-              <FormSelect placeholder="Select" options={INDUSTRIES} value={industriesServed} onValueChange={setIndustriesServed} />
+              <FormSelect placeholder="Select" options={industryOptions} value={industriesServed} onValueChange={setIndustriesServed} />
             </Field>
           </div>
 

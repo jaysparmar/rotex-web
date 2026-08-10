@@ -99,6 +99,7 @@ export function ProductFormFields() {
         <SelectField
           label="Category"
           options={PRODUCT_CATEGORIES.map((c) => ({ value: c, label: c }))}
+          defaultValue={form.getValues("category")}
           {...form.register("category", { required: true })}
         />
         <TextField label="Tags (comma separated)" {...form.register("tags")} />

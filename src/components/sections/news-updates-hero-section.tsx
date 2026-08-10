@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SimpleBreadcrumb } from "@/components/ui/simple-breadcrumb";
-import { RESOURCE_POSTS } from "@/lib/resources-data";
+import { formatResourceDate, type ResourceItem } from "@/lib/resource-types";
 
 function ArrowUpRight() {
   return (
@@ -17,9 +17,7 @@ function ArrowUpRight() {
   );
 }
 
-const highlighted = RESOURCE_POSTS.slice(0, 4);
-
-export function NewsUpdatesHeroSection() {
+export function NewsUpdatesHeroSection({ highlighted }: { highlighted: ResourceItem[] }) {
   return (
     <section className="pt-28 pb-16 lg:pt-32">
       <div className="container flex flex-col gap-10">
@@ -41,7 +39,7 @@ export function NewsUpdatesHeroSection() {
                 {/* Figma: thumbnail beside the arrow — 208×94 mobile, 171×94 desktop */}
                 <div className="self-stretch flex justify-between items-start gap-3">
                   <span className="relative w-52 lg:w-44 h-24 rounded-lg overflow-hidden shrink-0">
-                    <Image src={post.image} alt={post.title} fill className="object-cover" />
+                    <Image src={post.image} alt={post.title} fill className="object-cover" unoptimized />
                   </span>
                   {/* brand orange (#ee3e23), not red-600 (#dc2626) which reads too dark */}
                   <span className="size-10 lg:size-8 shrink-0 rounded-full bg-primary flex items-center justify-center text-white group-hover:rotate-45 transition-transform duration-300">
@@ -51,7 +49,7 @@ export function NewsUpdatesHeroSection() {
                 <div className="flex flex-col gap-1.5">
                   {/* stone-400 (#a8a29e) — the theme overrides neutral-400 to a dark #4a5565 */}
                   <span className="text-stone-400 text-sm font-semibold font-montserrat uppercase leading-6 lg:leading-5">
-                    {post.date}
+                    {formatResourceDate(post.createdAt)}
                   </span>
                   <h3 className="text-stone-900 text-base lg:text-lg font-medium font-montserrat leading-6">
                     {post.title}

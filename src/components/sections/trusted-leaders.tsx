@@ -66,7 +66,7 @@ export function TrustedLeaders({
                     alt={alt}
                     width={96}
                     height={64}
-                    className="object-contain"
+                    className="h-full w-auto object-contain"
                     unoptimized={typeof src === "string"}
                   />
                 </div>
@@ -87,7 +87,7 @@ export function TrustedLeaders({
                     alt={alt}
                     width={80}
                     height={28}
-                    className="object-contain"
+                    className="h-full w-auto object-contain"
                     unoptimized={typeof src === "string"}
                   />
                 </div>

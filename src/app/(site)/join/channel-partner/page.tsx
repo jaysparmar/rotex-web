@@ -5,63 +5,97 @@ import { ChannelPartnerBenefitsSection } from "@/components/sections/channel-par
 import { ChannelPartnerMapSection } from "@/components/sections/channel-partner-map-section";
 import { CustomerStoriesSection } from "@/components/sections/customer-stories-section";
 import { ChannelPartnerFormSection } from "@/components/sections/channel-partner-form-section";
+import { fetchChannelPartnerSection } from "@/lib/site-api";
 
-const channelPartnerStories = [
-  {
-    id: "1",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=640&q=80",
-    quote:
-      "Becoming a Rotex channel partner gave us access to a proven, technically differentiated product line — our margins and customer retention both improved within the first year.",
-    author: "Ahmed Al-Farsi",
-    company: "Managing Director, Gulf Flow Automation LLC",
-  },
-  {
-    id: "2",
-    image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=640&q=80",
-    quote:
-      "The support from Rotex's technical and sales teams made it easy to expand into new industrial segments we hadn't served before.",
-    author: "Priya Nair",
-    company: "CEO, Nair Industrial Solutions",
-  },
-  {
-    id: "3",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=640&q=80",
-    quote:
-      "Rotex's engineering-first approach to product design has made it far easier for us to win technically demanding tenders in the oil & gas sector.",
-    author: "Marco Bianchi",
-    company: "Founder, Bianchi Flow Systems Srl",
-  },
-  {
-    id: "4",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=640&q=80",
-    quote:
-      "From onboarding to ongoing technical training, Rotex treated us as a true growth partner, not just a supplier.",
-    author: "Wei Zhang",
-    company: "General Manager, Zhang Industrial Trading Co.",
-  },
-  {
-    id: "5",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654944?w=640&q=80",
-    quote:
-      "The scalable margin structure and consistent inventory support helped us grow our solenoid valve business by over 40% in two years.",
-    author: "Fatima Al-Sayed",
-    company: "Sales Director, Al-Sayed Automation Group",
-  },
-];
+type CtaButton = { label: string; href: string };
+type HeroData = { title: string; description: string; image: string; cta: CtaButton };
+type StatsData = { stats: { value: string; label: string }[]; growthHeading: string; growthDescription: string };
+type WhyData = { heading: string; description: string; cards: { title: string; points: string[] }[] };
+type BenefitsData = { heading: string; benefits: { icon: string; text: string }[] };
+type MapData = {
+  heading: string;
+  description: string;
+  callout: string;
+  pins: { name: string; stateOrCity: string | null; partnerCompany: string | null; coordinates: [number, number] }[];
+};
+type StoriesData = {
+  heading: { title: string; subtitle: string };
+  stories: { id: string; quote: string; author: string; company: string; image: string }[];
+};
+type FormData = {
+  headingPrefix: string;
+  headingHighlight: string;
+  description: string;
+  countryOptions: string[];
+  cityOptions: string[];
+  businessTypeOptions: string[];
+  industryOptions: string[];
+  defaultCountry: string;
+};
 
-export default function ChannelPartnerPage() {
+export default async function ChannelPartnerPage() {
+  const [hero, stats, why, benefits, map, stories, form] = await Promise.all([
+    fetchChannelPartnerSection<HeroData>("hero"),
+    fetchChannelPartnerSection<StatsData>("stats"),
+    fetchChannelPartnerSection<WhyData>("why"),
+    fetchChannelPartnerSection<BenefitsData>("benefits"),
+    fetchChannelPartnerSection<MapData>("map"),
+    fetchChannelPartnerSection<StoriesData>("stories"),
+    fetchChannelPartnerSection<FormData>("form"),
+  ]);
+
   return (
     <div>
-      <ChannelPartnerHeroSection />
-      <ChannelPartnerStatsSection />
-      <ChannelPartnerWhySection />
-      <ChannelPartnerBenefitsSection />
-      <ChannelPartnerMapSection />
-      <CustomerStoriesSection
-        heading={{ title: "Channel Partner Stories", subtitle: "Hear from partners who grew with Rotex" }}
-        stories={channelPartnerStories}
-      />
-      <ChannelPartnerFormSection />
+      {hero?.enabled && (
+        <ChannelPartnerHeroSection
+          title={hero.title}
+          description={hero.description}
+          image={hero.image || undefined}
+          cta={hero.cta}
+        />
+      )}
+
+      {stats?.enabled && (
+        <ChannelPartnerStatsSection
+          stats={stats.stats}
+          growthHeading={stats.growthHeading}
+          growthDescription={stats.growthDescription}
+        />
+      )}
+
+      {why?.enabled && (
+        <ChannelPartnerWhySection heading={why.heading} description={why.description} cards={why.cards} />
+      )}
+
+      {benefits?.enabled && (
+        <ChannelPartnerBenefitsSection heading={benefits.heading} benefits={benefits.benefits} />
+      )}
+
+      {map?.enabled && map.pins.length > 0 && (
+        <ChannelPartnerMapSection
+          heading={map.heading}
+          description={map.description}
+          callout={map.callout}
+          pins={map.pins}
+        />
+      )}
+
+      {stories?.enabled && stories.stories.length > 0 && (
+        <CustomerStoriesSection heading={stories.heading} stories={stories.stories} />
+      )}
+
+      {form?.enabled && (
+        <ChannelPartnerFormSection
+          headingPrefix={form.headingPrefix}
+          headingHighlight={form.headingHighlight}
+          description={form.description}
+          countryOptions={form.countryOptions}
+          cityOptions={form.cityOptions}
+          businessTypeOptions={form.businessTypeOptions}
+          industryOptions={form.industryOptions}
+          defaultCountry={form.defaultCountry}
+        />
+      )}
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import careerHero from "@/assets/Images/channel-partner/career-hero.svg";
 
 type CareerHeroSectionProps = {
   title?: string;
@@ -14,6 +16,12 @@ export function CareerHeroSection({
   return (
     <section className="relative bg-stone-900 pt-28 pb-16 lg:pb-20 overflow-hidden">
       <div className="container relative">
+        <Image
+          src={careerHero}
+          alt=""
+          className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-90 h-auto max-w-[50%] pointer-events-none"
+        />
+
         {/* Breadcrumb */}
         <nav className="relative z-10 flex items-center gap-2 mb-10 lg:mb-16" aria-label="Breadcrumb">
           <Link href="/" className="text-subtext text-sm font-semibold font-montserrat leading-5 hover:text-white transition-colors">
@@ -23,7 +31,7 @@ export function CareerHeroSection({
           <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">Career</span>
         </nav>
 
-        <div className="flex flex-col items-start gap-5 max-w-143">
+        <div className="relative flex flex-col items-start gap-5 max-w-143">
           <h1 className="text-gradient-hero text-4xl lg:text-6xl font-normal font-montserrat leading-tight lg:leading-[57px]">
             {title}
           </h1>

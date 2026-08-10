@@ -1,0 +1,92 @@
+[
+  {
+    "id": "cmrtar1an0000dmlef96iivmu",
+    "type": "case-studies",
+    "title": "Solenoid Valve Classification: The Engineering Logic Behind Reliable Automation Systems",
+    "slug": "solenoid-valve-classification",
+    "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+    "published": true,
+    "createdAt": "2026-07-20T14:05:09.839Z",
+    "updatedAt": "2026-07-20T15:37:52.904Z"
+  },
+  {
+    "id": "cmrtar1aq0001dmlef5keexma",
+    "type": "case-studies",
+    "title": "Future of Industrial Valves: 7 Rotex Technologies Improving Reliability & Uptime",
+    "slug": "future-industrial-valves",
+    "image": "https://images.unsplash.com/photo-1581092335397-9583eb92d232?w=600&q=80",
+    "published": true,
+    "createdAt": "2026-07-20T14:05:09.842Z",
+    "updatedAt": "2026-07-20T15:37:52.905Z"
+  },
+  {
+    "id": "cmrtar1ar0002dmlemnt9mv9z",
+    "type": "case-studies",
+    "title": "How to Select the Right Solenoid Valve for Your Industrial Process?",
+    "slug": "select-solenoid-valve",
+    "image": "https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=600&q=80",
+    "published": true,
+    "createdAt": "2026-07-20T14:05:09.843Z",
+    "updatedAt": "2026-07-20T15:37:52.906Z"
+  },
+  {
+    "id": "cmrtar1as0003dmlezx92f775",
+    "type": "news",
+    "title": "Rotex Expands Global Distribution Network Across 15 New Markets",
+    "slug": "global-expansion",
+    "image": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80",
+    "published": true,
+    "createdAt": "2026-07-20T14:05:09.844Z",
+    "updatedAt": "2026-07-20T15:37:52.906Z"
+  },
+  {
+    "id": "cmrtar1at0004dmleovypmc9g",
+    "type": "news",
+    "title": "Rotex Launches Next-Generation Smart Valve Controllers for Industry 4.0",
+    "slug": "smart-valve-controllers",
+    "image": "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=600&q=80",
+    "published": true,
+    "createdAt": "2026-07-20T14:05:09.845Z",
+    "updatedAt": "2026-07-20T15:37:52.907Z"
+  },
+  {
+    "id": "cmrtar1au0005dmlea745qaju",
+    "type": "news",
+    "title": "Rotex Achieves SIL 3 Certification for Critical Safety Systems",
+    "slug": "sil3-certification",
+    "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600&q=80",
+    "published": true,
+    "createdAt": "2026-07-20T14:05:09.846Z",
+    "updatedAt": "2026-07-20T15:37:52.907Z"
+  },
+  {
+    "id": "cmrtar1av0006dmle7hlyeinc",
+    "type": "blogs",
+    "title": "5 Signs Your Industrial Valve Needs Immediate Maintenance",
+    "slug": "valve-maintenance-signs",
+    "image": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
+    "published": true,
+    "createdAt": "2026-07-20T14:05:09.847Z",
+    "updatedAt": "2026-07-20T15:37:52.908Z"
+  },
+  {
+    "id": "cmrtar1aw0007dmlerdqgafj9",
+    "type": "blogs",
+    "title": "Understanding Valve Actuators: A Comprehensive Guide for Engineers",
+    "slug": "valve-actuators-guide",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80",
+    "published": true,
+    "createdAt": "2026-07-20T14:05:09.848Z",
+    "updatedAt": "2026-07-20T15:37:52.909Z"
+  },
+  {
+    "id": "cmrtar1ax0008dmleia886f4q",
+    "type": "blogs",
+    "title": "Flow Control in the Oil & Gas Industry: Challenges and Solutions",
+    "slug": "flow-control-oil-gas",
+    "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+    "published": true,
+    "createdAt": "2026-07-20T14:05:09.849Z",
+    "updatedAt": "2026-07-20T15:37:52.910Z"
+  }
+]

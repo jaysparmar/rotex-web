@@ -27,7 +27,7 @@ export function SupplierHeroSection({
     // flex column so the inner container can flex-1 and fill the frame — with a
     // min-h parent, a percentage h-full resolves to auto and mt-auto has no
     // free space to push the CTA into.
-    <section className="relative bg-stone-900 min-h-156.25 lg:min-h-0 lg:h-150 pt-28 pb-16 lg:pb-20 overflow-hidden flex flex-col">
+    <section className="relative bg-stone-900 min-h-156.25 lg:min-h-0 lg:h-170 pt-28 pb-16 lg:pb-20 overflow-hidden flex flex-col">
       {/*
         Desktop artwork. Figma places it at left 871 / top 178, 626×556 inside a
         1440×600 frame — it deliberately bleeds ~57px off the right edge and is

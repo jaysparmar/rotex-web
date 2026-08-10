@@ -75,8 +75,8 @@ export function IndustryOverview({ sectionTitle, overview, stats }: IndustryOver
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="shrink-0 flex items-start gap-7 lg:gap-12">
+        {/* Stats: 2 per row, wraps to new row as more stats are added */}
+        <div className="shrink-0 grid grid-cols-2 gap-x-7 gap-y-6 lg:gap-x-12 lg:gap-y-10">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}

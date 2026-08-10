@@ -3,11 +3,12 @@ import Link from "next/link";
 type AboutHeroSectionProps = {
   title: string;
   description?: string;
+  breadcrumbLabel?: string;
   children?: React.ReactNode;
 };
 
 /* Figma: 1440×720 canvas */
-export function AboutHeroSection({ title, description, children }: AboutHeroSectionProps) {
+export function AboutHeroSection({ title, description, breadcrumbLabel = "About Us", children }: AboutHeroSectionProps) {
   return (
     <section className="relative w-full flex justify-center overflow-hidden bg-stone-900">
       <div className="relative w-full max-w-360 lg:h-180">
@@ -43,7 +44,7 @@ export function AboutHeroSection({ title, description, children }: AboutHeroSect
             /
           </span>
           <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">
-            About Us
+            {breadcrumbLabel}
           </span>
         </nav>
 
