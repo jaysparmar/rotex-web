@@ -4,7 +4,7 @@ import { motion, useInView, useMotionValue, useSpring, useTransform } from "fram
 
 type Stat = { value: string; label: string };
 
-const STATS: Stat[] = [
+const DEFAULT_STATS: Stat[] = [
   { value: "47%", label: "Growth in industrial valve revenue" },
   { value: "53+", label: "Partners with a relationship lasting over 10 years." },
   { value: "71,000+", label: "Catalogue items" },
@@ -65,7 +65,17 @@ function StatValue({ value }: { value: string }) {
   );
 }
 
-export function ChannelPartnerStatsSection() {
+type ChannelPartnerStatsSectionProps = {
+  stats?: Stat[];
+  growthHeading?: string;
+  growthDescription?: string;
+};
+
+export function ChannelPartnerStatsSection({
+  stats = DEFAULT_STATS,
+  growthHeading = "Built for Growth",
+  growthDescription = "Expand your reach, operate efficiently, and grow with confidence.",
+}: ChannelPartnerStatsSectionProps) {
   return (
     <section className="bg-white py-14 lg:py-20">
       <div className="container">
@@ -73,7 +83,7 @@ export function ChannelPartnerStatsSection() {
           <div className="flex items-start">
             <RotexMark />
           </div>
-          {STATS.slice(0, 3).map((stat) => (
+          {stats.slice(0, 3).map((stat) => (
             <div key={stat.label} className="flex flex-col gap-2">
               <p className="text-stone-900 text-3xl lg:text-4xl font-semibold font-montserrat leading-tight">
                 <StatValue value={stat.value} />
@@ -86,13 +96,13 @@ export function ChannelPartnerStatsSection() {
 
           <div className="flex flex-col gap-2">
             <h2 className="text-stone-900 text-xl lg:text-2xl font-semibold font-montserrat leading-7">
-              Built for Growth
+              {growthHeading}
             </h2>
             <p className="text-stone-500 text-sm font-medium font-montserrat leading-5 max-w-56">
-              Expand your reach, operate efficiently, and grow with confidence.
+              {growthDescription}
             </p>
           </div>
-          {STATS.slice(3, 6).map((stat) => (
+          {stats.slice(3, 6).map((stat) => (
             <div key={stat.label} className="flex flex-col gap-2">
               <p className="text-stone-900 text-3xl lg:text-4xl font-semibold font-montserrat leading-tight">
                 <StatValue value={stat.value} />

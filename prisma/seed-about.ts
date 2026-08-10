@@ -117,6 +117,7 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
       title: "Trusted across 81 countries.",
       description:
         "From North Sea offshore platforms to Qatar gas fields, German cleanrooms, and Indian cement plants, Rotex is specified where precision matters and failure is not allowed.",
+      countryIds: [],
     },
   },
   {
@@ -146,18 +147,14 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
     order: 9,
     data: {
       heading: "What We Achieved So Far",
-      achievements: [
-        { badge: "rail", text: 'Featured as one of the "100 Innovative Companies in the Rail Sector of India".' },
-        { badge: "zed", text: "Quality and compliance recognition for the manufacturing unit." },
-        { badge: "trophy", text: '1st Runner-Up at the National-Level Indian Society for Quality (ISQ) Competition for the "Aarambh" Case Study.' },
-      ],
+      awardIds: [],
       cta: { label: "See More of Our Wins", href: "/about/awards" },
     },
   },
   {
     key: "gallery",
     order: 10,
-    data: { images: [] },
+    data: { mediaIds: [] },
   },
   {
     key: "resources",
@@ -169,6 +166,15 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
         { id: "news", label: "News & Updates", cta: { label: "View All News & Updates", href: "/news-updates" }, resourceIds: [] },
         { id: "blogs", label: "Blogs", cta: { label: "Read All Blogs", href: "/blogs" }, resourceIds: [] },
       ],
+    },
+  },
+  {
+    key: "awards",
+    order: 12,
+    data: {
+      title: "Awards & Recognition",
+      description:
+        "Celebrating excellence and innovation in industrial automation. Our commitment to quality and technological advancement has earned recognition from leading organizations worldwide.",
     },
   },
 ];

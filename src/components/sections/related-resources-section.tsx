@@ -1,9 +1,9 @@
 import { ResourceCard } from "@/components/ui/resource-card";
-import type { ResourcePost } from "@/lib/resources-data";
+import type { ResourceItem } from "@/lib/resource-types";
 
 type RelatedResourcesSectionProps = {
   heading: string;
-  posts: ResourcePost[];
+  posts: ResourceItem[];
   basePath: string;
 };
 

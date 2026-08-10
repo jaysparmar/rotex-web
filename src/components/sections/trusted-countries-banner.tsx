@@ -15,14 +15,18 @@ const TrustedWorldMap = dynamic(() => import("./trusted-world-map"), {
   loading: () => <div className="w-full h-full rounded-full bg-neutral-100 animate-pulse" />,
 });
 
+type Pin = { name: string; coordinates: [number, number] };
+
 type TrustedCountriesBannerProps = {
   title?: string;
   description?: string;
+  pins: Pin[];
 };
 
 export function TrustedCountriesBanner({
   title = "Trusted across 81 countries.",
   description = "From North Sea offshore platforms to Qatar gas fields, German cleanrooms, and Indian cement plants, Rotex is specified where precision matters and failure is not allowed.",
+  pins,
 }: TrustedCountriesBannerProps) {
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -148,7 +152,7 @@ export function TrustedCountriesBanner({
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
         >
-          <TrustedWorldMap rotateLng={rotateLng} rotateLat={rotateLat} />
+          <TrustedWorldMap rotateLng={rotateLng} rotateLat={rotateLat} pins={pins} />
         </div>
       </motion.div>
     </section>

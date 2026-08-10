@@ -5,21 +5,16 @@ import { cn } from "@/lib/utils";
 import { DownloadCard } from "@/components/ui/download-card";
 import { DownloadsFilterField } from "@/components/ui/downloads-filter-field";
 import { Pagination } from "@/components/ui/pagination";
-import {
-  DOWNLOAD_ITEMS,
-  DOWNLOAD_TABS,
-  PRODUCT_OPTIONS,
-  SUB_CATEGORY_OPTIONS,
-  PRODUCT_CERTIFICATE_OPTIONS,
-  QMS_CERTIFICATE_OPTIONS,
-  INDUSTRY_OPTIONS,
-  type DownloadTab,
-} from "@/lib/downloads-data";
+import { DOWNLOAD_TABS, type DownloadTab, type DownloadItem } from "@/lib/downloads-data";
 
 const ALL = "All";
 const PAGE_SIZE = 9;
 
-export function DownloadsSection() {
+function uniqueOptions(items: DownloadItem[], key: keyof DownloadItem): string[] {
+  return Array.from(new Set(items.map((i) => String(i[key])).filter(Boolean)));
+}
+
+export function DownloadsSection({ items }: { items: DownloadItem[] }) {
   const [activeTab, setActiveTab] = useState<DownloadTab>("certificates");
   const [product, setProduct] = useState(ALL);
   const [subCategory, setSubCategory] = useState(ALL);
@@ -28,9 +23,28 @@ export function DownloadsSection() {
   const [industry, setIndustry] = useState(ALL);
   const [page, setPage] = useState(1);
 
-  const items = useMemo(() => DOWNLOAD_ITEMS.filter((item) => item.tab === activeTab), [activeTab]);
-  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
-  const visibleItems = items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const productOptions = useMemo(() => uniqueOptions(items, "product"), [items]);
+  const subCategoryOptions = useMemo(() => uniqueOptions(items, "subCategory"), [items]);
+  const productCertOptions = useMemo(() => uniqueOptions(items, "productCertificateType"), [items]);
+  const qmsCertOptions = useMemo(() => uniqueOptions(items, "qmsCertificateType"), [items]);
+  const industryOptions = useMemo(() => uniqueOptions(items, "industry"), [items]);
+
+  const filteredItems = useMemo(
+    () =>
+      items.filter(
+        (item) =>
+          item.tab === activeTab &&
+          (product === ALL || item.product === product) &&
+          (subCategory === ALL || item.subCategory === subCategory) &&
+          (productCert === ALL || item.productCertificateType === productCert) &&
+          (qmsCert === ALL || item.qmsCertificateType === qmsCert) &&
+          (industry === ALL || item.industry === industry)
+      ),
+    [items, activeTab, product, subCategory, productCert, qmsCert, industry]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
+  const visibleItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const changeTab = (tab: DownloadTab) => {
     setActiveTab(tab);
@@ -43,29 +57,29 @@ export function DownloadsSection() {
         {/* Sidebar filters */}
         <aside className="w-full lg:w-80 shrink-0 flex flex-col gap-7">
           <h2 className="text-stone-900 text-base font-semibold font-montserrat leading-6">Filters</h2>
-          <DownloadsFilterField label="Product" placeholder="Select Product" options={PRODUCT_OPTIONS} value={product} onChange={setProduct} />
+          <DownloadsFilterField label="Product" placeholder="Select Product" options={productOptions} value={product} onChange={setProduct} />
           <DownloadsFilterField
             label="Sub Category Product"
             placeholder="Select Sub Category Product"
-            options={SUB_CATEGORY_OPTIONS}
+            options={subCategoryOptions}
             value={subCategory}
             onChange={setSubCategory}
           />
           <DownloadsFilterField
             label="Product Certificate type"
             placeholder="Select Certificate"
-            options={PRODUCT_CERTIFICATE_OPTIONS}
+            options={productCertOptions}
             value={productCert}
             onChange={setProductCert}
           />
           <DownloadsFilterField
             label="Quality Management Certificate type"
             placeholder="Select Certificate"
-            options={QMS_CERTIFICATE_OPTIONS}
+            options={qmsCertOptions}
             value={qmsCert}
             onChange={setQmsCert}
           />
-          <DownloadsFilterField label="Industry Type" placeholder="Select Industry" options={INDUSTRY_OPTIONS} value={industry} onChange={setIndustry} />
+          <DownloadsFilterField label="Industry Type" placeholder="Select Industry" options={industryOptions} value={industry} onChange={setIndustry} />
         </aside>
 
         {/* Content */}

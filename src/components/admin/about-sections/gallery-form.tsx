@@ -1,28 +1,36 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useForm, FormProvider, useFieldArray, useFormContext, useWatch } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
-import { Upload, Loader2 } from "lucide-react";
+import { FileVideo } from "lucide-react";
+import Image from "next/image";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
-import { TextField, AddButton, RepeaterItem } from "@/components/admin/form-fields";
-import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveAboutSection } from "@/app/admin/(dashboard)/about/actions";
 
-type GalleryImage = { src: string; alt: string };
-type FormValues = { enabled: boolean; images: GalleryImage[] };
+type MediaAsset = { id: string; url: string; type: "image" | "video"; filename: string; alt: string | null };
+type FormValues = { enabled: boolean; mediaIds: string[] };
 
 export function GalleryForm({
   initialEnabled,
   initialData,
+  allMedia,
 }: {
   initialEnabled: boolean;
-  initialData: { images: GalleryImage[] };
+  initialData: { mediaIds: string[] };
+  allMedia: MediaAsset[];
 }) {
-  const form = useForm<FormValues>({ defaultValues: { enabled: initialEnabled, ...initialData } });
-  const { fields, append, remove } = useFieldArray({ control: form.control, name: "images" });
+  const form = useForm<FormValues>({
+    defaultValues: { enabled: initialEnabled, mediaIds: initialData.mediaIds ?? [] },
+  });
   const { pending, error, success, run } = useSaveAction();
+  const selected = form.watch("mediaIds");
+
+  function toggle(id: string, checked: boolean) {
+    const current = form.getValues("mediaIds");
+    form.setValue("mediaIds", checked ? [...current, id] : current.filter((m) => m !== id));
+  }
 
   function onSubmit(values: FormValues) {
     const { enabled, ...data } = values;
@@ -42,57 +50,40 @@ export function GalleryForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <SectionMeta />
 
-        <div className="space-y-3">
-          {fields.map((field, i) => (
-            <RepeaterItem key={field.id} title={`Image ${i + 1}`} onRemove={() => remove(i)}>
-              <GalleryImageRow index={i} />
-            </RepeaterItem>
+        <p className="text-xs text-muted-foreground">
+          Pick which images/videos from the Media Library show in the About gallery. Upload new files on the{" "}
+          <a href="/admin/media" className="underline">Media Library</a> page first.
+        </p>
+
+        <div className="space-y-1 rounded-lg border border-border">
+          <span className="block p-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Gallery Media ({selected.length} selected)
+          </span>
+          {allMedia.length === 0 && (
+            <p className="p-4 text-sm text-muted-foreground">
+              No media uploaded yet. Add some on the Media Library page first.
+            </p>
+          )}
+          {allMedia.map((asset) => (
+            <div key={asset.id} className="flex items-center gap-4 border-t border-border p-4">
+              <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
+                {asset.type === "image" ? (
+                  <Image src={asset.url} alt={asset.alt ?? ""} width={48} height={48} className="size-full object-cover" unoptimized />
+                ) : (
+                  <FileVideo className="size-5 text-muted-foreground" />
+                )}
+              </div>
+              <span className="flex-1 truncate text-sm font-medium">{asset.filename}</span>
+              <Switch
+                checked={selected.includes(asset.id)}
+                onCheckedChange={(v) => toggle(asset.id, v)}
+              />
+            </div>
           ))}
-          <AddButton label="Add Image" onClick={() => append({ src: "", alt: "" })} />
         </div>
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>
     </FormProvider>
-  );
-}
-
-function GalleryImageRow({ index }: { index: number }) {
-  const form = useFormContext<FormValues>();
-  const [uploading, setUploading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const src = useWatch({ control: form.control, name: `images.${index}.src` });
-
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      const json = await res.json();
-      if (json.success) form.setValue(`images.${index}.src`, json.data.url, { shouldDirty: true });
-    } finally {
-      setUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
-    }
-  }
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-3">
-        <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => inputRef.current?.click()} className="gap-1.5">
-          {uploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
-          {uploading ? "Uploading..." : "Choose File"}
-        </Button>
-        <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-      </div>
-      {src && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="" className="h-32 w-full rounded-lg border border-border object-cover" />
-      )}
-      <TextField label="Alt Text" {...form.register(`images.${index}.alt`)} />
-    </div>
   );
 }

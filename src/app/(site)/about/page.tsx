@@ -25,15 +25,19 @@ type StoryData = {
 type MissionVisionData = { mission: string; vision: string };
 type ValuesData = { heading: string; subheading: string; values: { title: string; description: string }[] };
 type JourneyData = { heading: string; milestones: { year: string; title: string; description: string }[] };
-type TrustedCountriesData = { title: string; description: string };
+type TrustedCountriesData = {
+  title: string;
+  description: string;
+  pins: { name: string; coordinates: [number, number] }[];
+};
 type ZeroDowntimeCtaData = { title: string; description: string; ctaPrimary: CtaButton; ctaSecondary: CtaButton };
 type GrowWithRotexData = { title: string; description: string; image: string; cta: CtaButton };
 type AchievementsData = {
   heading: string;
-  achievements: { badge: "rail" | "zed" | "trophy"; text: string }[];
+  achievements: { id: string; title: string; year: string; image: string }[];
   cta: CtaButton;
 };
-type GalleryData = { images: { src: string; alt: string }[] };
+type GalleryData = { images: { src: string; alt: string; type: "image" | "video" }[] };
 type ResourcesData = {
   heading: { title: string };
   tabs: { id: string; label: string; cta: CtaButton; resources: { slug: string; title: string; image: string }[] }[];
@@ -91,8 +95,12 @@ export default async function AboutPage() {
         <JourneyTimelineSection heading={journey.heading} milestones={journey.milestones} />
       )}
 
-      {trustedCountries?.enabled && (
-        <TrustedCountriesBanner title={trustedCountries.title} description={trustedCountries.description} />
+      {trustedCountries?.enabled && trustedCountries.pins.length > 0 && (
+        <TrustedCountriesBanner
+          title={trustedCountries.title}
+          description={trustedCountries.description}
+          pins={trustedCountries.pins}
+        />
       )}
 
       {zeroDowntimeCta?.enabled && (

@@ -6,21 +6,13 @@ type Pin = { name: string; coordinates: [number, number] };
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-const pins: Pin[] = [
-  { name: "United Kingdom", coordinates: [-2.5, 54.5] },
-  { name: "Netherlands", coordinates: [5.29, 52.13] },
-  { name: "UAE", coordinates: [54.3, 23.9] },
-  { name: "Saudi Arabia", coordinates: [45.08, 23.89] },
-  { name: "India", coordinates: [78.96, 20.59] },
-  { name: "Malaysia", coordinates: [101.98, 4.21] },
-];
-
 type TrustedWorldMapProps = {
   rotateLng?: number;
   rotateLat?: number;
+  pins: Pin[];
 };
 
-function TrustedWorldMap({ rotateLng = -55, rotateLat = -18 }: TrustedWorldMapProps) {
+function TrustedWorldMap({ rotateLng = -55, rotateLat = -18, pins }: TrustedWorldMapProps) {
   return (
     // Square viewBox with radius 380 centred at 400,400 — the globe spans 20..780
     // on both axes, so nothing is clipped at the left, right or top edge.

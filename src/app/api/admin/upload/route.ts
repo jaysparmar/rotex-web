@@ -12,6 +12,9 @@ const ALLOWED_TYPES = new Set([
   "image/gif",
   "video/mp4",
   "video/webm",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
 
 const MAX_SIZE_MB = 200;

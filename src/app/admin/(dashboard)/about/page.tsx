@@ -16,8 +16,14 @@ const LABELS: Record<string, string> = {
   resources: "Resources",
 };
 
+// The "awards" row (hero + enable/disable for the standalone /about/awards page) is edited
+// from the Awards admin page instead — it isn't a section of THIS page, so it's hidden here.
+const HIDDEN_KEYS = new Set(["awards"]);
+
 export default async function AdminAboutPage() {
-  const sections = await prisma.aboutSection.findMany({ orderBy: { order: "asc" } });
+  const sections = (await prisma.aboutSection.findMany({ orderBy: { order: "asc" } })).filter(
+    (s) => !HIDDEN_KEYS.has(s.key)
+  );
 
   return (
     <div className="space-y-6">

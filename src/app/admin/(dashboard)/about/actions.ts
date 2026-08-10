@@ -18,4 +18,5 @@ export async function saveAboutSection(key: string, payload: { enabled: boolean;
   revalidatePath("/admin/about");
   revalidatePath(`/admin/about/${key}`);
   revalidatePath("/about");
+  if (key === "awards") revalidatePath("/admin/awards");
 }

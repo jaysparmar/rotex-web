@@ -12,7 +12,18 @@ import { ResourceFormDialog, RESOURCE_TYPES } from "@/components/admin/resources
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { deleteResource, toggleResourcePublished } from "@/app/admin/(dashboard)/resources/actions";
 
-type Resource = { id: string; type: string; title: string; slug: string; image: string; published: boolean };
+type Resource = {
+  id: string;
+  type: string;
+  title: string;
+  slug: string;
+  image: string;
+  published: boolean;
+  product: string;
+  industry: string;
+  extraTags: string[];
+  content: string;
+};
 
 export function ResourceList({ resources }: { resources: Resource[] }) {
   const [pending, startTransition] = useTransition();

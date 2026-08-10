@@ -5,6 +5,7 @@ import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { TextField, TextAreaField, FieldGrid, AddButton, RepeaterItem } from "@/components/admin/form-fields";
+import { MediaField } from "@/components/admin/media-field";
 import { Switch } from "@/components/ui/switch";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveAboutSection } from "@/app/admin/(dashboard)/about/actions";
@@ -17,7 +18,7 @@ type FormValues = {
   stats: { value: string; label: string }[];
   trustedLabel: string;
   partnerIds: string[];
-  videoSrc: string;
+  video: { src: string };
 };
 
 export function StoryForm({
@@ -44,7 +45,7 @@ export function StoryForm({
       stats: initialData.stats,
       trustedLabel: initialData.trustedLabel,
       partnerIds: initialData.partnerIds ?? [],
-      videoSrc: initialData.videoSrc,
+      video: { src: initialData.videoSrc },
     },
   });
   const paragraphArray = useFieldArray({ control: form.control, name: "paragraphs" });
@@ -58,8 +59,8 @@ export function StoryForm({
   }
 
   function onSubmit(values: FormValues) {
-    const { enabled, paragraphs, ...rest } = values;
-    const data = { ...rest, paragraphs: paragraphs.map((p) => p.text) };
+    const { enabled, paragraphs, video, ...rest } = values;
+    const data = { ...rest, paragraphs: paragraphs.map((p) => p.text), videoSrc: video.src };
     run(async () => {
       try {
         await saveAboutSection("story", { enabled, data });
@@ -101,7 +102,7 @@ export function StoryForm({
         </div>
 
         <TextField label="Trusted Label" {...form.register("trustedLabel")} />
-        <TextField label="Video Src" {...form.register("videoSrc")} />
+        <MediaField name="video" mediaType="video" showAlt={false} />
 
         <div className="space-y-1 rounded-lg border border-border">
           <span className="block p-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ImageView } from "@/components/ui/image-view";
-import type { ResourcePost } from "@/lib/resources-data";
+import type { ResourceItem } from "@/lib/resource-types";
 
 type ResourceCardProps = {
-  post: ResourcePost;
+  post: ResourceItem;
   basePath: string;
 };
 
@@ -16,14 +16,19 @@ export function ResourceCard({ post, basePath }: ResourceCardProps) {
         alt={post.title}
         containerClassName="w-full h-56 rounded-lg"
         className="object-cover"
+        unoptimized
       />
       <div className="flex items-center gap-1.5 flex-wrap">
-        <span className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5">
-          {post.product}
-        </span>
-        <span className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5">
-          {post.industry}
-        </span>
+        {post.product && (
+          <span className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5">
+            {post.product}
+          </span>
+        )}
+        {post.industry && (
+          <span className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5">
+            {post.industry}
+          </span>
+        )}
         {!!post.extraTags?.length && (
           <span className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5">
             +{post.extraTags.length} More

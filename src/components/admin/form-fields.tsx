@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -39,25 +40,46 @@ export function TextAreaField(props: React.ComponentProps<typeof Textarea> & { l
   );
 }
 
-export function SelectField(
-  props: React.ComponentProps<"select"> & { label: string; options: { value: string; label: string }[] }
-) {
-  const { label, options, className, ...rest } = props;
+/**
+ * Styled dropdown that still accepts a react-hook-form `register()` spread
+ * (name/onChange/onBlur/ref) — Select's onValueChange is bridged into a
+ * minimal synthetic event `{ target: { name, value } }` so RHF's onChange,
+ * which only reads target.name/target.value, works unmodified. Also accepts
+ * plain `value`/`onChange(value)` for manual Controller-driven usage.
+ */
+export function SelectField({
+  label,
+  options,
+  className,
+  placeholder,
+  ...rest
+}: React.ComponentProps<"select"> & {
+  label: string;
+  options: { value: string; label: string }[];
+  placeholder?: string;
+}) {
+  const { name, value, defaultValue, disabled, onChange } = rest;
   return (
     <Field label={label}>
-      <select
-        {...rest}
-        className={cn(
-          "h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring",
-          className
-        )}
+      <Select
+        value={value as string | undefined}
+        defaultValue={defaultValue as string | undefined}
+        disabled={disabled}
+        onValueChange={(v) =>
+          onChange?.({ target: { name, value: (v as string) ?? "" } } as unknown as React.ChangeEvent<HTMLSelectElement>)
+        }
       >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger className={cn("w-full", className)}>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </Field>
   );
 }
