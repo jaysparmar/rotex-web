@@ -358,15 +358,6 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
     data: {
       heading: { title: "Engineered Flow Control Systems" },
       cta: { label: "View All Products", href: "/products" },
-      products: [
-        { id: "prod_001", published: true, slug: "solenoid-valve", name: "Solenoid Valve", description: "The Component Inside Valves That Cannot Fail", image: { src: "https://cdn.rotex.com/products/solenoid-valve.png", alt: "Solenoid Valve" } },
-        { id: "prod_002", published: true, slug: "angle-seat-valve", name: "Angle Seat Valve", description: "Durable flow control for demanding needs", image: { src: "https://cdn.rotex.com/products/angle-seat-valve.png", alt: "Angle Seat Valve" } },
-        { id: "prod_003", published: true, slug: "actuators", name: "Actuators", description: "Powerful mechanical devices for valve movement", image: { src: "https://cdn.rotex.com/products/actuators.png", alt: "Actuators" } },
-        { id: "prod_004", published: true, slug: "positioners", name: "Positioners", description: "Precise, digital control for valve positioning", image: { src: "https://cdn.rotex.com/products/positioners.png", alt: "Positioners" } },
-        { id: "prod_005", published: true, slug: "controllers", name: "Controllers", description: "Smart process control for industrial systems", image: { src: "https://cdn.rotex.com/products/controllers.png", alt: "Controllers" } },
-        { id: "prod_006", published: true, slug: "sensors", name: "Sensors", description: "Accurate measurement for critical processes", image: { src: "https://cdn.rotex.com/products/sensors.png", alt: "Sensors" } },
-        { id: "prod_007", published: true, slug: "automation", name: "Automation Systems", description: "End-to-end automation for flow operations", image: { src: "https://cdn.rotex.com/products/automation.png", alt: "Automation Systems" } },
-      ],
     },
   },
   {
