@@ -201,3 +201,29 @@ export async function fetchIndustries<T extends object>(): Promise<T | null> {
     return null;
   }
 }
+
+/**
+ * Fetches the live top-level categories list through /api/v1/categories.
+ */
+export async function fetchCategories<T extends object>(): Promise<T | null> {
+  try {
+    const baseUrl = await getBaseUrl();
+    const res = await fetch(`${baseUrl}/api/v1/categories`, { cache: "no-store" });
+
+    if (!res.ok) {
+      console.error(`[site-api] GET /api/v1/categories → ${res.status}`);
+      return null;
+    }
+
+    const json = await res.json();
+    if (!json.success) {
+      console.error(`[site-api] GET /api/v1/categories → ${json.error?.code}: ${json.error?.message}`);
+      return null;
+    }
+
+    return json.data;
+  } catch (err) {
+    console.error(`[site-api] GET /api/v1/categories failed:`, err);
+    return null;
+  }
+}

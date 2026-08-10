@@ -1,4 +1,4 @@
-import { fetchHomeSection, fetchIndustries } from "@/lib/site-api";
+import { fetchHomeSection, fetchIndustries, fetchCategories } from "@/lib/site-api";
 import { HeroSection } from "@/components/sections/hero-section";
 import { TrustedLeaders } from "@/components/sections/trusted-leaders";
 import { RedefiningSection } from "@/components/sections/redefining-section";
@@ -45,6 +45,8 @@ type ResourcesData = {
 };
 type IndustriesHeadingData = { heading: { title: string; subtitle: string } };
 type IndustryCard = { id: string; slug: string; name: string; description: string; image: string };
+type ProductsHeadingData = { heading: { title: string }; cta: { label: string; href: string } };
+type CategoryCard = { id: string; slug: string; name: string; tagline: string; image: string | null };
 
 export default async function Home() {
   const hero = await fetchHomeSection<HeroData>("hero");
@@ -52,7 +54,8 @@ export default async function Home() {
   const redefining = await fetchHomeSection<RedefiningData>("redefining");
   const industriesSection = await fetchHomeSection<IndustriesHeadingData>("industries");
   const industriesList = await fetchIndustries<{ industries: IndustryCard[] }>();
-  const products = await fetchHomeSection<object>("products");
+  const products = await fetchHomeSection<ProductsHeadingData>("products");
+  const categoriesList = await fetchCategories<{ categories: CategoryCard[] }>();
   const certifications = await fetchHomeSection<CertificationsData>("certifications");
   const customerStories = await fetchHomeSection<CustomerStoriesData>("customer-stories");
   const resources = await fetchHomeSection<ResourcesData>("resources");
@@ -77,7 +80,13 @@ export default async function Home() {
       {industriesSection?.enabled && industriesList && industriesList.industries.length > 0 && (
         <IndustriesSection heading={industriesSection.heading} industries={industriesList.industries} />
       )}
-      {products?.enabled && <ProductsSection />}
+      {products?.enabled && categoriesList && categoriesList.categories.length > 0 && (
+        <ProductsSection
+          heading={products.heading}
+          cta={products.cta}
+          categories={categoriesList.categories}
+        />
+      )}
       {certifications?.enabled && certifications.logos.length > 0 && (
         <TrustedLeaders title={certifications.title} logos={certifications.logos} primary />
       )}

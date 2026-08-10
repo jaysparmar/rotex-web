@@ -3,62 +3,27 @@ import { useRef } from "react";
 import Link from "next/link";
 import { ProductCard } from "@/components/ui/product-card";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
-import product1 from "@/assets/Images/products/product_1.png";
-import product2 from "@/assets/Images/products/product_2.png";
-import product3 from "@/assets/Images/products/product_3.png";
-import product4 from "@/assets/Images/products/product_4.png";
 
-const productImages = [product1, product2, product3, product4];
+type CategoryCard = {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string;
+  image: string | null;
+};
 
-const products = [
-  {
-    id: "solenoid-valve",
-    name: "Solenoid Valve",
-    description: "The Component Inside Valves That Cannot Fail",
-    href: "/products/solenoid-valve",
-  },
-  {
-    id: "angle-seat-valve",
-    name: "Angle Seat Valve",
-    description: "Durable flow control for demanding needs",
-    href: "/products/angle-seat-valve",
-  },
-  {
-    id: "actuators",
-    name: "Actuators",
-    description: "Powerful mechanical devices for valve movement",
-    href: "/products/actuators",
-  },
-  {
-    id: "positioners",
-    name: "Positioners",
-    description: "Precise, digital control for valve positioning",
-    href: "/products/positioners",
-  },
-  {
-    id: "controllers",
-    name: "Controllers",
-    description: "Smart process control for industrial systems",
-    href: "/products/controllers",
-  },
-  {
-    id: "sensors",
-    name: "Sensors",
-    description: "Accurate measurement for critical processes",
-    href: "/products/sensors",
-  },
-  {
-    id: "automation",
-    name: "Automation Systems",
-    description: "End-to-end automation for flow operations",
-    href: "/products/automation",
-  },
-].map((product, i) => ({ ...product, image: productImages[i % productImages.length] }));
+type ProductsSectionProps = {
+  heading: { title: string };
+  cta: { label: string; href: string };
+  categories: CategoryCard[];
+};
 
 const SCROLL_AMOUNT = 308; // card width (288) + gap (20)
 
-export function ProductsSection() {
+export function ProductsSection({ heading, cta, categories }: ProductsSectionProps) {
   const trackRef = useRef<HTMLDivElement>(null);
+
+  if (!categories.length) return null;
 
   const scroll = (dir: "left" | "right") => {
     trackRef.current?.scrollBy({
@@ -74,7 +39,7 @@ export function ProductsSection() {
       <div className="container">
         <div className="flex items-center justify-between mb-9">
           <h2 className="text-gradient-orange-dark font-montserrat font-normal text-3xl lg:text-4xl leading-10">
-            Engineered Flow Control Systems
+            {heading.title}
           </h2>
 
           {/* Arrow nav */}
@@ -106,8 +71,14 @@ export function ProductsSection() {
           scrollbarWidth: "none",
         }}
       >
-        {products.map((product) => (
-          <ProductCard key={product.id} {...product} />
+        {categories.map((category) => (
+          <ProductCard
+            key={category.id}
+            name={category.name}
+            description={category.tagline}
+            image={category.image ?? ""}
+            href={`/products?category=${category.slug}`}
+          />
         ))}
         {/* Trailing spacer so last card doesn't sit flush against viewport */}
         <div className="shrink-0 w-4" />
@@ -116,10 +87,10 @@ export function ProductsSection() {
       {/* CTA — back inside container */}
       <div className="container flex justify-center mt-10">
         <Link
-          href="/products"
+          href={cta.href}
           className="px-6 py-3.5 rounded-full bg-stone-900 text-white font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-stone-800 transition-colors duration-150"
         >
-          View All Products
+          {cta.label}
         </Link>
       </div>
 
