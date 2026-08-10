@@ -1,5 +1,6 @@
 "use client";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { IoChevronForwardOutline, IoChevronBackOutline } from "react-icons/io5";
 import type { StaticImageData } from "next/image";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,10 @@ const ALL_PRODUCTS: Product[] = [
 ];
 
 const TABS = ["All Products", "Solenoid Valve", "Angle Seat Valve", "Actuators", "Positioners", "Automotive Solutions"];
+
+function slugifyTab(tab: string): string {
+  return tab.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
 
 // ── Filter config ─────────────────────────────────────────────────────────────
 
@@ -127,7 +132,19 @@ function FilterSidebar({
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ProductsPage() {
-  const [activeTab, setActiveTab] = useState("All Products");
+  return (
+    <Suspense fallback={null}>
+      <ProductsPageContent />
+    </Suspense>
+  );
+}
+
+function ProductsPageContent() {
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => {
+    const categoryParam = searchParams.get("category");
+    return TABS.find((tab) => slugifyTab(tab) === categoryParam) ?? "All Products";
+  });
   const [pillState, setPillState] = useState<Record<string, string[]>>({
     subType: ["Standard"],
     operatingType: ["Direct Acting"],
