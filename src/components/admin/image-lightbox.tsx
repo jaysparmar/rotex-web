@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
@@ -32,9 +31,10 @@ export function ImageLightboxTrigger({
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl bg-transparent p-0 shadow-none ring-0 sm:max-w-2xl">
-          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
-            <Image src={src} alt={alt} fill className="object-contain p-8" unoptimized />
+        <DialogContent className="w-auto max-w-[calc(100%-2rem)] bg-transparent p-0 shadow-none ring-0 sm:max-w-[calc(100%-2rem)]">
+          <div className="flex items-center justify-center rounded-xl bg-card p-6 ring-1 ring-foreground/10">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={src} alt={alt} className="max-h-[70vh] max-w-[80vw] w-auto h-auto object-contain" />
           </div>
         </DialogContent>
       </Dialog>
