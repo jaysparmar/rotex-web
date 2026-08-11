@@ -1,12 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import { Upload, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { useTheme } from "next-themes";
+import { Editor } from "@tinymce/tinymce-react";
+import { marked } from "marked";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { TextField, FieldGrid, SwitchField, SelectField, Field } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
@@ -138,7 +138,7 @@ export function ResourceEditForm({ resource, defaultType }: { resource?: Resourc
         <Card>
           <CardHeader>
             <CardTitle>Content</CardTitle>
-            <CardDescription>Markdown — supports ## headings, **bold**, links, lists, images.</CardDescription>
+            <CardDescription>Rich text editor — headings, bold, links, lists, images.</CardDescription>
           </CardHeader>
           <CardContent>
             <ContentField />
@@ -151,74 +151,48 @@ export function ResourceEditForm({ resource, defaultType }: { resource?: Resourc
   );
 }
 
+function looksLikeHtml(value: string): boolean {
+  return /<[a-z][\s\S]*>/i.test(value);
+}
+
 function ContentField() {
   const form = useFormContext<ResourceFormValues>();
-  const fileRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const { ref: registerRef, ...contentProps } = form.register("content");
+  const raw = form.getValues("content");
+  const initialValue = raw && !looksLikeHtml(raw) ? (marked.parse(raw, { async: false }) as string) : raw;
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  useEffect(() => setMounted(true), []);
 
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      const json = await res.json();
-      if (!json.success) return;
-
-      const snippet = `![${file.name}](${json.data.url})`;
-      const textarea = textareaRef.current;
-      const current = form.getValues("content");
-
-      if (textarea) {
-        const start = textarea.selectionStart ?? current.length;
-        const end = textarea.selectionEnd ?? current.length;
-        const next = `${current.slice(0, start)}${snippet}${current.slice(end)}`;
-        form.setValue("content", next, { shouldDirty: true });
-        requestAnimationFrame(() => {
-          textarea.focus();
-          textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
-        });
-      } else {
-        form.setValue("content", current ? `${current}\n\n${snippet}\n` : snippet, { shouldDirty: true });
-      }
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
-  }
+  const isDark = mounted && resolvedTheme === "dark";
 
   return (
     <Field label="Content">
-      <div className="space-y-2">
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={uploading}
-            onClick={() => fileRef.current?.click()}
-            className="gap-1.5"
-          >
-            {uploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
-            {uploading ? "Uploading..." : "Insert Image"}
-          </Button>
-          <input ref={fileRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-        </div>
-        <Textarea
-          {...contentProps}
-          ref={(el) => {
-            registerRef(el);
-            textareaRef.current = el;
-          }}
-          rows={16}
-        />
-      </div>
+      <Editor
+        key={isDark ? "dark" : "light"}
+        tinymceScriptSrc="/tinymce/tinymce.min.js"
+        licenseKey="gpl"
+        initialValue={initialValue}
+        onEditorChange={(value) => form.setValue("content", value, { shouldDirty: true })}
+        init={{
+          height: 640,
+          menubar: false,
+          skin: isDark ? "oxide-dark" : "oxide",
+          content_css: isDark ? "dark" : "default",
+          plugins: ["link", "image", "lists", "table", "blockquote", "autoresize"],
+          toolbar:
+            "undo redo | blocks | bold italic | bullist numlist | link image table blockquote | removeformat",
+          block_formats: "Paragraph=p; Heading 2=h2; Heading 3=h3",
+          images_upload_handler: async (blobInfo) => {
+            const formData = new FormData();
+            formData.append("file", blobInfo.blob(), blobInfo.filename());
+            const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+            const json = await res.json();
+            if (!json.success) throw new Error(json.error?.message ?? "Upload failed");
+            return json.data.url as string;
+          },
+        }}
+      />
     </Field>
   );
 }
