@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { Editor } from "@tinymce/tinymce-react";
 import { marked } from "marked";
+import "./tinymce-theme.css";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { TextField, FieldGrid, SwitchField, SelectField, Field } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
@@ -186,8 +187,16 @@ function ContentField() {
         init={{
           height: 640,
           menubar: true,
+          promotion: false,
+          toolbar_mode: "wrap",
           skin: isDark ? "oxide-dark" : "oxide",
           content_css: isDark ? "dark" : "default",
+          // literal hex, not CSS vars: the edit area is a same-origin iframe with its own
+          // document, so --card/--card-foreground from globals.css don't inherit into it.
+          // Keep in sync with the .dark/:root --card values in src/app/globals.css.
+          content_style: isDark
+            ? "body { background-color: #2a2525; color: #ffffff; font-family: inherit; }"
+            : "body { background-color: #ffffff; color: #201d1d; font-family: inherit; }",
           plugins: [
             "advlist",
             "autolink",

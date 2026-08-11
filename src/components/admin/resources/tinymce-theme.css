@@ -1,0 +1,50 @@
+body .tox.tox-tinymce {
+  border-color: var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  background-color: var(--card) !important;
+  overflow: hidden;
+}
+
+body .tox .tox-editor-header,
+body .tox .tox-menubar,
+body .tox .tox-toolbar,
+body .tox .tox-toolbar-overlord,
+body .tox .tox-toolbar__primary,
+body .tox .tox-toolbar__overflow,
+body .tox .tox-statusbar {
+  background-color: var(--card) !important;
+  background-image: none !important;
+  border-color: var(--border) !important;
+}
+
+body .tox .tox-mbtn,
+body .tox .tox-tbtn {
+  color: var(--card-foreground) !important;
+  background-color: transparent !important;
+}
+
+body .tox .tox-mbtn svg,
+body .tox .tox-tbtn svg {
+  fill: var(--card-foreground) !important;
+}
+
+body .tox .tox-mbtn:hover:not(:disabled),
+body .tox .tox-tbtn:hover:not(:disabled) {
+  background-color: var(--accent) !important;
+}
+
+body .tox .tox-statusbar,
+body .tox .tox-statusbar a,
+body .tox .tox-statusbar__path-item,
+body .tox .tox-statusbar__wordcount {
+  color: var(--muted-foreground) !important;
+}
+
+body .tox .tox-edit-area,
+body .tox .tox-edit-area__iframe {
+  background-color: var(--card) !important;
+}
+
+body .tox .tox-toolbar__group {
+  border-color: var(--border) !important;
+}
