@@ -54,53 +54,59 @@ export function CertificationList({ certifications }: { certifications: Certific
         />
       </div>
 
-      <div className="divide-y divide-border rounded-lg border border-border">
-        {certifications.length === 0 && (
-          <p className="p-6 text-sm text-muted-foreground">No certifications yet.</p>
-        )}
-        {certifications.map((certification) => (
-          <div key={certification.id} className="flex items-center gap-4 p-4">
-            <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-              {certification.logo && (
-                <Image
-                  src={certification.logo}
-                  alt={certification.name}
-                  width={48}
-                  height={48}
-                  className="size-full object-contain"
-                  unoptimized
+      {certifications.length === 0 ? (
+        <p className="rounded-lg border border-border p-6 text-sm text-muted-foreground">
+          No certifications yet.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+          {certifications.map((certification) => (
+            <div key={certification.id} className="space-y-2">
+              <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/30">
+                {certification.logo && (
+                  <Image
+                    src={certification.logo}
+                    alt={certification.name}
+                    fill
+                    className="object-contain p-3"
+                    unoptimized
+                  />
+                )}
+              </div>
+
+              <p className="truncate text-sm font-medium">{certification.name}</p>
+
+              <div className="flex items-center justify-between gap-1">
+                <Switch
+                  checked={certification.published}
+                  disabled={pending}
+                  onCheckedChange={(v) => handleTogglePublished(certification, v)}
                 />
-              )}
+
+                <div className="flex items-center gap-1">
+                  <CertificationFormDialog
+                    certification={certification}
+                    trigger={
+                      <Button variant="ghost" size="icon-sm">
+                        <Pencil className="size-3.5" />
+                      </Button>
+                    }
+                  />
+
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    disabled={pending}
+                    onClick={() => setToDelete(certification)}
+                  >
+                    <Trash2 className="size-3.5 text-destructive" />
+                  </Button>
+                </div>
+              </div>
             </div>
-
-            <span className="flex-1 text-sm font-medium">{certification.name}</span>
-
-            <Switch
-              checked={certification.published}
-              disabled={pending}
-              onCheckedChange={(v) => handleTogglePublished(certification, v)}
-            />
-
-            <CertificationFormDialog
-              certification={certification}
-              trigger={
-                <Button variant="ghost" size="icon-sm">
-                  <Pencil className="size-3.5" />
-                </Button>
-              }
-            />
-
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              disabled={pending}
-              onClick={() => setToDelete(certification)}
-            >
-              <Trash2 className="size-3.5 text-destructive" />
-            </Button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}

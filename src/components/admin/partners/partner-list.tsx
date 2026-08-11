@@ -54,53 +54,59 @@ export function PartnerList({ partners }: { partners: Partner[] }) {
         />
       </div>
 
-      <div className="divide-y divide-border rounded-lg border border-border">
-        {partners.length === 0 && (
-          <p className="p-6 text-sm text-muted-foreground">No partners yet.</p>
-        )}
-        {partners.map((partner) => (
-          <div key={partner.id} className="flex items-center gap-4 p-4">
-            <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-              {partner.logo && (
-                <Image
-                  src={partner.logo}
-                  alt={partner.name}
-                  width={48}
-                  height={48}
-                  className="size-full object-contain"
-                  unoptimized
+      {partners.length === 0 ? (
+        <p className="rounded-lg border border-border p-6 text-sm text-muted-foreground">
+          No partners yet.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+          {partners.map((partner) => (
+            <div key={partner.id} className="space-y-2">
+              <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/30">
+                {partner.logo && (
+                  <Image
+                    src={partner.logo}
+                    alt={partner.name}
+                    fill
+                    className="object-contain p-3"
+                    unoptimized
+                  />
+                )}
+              </div>
+
+              <p className="truncate text-sm font-medium">{partner.name}</p>
+
+              <div className="flex items-center justify-between gap-1">
+                <Switch
+                  checked={partner.published}
+                  disabled={pending}
+                  onCheckedChange={(v) => handleTogglePublished(partner, v)}
                 />
-              )}
+
+                <div className="flex items-center gap-1">
+                  <PartnerFormDialog
+                    partner={partner}
+                    trigger={
+                      <Button variant="ghost" size="icon-sm">
+                        <Pencil className="size-3.5" />
+                      </Button>
+                    }
+                  />
+
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    disabled={pending}
+                    onClick={() => setToDelete(partner)}
+                  >
+                    <Trash2 className="size-3.5 text-destructive" />
+                  </Button>
+                </div>
+              </div>
             </div>
-
-            <span className="flex-1 text-sm font-medium">{partner.name}</span>
-
-            <Switch
-              checked={partner.published}
-              disabled={pending}
-              onCheckedChange={(v) => handleTogglePublished(partner, v)}
-            />
-
-            <PartnerFormDialog
-              partner={partner}
-              trigger={
-                <Button variant="ghost" size="icon-sm">
-                  <Pencil className="size-3.5" />
-                </Button>
-              }
-            />
-
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              disabled={pending}
-              onClick={() => setToDelete(partner)}
-            >
-              <Trash2 className="size-3.5 text-destructive" />
-            </Button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}
