@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { CertificationList } from "@/components/admin/certifications/certification-list";
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 12;
 
 export default async function AdminCertificationsPage({
   searchParams,

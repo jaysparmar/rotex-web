@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { PartnerList } from "@/components/admin/partners/partner-list";
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 12;
 
 export default async function AdminPartnersPage({
   searchParams,

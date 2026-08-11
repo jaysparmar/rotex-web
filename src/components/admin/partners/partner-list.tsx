@@ -9,6 +9,7 @@ import { Pencil, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { PartnerFormDialog } from "@/components/admin/partners/partner-form-dialog";
+import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { deletePartner, togglePartnerPublished } from "@/app/admin/(dashboard)/partners/actions";
 
@@ -84,17 +85,23 @@ export function PartnerList({
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
           {partners.map((partner) => (
             <div key={partner.id} className="space-y-2">
-              <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/30">
+              <ImageLightboxTrigger
+                src={partner.logo}
+                alt={partner.name}
+                className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/30"
+              >
                 {partner.logo && (
-                  <Image
-                    src={partner.logo}
-                    alt={partner.name}
-                    fill
-                    className="object-contain p-3"
-                    unoptimized
-                  />
+                  <div className="relative size-20">
+                    <Image
+                      src={partner.logo}
+                      alt={partner.name}
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
                 )}
-              </div>
+              </ImageLightboxTrigger>
 
               <p className="truncate text-sm font-medium">{partner.name}</p>
 

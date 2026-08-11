@@ -9,6 +9,7 @@ import { Pencil, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { CertificationFormDialog } from "@/components/admin/certifications/certification-form-dialog";
+import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { deleteCertification, toggleCertificationPublished } from "@/app/admin/(dashboard)/certifications/actions";
 
@@ -84,17 +85,23 @@ export function CertificationList({
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
           {certifications.map((certification) => (
             <div key={certification.id} className="space-y-2">
-              <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/30">
+              <ImageLightboxTrigger
+                src={certification.logo}
+                alt={certification.name}
+                className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/30"
+              >
                 {certification.logo && (
-                  <Image
-                    src={certification.logo}
-                    alt={certification.name}
-                    fill
-                    className="object-contain p-3"
-                    unoptimized
-                  />
+                  <div className="relative size-20">
+                    <Image
+                      src={certification.logo}
+                      alt={certification.name}
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
                 )}
-              </div>
+              </ImageLightboxTrigger>
 
               <p className="truncate text-sm font-medium">{certification.name}</p>
 
