@@ -246,6 +246,19 @@ const PARTNERS: { id: string; name: string; logo: string }[] = [
   { id: "partner_018", name: "NIGC", logo: "/uploads/partners/nigc.png" },
 ];
 
+const CERTIFICATIONS: { id: string; name: string; logo: string }[] = [
+  { id: "cert_001", name: "CE", logo: "/uploads/certifications/ce.png" },
+  { id: "cert_002", name: "EX", logo: "/uploads/certifications/ex.png" },
+  { id: "cert_003", name: "SIL3", logo: "/uploads/certifications/sil3.png" },
+  { id: "cert_004", name: "IATF", logo: "/uploads/certifications/iatf.png" },
+  { id: "cert_005", name: "inmetro", logo: "/uploads/certifications/inmetro.png" },
+  { id: "cert_006", name: "ISI", logo: "/uploads/certifications/isi.png" },
+  { id: "cert_007", name: "KOSHA", logo: "/uploads/certifications/kosha.png" },
+  { id: "cert_008", name: "PCT", logo: "/uploads/certifications/pct.png" },
+  { id: "cert_009", name: "PED", logo: "/uploads/certifications/ped.png" },
+  { id: "cert_010", name: "UL", logo: "/uploads/certifications/ul.png" },
+];
+
 const RESOURCES: { type: string; slug: string; title: string; image: string }[] = [
   { type: "case-studies", slug: "solenoid-valve-classification", title: "Solenoid Valve Classification: The Engineering Logic Behind Reliable Automation Systems", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" },
   { type: "case-studies", slug: "future-industrial-valves", title: "Future of Industrial Valves: 7 Rotex Technologies Improving Reliability & Uptime", image: "https://images.unsplash.com/photo-1581092335397-9583eb92d232?w=600&q=80" },
@@ -375,7 +388,7 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
     data: {
       title: "Certified & Trusted Worldwide",
       description: "Recognised and certified by leading global standards bodies and industry partners.",
-      partnerIds: PARTNERS.map((p) => p.id),
+      certificationIds: CERTIFICATIONS.map((c) => c.id),
     },
   },
   {
@@ -428,6 +441,14 @@ async function main() {
       where: { id: partner.id },
       update: { name: partner.name, logo: partner.logo },
       create: { id: partner.id, name: partner.name, logo: partner.logo, published: true },
+    });
+  }
+
+  for (const certification of CERTIFICATIONS) {
+    await prisma.certification.upsert({
+      where: { id: certification.id },
+      update: { name: certification.name, logo: certification.logo },
+      create: { id: certification.id, name: certification.name, logo: certification.logo, published: true },
     });
   }
 
@@ -504,7 +525,7 @@ async function main() {
     }
   }
 
-  console.log(`Seeded global config, home SEO, ${PARTNERS.length} partners, and ${SECTIONS.length} home sections.`);
+  console.log(`Seeded global config, home SEO, ${PARTNERS.length} partners, ${CERTIFICATIONS.length} certifications, and ${SECTIONS.length} home sections.`);
 }
 
 main()
