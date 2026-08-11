@@ -360,6 +360,7 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
         const slides = json?.data?.slides;
         setHeroActive(
           Boolean(json?.data?.enabled) &&
+            Boolean(json?.data?.isFirst) &&
             Array.isArray(slides) &&
             slides.length > 0,
         );

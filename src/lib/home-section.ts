@@ -63,5 +63,17 @@ export async function getHomeSection(key: string) {
     );
   }
 
+  if (key === "hero") {
+    const firstEnabled = await prisma.homeSection.findFirst({
+      where: { enabled: true },
+      orderBy: { order: "asc" },
+      select: { key: true },
+    });
+    return apiSuccess(
+      { enabled: section.enabled, order: section.order, isFirst: firstEnabled?.key === "hero", ...data },
+      section.updatedAt
+    );
+  }
+
   return apiSuccess({ enabled: section.enabled, order: section.order, ...data }, section.updatedAt);
 }
