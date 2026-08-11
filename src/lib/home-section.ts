@@ -16,7 +16,7 @@ export async function getHomeSection(key: string) {
     const partners = await getSelectedPartners((data.partnerIds as string[]) ?? []);
     const logos = partners.map((p) => ({ id: p.id, src: p.logo, alt: p.name }));
     return apiSuccess(
-      { enabled: section.enabled, title: data.title, description: data.description, logos },
+      { enabled: section.enabled, order: section.order, title: data.title, description: data.description, logos },
       section.updatedAt
     );
   }
@@ -25,7 +25,7 @@ export async function getHomeSection(key: string) {
     const certifications = await getSelectedCertifications((data.certificationIds as string[]) ?? []);
     const logos = certifications.map((c) => ({ id: c.id, src: c.logo, alt: c.name }));
     return apiSuccess(
-      { enabled: section.enabled, title: data.title, description: data.description, logos },
+      { enabled: section.enabled, order: section.order, title: data.title, description: data.description, logos },
       section.updatedAt
     );
   }
@@ -39,7 +39,7 @@ export async function getHomeSection(key: string) {
         })
       : [];
     return apiSuccess(
-      { enabled: section.enabled, heading: data.heading, stories },
+      { enabled: section.enabled, order: section.order, heading: data.heading, stories },
       section.updatedAt
     );
   }
@@ -57,8 +57,11 @@ export async function getHomeSection(key: string) {
         return { id: tab.id, label: tab.label, cta: tab.cta, resources: ordered };
       })
     );
-    return apiSuccess({ enabled: section.enabled, heading: data.heading, tabs: resolvedTabs }, section.updatedAt);
+    return apiSuccess(
+      { enabled: section.enabled, order: section.order, heading: data.heading, tabs: resolvedTabs },
+      section.updatedAt
+    );
   }
 
-  return apiSuccess({ enabled: section.enabled, ...data }, section.updatedAt);
+  return apiSuccess({ enabled: section.enabled, order: section.order, ...data }, section.updatedAt);
 }

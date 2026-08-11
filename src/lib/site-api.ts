@@ -13,7 +13,7 @@ async function getBaseUrl() {
  */
 export async function fetchHomeSection<T extends object>(
   key: string
-): Promise<({ enabled: boolean } & T) | null> {
+): Promise<({ enabled: boolean; order: number } & T) | null> {
   try {
     const baseUrl = await getBaseUrl();
     const res = await fetch(`${baseUrl}/api/v1/home/${key}`, { cache: "no-store" });

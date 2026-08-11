@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { fetchHomeSection, fetchIndustries } from "@/lib/site-api";
 import { HeroSection } from "@/components/sections/hero-section";
 import { TrustedLeaders } from "@/components/sections/trusted-leaders";
@@ -60,34 +61,65 @@ export default async function Home() {
   const cta = await fetchHomeSection<object>("cta");
   const heroVisible = Boolean(hero?.enabled && hero.slides.length > 0);
 
-  return (
-    <div className={heroVisible ? undefined : "pt-20 lg:pt-24"}>
-      {heroVisible && <HeroSection slides={hero!.slides} />}
-      {partners?.enabled && partners.logos.length > 0 && (
-        <TrustedLeaders title={partners.title} logos={partners.logos} />
-      )}
-      {redefining?.enabled && (
+  const sections = [
+    { order: hero?.order ?? 0, node: heroVisible ? <HeroSection key="hero" slides={hero!.slides} /> : null },
+    {
+      order: partners?.order ?? 0,
+      node:
+        partners?.enabled && partners.logos.length > 0 ? (
+          <TrustedLeaders key="partners" title={partners.title} logos={partners.logos} />
+        ) : null,
+    },
+    {
+      order: redefining?.order ?? 0,
+      node: redefining?.enabled ? (
         <RedefiningSection
+          key="redefining"
           heading={redefining.heading}
           media={redefining.media}
           tagline={redefining.tagline}
           stats={redefining.stats}
         />
-      )}
-      {industriesSection?.enabled && industriesList && industriesList.industries.length > 0 && (
-        <IndustriesSection heading={industriesSection.heading} industries={industriesList.industries} />
-      )}
-      {products?.enabled && <ProductsSection />}
-      {certifications?.enabled && certifications.logos.length > 0 && (
-        <TrustedLeaders title={certifications.title} logos={certifications.logos} primary />
-      )}
-      {customerStories?.enabled && customerStories.stories.length > 0 && (
-        <CustomerStoriesSection heading={customerStories.heading} stories={customerStories.stories} />
-      )}
-      {resources?.enabled && resourceTabs.length > 0 && (
-        <LearnSection heading={resources.heading.title} tabs={resourceTabs} />
-      )}
-      {cta?.enabled && <CtaSection />}
-    </div>
-  );
+      ) : null,
+    },
+    {
+      order: industriesSection?.order ?? 0,
+      node:
+        industriesSection?.enabled && industriesList && industriesList.industries.length > 0 ? (
+          <IndustriesSection
+            key="industries"
+            heading={industriesSection.heading}
+            industries={industriesList.industries}
+          />
+        ) : null,
+    },
+    { order: products?.order ?? 0, node: products?.enabled ? <ProductsSection key="products" /> : null },
+    {
+      order: certifications?.order ?? 0,
+      node:
+        certifications?.enabled && certifications.logos.length > 0 ? (
+          <TrustedLeaders key="certifications" title={certifications.title} logos={certifications.logos} primary />
+        ) : null,
+    },
+    {
+      order: customerStories?.order ?? 0,
+      node:
+        customerStories?.enabled && customerStories.stories.length > 0 ? (
+          <CustomerStoriesSection key="customer-stories" heading={customerStories.heading} stories={customerStories.stories} />
+        ) : null,
+    },
+    {
+      order: resources?.order ?? 0,
+      node:
+        resources?.enabled && resourceTabs.length > 0 ? (
+          <LearnSection key="resources" heading={resources.heading.title} tabs={resourceTabs} />
+        ) : null,
+    },
+    { order: cta?.order ?? 0, node: cta?.enabled ? <CtaSection key="cta" /> : null },
+  ]
+    .sort((a, b) => a.order - b.order)
+    .map((s) => s.node)
+    .filter((node): node is ReactElement => node !== null);
+
+  return <div className={heroVisible ? undefined : "pt-20 lg:pt-24"}>{sections}</div>;
 }
