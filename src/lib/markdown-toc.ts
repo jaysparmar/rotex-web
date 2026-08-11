@@ -8,7 +8,10 @@ export function slugifyHeading(text: string): string {
 
 export type TocEntry = { text: string; id: string };
 
-export function extractToc(markdown: string): TocEntry[] {
-  const matches = [...markdown.matchAll(/^##\s+(.+)$/gm)];
-  return matches.map((m) => ({ text: m[1].trim(), id: slugifyHeading(m[1].trim()) }));
+export function extractToc(html: string): TocEntry[] {
+  const matches = [...html.matchAll(/<h2[^>]*>(.*?)<\/h2>/gis)];
+  return matches.map((m) => {
+    const text = m[1].replace(/<[^>]+>/g, "").trim();
+    return { text, id: slugifyHeading(text) };
+  });
 }
