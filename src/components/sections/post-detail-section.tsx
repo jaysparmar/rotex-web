@@ -1,11 +1,10 @@
 import Image from "next/image";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import type { Components } from "react-markdown";
+import DOMPurify from "isomorphic-dompurify";
 import { PostBreadcrumb } from "@/components/ui/post-breadcrumb";
 import { PostShareButtons } from "@/components/ui/post-share-buttons";
 import { getResourceTags, formatResourceDate, type ResourceItem } from "@/lib/resource-types";
 import { extractToc, slugifyHeading } from "@/lib/markdown-toc";
+import styles from "./post-detail-section.module.css";
 
 type PostDetailSectionProps = {
   post: ResourceItem;
@@ -14,61 +13,21 @@ type PostDetailSectionProps = {
   typeHref: string;
 };
 
-function headingText(children: React.ReactNode): string {
-  if (typeof children === "string") return children;
-  if (Array.isArray(children)) return children.map(headingText).join("");
-  return "";
+function withHeadingIds(html: string): string {
+  return html.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/gi, (match, attrs: string, inner: string) => {
+    if (/\sid=/.test(attrs)) return match;
+    const text = inner.replace(/<[^>]+>/g, "").trim();
+    return `<h2${attrs} id="${slugifyHeading(text)}">${inner}</h2>`;
+  });
 }
-
-const markdownComponents: Components = {
-  h2: ({ children, ...props }) => (
-    <h2
-      id={slugifyHeading(headingText(children))}
-      className="scroll-mt-24 lg:scroll-mt-32 text-zinc-800 text-2xl font-medium font-montserrat leading-8"
-      {...props}
-    >
-      {children}
-    </h2>
-  ),
-  h3: ({ children, ...props }) => (
-    <h3 className="text-zinc-800 text-xl font-medium font-montserrat leading-7" {...props}>
-      {children}
-    </h3>
-  ),
-  p: ({ children, ...props }) => (
-    <p className="text-stone-500 text-base font-medium font-montserrat leading-6" {...props}>
-      {children}
-    </p>
-  ),
-  a: ({ children, ...props }) => (
-    <a className="text-red-600 underline hover:no-underline" {...props}>
-      {children}
-    </a>
-  ),
-  ul: ({ children, ...props }) => (
-    <ul className="list-disc pl-5 flex flex-col gap-1.5 text-stone-500 text-base font-medium font-montserrat leading-6" {...props}>
-      {children}
-    </ul>
-  ),
-  ol: ({ children, ...props }) => (
-    <ol className="list-decimal pl-5 flex flex-col gap-1.5 text-stone-500 text-base font-medium font-montserrat leading-6" {...props}>
-      {children}
-    </ol>
-  ),
-  img: ({ ...props }) => (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img {...props} className="w-full rounded-2xl outline-1 -outline-offset-1 outline-neutral-200" alt={props.alt ?? ""} />
-  ),
-  strong: ({ children, ...props }) => (
-    <strong className="text-stone-900 font-semibold" {...props}>
-      {children}
-    </strong>
-  ),
-};
 
 export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: PostDetailSectionProps) {
   const tags = getResourceTags(post);
   const toc = extractToc(post.content);
+  const contentHtml = DOMPurify.sanitize(withHeadingIds(post.content), {
+    ADD_TAGS: ["iframe"],
+    ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "target"],
+  });
 
   return (
     <section className="pt-28 pb-16 lg:pt-32">
@@ -104,11 +63,7 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
             </div>
 
             {/* Body */}
-            <div className="flex flex-col gap-6 [&>*+*]:mt-0">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                {post.content}
-              </ReactMarkdown>
-            </div>
+            <div className={styles.content} dangerouslySetInnerHTML={{ __html: contentHtml }} />
           </div>
 
           {/* Sidebar */}

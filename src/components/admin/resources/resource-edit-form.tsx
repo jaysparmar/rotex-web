@@ -164,11 +164,20 @@ function ContentField() {
 
   useEffect(() => setMounted(true), []);
 
-  const isDark = mounted && resolvedTheme === "dark";
+  if (!mounted) {
+    return (
+      <Field label="Content">
+        <div className="h-160 rounded-md border bg-muted animate-pulse" />
+      </Field>
+    );
+  }
+
+  const isDark = resolvedTheme === "dark";
 
   return (
     <Field label="Content">
       <Editor
+        id="resource-content-editor"
         key={isDark ? "dark" : "light"}
         tinymceScriptSrc="/tinymce/tinymce.min.js"
         licenseKey="gpl"
@@ -176,13 +185,41 @@ function ContentField() {
         onEditorChange={(value) => form.setValue("content", value, { shouldDirty: true })}
         init={{
           height: 640,
-          menubar: false,
+          menubar: true,
           skin: isDark ? "oxide-dark" : "oxide",
           content_css: isDark ? "dark" : "default",
-          plugins: ["link", "image", "lists", "table", "blockquote", "autoresize"],
+          plugins: [
+            "advlist",
+            "autolink",
+            "lists",
+            "link",
+            "image",
+            "charmap",
+            "preview",
+            "anchor",
+            "searchreplace",
+            "visualblocks",
+            "visualchars",
+            "fullscreen",
+            "insertdatetime",
+            "media",
+            "table",
+            "code",
+            "help",
+            "wordcount",
+            "emoticons",
+            "nonbreaking",
+            "pagebreak",
+            "directionality",
+            "quickbars",
+          ],
           toolbar:
-            "undo redo | blocks | bold italic | bullist numlist | link image table blockquote | removeformat",
-          block_formats: "Paragraph=p; Heading 2=h2; Heading 3=h3",
+            "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | " +
+            "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | " +
+            "link image media table | blockquote hr removeformat | charmap emoticons insertdatetime | " +
+            "anchor searchreplace visualblocks | fullscreen preview code | help",
+          block_formats:
+            "Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre; Blockquote=blockquote",
           images_upload_handler: async (blobInfo) => {
             const formData = new FormData();
             formData.append("file", blobInfo.blob(), blobInfo.filename());
