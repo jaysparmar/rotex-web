@@ -47,6 +47,7 @@ const NAV_ITEMS = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/industries", label: "Industries", icon: Factory },
   { href: "/admin/partners", label: "Partners", icon: Handshake },
+  { href: "/admin/certifications", label: "Certifications", icon: Award },
   { href: "/admin/countries", label: "Countries", icon: Globe },
   { href: "/admin/job-postings", label: "Job Postings", icon: Briefcase },
   { href: "/admin/job-applications", label: "Job Applications", icon: FileText },
