@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +14,27 @@ import { deletePartner, togglePartnerPublished } from "@/app/admin/(dashboard)/p
 
 type Partner = { id: string; name: string; logo: string; published: boolean };
 
-export function PartnerList({ partners }: { partners: Partner[] }) {
+export function PartnerList({
+  partners,
+  total,
+  page,
+  pageSize,
+}: {
+  partners: Partner[];
+  total: number;
+  page: number;
+  pageSize: number;
+}) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  function pageHref(nextPage: number) {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(nextPage));
+    return `${pathname}?${params.toString()}`;
+  }
+
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<Partner | null>(null);
 
@@ -54,7 +76,7 @@ export function PartnerList({ partners }: { partners: Partner[] }) {
         />
       </div>
 
-      {partners.length === 0 ? (
+      {total === 0 ? (
         <p className="rounded-lg border border-border p-6 text-sm text-muted-foreground">
           No partners yet.
         </p>
@@ -105,6 +127,26 @@ export function PartnerList({ partners }: { partners: Partner[] }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {total > 0 && (
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            {total} partner{total === 1 ? "" : "s"} · Page {page} of {totalPages}
+          </span>
+          <div className="flex items-center gap-2">
+            <Link href={pageHref(Math.max(1, page - 1))} aria-disabled={page <= 1}>
+              <Button variant="outline" size="sm" disabled={page <= 1}>
+                Previous
+              </Button>
+            </Link>
+            <Link href={pageHref(Math.min(totalPages, page + 1))} aria-disabled={page >= totalPages}>
+              <Button variant="outline" size="sm" disabled={page >= totalPages}>
+                Next
+              </Button>
+            </Link>
+          </div>
         </div>
       )}
 
