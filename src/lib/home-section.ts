@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { apiSuccess, apiError } from "@/lib/api-response";
 import { getSelectedPartners } from "@/lib/partners";
+import { getSelectedCertifications } from "@/lib/certifications";
 
 export async function getHomeSection(key: string) {
   const section = await prisma.homeSection.findUnique({ where: { key } });
@@ -11,9 +12,18 @@ export async function getHomeSection(key: string) {
 
   const data = section.data as Record<string, unknown>;
 
-  if (key === "partners" || key === "certifications") {
+  if (key === "partners") {
     const partners = await getSelectedPartners((data.partnerIds as string[]) ?? []);
     const logos = partners.map((p) => ({ id: p.id, src: p.logo, alt: p.name }));
+    return apiSuccess(
+      { enabled: section.enabled, title: data.title, description: data.description, logos },
+      section.updatedAt
+    );
+  }
+
+  if (key === "certifications") {
+    const certifications = await getSelectedCertifications((data.certificationIds as string[]) ?? []);
+    const logos = certifications.map((c) => ({ id: c.id, src: c.logo, alt: c.name }));
     return apiSuccess(
       { enabled: section.enabled, title: data.title, description: data.description, logos },
       section.updatedAt
