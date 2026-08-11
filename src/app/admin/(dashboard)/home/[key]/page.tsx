@@ -27,8 +27,17 @@ export default async function AdminHomeSectionPage({
   const label = key.replace("-", " ");
 
   const allPartners =
-    key === "partners" || key === "certifications"
+    key === "partners"
       ? await prisma.partner.findMany({
+          where: { published: true },
+          orderBy: { createdAt: "asc" },
+          select: { id: true, name: true, logo: true },
+        })
+      : [];
+
+  const allCertifications =
+    key === "certifications"
+      ? await prisma.certification.findMany({
           where: { published: true },
           orderBy: { createdAt: "asc" },
           select: { id: true, name: true, logo: true },
@@ -68,7 +77,7 @@ export default async function AdminHomeSectionPage({
         <PartnersPickerForm {...meta} initialData={data} allPartners={allPartners} />
       )}
       {key === "certifications" && (
-        <CertificationsPickerForm {...meta} initialData={data} allPartners={allPartners} />
+        <CertificationsPickerForm {...meta} initialData={data} allCertifications={allCertifications} />
       )}
       {key === "redefining" && <RedefiningForm {...meta} initialData={data} />}
       {key === "industries" && <IndustriesForm {...meta} initialData={data} />}

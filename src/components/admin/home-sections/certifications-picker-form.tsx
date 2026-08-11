@@ -9,34 +9,34 @@ import { Switch } from "@/components/ui/switch";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveHomeSection } from "@/app/admin/(dashboard)/home/actions";
 
-type Partner = { id: string; name: string; logo: string };
-type FormValues = { enabled: boolean; title: string; description: string; partnerIds: string[] };
+type Certification = { id: string; name: string; logo: string };
+type FormValues = { enabled: boolean; title: string; description: string; certificationIds: string[] };
 
 export function CertificationsPickerForm({
   initialEnabled,
   initialData,
-  allPartners,
+  allCertifications,
 }: {
   initialEnabled: boolean;
-  initialData: { title: string; description?: string; partnerIds: string[] };
-  allPartners: Partner[];
+  initialData: { title: string; description?: string; certificationIds: string[] };
+  allCertifications: Certification[];
 }) {
   const form = useForm<FormValues>({
     defaultValues: {
       enabled: initialEnabled,
       title: initialData.title,
       description: initialData.description ?? "",
-      partnerIds: initialData.partnerIds ?? [],
+      certificationIds: initialData.certificationIds ?? [],
     },
   });
   const { pending, error, success, run } = useSaveAction();
-  const selected = form.watch("partnerIds");
+  const selected = form.watch("certificationIds");
 
   function toggle(id: string, checked: boolean) {
-    const current = form.getValues("partnerIds");
+    const current = form.getValues("certificationIds");
     form.setValue(
-      "partnerIds",
-      checked ? [...current, id] : current.filter((p) => p !== id)
+      "certificationIds",
+      checked ? [...current, id] : current.filter((c) => c !== id)
     );
   }
 
@@ -61,18 +61,18 @@ export function CertificationsPickerForm({
         <TextAreaField label="Description" {...form.register("description")} />
 
         <div className="space-y-1 rounded-lg border border-border">
-          {allPartners.length === 0 && (
+          {allCertifications.length === 0 && (
             <p className="p-4 text-sm text-muted-foreground">
-              No published partners yet. Add some on the Partners page first.
+              No published certifications yet. Add some on the Certifications page first.
             </p>
           )}
-          {allPartners.map((partner) => (
-            <div key={partner.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
+          {allCertifications.map((certification) => (
+            <div key={certification.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
               <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                {partner.logo && (
+                {certification.logo && (
                   <Image
-                    src={partner.logo}
-                    alt={partner.name}
+                    src={certification.logo}
+                    alt={certification.name}
                     width={40}
                     height={40}
                     className="size-full object-contain"
@@ -80,10 +80,10 @@ export function CertificationsPickerForm({
                   />
                 )}
               </div>
-              <span className="flex-1 text-sm font-medium">{partner.name}</span>
+              <span className="flex-1 text-sm font-medium">{certification.name}</span>
               <Switch
-                checked={selected.includes(partner.id)}
-                onCheckedChange={(v) => toggle(partner.id, v)}
+                checked={selected.includes(certification.id)}
+                onCheckedChange={(v) => toggle(certification.id, v)}
               />
             </div>
           ))}
