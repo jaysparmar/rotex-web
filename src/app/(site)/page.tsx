@@ -62,8 +62,13 @@ export default async function Home() {
   const heroVisible = Boolean(hero?.enabled && hero.slides.length > 0);
 
   const sections = [
-    { order: hero?.order ?? 0, node: heroVisible ? <HeroSection key="hero" slides={hero!.slides} /> : null },
     {
+      id: "hero",
+      order: hero?.order ?? 0,
+      node: heroVisible ? <HeroSection key="hero" slides={hero!.slides} /> : null,
+    },
+    {
+      id: "partners",
       order: partners?.order ?? 0,
       node:
         partners?.enabled && partners.logos.length > 0 ? (
@@ -71,6 +76,7 @@ export default async function Home() {
         ) : null,
     },
     {
+      id: "redefining",
       order: redefining?.order ?? 0,
       node: redefining?.enabled ? (
         <RedefiningSection
@@ -83,6 +89,7 @@ export default async function Home() {
       ) : null,
     },
     {
+      id: "industries",
       order: industriesSection?.order ?? 0,
       node:
         industriesSection?.enabled && industriesList && industriesList.industries.length > 0 ? (
@@ -93,8 +100,13 @@ export default async function Home() {
           />
         ) : null,
     },
-    { order: products?.order ?? 0, node: products?.enabled ? <ProductsSection key="products" /> : null },
     {
+      id: "products",
+      order: products?.order ?? 0,
+      node: products?.enabled ? <ProductsSection key="products" /> : null,
+    },
+    {
+      id: "certifications",
       order: certifications?.order ?? 0,
       node:
         certifications?.enabled && certifications.logos.length > 0 ? (
@@ -102,6 +114,7 @@ export default async function Home() {
         ) : null,
     },
     {
+      id: "customer-stories",
       order: customerStories?.order ?? 0,
       node:
         customerStories?.enabled && customerStories.stories.length > 0 ? (
@@ -109,17 +122,21 @@ export default async function Home() {
         ) : null,
     },
     {
+      id: "resources",
       order: resources?.order ?? 0,
       node:
         resources?.enabled && resourceTabs.length > 0 ? (
           <LearnSection key="resources" heading={resources.heading.title} tabs={resourceTabs} />
         ) : null,
     },
-    { order: cta?.order ?? 0, node: cta?.enabled ? <CtaSection key="cta" /> : null },
+    { id: "cta", order: cta?.order ?? 0, node: cta?.enabled ? <CtaSection key="cta" /> : null },
   ]
     .sort((a, b) => a.order - b.order)
-    .map((s) => s.node)
-    .filter((node): node is ReactElement => node !== null);
+    .filter((s): s is typeof s & { node: ReactElement } => s.node !== null);
 
-  return <div className={heroVisible ? undefined : "pt-20 lg:pt-24"}>{sections}</div>;
+  const heroIsFirst = sections[0]?.id === "hero";
+
+  return (
+    <div className={heroIsFirst ? undefined : "pt-20 lg:pt-24"}>{sections.map((s) => s.node)}</div>
+  );
 }
