@@ -211,8 +211,8 @@ const GLOBAL_CONFIG: PrismaJson.GlobalConfigData = {
     legal: {
       copyright: "© 2026 Rotex. All rights reserved.",
       links: [
-        { label: "Privacy Policy", href: "/privacy" },
-        { label: "Terms of Use", href: "/terms" },
+        { label: "Privacy Policy", href: "/privacy-policy" },
+        { label: "Terms & Conditions", href: "/terms-and-conditions" },
       ],
     },
     contact: {

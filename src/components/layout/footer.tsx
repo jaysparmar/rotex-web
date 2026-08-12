@@ -7,7 +7,7 @@ import { SOCIAL_PLATFORM_MAP } from "@/lib/social-platforms";
 import bg from "@/assets/footer_bg.svg";
 
 // Pages not built yet — render as disabled text instead of a broken link.
-const DISABLED_HREFS = new Set(["/privacy", "/terms"]);
+const DISABLED_HREFS = new Set<string>([]);
 
 /* Figma: bg-radial-[at_57%_162%] from-amber-500 via-orange-600 28% to-black 87%
    Origin pulled to 50%: Figma's 57% is near-centre on its 1440px frame, but the
