@@ -4,7 +4,7 @@ import { PostBreadcrumb } from "@/components/ui/post-breadcrumb";
 import { PostShareButtons } from "@/components/ui/post-share-buttons";
 import { getResourceTags, formatResourceDate, type ResourceItem } from "@/lib/resource-types";
 import { extractToc, slugifyHeading } from "@/lib/markdown-toc";
-import styles from "./post-detail-section.module.css";
+import styles from "./rich-content.module.css";
 
 type PostDetailSectionProps = {
   post: ResourceItem;
