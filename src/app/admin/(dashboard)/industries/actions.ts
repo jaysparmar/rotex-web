@@ -24,9 +24,8 @@ type SubIndustryData = {
   storyIds: string[];
   challengesTitle: string;
   solutionsTitle: string;
-  solutionsIntro: string;
-  challenges: string[];
-  solutions: string[];
+  challenges: { title: string; description: string }[];
+  solutions: { title: string; description: string }[];
 };
 
 function revalidateIndustry(slug: string) {
