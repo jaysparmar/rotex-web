@@ -1,6 +1,7 @@
 declare global {
   namespace PrismaJson {
     type StringList = string[];
+    type CardList = { title: string; description: string }[];
 
     type IndustryStats = {
       value: string;

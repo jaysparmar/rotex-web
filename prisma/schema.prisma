@@ -107,10 +107,9 @@ model SubIndustry {
   storyIds            Json     @default("[]")
   challengesTitle     String
   solutionsTitle      String
-  solutionsIntro      String
-  /// [StringList]
+  /// [CardList]
   challenges          Json
-  /// [StringList]
+  /// [CardList]
   solutions           Json
   /// [StringList]
   recommendedProducts Json
