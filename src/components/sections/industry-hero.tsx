@@ -20,9 +20,9 @@ export function IndustryHero({ name, description, bg }: Props) {
         <div className="relative w-full aspect-4/3 overflow-hidden">
           <Image src={bg} alt={name} fill className="object-cover object-center" />
         </div>
-        <div className="bg-black px-4 py-8 flex flex-col gap-2.5">
-          <h2 className="text-white text-2xl font-medium font-montserrat leading-8">{name}</h2>
-          <p className="text-subtext text-sm font-medium font-montserrat leading-5">{description}</p>
+        <div className="bg-white px-4 py-8 flex flex-col gap-2.5">
+          <h2 className="text-stone-900 text-2xl font-medium font-montserrat leading-8">{name}</h2>
+          <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{description}</p>
         </div>
       </div>
 
