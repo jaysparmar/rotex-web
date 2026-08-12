@@ -42,6 +42,7 @@ export default async function AdminSubIndustryDetailPage({
 
       <SubIndustryEditForm
         industryId={industry.id}
+        industryName={industry.name}
         subIndustry={subIndustry}
         allPartners={allPartners}
         allStories={allStories}

@@ -37,7 +37,12 @@ export default async function AdminNewSubIndustryPage({
         />
       </div>
 
-      <SubIndustryEditForm industryId={industry.id} allPartners={allPartners} allStories={allStories} />
+      <SubIndustryEditForm
+        industryId={industry.id}
+        industryName={industry.name}
+        allPartners={allPartners}
+        allStories={allStories}
+      />
     </div>
   );
 }
