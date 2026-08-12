@@ -219,6 +219,13 @@ model ContactSection {
   updatedAt DateTime @updatedAt
 }
 
+model LegalPage {
+  key       String   @id
+  title     String
+  content   String
+  updatedAt DateTime @updatedAt
+}
+
 model MediaAsset {
   id        String   @id @default(cuid())
   url       String
