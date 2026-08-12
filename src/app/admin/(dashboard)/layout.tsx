@@ -21,7 +21,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     <div className="flex min-h-screen bg-background">
       <AdminSidebar logoLight={adminConfig.sidebarLogoLight} logoDark={adminConfig.sidebarLogoDark} />
 
-      <div className="flex min-h-screen flex-1 flex-col">
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <AdminHeader email={session?.user?.email} />
         <main className="flex-1 p-6">{children}</main>
         <AdminFooter />
