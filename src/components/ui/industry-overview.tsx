@@ -60,7 +60,7 @@ export function IndustryOverview({ sectionTitle, overview, stats }: IndustryOver
 
             <motion.button
               onClick={() => setExpanded((e) => !e)}
-              className="text-left text-stone-400 text-sm lg:text-base font-normal font-montserrat leading-5 lg:leading-6 hover:text-stone-600 transition-colors duration-150"
+              className="text-left text-stone-400 text-sm lg:text-base font-normal font-montserrat leading-5 lg:leading-6 underline underline-offset-2 hover:text-stone-600 transition-colors duration-150"
               whileTap={{ scale: 0.97 }}
             >
               <motion.span
