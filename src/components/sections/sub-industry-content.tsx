@@ -58,10 +58,9 @@ export async function SubIndustryContent({
 
       <IndustryChallengesSolutions
         challengesTitle={subIndustry.challengesTitle}
-        challenges={subIndustry.challenges as unknown as string[]}
+        challenges={subIndustry.challenges as unknown as { title: string; description: string }[]}
         solutionsTitle={subIndustry.solutionsTitle}
-        solutionsIntro={subIndustry.solutionsIntro}
-        solutions={subIndustry.solutions as unknown as string[]}
+        solutions={subIndustry.solutions as unknown as { title: string; description: string }[]}
       />
 
       {/* TODO: re-enable once recommended products are wired to the real Product catalog
