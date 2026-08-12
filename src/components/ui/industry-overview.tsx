@@ -8,6 +8,9 @@ type IndustryStat = { value: string; suffix?: string; label: string };
 function AnimatedCounter({ value, suffix }: { value: string; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  // Trailing letters in the value (e.g. "10M") are a unit, not noise — keep them
+  // and render after the animated digits instead of stripping them out.
+  const unit = value.match(/[a-zA-Z]+$/)?.[0] ?? "";
   const numeric = parseInt(value.replace(/\D/g, ""), 10) || 0;
 
   const count = useMotionValue(0);
@@ -21,6 +24,7 @@ function AnimatedCounter({ value, suffix }: { value: string; suffix?: string }) 
   return (
     <span ref={ref} className="text-stone-900 text-3xl font-normal font-montserrat leading-10">
       <motion.span>{rounded}</motion.span>
+      {unit}
       {suffix && <span className="text-primary">{suffix}</span>}
     </span>
   );
