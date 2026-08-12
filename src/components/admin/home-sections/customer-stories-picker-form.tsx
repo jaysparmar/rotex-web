@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { TextField } from "@/components/admin/form-fields";
-import { Switch } from "@/components/ui/switch";
+import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveHomeSection } from "@/app/admin/(dashboard)/home/actions";
 
@@ -63,37 +62,18 @@ export function CustomerStoriesPickerForm({
         <TextField label="Heading Title" {...form.register("heading.title")} />
         <TextField label="Heading Subtitle" {...form.register("heading.subtitle")} />
 
-        <div className="space-y-1 rounded-lg border border-border">
-          {allStories.length === 0 && (
-            <p className="p-4 text-sm text-muted-foreground">
-              No published customer stories yet. Add some on the Customer Stories page first.
-            </p>
-          )}
-          {allStories.map((story) => (
-            <div key={story.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
-              <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                {story.image && (
-                  <Image
-                    src={story.image}
-                    alt={story.author}
-                    width={40}
-                    height={40}
-                    className="size-full object-cover"
-                    unoptimized
-                  />
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{story.author}, {story.company}</p>
-                <p className="truncate text-xs text-muted-foreground">{story.quote}</p>
-              </div>
-              <Switch
-                checked={selected.includes(story.id)}
-                onCheckedChange={(v) => toggle(story.id, v)}
-              />
-            </div>
-          ))}
-        </div>
+        <ItemPickerGrid
+          items={allStories.map((s) => ({
+            id: s.id,
+            image: s.image,
+            label: `${s.author}, ${s.company}`,
+            sublabel: s.quote,
+          }))}
+          selectedIds={selected}
+          onToggle={toggle}
+          emptyMessage="No published customer stories yet. Add some on the Customer Stories page first."
+          imageFit="cover"
+        />
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>

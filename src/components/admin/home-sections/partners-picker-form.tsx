@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { TextField } from "@/components/admin/form-fields";
-import { Switch } from "@/components/ui/switch";
+import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveHomeSection } from "@/app/admin/(dashboard)/home/actions";
 
@@ -58,34 +57,12 @@ export function PartnersPickerForm({
         <SectionMeta />
         <TextField label="Title" {...form.register("title")} />
 
-        <div className="space-y-1 rounded-lg border border-border">
-          {allPartners.length === 0 && (
-            <p className="p-4 text-sm text-muted-foreground">
-              No published partners yet. Add some on the Partners page first.
-            </p>
-          )}
-          {allPartners.map((partner) => (
-            <div key={partner.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
-              <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                {partner.logo && (
-                  <Image
-                    src={partner.logo}
-                    alt={partner.name}
-                    width={40}
-                    height={40}
-                    className="size-full object-contain"
-                    unoptimized
-                  />
-                )}
-              </div>
-              <span className="flex-1 text-sm font-medium">{partner.name}</span>
-              <Switch
-                checked={selected.includes(partner.id)}
-                onCheckedChange={(v) => toggle(partner.id, v)}
-              />
-            </div>
-          ))}
-        </div>
+        <ItemPickerGrid
+          items={allPartners.map((p) => ({ id: p.id, image: p.logo, label: p.name }))}
+          selectedIds={selected}
+          onToggle={toggle}
+          emptyMessage="No published partners yet. Add some on the Partners page first."
+        />
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>

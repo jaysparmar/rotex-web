@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useForm, FormProvider, useFieldArray, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { TextField, FieldGrid } from "@/components/admin/form-fields";
-import { Switch } from "@/components/ui/switch";
+import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveHomeSection } from "@/app/admin/(dashboard)/home/actions";
 
@@ -97,34 +96,13 @@ function ResourcePicker({
       <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {typeId.replace("-", " ")}
       </span>
-      <div className="rounded-lg border border-border">
-        {options.length === 0 && (
-          <p className="p-4 text-sm text-muted-foreground">
-            No published resources of this type yet. Add some on the Resources page first.
-          </p>
-        )}
-        {options.map((resource) => (
-          <div key={resource.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
-            <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-              {resource.image && (
-                <Image
-                  src={resource.image}
-                  alt={resource.title}
-                  width={40}
-                  height={40}
-                  className="size-full object-cover"
-                  unoptimized
-                />
-              )}
-            </div>
-            <span className="flex-1 truncate text-sm font-medium">{resource.title}</span>
-            <Switch
-              checked={selected.includes(resource.id)}
-              onCheckedChange={(v) => toggle(resource.id, v)}
-            />
-          </div>
-        ))}
-      </div>
+      <ItemPickerGrid
+        items={options.map((r) => ({ id: r.id, image: r.image, label: r.title }))}
+        selectedIds={selected}
+        onToggle={toggle}
+        emptyMessage="No published resources of this type yet. Add some on the Resources page first."
+        imageFit="cover"
+      />
     </div>
   );
 }

@@ -54,7 +54,7 @@ export function ItemPickerGrid({
               <Switch
                 checked={checked}
                 onCheckedChange={(v) => onToggle(item.id, v)}
-                className="absolute right-1.5 top-1.5 bg-background/80 backdrop-blur-sm"
+                className="absolute right-1.5 top-1.5 border-border bg-muted shadow-sm ring-1 ring-foreground/10 backdrop-blur-sm data-checked:bg-primary"
                 onClick={(e) => e.stopPropagation()}
               />
             </div>

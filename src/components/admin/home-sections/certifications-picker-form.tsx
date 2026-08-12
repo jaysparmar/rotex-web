@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { TextField, TextAreaField } from "@/components/admin/form-fields";
-import { Switch } from "@/components/ui/switch";
+import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveHomeSection } from "@/app/admin/(dashboard)/home/actions";
 
@@ -60,34 +59,12 @@ export function CertificationsPickerForm({
         <TextField label="Title" {...form.register("title")} />
         <TextAreaField label="Description" {...form.register("description")} />
 
-        <div className="space-y-1 rounded-lg border border-border">
-          {allCertifications.length === 0 && (
-            <p className="p-4 text-sm text-muted-foreground">
-              No published certifications yet. Add some on the Certifications page first.
-            </p>
-          )}
-          {allCertifications.map((certification) => (
-            <div key={certification.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
-              <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                {certification.logo && (
-                  <Image
-                    src={certification.logo}
-                    alt={certification.name}
-                    width={40}
-                    height={40}
-                    className="size-full object-contain"
-                    unoptimized
-                  />
-                )}
-              </div>
-              <span className="flex-1 text-sm font-medium">{certification.name}</span>
-              <Switch
-                checked={selected.includes(certification.id)}
-                onCheckedChange={(v) => toggle(certification.id, v)}
-              />
-            </div>
-          ))}
-        </div>
+        <ItemPickerGrid
+          items={allCertifications.map((c) => ({ id: c.id, image: c.logo, label: c.name }))}
+          selectedIds={selected}
+          onToggle={toggle}
+          emptyMessage="No published certifications yet. Add some on the Certifications page first."
+        />
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>
