@@ -4,7 +4,8 @@
 
 **Goal:** Make the home page "Industries" section admin screen pick real Industries (checkbox + up/down reorder) and drive what actually renders on the public home page, replacing a dead hand-entered repeater that today has zero effect (the home page always shows every industry, unfiltered, unordered).
 
-**Architecture:** `industries-form.tsx` swaps its `useFieldArray` repeater for a checkbox+reorder list (same logic already proven in `mega-menu-editor.tsx`'s `IndustriesPicker`), storing an ordered `industryIds: string[]` instead of duplicated industry data. The admin `[key]/page.tsx` fetches `allIndustries` the same way it fetches `allCertifications`/`allPartners`. The public `(site)/page.tsx` filters+orders the already-fetched full industries list by `industryIds` instead of passing it straight through.
+**Architecture:** `industries-form.tsx` swaps its `useFieldArray` repeater for a checkbox+reorder list (same logic already proven in `mega-menu-editor.tsx`'s `IndustriesPicker`), storing an ordered
+ `industryIds: string[]` instead of duplicated industry data. The admin `[key]/page.tsx` fetches `allIndustries` the same way it fetches `allCertifications`/`allPartners`. The public `(site)/page.tsx` filters+orders the already-fetched full industries list by `industryIds` instead of passing it straight through.
 
 **Tech Stack:** Next.js App Router, React, TypeScript, react-hook-form, Prisma, Tailwind. No test runner in this repo — verification is `tsc --noEmit` + `next build` + manual browser check via a Playwright script (project has `playwright` as a dependency; no `chromium-cli`/project run-skill exists yet).
 

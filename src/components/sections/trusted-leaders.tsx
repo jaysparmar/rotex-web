@@ -34,7 +34,7 @@ export function TrustedLeaders({
   logos = defaultLogos,
 }: TrustedLeadersProps) {
   return (
-    <section className={primary ? "bg-white border-t py-10 lg:py-0 lg:h-64" : "bg-white border-t border-stone-100 py-8 lg:py-0 lg:h-36"}>
+    <section className={primary ? "bg-white border-t py-10 lg:py-0 lg:h-64" : "bg-white py-8 lg:py-0 lg:h-36"}>
       <div className="container h-full flex flex-col items-center gap-5 lg:flex-row lg:gap-8">
 
         {/* Label */}

@@ -2,8 +2,7 @@
 
 ## Problem
 The sub-industry admin form (`src/components/admin/industries/sub-industry-edit-form.tsx`) has two
-"one item per line" plain-text lists — Challenges and Solutions — rendered on the public
-sub-industry page as flat bullet rows (`src/components/sections/industry-challenges-solutions.tsx`).
+![alt text](image.png)sub-industry page as flat bullet rows (`src/components/sections/industry-challenges-solutions.tsx`).
 Admin wants each bullet to become a title+description card (like the existing
 `Industry.whyChoose.cards` pattern already used at the top-level industry), admin-addable/removable
 (N cards per side), and the two admin section labels renamed.
