@@ -4,7 +4,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { TextField } from "@/components/admin/form-fields";
-import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
+import { StoryPickerList } from "@/components/admin/story-picker-list";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveHomeSection } from "@/app/admin/(dashboard)/home/actions";
 
@@ -62,17 +62,11 @@ export function CustomerStoriesPickerForm({
         <TextField label="Heading Title" {...form.register("heading.title")} />
         <TextField label="Heading Subtitle" {...form.register("heading.subtitle")} />
 
-        <ItemPickerGrid
-          items={allStories.map((s) => ({
-            id: s.id,
-            image: s.image,
-            label: `${s.author}, ${s.company}`,
-            sublabel: s.quote,
-          }))}
+        <StoryPickerList
+          stories={allStories}
           selectedIds={selected}
           onToggle={toggle}
           emptyMessage="No published customer stories yet. Add some on the Customer Stories page first."
-          imageFit="cover"
         />
 
         <SaveBar pending={pending} error={error} success={success} />

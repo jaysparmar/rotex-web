@@ -1,17 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import { Field, TextField, TextAreaField, FieldGrid } from "@/components/admin/form-fields";
 import { ImageUrlField } from "@/components/admin/image-url-field";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { SaveBar } from "@/components/admin/section-form-shell";
 import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
+import { StoryPickerList } from "@/components/admin/story-picker-list";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { createSubIndustry, updateSubIndustry } from "@/app/admin/(dashboard)/industries/actions";
 
@@ -93,16 +90,6 @@ export function SubIndustryEditForm({
 
   const selectedPartnerIds = form.watch("partnerIds");
   const selectedStoryIds = form.watch("storyIds");
-  const [storySearch, setStorySearch] = useState("");
-  const filteredStories = allStories.filter((story) => {
-    const q = storySearch.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      story.author.toLowerCase().includes(q) ||
-      story.company.toLowerCase().includes(q) ||
-      story.quote.toLowerCase().includes(q)
-    );
-  });
 
   function togglePartner(id: string, checked: boolean) {
     const current = form.getValues("partnerIds");
@@ -235,51 +222,17 @@ export function SubIndustryEditForm({
           <CardHeader>
             <CardTitle>Customer Stories</CardTitle>
             <CardDescription>
-              Pick which stories appear on this sub-industry page ({selectedStoryIds.length} selected). Manage the
-              stories themselves from the Customer Stories page.
+              Pick which stories appear on this sub-industry page. Manage the stories themselves from the
+              Customer Stories page.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Input
-              type="text"
-              placeholder="Search by name, company, or quote..."
-              value={storySearch}
-              onChange={(e) => setStorySearch(e.target.value)}
+          <CardContent>
+            <StoryPickerList
+              stories={allStories}
+              selectedIds={selectedStoryIds}
+              onToggle={toggleStory}
+              emptyMessage="No published customer stories yet. Add some on the Customer Stories page first."
             />
-            <div className="max-h-80 space-y-1 overflow-y-auto rounded-lg border border-border">
-              {allStories.length === 0 && (
-                <p className="p-4 text-sm text-muted-foreground">
-                  No published customer stories yet. Add some on the Customer Stories page first.
-                </p>
-              )}
-              {allStories.length > 0 && filteredStories.length === 0 && (
-                <p className="p-4 text-sm text-muted-foreground">No stories match your search.</p>
-              )}
-              {filteredStories.map((story) => (
-                <div key={story.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
-                  <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                    {story.image && (
-                      <Image
-                        src={story.image}
-                        alt={story.author}
-                        width={40}
-                        height={40}
-                        className="size-full object-cover"
-                        unoptimized
-                      />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{story.author}, {story.company}</p>
-                    <p className="truncate text-xs text-muted-foreground">{story.quote}</p>
-                  </div>
-                  <Switch
-                    checked={selectedStoryIds.includes(story.id)}
-                    onCheckedChange={(v) => toggleStory(story.id, v)}
-                  />
-                </div>
-              ))}
-            </div>
           </CardContent>
         </Card>
 
