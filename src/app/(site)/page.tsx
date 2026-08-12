@@ -44,7 +44,7 @@ type ResourcesData = {
     resources: { slug: string; title: string; image: string }[];
   }[];
 };
-type IndustriesHeadingData = { heading: { title: string; subtitle: string } };
+type IndustriesHeadingData = { heading: { title: string; subtitle: string }; industryIds: string[] };
 type IndustryCard = { id: string; slug: string; name: string; description: string; image: string };
 
 export default async function Home() {
@@ -53,6 +53,9 @@ export default async function Home() {
   const redefining = await fetchHomeSection<RedefiningData>("redefining");
   const industriesSection = await fetchHomeSection<IndustriesHeadingData>("industries");
   const industriesList = await fetchIndustries<{ industries: IndustryCard[] }>();
+  const orderedIndustries = (industriesSection?.industryIds ?? [])
+    .map((id) => industriesList?.industries.find((i) => i.id === id))
+    .filter((i): i is IndustryCard => Boolean(i));
   const products = await fetchHomeSection<object>("products");
   const certifications = await fetchHomeSection<CertificationsData>("certifications");
   const customerStories = await fetchHomeSection<CustomerStoriesData>("customer-stories");
@@ -92,11 +95,11 @@ export default async function Home() {
       id: "industries",
       order: industriesSection?.order ?? 0,
       node:
-        industriesSection?.enabled && industriesList && industriesList.industries.length > 0 ? (
+        industriesSection?.enabled && orderedIndustries.length > 0 ? (
           <IndustriesSection
             key="industries"
             heading={industriesSection.heading}
-            industries={industriesList.industries}
+            industries={orderedIndustries}
           />
         ) : null,
     },
