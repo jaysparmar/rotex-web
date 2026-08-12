@@ -1,10 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useForm, FormProvider, Controller } from "react-hook-form";
-import { Field, TextField, TextAreaField, FieldGrid } from "@/components/admin/form-fields";
+import { useForm, FormProvider, useFieldArray } from "react-hook-form";
+import { TextField, TextAreaField, FieldGrid, RepeaterItem, AddButton } from "@/components/admin/form-fields";
 import { ImageUrlField } from "@/components/admin/image-url-field";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { SaveBar } from "@/components/admin/section-form-shell";
 import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
@@ -14,6 +13,7 @@ import { createSubIndustry, updateSubIndustry } from "@/app/admin/(dashboard)/in
 
 type Partner = { id: string; name: string; logo: string };
 type Story = { id: string; quote: string; author: string; company: string; image: string };
+type CardItem = { title: string; description: string };
 
 type FormValues = {
   name: string;
@@ -23,10 +23,9 @@ type FormValues = {
   partnerIds: string[];
   storyIds: string[];
   challengesTitle: string;
-  challenges: string;
+  challenges: CardItem[];
   solutionsTitle: string;
-  solutionsIntro: string;
-  solutions: string;
+  solutions: CardItem[];
   // recommendedProducts: string; // TODO: re-enable once wired to the real Product catalog
 };
 
@@ -40,30 +39,20 @@ type SubIndustryInput = {
   storyIds: unknown;
   challengesTitle: string;
   solutionsTitle: string;
-  solutionsIntro: string;
   challenges: unknown;
   solutions: unknown;
   // recommendedProducts: unknown; // TODO: re-enable once wired to the real Product catalog
 };
 
-function toLines(value: unknown): string {
-  return ((value as string[] | null) ?? []).join("\n");
-}
-
-function fromLines(value: string): string[] {
-  return value
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
 export function SubIndustryEditForm({
   industryId,
+  industryName,
   subIndustry,
   allPartners,
   allStories,
 }: {
   industryId: string;
+  industryName: string;
   subIndustry?: SubIndustryInput;
   allPartners: Partner[];
   allStories: Story[];
@@ -79,10 +68,9 @@ export function SubIndustryEditForm({
       partnerIds: (subIndustry?.partnerIds as string[] | null) ?? [],
       storyIds: (subIndustry?.storyIds as string[] | null) ?? [],
       challengesTitle: subIndustry?.challengesTitle ?? "",
-      challenges: toLines(subIndustry?.challenges),
+      challenges: (subIndustry?.challenges as CardItem[] | null) ?? [],
       solutionsTitle: subIndustry?.solutionsTitle ?? "",
-      solutionsIntro: subIndustry?.solutionsIntro ?? "",
-      solutions: toLines(subIndustry?.solutions),
+      solutions: (subIndustry?.solutions as CardItem[] | null) ?? [],
       // recommendedProducts: toLines(subIndustry?.recommendedProducts), // TODO: re-enable once wired to the real Product catalog
     },
   });
@@ -90,6 +78,8 @@ export function SubIndustryEditForm({
 
   const selectedPartnerIds = form.watch("partnerIds");
   const selectedStoryIds = form.watch("storyIds");
+  const challengesArray = useFieldArray({ control: form.control, name: "challenges" });
+  const solutionsArray = useFieldArray({ control: form.control, name: "solutions" });
 
   function togglePartner(id: string, checked: boolean) {
     const current = form.getValues("partnerIds");
@@ -111,9 +101,8 @@ export function SubIndustryEditForm({
       storyIds: values.storyIds,
       challengesTitle: values.challengesTitle,
       solutionsTitle: values.solutionsTitle,
-      solutionsIntro: values.solutionsIntro,
-      challenges: fromLines(values.challenges),
-      solutions: fromLines(values.solutions),
+      challenges: values.challenges,
+      solutions: values.solutions,
       // recommendedProducts: fromLines(values.recommendedProducts), // TODO: re-enable once wired to the real Product catalog
     };
 
@@ -162,40 +151,45 @@ export function SubIndustryEditForm({
 
         <Card>
           <CardHeader>
-            <CardTitle>Challenges</CardTitle>
-            <CardDescription>Shown in the left column of the challenges vs. solutions section.</CardDescription>
+            <CardTitle>Application</CardTitle>
+            <CardDescription>Cards shown in the left column of the challenges vs. solutions section.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <TextField label="Challenges Title" {...form.register("challengesTitle")} />
-            <Controller
-              control={form.control}
-              name="challenges"
-              render={({ field }) => (
-                <Field label="Challenges (one per line)">
-                  <Textarea {...field} rows={5} />
-                </Field>
-              )}
-            />
+            <TextField label="Application Title" {...form.register("challengesTitle")} />
+            <div className="space-y-3">
+              {challengesArray.fields.map((field, i) => (
+                <RepeaterItem key={field.id} title={`Card ${i + 1}`} onRemove={() => challengesArray.remove(i)}>
+                  <TextField label="Title" {...form.register(`challenges.${i}.title`)} />
+                  <TextAreaField label="Description" {...form.register(`challenges.${i}.description`)} />
+                </RepeaterItem>
+              ))}
+              <AddButton
+                label="Add Card"
+                onClick={() => challengesArray.append({ title: "", description: "" })}
+              />
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Solutions</CardTitle>
-            <CardDescription>Shown in the right column of the challenges vs. solutions section.</CardDescription>
+            <CardTitle>Why Choose Rotex for {industryName} Industries</CardTitle>
+            <CardDescription>Cards shown in the right column of the challenges vs. solutions section.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <TextField label="Solutions Title" {...form.register("solutionsTitle")} />
-            <TextAreaField label="Solutions Intro" {...form.register("solutionsIntro")} />
-            <Controller
-              control={form.control}
-              name="solutions"
-              render={({ field }) => (
-                <Field label="Solutions (one per line)">
-                  <Textarea {...field} rows={5} />
-                </Field>
-              )}
-            />
+            <div className="space-y-3">
+              {solutionsArray.fields.map((field, i) => (
+                <RepeaterItem key={field.id} title={`Card ${i + 1}`} onRemove={() => solutionsArray.remove(i)}>
+                  <TextField label="Title" {...form.register(`solutions.${i}.title`)} />
+                  <TextAreaField label="Description" {...form.register(`solutions.${i}.description`)} />
+                </RepeaterItem>
+              ))}
+              <AddButton
+                label="Add Card"
+                onClick={() => solutionsArray.append({ title: "", description: "" })}
+              />
+            </div>
           </CardContent>
         </Card>
 
