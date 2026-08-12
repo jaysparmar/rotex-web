@@ -1,14 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import { Field, TextField, TextAreaField, FieldGrid } from "@/components/admin/form-fields";
 import { ImageUrlField } from "@/components/admin/image-url-field";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { SaveBar } from "@/components/admin/section-form-shell";
+import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { createSubIndustry, updateSubIndustry } from "@/app/admin/(dashboard)/industries/actions";
 
@@ -90,6 +93,16 @@ export function SubIndustryEditForm({
 
   const selectedPartnerIds = form.watch("partnerIds");
   const selectedStoryIds = form.watch("storyIds");
+  const [storySearch, setStorySearch] = useState("");
+  const filteredStories = allStories.filter((story) => {
+    const q = storySearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      story.author.toLowerCase().includes(q) ||
+      story.company.toLowerCase().includes(q) ||
+      story.quote.toLowerCase().includes(q)
+    );
+  });
 
   function togglePartner(id: string, checked: boolean) {
     const current = form.getValues("partnerIds");
@@ -151,34 +164,12 @@ export function SubIndustryEditForm({
             <CardDescription>Pick which partner logos appear on this sub-industry page.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-1 overflow-hidden rounded-lg border border-border">
-              {allPartners.length === 0 && (
-                <p className="p-4 text-sm text-muted-foreground">
-                  No published partners yet. Add some on the Partners page first.
-                </p>
-              )}
-              {allPartners.map((partner) => (
-                <div key={partner.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
-                  <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                    {partner.logo && (
-                      <Image
-                        src={partner.logo}
-                        alt={partner.name}
-                        width={40}
-                        height={40}
-                        className="size-full object-contain"
-                        unoptimized
-                      />
-                    )}
-                  </div>
-                  <span className="flex-1 text-sm font-medium">{partner.name}</span>
-                  <Switch
-                    checked={selectedPartnerIds.includes(partner.id)}
-                    onCheckedChange={(v) => togglePartner(partner.id, v)}
-                  />
-                </div>
-              ))}
-            </div>
+            <ItemPickerGrid
+              items={allPartners.map((p) => ({ id: p.id, image: p.logo, label: p.name }))}
+              selectedIds={selectedPartnerIds}
+              onToggle={togglePartner}
+              emptyMessage="No published partners yet. Add some on the Partners page first."
+            />
           </CardContent>
         </Card>
 
@@ -244,18 +235,27 @@ export function SubIndustryEditForm({
           <CardHeader>
             <CardTitle>Customer Stories</CardTitle>
             <CardDescription>
-              Pick which stories appear on this sub-industry page. Manage the stories themselves from the
-              Customer Stories page.
+              Pick which stories appear on this sub-industry page ({selectedStoryIds.length} selected). Manage the
+              stories themselves from the Customer Stories page.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-1 overflow-hidden rounded-lg border border-border">
+          <CardContent className="space-y-3">
+            <Input
+              type="text"
+              placeholder="Search by name, company, or quote..."
+              value={storySearch}
+              onChange={(e) => setStorySearch(e.target.value)}
+            />
+            <div className="max-h-80 space-y-1 overflow-y-auto rounded-lg border border-border">
               {allStories.length === 0 && (
                 <p className="p-4 text-sm text-muted-foreground">
                   No published customer stories yet. Add some on the Customer Stories page first.
                 </p>
               )}
-              {allStories.map((story) => (
+              {allStories.length > 0 && filteredStories.length === 0 && (
+                <p className="p-4 text-sm text-muted-foreground">No stories match your search.</p>
+              )}
+              {filteredStories.map((story) => (
                 <div key={story.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
                   <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
                     {story.image && (
