@@ -27,6 +27,7 @@ import {
   FileText,
   Download,
   Wrench,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,7 @@ const PAGE_ITEMS = [
   { href: "/admin/career", label: "Career Page", icon: Briefcase },
   { href: "/admin/supplier", label: "Supplier Page", icon: Truck },
   { href: "/admin/partner-sales-tools", label: "Partner Sales Tools", icon: Wrench },
+  { href: "/admin/legal", label: "Legal Pages", icon: Shield },
 ];
 
 const NAV_ITEMS = [
