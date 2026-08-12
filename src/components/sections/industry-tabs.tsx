@@ -37,9 +37,10 @@ export function IndustryTabs({ sectorSlug, subIndustries }: Props) {
   return (
     <div className="sticky top-20 lg:top-24 z-20 bg-white shadow-[0px_2px_4px_0px_rgba(31,31,31,0.05)]">
       <div className="container">
-        {/* Mobile: spread across the full width like the Resources tabs.
-            Desktop: left-aligned, scrolling if the sector has many sub-industries. */}
-        <div className="flex items-end justify-between lg:justify-start gap-0.5 lg:gap-1 overflow-x-auto no-scrollbar border-b border-stone-200">
+        {/* Left-aligned with a fixed gap at every breakpoint — justify-between
+            spread tabs edge-to-edge on mobile, which looked broken with only
+            2 sub-industries (huge gap). Scrolls if the sector has many. */}
+        <div className="flex items-end justify-start gap-6 lg:gap-1 overflow-x-auto no-scrollbar border-b border-stone-200">
           {subIndustries.map((sub) => {
             const isActive = sub.slug === activeSlug;
             return (
