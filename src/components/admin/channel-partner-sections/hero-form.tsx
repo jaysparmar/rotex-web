@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { TextField, TextAreaField, FieldGrid } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
+import { FlatImageField } from "@/components/admin/flat-image-field";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveChannelPartnerSection } from "@/app/admin/(dashboard)/channel-partner/actions";
 
@@ -12,6 +13,7 @@ type HeroData = {
   title: string;
   description: string;
   image: string;
+  mobileImage?: string;
   cta: { label: string; href: string };
 };
 type FormValues = {
@@ -19,6 +21,7 @@ type FormValues = {
   title: string;
   description: string;
   image: { src: string };
+  mobileImage: string;
   cta: { label: string; href: string };
 };
 
@@ -35,6 +38,7 @@ export function ChannelPartnerHeroForm({
       title: initialData.title,
       description: initialData.description,
       image: { src: initialData.image ?? "" },
+      mobileImage: initialData.mobileImage ?? "",
       cta: initialData.cta,
     },
   });
@@ -65,6 +69,7 @@ export function ChannelPartnerHeroForm({
           <TextField label="CTA Href" {...form.register("cta.href")} />
         </FieldGrid>
         <MediaField name="image" mediaType="image" showAlt={false} />
+        <FlatImageField name="mobileImage" label="Mobile Image (optional, falls back to image above)" />
         <SaveBar pending={pending} error={error} success={success} />
       </form>
     </FormProvider>

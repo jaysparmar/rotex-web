@@ -51,6 +51,7 @@ export async function SubIndustryContent({
           name={subIndustry.name}
           description={subIndustry.description}
           bg={bg}
+          mobileBg={subIndustry.mobileImage ?? undefined}
         />
       )}
 

@@ -6,6 +6,7 @@ import { Upload, Loader2, X } from "lucide-react";
 import { Field } from "@/components/admin/form-fields";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 
 export function ImageUrlField({ name, label }: { name: string; label: string }) {
   const form = useFormContext();
@@ -71,8 +72,10 @@ export function ImageUrlField({ name, label }: { name: string; label: string }) 
       </div>
       {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
       {src && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="" className="mt-2 h-24 w-full rounded-lg border border-border object-cover" />
+        <ImageLightboxTrigger src={src} alt={label} className="mt-2 block w-full">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt="" className="h-24 w-full rounded-lg border border-border object-cover" />
+        </ImageLightboxTrigger>
       )}
     </Field>
   );

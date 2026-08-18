@@ -45,7 +45,14 @@ type ResourcesData = {
   }[];
 };
 type IndustriesHeadingData = { heading: { title: string; subtitle: string }; industryIds: string[] };
-type IndustryCard = { id: string; slug: string; name: string; description: string; image: string };
+type IndustryCard = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  image: string;
+  mobileImage: string | null;
+};
 
 export default async function Home() {
   const hero = await fetchHomeSection<HeroData>("hero");

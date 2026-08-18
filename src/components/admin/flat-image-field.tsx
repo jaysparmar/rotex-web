@@ -6,6 +6,7 @@ import { Upload, Link2, Loader2, X } from "lucide-react";
 import { Field, TextField } from "@/components/admin/form-fields";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 
 // Uploads to a flat string form path (e.g. "sidebarLogoLight"), unlike MediaField
 // which expects a nested { src, alt } object.
@@ -101,10 +102,10 @@ export function FlatImageField({ name, label }: { name: string; label: string })
       )}
 
       {src && (
-        <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+        <ImageLightboxTrigger src={src} alt={label} className="block overflow-hidden rounded-lg border border-border bg-muted/30">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={src} alt="" className="h-32 w-full object-cover" />
-        </div>
+        </ImageLightboxTrigger>
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import { Upload, Link2, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, TextField } from "@/components/admin/form-fields";
 import { cn } from "@/lib/utils";
+import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 
 export function MediaField({
   name,
@@ -123,8 +124,10 @@ export function MediaField({
       {src && (
         <div className={cn("overflow-hidden rounded-lg border border-border bg-muted/30", previewFit === "contain" && "p-4")}>
           {mediaType === "image" ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={src} alt="" className={cn("h-32 w-full", previewFit === "contain" ? "object-contain" : "object-cover")} />
+            <ImageLightboxTrigger src={src} alt="" className="block w-full">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" className={cn("h-32 w-full", previewFit === "contain" ? "object-contain" : "object-cover")} />
+            </ImageLightboxTrigger>
           ) : (
             <video src={src} className={cn("h-32 w-full", previewFit === "contain" ? "object-contain" : "object-cover")} muted />
           )}

@@ -8,7 +8,7 @@ import { ChannelPartnerFormSection } from "@/components/sections/channel-partner
 import { fetchChannelPartnerSection } from "@/lib/site-api";
 
 type CtaButton = { label: string; href: string };
-type HeroData = { title: string; description: string; image: string; cta: CtaButton };
+type HeroData = { title: string; description: string; image: string; mobileImage?: string; cta: CtaButton };
 type StatsData = { stats: { value: string; label: string }[]; growthHeading: string; growthDescription: string };
 type WhyData = { heading: string; description: string; cards: { title: string; points: string[] }[] };
 type BenefitsData = { heading: string; benefits: { icon: string; text: string }[] };
@@ -51,6 +51,7 @@ export default async function ChannelPartnerPage() {
           title={hero.title}
           description={hero.description}
           image={hero.image || undefined}
+          mobileImage={hero.mobileImage || undefined}
           cta={hero.cta}
         />
       )}

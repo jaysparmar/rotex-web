@@ -7,6 +7,7 @@ type ChannelPartnerHeroSectionProps = {
   title?: string;
   description?: string;
   image?: string;
+  mobileImage?: string;
   cta?: { label: string; href: string };
 };
 
@@ -14,9 +15,11 @@ export function ChannelPartnerHeroSection({
   title = "Partner with a Global Leader in Solenoid Valve & Fluid Control Solutions",
   description = "Join Rotex's international channel partner network and deliver high-performance, application-engineered solutions across Oil & Gas, Chemical, Power, Mining, and Industrial Automation sectors.",
   image,
+  mobileImage,
   cta = { label: "Become a Channel Partner", href: "#form" },
 }: ChannelPartnerHeroSectionProps) {
   const photo = image ?? channelPartnerImg.src;
+  const mobilePhoto = mobileImage ?? photo;
 
   return (
     // Figma: 625px mobile / 600px desktop — a fixed frame, so the artwork is
@@ -70,9 +73,15 @@ export function ChannelPartnerHeroSection({
           {/* Mobile artwork — Figma: 335×288 below the copy */}
           <div className="lg:hidden mt-5">
             <HexFrame
+              src={mobilePhoto}
+              alt="Rotex channel partners shaking hands"
+              className="w-80 max-w-full md:hidden"
+              placeholder={<Handshake className="relative size-16 text-stone-400/70" strokeWidth={1.5} />}
+            />
+            <HexFrame
               src={photo}
               alt="Rotex channel partners shaking hands"
-              className="w-80 max-w-full"
+              className="w-80 max-w-full hidden md:block"
               placeholder={<Handshake className="relative size-16 text-stone-400/70" strokeWidth={1.5} />}
             />
           </div>

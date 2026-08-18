@@ -35,7 +35,7 @@ type Slide = {
   published?: boolean;
   title: string;
   description: string;
-  media: { type: "image" | "video"; src: string; alt?: string };
+  media: { type: "image" | "video"; src: string; alt?: string; mobileSrc?: string };
   cta_buttons: CtaButton[];
 };
 
@@ -260,13 +260,24 @@ function HexSlider({
                 containerClassName="w-full h-full"
               />
             ) : (
-              <ImageView
-                src={media.src}
-                alt={media.alt ?? title}
-                fill
-                containerClassName="w-full h-full"
-                unoptimized
-              />
+              <>
+                {media.mobileSrc && (
+                  <ImageView
+                    src={media.mobileSrc}
+                    alt={media.alt ?? title}
+                    fill
+                    containerClassName="w-full h-full md:hidden"
+                    unoptimized
+                  />
+                )}
+                <ImageView
+                  src={media.src}
+                  alt={media.alt ?? title}
+                  fill
+                  containerClassName={media.mobileSrc ? "w-full h-full hidden md:block" : "w-full h-full"}
+                  unoptimized
+                />
+              </>
             )}
           </motion.div>
         </AnimatePresence>

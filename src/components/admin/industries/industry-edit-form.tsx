@@ -17,6 +17,7 @@ type FormValues = {
   slug: string;
   bgKey: string;
   image: string;
+  mobileImage: string;
   description: string;
   sectionTitle: string;
   overview: string;
@@ -30,6 +31,7 @@ type IndustryInput = {
   slug: string;
   bgKey: string | null;
   image: string | null;
+  mobileImage: string | null;
   description: string;
   sectionTitle: string;
   overview: string;
@@ -52,6 +54,7 @@ export function IndustryEditForm({ industry }: { industry?: IndustryInput }) {
       slug: industry?.slug ?? "",
       bgKey: industry?.bgKey ?? "",
       image: industry?.image ?? "",
+      mobileImage: industry?.mobileImage ?? "",
       description: industry?.description ?? "",
       sectionTitle: industry?.sectionTitle ?? "",
       overview: industry?.overview ?? "",
@@ -92,6 +95,7 @@ export function IndustryEditForm({ industry }: { industry?: IndustryInput }) {
               <TextField label="Background Key" {...form.register("bgKey")} />
               <ImageUrlField name="image" label="Home Teaser Image" />
             </FieldGrid>
+            <ImageUrlField name="mobileImage" label="Home Teaser Image (Mobile)" />
           </CardContent>
         </Card>
 

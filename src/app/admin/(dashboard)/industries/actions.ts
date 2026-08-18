@@ -8,6 +8,7 @@ type IndustryData = {
   slug: string;
   bgKey?: string;
   image?: string;
+  mobileImage?: string;
   description: string;
   sectionTitle: string;
   overview: string;
@@ -20,6 +21,7 @@ type SubIndustryData = {
   name: string;
   description: string;
   image?: string;
+  mobileImage?: string;
   partnerIds: string[];
   storyIds: string[];
   challengesTitle: string;

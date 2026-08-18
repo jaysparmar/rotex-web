@@ -10,6 +10,7 @@ type SupplierHeroSectionProps = {
   title?: string;
   description?: string;
   image?: string;
+  mobileImage?: string;
   cta?: { label: string; href: string };
 };
 
@@ -17,9 +18,11 @@ export function SupplierHeroSection({
   title = "Become a Supplier",
   description = "Expand your reach by supplying high-demand industrial components to a global distribution network.",
   image,
+  mobileImage,
   cta = { label: "Apply as a Supplier", href: "#form" },
 }: SupplierHeroSectionProps) {
   const photo = image ?? supplierImg.src;
+  const mobilePhoto = mobileImage ?? photo;
 
   return (
     // Same pattern as the Channel Partner hero: 625px mobile / 600px desktop,
@@ -60,8 +63,15 @@ export function SupplierHeroSection({
         style={{ left: "7.61%", top: "46.72%", width: "116.4%" }}
       >
         <HexFrame
+          src={mobilePhoto}
+          alt="Rotex industrial supplier components"
+          className="md:hidden"
+          placeholder={<Package className="relative size-16 text-stone-400/70" strokeWidth={1.5} />}
+        />
+        <HexFrame
           src={photo}
           alt="Rotex industrial supplier components"
+          className="hidden md:block"
           placeholder={<Package className="relative size-16 text-stone-400/70" strokeWidth={1.5} />}
         />
       </div>

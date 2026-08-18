@@ -20,6 +20,7 @@ type FormValues = {
   slug: string;
   description: string;
   image: string;
+  mobileImage: string;
   partnerIds: string[];
   storyIds: string[];
   challengesTitle: string;
@@ -35,6 +36,7 @@ type SubIndustryInput = {
   slug: string;
   description: string;
   image: string | null;
+  mobileImage: string | null;
   partnerIds: unknown;
   storyIds: unknown;
   challengesTitle: string;
@@ -65,6 +67,7 @@ export function SubIndustryEditForm({
       slug: subIndustry?.slug ?? "",
       description: subIndustry?.description ?? "",
       image: subIndustry?.image ?? "",
+      mobileImage: subIndustry?.mobileImage ?? "",
       partnerIds: (subIndustry?.partnerIds as string[] | null) ?? [],
       storyIds: (subIndustry?.storyIds as string[] | null) ?? [],
       challengesTitle: subIndustry?.challengesTitle ?? "",
@@ -97,6 +100,7 @@ export function SubIndustryEditForm({
       slug: values.slug,
       description: values.description,
       image: values.image,
+      mobileImage: values.mobileImage,
       partnerIds: values.partnerIds,
       storyIds: values.storyIds,
       challengesTitle: values.challengesTitle,
@@ -131,6 +135,7 @@ export function SubIndustryEditForm({
             </FieldGrid>
             <TextAreaField label="Description" {...form.register("description")} />
             <ImageUrlField name="image" label="Banner Image" />
+            <ImageUrlField name="mobileImage" label="Banner Image (Mobile)" />
           </CardContent>
         </Card>
 

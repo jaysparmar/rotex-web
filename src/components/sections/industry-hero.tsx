@@ -8,9 +8,10 @@ type Props = {
   name: string;
   description: string;
   bg: StaticImageData | string;
+  mobileBg?: string;
 };
 
-export function IndustryHero({ name, description, bg }: Props) {
+export function IndustryHero({ name, description, bg, mobileBg }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -18,7 +19,15 @@ export function IndustryHero({ name, description, bg }: Props) {
       {/* ── MOBILE: image on top, full text below (no overlay, no clamp) ── */}
       <div className="lg:hidden">
         <div className="relative w-full aspect-4/3 overflow-hidden">
-          <Image src={bg} alt={name} fill className="object-cover object-center" />
+          {mobileBg && (
+            <Image src={mobileBg} alt={name} fill className="object-cover object-center md:hidden" />
+          )}
+          <Image
+            src={bg}
+            alt={name}
+            fill
+            className={`object-cover object-center ${mobileBg ? "hidden md:block" : ""}`}
+          />
         </div>
         <div className="bg-white px-4 py-8 flex flex-col gap-2.5">
           <h2 className="text-stone-900 text-2xl font-medium font-montserrat leading-8">{name}</h2>

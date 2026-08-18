@@ -4,6 +4,7 @@ import { useForm, FormProvider, useFieldArray, useFormContext, useWatch, Control
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { Field, TextField, TextAreaField, SwitchField, AddButton, FieldGrid } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
+import { FlatImageField } from "@/components/admin/flat-image-field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveHomeSection } from "@/app/admin/(dashboard)/home/actions";
@@ -16,7 +17,7 @@ type Slide = {
   published: boolean;
   title: string;
   description: string;
-  media: { type: "image" | "video"; src: string; alt?: string };
+  media: { type: "image" | "video"; src: string; alt?: string; mobileSrc?: string };
   cta_buttons: CtaButton[];
 };
 type FormValues = { enabled: boolean; slides: Slide[] };
@@ -57,7 +58,7 @@ export function HeroForm({
                 published: true,
                 title: "",
                 description: "",
-                media: { type: "image", src: "", alt: "" },
+                media: { type: "image", src: "", alt: "", mobileSrc: "" },
                 cta_buttons: [],
               })
             }
@@ -120,6 +121,12 @@ function SlideCard({ slideIndex, onRemove }: { slideIndex: number; onRemove: () 
             )}
           />
           <MediaField name={`slides.${slideIndex}.media`} mediaType={mediaType ?? "image"} />
+          {mediaType === "image" && (
+            <FlatImageField
+              name={`slides.${slideIndex}.media.mobileSrc`}
+              label="Mobile Image (optional, falls back to image above)"
+            />
+          )}
         </div>
 
         <CtaButtonsRepeater slideIndex={slideIndex} />

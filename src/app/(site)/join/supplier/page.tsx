@@ -4,7 +4,7 @@ import { SupplierFormSection } from "@/components/sections/supplier-form-section
 import { fetchSupplierSection } from "@/lib/site-api";
 
 type CtaButton = { label: string; href: string };
-type HeroData = { title: string; description: string; image: string; cta: CtaButton };
+type HeroData = { title: string; description: string; image: string; mobileImage?: string; cta: CtaButton };
 type BenefitsData = {
   heading: string;
   description: string;
@@ -37,6 +37,7 @@ export default async function SupplierPage() {
           title={hero.title}
           description={hero.description}
           image={hero.image || undefined}
+          mobileImage={hero.mobileImage || undefined}
           cta={hero.cta}
         />
       )}

@@ -12,6 +12,7 @@ type Industry = {
   name: string;
   description: string;
   image: string;
+  mobileImage?: string | null;
 };
 
 type IndustriesSectionProps = {
@@ -84,11 +85,20 @@ export function IndustriesSection({ heading, industries }: IndustriesSectionProp
                       {/* Figma: image, then the copy in black, then the button — stacked */}
                       <div className="pb-5 flex flex-col gap-4">
                         <div className="relative rounded-xl overflow-hidden aspect-334/224">
+                          {industry.mobileImage && (
+                            <ImageView
+                              fill
+                              src={industry.mobileImage}
+                              alt={industry.name}
+                              containerClassName="w-full h-full md:hidden"
+                              className="object-cover"
+                            />
+                          )}
                           <ImageView
                             fill
                             src={industry.image}
                             alt={industry.name}
-                            containerClassName="w-full h-full"
+                            containerClassName={cn("w-full h-full", industry.mobileImage && "hidden md:block")}
                             className="object-cover"
                           />
                         </div>

@@ -81,6 +81,7 @@ model Industry {
   name          String
   bgKey         String?
   image         String?
+  mobileImage   String?
   description   String
   sectionTitle  String
   overview      String
@@ -101,6 +102,7 @@ model SubIndustry {
   name                String
   description         String
   image               String?
+  mobileImage         String?
   /// [StringList]
   partnerIds          Json     @default("[]")
   /// [StringList]
