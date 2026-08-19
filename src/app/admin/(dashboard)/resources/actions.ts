@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { slugify } from "@/lib/product-import";
+import { slugify } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 
 function revalidateResources() {

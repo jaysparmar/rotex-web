@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { deleteProduct } from "@/app/admin/(dashboard)/products/actions";
 
-export function ProductDetailHeader({ id, name, code }: { id: string; name: string; code: string }) {
+export function ProductDetailHeader({ id, name, modelNumber }: { id: string; name: string; modelNumber: string }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -42,7 +42,7 @@ export function ProductDetailHeader({ id, name, code }: { id: string; name: stri
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title="Delete product"
-        description={`Delete "${name}" (${code})? This also deletes all its variants. This cannot be undone.`}
+        description={`Delete "${name}" (${modelNumber})? This also deletes all its variants. This cannot be undone.`}
         onConfirm={handleDelete}
         pending={pending}
       />

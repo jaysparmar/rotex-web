@@ -14,16 +14,20 @@ export default async function AdminProductsPage({
   const page = Math.max(1, Number(pageParam) || 1);
 
   const where: Prisma.ProductWhereInput = q
-    ? { OR: [{ name: { contains: q } }, { code: { contains: q } }] }
+    ? { OR: [{ name: { contains: q } }, { modelNumber: { contains: q } }] }
     : {};
 
   const [products, total] = await Promise.all([
     prisma.product.findMany({
       where,
-      orderBy: { code: "asc" },
+      orderBy: { modelNumber: "asc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
-      include: { _count: { select: { variants: true } } },
+      include: {
+        company: { select: { name: true } },
+        category: { select: { name: true } },
+        _count: { select: { variants: true } },
+      },
     }),
     prisma.product.count({ where }),
   ]);
@@ -39,8 +43,7 @@ export default async function AdminProductsPage({
         <div>
           <h1 className="text-2xl font-semibold">Products</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage the valve catalog. Upload an Excel file to bulk import/update products, or edit
-            products individually.
+            Manage the product catalog — simple products and variable products with variants.
           </p>
         </div>
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Products" }]} />

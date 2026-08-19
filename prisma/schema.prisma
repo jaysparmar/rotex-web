@@ -23,31 +23,40 @@ model AdminUser {
 }
 
 model Product {
-  id       String   @id @default(cuid())
-  slug     String   @unique
-  code     String   @unique
-  name     String
-  category String
-  image    String
+  id          String  @id @default(cuid())
+  modelNumber String  @unique
+  slug        String  @unique
+  name        String
+  image       String?
+
+  productFamily String // "Solenoid Valves" | "Angle Seat Valves" | "Automotive Solutions" | "CTIS Actuators" | "Positioners"
+  productType   String // "simple" | "variable"
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  companyId String
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId String
+
+  subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id], onDelete: SetNull)
+  subCategoryId String?
+
+  industry   Industry? @relation(fields: [industryId], references: [id], onDelete: SetNull)
+  industryId String?
+
+  subIndustry   SubIndustry? @relation(fields: [subIndustryId], references: [id], onDelete: SetNull)
+  subIndustryId String?
+
+  industriesServed String?
+
+  // Simple-product content (used when productType === "simple")
   /// [StringList]
-  tags     Json
-
-  subType         String? // Engineering type (Standard, Valve Block, ...)
-  operatingType   String? // Design Type (Direct acting, Pilot Operated, ...)
-  actionType      String? // Functional Type (NC, NO, Universal, 5/2 way, ...)
-  portConnections Int? // Port Connections (2, 3, 5)
-  operatorSize    String? // unused by valve import; kept for future actuator/positioner products
-
-  bodyMaterial String?
-  sealMaterial String?
-  description  String?
-  remark       String?
-
-  /// [ProductApprovals]
-  approvals Json?
-
-  /// [ProductSpecs]
-  specs Json?
+  certificates Json @default("[]")
+  features     String?
+  /// [SpecList]
+  specifications Json @default("[]")
+  /// [DownloadList]
+  downloads      Json @default("[]")
 
   variants ProductVariant[]
 
@@ -60,19 +69,88 @@ model ProductVariant {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
 
-  size        String // SIZE (inch)
-  type        String? // Type (thread/connection type)
-  minPressure Float?
-  maxPressure Float?
-  orifice     String? // ORIFICE (mm) — raw string, handles composite values like "12/2.2"
-  flowFactor  String? // FLOW FACTOR (LPM) — raw string, handles composite values
-  optionCode  String? // suffix stripped from the original Model Number (e.g. "A", "EP", "V01")
-  // distinguishing variants that share a base model code
+  size             String?
+  variantType      String?
+  orifice          String?
+  minOperatingTemp String?
+  maxOperatingTemp String?
+  flowFactor       String?
+
+  // Same content shape as Product's simple-product fields, but per-variant
+  // (used when productType === "variable")
+  /// [StringList]
+  certificates Json @default("[]")
+  features     String?
+  /// [SpecList]
+  specifications Json @default("[]")
+  /// [DownloadList]
+  downloads      Json @default("[]")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([productId, size, type, minPressure, maxPressure, orifice, flowFactor, optionCode])
+  @@unique([productId, size, variantType, orifice, minOperatingTemp, maxOperatingTemp, flowFactor])
+}
+
+model AttributeValue {
+  id        String   @id @default(cuid())
+  attribute String // "size" | "variantType" | "orifice" | "minOperatingTemp" | "maxOperatingTemp" | "flowFactor"
+  value     String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@unique([attribute, value])
+}
+
+model Company {
+  id         String     @id @default(cuid())
+  slug       String     @unique
+  name       String
+  categories Category[]
+  products   Product[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  slug        String
+  name        String
+  image       String?
+  mobileImage String?
+  description String?
+  order       Int      @default(0)
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+
+  subCategories SubCategory[]
+  products      Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, slug])
+}
+
+model SubCategory {
+  id          String   @id @default(cuid())
+  slug        String
+  name        String
+  image       String?
+  mobileImage String?
+  description String?
+  order       Int      @default(0)
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([categoryId, slug])
 }
 
 model Industry {
@@ -91,6 +169,7 @@ model Industry {
   whyChoose     Json
 
   subIndustries SubIndustry[]
+  products      Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,6 +198,8 @@ model SubIndustry {
 
   industry   Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
   industryId String
+
+  products Product[]
 
   createdAt DateTime @default(now())
 

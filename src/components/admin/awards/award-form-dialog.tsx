@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { TextField, TextAreaField, SwitchField, FieldGrid } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
 import { useSaveAction } from "@/hooks/use-save-action";
-import { slugify } from "@/lib/product-import";
+import { slugify } from "@/lib/utils";
 import { createAward, updateAward } from "@/app/admin/(dashboard)/awards/actions";
 
 type AwardFormValues = {

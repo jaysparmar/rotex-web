@@ -65,13 +65,12 @@ async function resolveIndustriesMenu(source: PrismaJson.MegaMenuSource): Promise
 }
 
 async function resolveProductsMenu(source: PrismaJson.MegaMenuSource): Promise<PrismaJson.CategorySwitcherMenu> {
-  const rows = await prisma.product.findMany({
-    distinct: ["category"],
-    select: { category: true },
-    orderBy: { category: "asc" },
+  const rows = await prisma.category.findMany({
+    select: { name: true },
+    orderBy: { name: "asc" },
   });
   const categories = rows
-    .map((r) => r.category)
+    .map((r) => r.name)
     .filter((c) => source.selectedIds.includes(c))
     .map((label) => ({ label, items: [] }));
 

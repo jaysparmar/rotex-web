@@ -16,12 +16,11 @@ export default async function AdminGlobalHeaderPage() {
     },
   });
 
-  const categoryRows = await prisma.product.findMany({
-    distinct: ["category"],
-    select: { category: true },
-    orderBy: { category: "asc" },
+  const categoryRows = await prisma.category.findMany({
+    select: { name: true },
+    orderBy: { name: "asc" },
   });
-  const productCategories = categoryRows.map((r) => r.category);
+  const productCategories = categoryRows.map((r) => r.name);
 
   return (
     <div className="space-y-6">

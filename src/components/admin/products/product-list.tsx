@@ -10,12 +10,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
-import { ProductFormDialog } from "@/components/admin/products/product-form-dialog";
-import type { EditableProduct } from "@/components/admin/products/product-form-fields";
 import { ImportProductsButton } from "@/components/admin/products/import-products-button";
 import { deleteProduct } from "@/app/admin/(dashboard)/products/actions";
 
-type ProductRow = EditableProduct & { variantCount: number };
+type ProductRow = {
+  id: string;
+  modelNumber: string;
+  name: string;
+  image: string | null;
+  productFamily: string;
+  productType: string;
+  company: { name: string };
+  category: { name: string };
+  variantCount: number;
+};
 
 export function ProductList({
   products,
@@ -84,7 +92,7 @@ export function ProductList({
         <div className="relative w-full max-w-xs">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by name or code..."
+            placeholder="Search by name or model number..."
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="h-9 pl-8"
@@ -93,14 +101,12 @@ export function ProductList({
 
         <div className="flex items-center gap-2">
           <ImportProductsButton />
-          <ProductFormDialog
-            trigger={
-              <Button size="sm" className="gap-1.5">
-                <Plus className="size-3.5" />
-                Add Product
-              </Button>
-            }
-          />
+          <Link href="/admin/products/new">
+            <Button size="sm" className="gap-1.5">
+              <Plus className="size-3.5" />
+              Add Product
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -109,8 +115,10 @@ export function ProductList({
           <thead>
             <tr className="border-b border-border bg-muted/30 text-xs uppercase tracking-wide text-muted-foreground">
               <th className="py-2.5 pl-4 pr-3 font-medium">Product</th>
-              <th className="py-2.5 pr-3 font-medium">Code</th>
-              <th className="py-2.5 pr-3 font-medium">Category</th>
+              <th className="py-2.5 pr-3 font-medium">Model Number</th>
+              <th className="py-2.5 pr-3 font-medium">Family</th>
+              <th className="py-2.5 pr-3 font-medium">Company / Category</th>
+              <th className="py-2.5 pr-3 font-medium">Type</th>
               <th className="py-2.5 pr-3 font-medium">Variants</th>
               <th className="py-2.5 pr-4 font-medium text-right">Actions</th>
             </tr>
@@ -118,7 +126,7 @@ export function ProductList({
           <tbody className="divide-y divide-border">
             {products.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
+                <td colSpan={7} className="py-8 text-center text-sm text-muted-foreground">
                   No products found.
                 </td>
               </tr>
@@ -142,10 +150,14 @@ export function ProductList({
                     <span className="font-medium hover:underline">{product.name}</span>
                   </Link>
                 </td>
-                <td className="py-2.5 pr-3 text-muted-foreground">{product.code}</td>
+                <td className="py-2.5 pr-3 text-muted-foreground">{product.modelNumber}</td>
                 <td className="py-2.5 pr-3">
-                  <Badge variant="outline">{product.category}</Badge>
+                  <Badge variant="outline">{product.productFamily}</Badge>
                 </td>
+                <td className="py-2.5 pr-3 text-muted-foreground">
+                  {product.company.name} / {product.category.name}
+                </td>
+                <td className="py-2.5 pr-3 capitalize text-muted-foreground">{product.productType}</td>
                 <td className="py-2.5 pr-3">
                   <span className="flex items-center gap-1 text-muted-foreground">
                     <Layers className="size-3.5" />
@@ -197,7 +209,7 @@ export function ProductList({
         open={toDelete !== null}
         onOpenChange={(open) => !open && setToDelete(null)}
         title="Delete product"
-        description={`Delete "${toDelete?.name}" (${toDelete?.code})? This also deletes all its variants. This cannot be undone.`}
+        description={`Delete "${toDelete?.name}" (${toDelete?.modelNumber})? This also deletes all its variants. This cannot be undone.`}
         onConfirm={confirmDelete}
         pending={pending}
       />

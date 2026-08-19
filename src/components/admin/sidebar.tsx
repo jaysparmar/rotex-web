@@ -28,6 +28,8 @@ import {
   Download,
   Wrench,
   Shield,
+  Building2,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -47,6 +49,8 @@ const NAV_ITEMS = [
   { href: "/admin/media", label: "Media Library", icon: Images },
   { href: "/admin/awards", label: "Awards", icon: Award },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/attributes", label: "Attributes", icon: SlidersHorizontal },
+  { href: "/admin/companies", label: "Companies", icon: Building2 },
   { href: "/admin/industries", label: "Industries", icon: Factory },
   { href: "/admin/partners", label: "Partners", icon: Handshake },
   { href: "/admin/certifications", label: "Certifications", icon: Award },

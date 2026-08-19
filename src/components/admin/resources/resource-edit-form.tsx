@@ -13,7 +13,7 @@ import { TextField, FieldGrid, SwitchField, SelectField, Field } from "@/compone
 import { MediaField } from "@/components/admin/media-field";
 import { SaveBar } from "@/components/admin/section-form-shell";
 import { useSaveAction } from "@/hooks/use-save-action";
-import { slugify } from "@/lib/product-import";
+import { slugify } from "@/lib/utils";
 import { createResource, updateResource } from "@/app/admin/(dashboard)/resources/actions";
 
 export const RESOURCE_TYPES = [

@@ -102,14 +102,8 @@ declare global {
       canonical: string;
     };
 
-    type ProductApprovals = {
-      eac?: string | null;
-      sil3?: string | null;
-      ce?: string | null;
-      marine?: string | null;
-    };
-
-    type ProductSpecs = Record<string, string | number | null>;
+    type SpecList = { key: string; value: string }[];
+    type DownloadList = { title: string; description: string; url: string }[];
 
     type JobPerks = { icon: string; label: string }[];
 
