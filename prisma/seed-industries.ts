@@ -504,7 +504,7 @@ async function main() {
     });
 
     for (const sub of subIndustries) {
-      const { customerStories, ...subFields } = sub;
+      const { customerStories, challenges, solutions, ...subFields } = sub;
 
       const storyIds: string[] = [];
       for (const story of customerStories) {
@@ -512,10 +512,12 @@ async function main() {
         storyIds.push(created.id);
       }
 
+      const toCards = (items: string[]) => items.map((title) => ({ title, description: "" }));
+
       await prisma.subIndustry.upsert({
         where: { industryId_slug: { industryId: industryRow.id, slug: sub.slug } },
-        update: { ...subFields, storyIds },
-        create: { ...subFields, storyIds, industryId: industryRow.id },
+        update: { ...subFields, challenges: toCards(challenges), solutions: toCards(solutions), storyIds },
+        create: { ...subFields, challenges: toCards(challenges), solutions: toCards(solutions), storyIds, industryId: industryRow.id },
       });
     }
   }
