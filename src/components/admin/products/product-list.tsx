@@ -5,13 +5,33 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { ChevronRight, Trash2, Plus, Layers, Search } from "lucide-react";
+import { ChevronRight, Trash2, Plus, Layers, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { TypeToConfirmDialog } from "@/components/admin/products/type-to-confirm-dialog";
+import { ProductFiltersSheet } from "@/components/admin/products/product-filters-sheet";
 import { ImportProductsButton } from "@/components/admin/products/import-products-button";
-import { deleteProduct } from "@/app/admin/(dashboard)/products/actions";
+import {
+  deleteProduct,
+  deleteProducts,
+  countProductsByFilter,
+  deleteProductsByFilter,
+} from "@/app/admin/(dashboard)/products/actions";
+import { FILTER_KEYS, type ProductFilterParams } from "@/lib/product-filters";
+import { PRODUCT_ATTRIBUTES } from "@/lib/product-constants";
+import type { getCompanyCategoryTree, getIndustryTree } from "@/lib/products";
+
+type CompanyOption = Awaited<ReturnType<typeof getCompanyCategoryTree>>[number];
+type IndustryOption = Awaited<ReturnType<typeof getIndustryTree>>[number];
 
 type ProductRow = {
   id: string;
@@ -25,18 +45,30 @@ type ProductRow = {
   variantCount: number;
 };
 
+type FilterDeleteTarget = { filter: ProductFilterParams; count: number; description: string };
+
+const ATTR_LABEL_BY_KEY = Object.fromEntries(PRODUCT_ATTRIBUTES.map((a) => [a.key, a.label]));
+
 export function ProductList({
   products,
   total,
   page,
   pageSize,
   q,
+  filters,
+  companies,
+  industries,
+  attributeValues,
 }: {
   products: ProductRow[];
   total: number;
   page: number;
   pageSize: number;
   q: string;
+  filters: ProductFilterParams;
+  companies: CompanyOption[];
+  industries: IndustryOption[];
+  attributeValues: Record<string, string[]>;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -47,9 +79,24 @@ export function ProductList({
   const [prevQ, setPrevQ] = useState(q);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectAllAcrossPages, setSelectAllAcrossPages] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [filterDeleteTarget, setFilterDeleteTarget] = useState<FilterDeleteTarget | null>(null);
+  const [countingType, setCountingType] = useState<"variable" | "simple" | null>(null);
+
   if (q !== prevQ) {
     setPrevQ(q);
     setSearch(q);
+  }
+
+  const searchKey = `${q}|${page}|${FILTER_KEYS.map((k) => filters[k] ?? "").join("|")}`;
+  const [prevSearchKey, setPrevSearchKey] = useState(searchKey);
+  if (searchKey !== prevSearchKey) {
+    setPrevSearchKey(searchKey);
+    setSelectedIds(new Set());
+    setSelectAllAcrossPages(false);
   }
 
   function handleSearchChange(value: string) {
@@ -84,7 +131,144 @@ export function ProductList({
     setToDelete(null);
   }
 
+  const pageIds = products.map((p) => p.id);
+  const allPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
+  const showSelectAllBanner = allPageSelected && !selectAllAcrossPages && total > products.length;
+
+  function toggleSelectAllOnPage() {
+    if (selectAllAcrossPages) {
+      setSelectAllAcrossPages(false);
+      setSelectedIds(new Set());
+      return;
+    }
+    setSelectedIds(allPageSelected ? new Set() : new Set(pageIds));
+  }
+
+  function toggleRow(id: string) {
+    if (selectAllAcrossPages) return;
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set());
+    setSelectAllAcrossPages(false);
+  }
+
+  function handleDeleteSelected() {
+    if (selectAllAcrossPages) {
+      setFilterDeleteTarget({
+        filter: filters,
+        count: total,
+        description: `Delete all ${total} product${total === 1 ? "" : "s"} matching the current filters? This also deletes all their variants. This cannot be undone.`,
+      });
+    } else {
+      setBulkDeleteOpen(true);
+    }
+  }
+
+  function confirmBulkDeleteSelected() {
+    const ids = [...selectedIds];
+    startTransition(async () => {
+      try {
+        await deleteProducts(ids);
+        toast.success(`${ids.length} product${ids.length === 1 ? "" : "s"} deleted`);
+        clearSelection();
+      } catch {
+        toast.error("Failed to delete selected products");
+      }
+    });
+    setBulkDeleteOpen(false);
+  }
+
+  async function openDeleteAllByType(type: "variable" | "simple") {
+    setCountingType(type);
+    try {
+      const filter: ProductFilterParams = { ...filters, productType: type };
+      const count = await countProductsByFilter(filter);
+      setFilterDeleteTarget({
+        filter,
+        count,
+        description: `Delete all ${count} ${type} product${count === 1 ? "" : "s"} matching the current filters? This also deletes all their variants. This cannot be undone.`,
+      });
+    } catch {
+      toast.error("Failed to count products");
+    } finally {
+      setCountingType(null);
+    }
+  }
+
+  function confirmFilterDelete() {
+    if (!filterDeleteTarget) return;
+    const { filter, count } = filterDeleteTarget;
+    startTransition(async () => {
+      try {
+        await deleteProductsByFilter(filter);
+        toast.success(`${count} product${count === 1 ? "" : "s"} deleted`);
+        clearSelection();
+      } catch {
+        toast.error("Failed to delete products");
+      }
+    });
+    setFilterDeleteTarget(null);
+  }
+
+  function resolveFilterLabel(key: (typeof FILTER_KEYS)[number], value: string): string {
+    switch (key) {
+      case "productType":
+        return value === "variable" ? "Variable" : "Simple";
+      case "companyId":
+        return companies.find((c) => c.id === value)?.name ?? value;
+      case "categoryId":
+        return companies.flatMap((c) => c.categories).find((c) => c.id === value)?.name ?? value;
+      case "subCategoryId":
+        return (
+          companies
+            .flatMap((c) => c.categories)
+            .flatMap((c) => c.subCategories)
+            .find((s) => s.id === value)?.name ?? value
+        );
+      case "industryId":
+        return industries.find((i) => i.id === value)?.name ?? value;
+      case "subIndustryId":
+        return industries.flatMap((i) => i.subIndustries).find((s) => s.id === value)?.name ?? value;
+      default:
+        return value;
+    }
+  }
+
+  function filterFieldLabel(key: (typeof FILTER_KEYS)[number]): string {
+    if (key === "productType") return "Type";
+    if (key === "productFamily") return "Family";
+    if (key === "companyId") return "Company";
+    if (key === "categoryId") return "Category";
+    if (key === "subCategoryId") return "Sub-Category";
+    if (key === "industryId") return "Industry";
+    if (key === "subIndustryId") return "Sub-Industry";
+    return ATTR_LABEL_BY_KEY[key] ?? key;
+  }
+
+  function removeFilter(key: (typeof FILTER_KEYS)[number]) {
+    const params = new URLSearchParams(searchParams);
+    params.delete(key);
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
+  function clearAllFilters() {
+    const params = new URLSearchParams(searchParams);
+    for (const key of FILTER_KEYS) params.delete(key);
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
+  const activeFilters = FILTER_KEYS.filter((k) => filters[k]);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const selectionCount = selectAllAcrossPages ? total : selectedIds.size;
 
   return (
     <div className="space-y-4">
@@ -100,6 +284,35 @@ export function ProductList({
         </div>
 
         <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setFilterSheetOpen(true)}>
+            <SlidersHorizontal className="size-3.5" />
+            Filters
+            {activeFilters.length > 0 && (
+              <Badge variant="secondary" className="ml-0.5 px-1.5">
+                {activeFilters.length}
+              </Badge>
+            )}
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button size="sm" variant="outline" className="gap-1.5 text-destructive">
+                  <Trash2 className="size-3.5" />
+                  Delete All
+                </Button>
+              }
+            />
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem disabled={countingType !== null} onClick={() => openDeleteAllByType("variable")}>
+                All Variable Products
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled={countingType !== null} onClick={() => openDeleteAllByType("simple")}>
+                All Simple Products
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <ImportProductsButton />
           <Link href="/admin/products/new">
             <Button size="sm" className="gap-1.5">
@@ -110,11 +323,76 @@ export function ProductList({
         </div>
       </div>
 
+      {activeFilters.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {activeFilters.map((key) => (
+            <Badge key={key} variant="outline" className="gap-1 pr-1">
+              {filterFieldLabel(key)}: {resolveFilterLabel(key, filters[key]!)}
+              <button
+                type="button"
+                className="rounded-full p-0.5 hover:bg-muted"
+                onClick={() => removeFilter(key)}
+              >
+                <X className="size-3" />
+              </button>
+            </Badge>
+          ))}
+          <button
+            type="button"
+            className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+            onClick={clearAllFilters}
+          >
+            Clear all
+          </button>
+        </div>
+      )}
+
+      {selectionCount > 0 && (
+        <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-2">
+          <span className="text-sm">
+            {selectionCount} product{selectionCount === 1 ? "" : "s"} selected
+            {selectAllAcrossPages ? " (all matching filters)" : ""}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={clearSelection}>
+              Clear selection
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger render={<Button size="sm" variant="outline">Bulk options</Button>} />
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem variant="destructive" onClick={handleDeleteSelected}>
+                  Delete selected
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      )}
+
+      {showSelectAllBanner && (
+        <div className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-border py-2 text-sm text-muted-foreground">
+          All {products.length} products on this page are selected.
+          <button
+            type="button"
+            className="font-medium text-primary hover:underline"
+            onClick={() => setSelectAllAcrossPages(true)}
+          >
+            Select all {total} matching products
+          </button>
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-lg border border-border">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/30 text-xs uppercase tracking-wide text-muted-foreground">
-              <th className="py-2.5 pl-4 pr-3 font-medium">Product</th>
+              <th className="w-10 py-2.5 pl-4 pr-1 font-medium">
+                <Checkbox
+                  checked={selectAllAcrossPages || allPageSelected}
+                  onCheckedChange={toggleSelectAllOnPage}
+                />
+              </th>
+              <th className="py-2.5 pr-3 font-medium">Product</th>
               <th className="py-2.5 pr-3 font-medium">Model Number</th>
               <th className="py-2.5 pr-3 font-medium">Family</th>
               <th className="py-2.5 pr-3 font-medium">Company / Category</th>
@@ -126,14 +404,21 @@ export function ProductList({
           <tbody className="divide-y divide-border">
             {products.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-sm text-muted-foreground">
+                <td colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
                   No products found.
                 </td>
               </tr>
             )}
             {products.map((product) => (
               <tr key={product.id} className="transition-colors hover:bg-muted/20">
-                <td className="py-2.5 pl-4 pr-3">
+                <td className="py-2.5 pl-4 pr-1">
+                  <Checkbox
+                    checked={selectAllAcrossPages || selectedIds.has(product.id)}
+                    onCheckedChange={() => toggleRow(product.id)}
+                    disabled={selectAllAcrossPages}
+                  />
+                </td>
+                <td className="py-2.5 pr-3">
                   <Link href={`/admin/products/${product.id}`} className="flex items-center gap-3">
                     <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
                       {product.image && (
@@ -212,6 +497,33 @@ export function ProductList({
         description={`Delete "${toDelete?.name}" (${toDelete?.modelNumber})? This also deletes all its variants. This cannot be undone.`}
         onConfirm={confirmDelete}
         pending={pending}
+      />
+
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        onOpenChange={setBulkDeleteOpen}
+        title="Delete selected products"
+        description={`Delete ${selectedIds.size} selected product${selectedIds.size === 1 ? "" : "s"}? This also deletes all their variants. This cannot be undone.`}
+        onConfirm={confirmBulkDeleteSelected}
+        pending={pending}
+      />
+
+      <TypeToConfirmDialog
+        open={filterDeleteTarget !== null}
+        onOpenChange={(open) => !open && setFilterDeleteTarget(null)}
+        title="Delete products"
+        description={filterDeleteTarget?.description ?? ""}
+        onConfirm={confirmFilterDelete}
+        pending={pending}
+      />
+
+      <ProductFiltersSheet
+        open={filterSheetOpen}
+        onOpenChange={setFilterSheetOpen}
+        filters={filters}
+        companies={companies}
+        industries={industries}
+        attributeValues={attributeValues}
       />
     </div>
   );

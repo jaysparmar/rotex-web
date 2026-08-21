@@ -1,23 +1,26 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@/generated/prisma/client";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { ProductList } from "@/components/admin/products/product-list";
+import { buildProductWhere, type ProductFilterParams } from "@/lib/product-filters";
+import { getCompanyCategoryTree, getIndustryTree, getAttributeValuesByKey } from "@/lib/products";
 
 const PAGE_SIZE = 20;
+
+type SearchParams = ProductFilterParams & { page?: string };
 
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
-  const { q = "", page: pageParam } = await searchParams;
+  const params = await searchParams;
+  const { page: pageParam, ...filters } = params;
+  const q = filters.q ?? "";
   const page = Math.max(1, Number(pageParam) || 1);
 
-  const where: Prisma.ProductWhereInput = q
-    ? { OR: [{ name: { contains: q } }, { modelNumber: { contains: q } }] }
-    : {};
+  const where = buildProductWhere(filters);
 
-  const [products, total] = await Promise.all([
+  const [products, total, companies, industries, attributeValues] = await Promise.all([
     prisma.product.findMany({
       where,
       orderBy: { modelNumber: "asc" },
@@ -30,6 +33,9 @@ export default async function AdminProductsPage({
       },
     }),
     prisma.product.count({ where }),
+    getCompanyCategoryTree(),
+    getIndustryTree(),
+    getAttributeValuesByKey(),
   ]);
 
   const rows = products.map(({ _count, ...product }) => ({
@@ -49,7 +55,17 @@ export default async function AdminProductsPage({
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Products" }]} />
       </div>
 
-      <ProductList products={rows} total={total} page={page} pageSize={PAGE_SIZE} q={q} />
+      <ProductList
+        products={rows}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        q={q}
+        filters={filters}
+        companies={companies}
+        industries={industries}
+        attributeValues={attributeValues}
+      />
     </div>
   );
 }

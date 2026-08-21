@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { buildProductWhere, type ProductFilterParams } from "@/lib/product-filters";
 
 type ContentFields = {
   certificates: string[];
@@ -55,6 +56,22 @@ export async function updateProduct(id: string, data: ProductInput) {
 export async function deleteProduct(id: string) {
   await prisma.product.delete({ where: { id } });
   revalidateProducts(id);
+}
+
+export async function deleteProducts(ids: string[]) {
+  const result = await prisma.product.deleteMany({ where: { id: { in: ids } } });
+  revalidateProducts();
+  return { count: result.count };
+}
+
+export async function countProductsByFilter(filter: ProductFilterParams) {
+  return prisma.product.count({ where: buildProductWhere(filter) });
+}
+
+export async function deleteProductsByFilter(filter: ProductFilterParams) {
+  const result = await prisma.product.deleteMany({ where: buildProductWhere(filter) });
+  revalidateProducts();
+  return { count: result.count };
 }
 
 export async function createVariant(productId: string, data: VariantInput) {
