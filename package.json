@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "kill -9 $(lsof -t -i:5007) 2>/dev/null; next start -p 5007",
     "lint": "eslint",
-    "import:products": "tsx scripts/import-products.ts",
     "seed": "tsx prisma/seed.ts",
     "seed:export": "tsx scripts/export-seed-data.ts",
     "postinstall": "node scripts/copy-tinymce.mjs && patch-package"

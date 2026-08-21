@@ -1,0 +1,458 @@
+import { prisma } from "@/lib/prisma";
+import { slugify } from "@/lib/utils";
+import { excelColumnLabel } from "@/lib/excel-columns";
+import { PRODUCT_ATTRIBUTES, PRODUCT_FAMILIES, type ProductAttributeKey } from "@/lib/product-constants";
+import type { ProductInput, VariantInput } from "@/app/admin/(dashboard)/products/actions";
+
+const ATTRIBUTE_KEYS = PRODUCT_ATTRIBUTES.map((a) => a.key);
+
+export type ImportGrid = string[][];
+
+type ClassificationField = "company" | "category" | "subCategory" | "productFamily" | "industry" | "subIndustry";
+
+export type ColumnDestination =
+  | "ignore"
+  | "modelNumber"
+  | "name"
+  | "image"
+  | "certificates"
+  | "features"
+  | "specification"
+  | ClassificationField
+  | ProductAttributeKey;
+
+export type ClassificationFieldConfig = { mode: "fixed"; value: string | null } | { mode: "mapped"; column: number };
+export type OptionalClassificationFieldConfig = ClassificationFieldConfig | { mode: "none" };
+
+export type VariableImportMapping = {
+  headerRow: number; // 1-indexed row number containing column labels
+  columnDestinations: Record<number, ColumnDestination>; // 0-indexed column -> destination
+  classification: {
+    company: ClassificationFieldConfig;
+    category: ClassificationFieldConfig;
+    subCategory: OptionalClassificationFieldConfig;
+    productFamily: ClassificationFieldConfig;
+    industry: OptionalClassificationFieldConfig;
+    subIndustry: OptionalClassificationFieldConfig;
+  };
+};
+
+export type VariableImportRowError = { rowNumber: number; modelNumber: string | null; reason: string };
+
+export type VariableImportSummary = {
+  totalDataRows: number;
+  groupCount: number;
+  productsToCreate: number;
+  productsReused: number;
+  variantsToCreate: number;
+  variantsSkipped: number;
+  newAttributeValues: { attribute: string; value: string }[];
+  errors: VariableImportRowError[];
+};
+
+type StagedProduct = ProductInput & { modelNumber: string };
+
+export type VariableImportPlan = {
+  summary: VariableImportSummary;
+  newProducts: StagedProduct[];
+  newVariantsByModelNumber: Map<string, VariantInput[]>;
+  existingProductIdByModelNumber: Map<string, string>;
+  newAttributeValueRows: { attribute: string; value: string; order: number }[];
+};
+
+function emptyPlan(reason: string): VariableImportPlan {
+  return {
+    summary: {
+      totalDataRows: 0,
+      groupCount: 0,
+      productsToCreate: 0,
+      productsReused: 0,
+      variantsToCreate: 0,
+      variantsSkipped: 0,
+      newAttributeValues: [],
+      errors: [{ rowNumber: 0, modelNumber: null, reason }],
+    },
+    newProducts: [],
+    newVariantsByModelNumber: new Map(),
+    existingProductIdByModelNumber: new Map(),
+    newAttributeValueRows: [],
+  };
+}
+
+function findSingleColumn(mapping: VariableImportMapping, dest: ColumnDestination): number | undefined {
+  for (const [col, d] of Object.entries(mapping.columnDestinations)) {
+    if (d === dest) return Number(col);
+  }
+  return undefined;
+}
+
+function findAllColumns(mapping: VariableImportMapping, dest: ColumnDestination): number[] {
+  return Object.entries(mapping.columnDestinations)
+    .filter(([, d]) => d === dest)
+    .map(([col]) => Number(col));
+}
+
+function variantKey(v: {
+  size: string | null;
+  variantType: string | null;
+  orifice: string | null;
+  minOperatingTemp: string | null;
+  maxOperatingTemp: string | null;
+  flowFactor: string | null;
+}) {
+  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor]
+    .map((x) => x ?? "")
+    .join("");
+}
+
+type Resolved = { ok: true; id: string | null } | { ok: false; reason: string };
+
+function resolveClassificationValue(
+  fieldLabel: string,
+  config: OptionalClassificationFieldConfig,
+  firstRow: string[],
+  lookup: Map<string, string>,
+  required: boolean
+): Resolved {
+  if (config.mode === "none") return { ok: true, id: null };
+  if (config.mode === "fixed") {
+    if (!config.value) return required ? { ok: false, reason: `${fieldLabel} is not set` } : { ok: true, id: null };
+    return { ok: true, id: config.value };
+  }
+  const raw = (firstRow[config.column] ?? "").trim();
+  if (!raw) return required ? { ok: false, reason: `Missing ${fieldLabel}` } : { ok: true, id: null };
+  const match = lookup.get(raw.toLowerCase());
+  if (!match) return { ok: false, reason: `${fieldLabel} "${raw}" not found` };
+  return { ok: true, id: match };
+}
+
+function resolveProductFamily(config: ClassificationFieldConfig, firstRow: string[]): Resolved {
+  if (config.mode === "fixed") {
+    if (!config.value) return { ok: false, reason: "Product Family is not set" };
+    return { ok: true, id: config.value };
+  }
+  const raw = (firstRow[config.column] ?? "").trim();
+  if (!raw) return { ok: false, reason: "Missing Product Family" };
+  const match = PRODUCT_FAMILIES.find((f) => f.toLowerCase() === raw.toLowerCase());
+  if (!match) return { ok: false, reason: `Product Family "${raw}" not recognized` };
+  return { ok: true, id: match };
+}
+
+export async function analyzeVariableProductImport(
+  grid: ImportGrid,
+  mapping: VariableImportMapping
+): Promise<VariableImportPlan> {
+  const modelNumberCol = findSingleColumn(mapping, "modelNumber");
+  if (modelNumberCol == null) return emptyPlan("No column is mapped to Model Number.");
+
+  const headerValues = grid[mapping.headerRow - 1] ?? [];
+  const columnLabel = (col: number) => (headerValues[col] ?? "").trim() || excelColumnLabel(col);
+
+  const nameCol = findSingleColumn(mapping, "name");
+  const imageCol = findSingleColumn(mapping, "image");
+  const certificatesCol = findSingleColumn(mapping, "certificates");
+  const featuresCol = findSingleColumn(mapping, "features");
+  const specCols = findAllColumns(mapping, "specification");
+  const attributeCols: Partial<Record<ProductAttributeKey, number>> = {};
+  for (const key of ATTRIBUTE_KEYS) {
+    const col = findSingleColumn(mapping, key);
+    if (col != null) attributeCols[key] = col;
+  }
+
+  const dataRows = grid
+    .slice(mapping.headerRow)
+    .map((cells, i) => ({ rowNumber: mapping.headerRow + 1 + i, cells }));
+
+  const errors: VariableImportRowError[] = [];
+  const groups = new Map<string, { rowNumber: number; cells: string[] }[]>();
+  for (const row of dataRows) {
+    if (row.cells.every((c) => !c || !c.trim())) continue;
+    const modelNumber = (row.cells[modelNumberCol] ?? "").trim();
+    if (!modelNumber) {
+      errors.push({ rowNumber: row.rowNumber, modelNumber: null, reason: "Missing Model Number" });
+      continue;
+    }
+    if (!groups.has(modelNumber)) groups.set(modelNumber, []);
+    groups.get(modelNumber)!.push(row);
+  }
+
+  // Classification lookups (case-insensitive name matching, scoped to already-resolved parents)
+  const companies = await prisma.company.findMany({ include: { categories: { include: { subCategories: true } } } });
+  const companyByName = new Map(companies.map((c) => [c.name.toLowerCase(), c.id]));
+  const categoriesByCompany = new Map<string, Map<string, string>>();
+  const subCategoriesByCategory = new Map<string, Map<string, string>>();
+  for (const c of companies) {
+    categoriesByCompany.set(c.id, new Map(c.categories.map((cat) => [cat.name.toLowerCase(), cat.id])));
+    for (const cat of c.categories) {
+      subCategoriesByCategory.set(cat.id, new Map(cat.subCategories.map((s) => [s.name.toLowerCase(), s.id])));
+    }
+  }
+
+  const industries = await prisma.industry.findMany({ include: { subIndustries: true } });
+  const industryByName = new Map(industries.map((i) => [i.name.toLowerCase(), i.id]));
+  const subIndustriesByIndustry = new Map<string, Map<string, string>>();
+  for (const ind of industries) {
+    subIndustriesByIndustry.set(ind.id, new Map(ind.subIndustries.map((s) => [s.name.toLowerCase(), s.id])));
+  }
+
+  // Attribute value lookups (case-sensitive exact match) + next `order` per key
+  const attributeRows = await prisma.attributeValue.findMany({ select: { attribute: true, value: true, order: true } });
+  const existingAttrValues = new Map<string, Set<string>>();
+  const nextOrder = new Map<string, number>();
+  for (const key of ATTRIBUTE_KEYS) {
+    existingAttrValues.set(key, new Set());
+    nextOrder.set(key, 0);
+  }
+  for (const row of attributeRows) {
+    if (!existingAttrValues.has(row.attribute)) {
+      existingAttrValues.set(row.attribute, new Set());
+      nextOrder.set(row.attribute, 0);
+    }
+    existingAttrValues.get(row.attribute)!.add(row.value);
+    nextOrder.set(row.attribute, Math.max(nextOrder.get(row.attribute)!, row.order + 1));
+  }
+
+  // Existing products/variants for the Model Numbers present in this sheet
+  const existingProducts = await prisma.product.findMany({
+    where: { modelNumber: { in: [...groups.keys()] } },
+    select: { id: true, modelNumber: true },
+  });
+  const existingProductIdByModelNumber = new Map(existingProducts.map((p) => [p.modelNumber, p.id] as const));
+  const existingProductIds = existingProducts.map((p) => p.id);
+  const existingVariantRows = existingProductIds.length
+    ? await prisma.productVariant.findMany({
+        where: { productId: { in: existingProductIds } },
+        select: {
+          productId: true,
+          size: true,
+          variantType: true,
+          orifice: true,
+          minOperatingTemp: true,
+          maxOperatingTemp: true,
+          flowFactor: true,
+        },
+      })
+    : [];
+  const existingVariantKeysByProduct = new Map<string, Set<string>>();
+  for (const v of existingVariantRows) {
+    if (!existingVariantKeysByProduct.has(v.productId)) existingVariantKeysByProduct.set(v.productId, new Set());
+    existingVariantKeysByProduct.get(v.productId)!.add(variantKey(v));
+  }
+
+  const newProducts: StagedProduct[] = [];
+  const newVariantsByModelNumber = new Map<string, VariantInput[]>();
+  const newAttributeValueRows: { attribute: string; value: string; order: number }[] = [];
+  let productsToCreate = 0;
+  let productsReused = 0;
+  let variantsToCreate = 0;
+  let variantsSkipped = 0;
+
+  for (const [modelNumber, rows] of groups) {
+    const firstRow = rows[0].cells;
+    const firstRowNumber = rows[0].rowNumber;
+
+    const company = resolveClassificationValue(
+      "Company",
+      mapping.classification.company,
+      firstRow,
+      companyByName,
+      true
+    );
+    if (!company.ok) {
+      errors.push({ rowNumber: firstRowNumber, modelNumber, reason: company.reason });
+      continue;
+    }
+
+    const category = resolveClassificationValue(
+      "Category",
+      mapping.classification.category,
+      firstRow,
+      categoriesByCompany.get(company.id!) ?? new Map(),
+      true
+    );
+    if (!category.ok) {
+      errors.push({ rowNumber: firstRowNumber, modelNumber, reason: category.reason });
+      continue;
+    }
+
+    const subCategory = resolveClassificationValue(
+      "Sub-Category",
+      mapping.classification.subCategory,
+      firstRow,
+      subCategoriesByCategory.get(category.id!) ?? new Map(),
+      false
+    );
+    if (!subCategory.ok) {
+      errors.push({ rowNumber: firstRowNumber, modelNumber, reason: subCategory.reason });
+      continue;
+    }
+
+    const productFamily = resolveProductFamily(mapping.classification.productFamily, firstRow);
+    if (!productFamily.ok) {
+      errors.push({ rowNumber: firstRowNumber, modelNumber, reason: productFamily.reason });
+      continue;
+    }
+
+    const industry = resolveClassificationValue(
+      "Industry",
+      mapping.classification.industry,
+      firstRow,
+      industryByName,
+      false
+    );
+    if (!industry.ok) {
+      errors.push({ rowNumber: firstRowNumber, modelNumber, reason: industry.reason });
+      continue;
+    }
+
+    const subIndustry = industry.id
+      ? resolveClassificationValue(
+          "Sub-Industry",
+          mapping.classification.subIndustry,
+          firstRow,
+          subIndustriesByIndustry.get(industry.id) ?? new Map(),
+          false
+        )
+      : ({ ok: true, id: null } as const);
+    if (!subIndustry.ok) {
+      errors.push({ rowNumber: firstRowNumber, modelNumber, reason: subIndustry.reason });
+      continue;
+    }
+
+    const name = (nameCol != null ? (firstRow[nameCol] ?? "").trim() : "") || modelNumber;
+    const image = imageCol != null ? (firstRow[imageCol] ?? "").trim() || null : null;
+
+    const existingProductId = existingProductIdByModelNumber.get(modelNumber);
+    if (existingProductId) {
+      productsReused++;
+    } else {
+      newProducts.push({
+        modelNumber,
+        name,
+        image,
+        productFamily: productFamily.id!,
+        productType: "variable",
+        companyId: company.id!,
+        categoryId: category.id!,
+        subCategoryId: subCategory.id,
+        industryId: industry.id,
+        subIndustryId: subIndustry.id,
+        industriesServed: null,
+        certificates: [],
+        features: null,
+        specifications: [],
+        downloads: [],
+      });
+      productsToCreate++;
+    }
+
+    const seenKeys = new Set(existingProductId ? existingVariantKeysByProduct.get(existingProductId) ?? [] : []);
+    const stagedVariants: VariantInput[] = [];
+
+    for (const row of rows) {
+      const attrs: Record<ProductAttributeKey, string | null> = {
+        size: null,
+        variantType: null,
+        orifice: null,
+        minOperatingTemp: null,
+        maxOperatingTemp: null,
+        flowFactor: null,
+      };
+      for (const key of ATTRIBUTE_KEYS) {
+        const col = attributeCols[key];
+        const raw = col != null ? (row.cells[col] ?? "").trim() : "";
+        attrs[key] = raw || null;
+        if (raw && !existingAttrValues.get(key)!.has(raw)) {
+          newAttributeValueRows.push({ attribute: key, value: raw, order: nextOrder.get(key)! });
+          nextOrder.set(key, nextOrder.get(key)! + 1);
+          existingAttrValues.get(key)!.add(raw);
+        }
+      }
+
+      const key = variantKey(attrs);
+      if (seenKeys.has(key)) {
+        variantsSkipped++;
+        continue;
+      }
+      seenKeys.add(key);
+
+      const certificates = certificatesCol != null
+        ? (row.cells[certificatesCol] ?? "").split(/[;,]/).map((s) => s.trim()).filter(Boolean)
+        : [];
+      const features = featuresCol != null ? (row.cells[featuresCol] ?? "").trim() || null : null;
+      const specifications = specCols
+        .map((col) => ({ key: columnLabel(col), value: (row.cells[col] ?? "").trim() }))
+        .filter((s) => s.value);
+
+      stagedVariants.push({
+        size: attrs.size,
+        variantType: attrs.variantType,
+        orifice: attrs.orifice,
+        minOperatingTemp: attrs.minOperatingTemp,
+        maxOperatingTemp: attrs.maxOperatingTemp,
+        flowFactor: attrs.flowFactor,
+        certificates,
+        features,
+        specifications,
+        downloads: [],
+      });
+      variantsToCreate++;
+    }
+
+    if (stagedVariants.length) newVariantsByModelNumber.set(modelNumber, stagedVariants);
+  }
+
+  return {
+    summary: {
+      totalDataRows: dataRows.length,
+      groupCount: groups.size,
+      productsToCreate,
+      productsReused,
+      variantsToCreate,
+      variantsSkipped,
+      newAttributeValues: newAttributeValueRows.map(({ attribute, value }) => ({ attribute, value })),
+      errors,
+    },
+    newProducts,
+    newVariantsByModelNumber,
+    existingProductIdByModelNumber,
+    newAttributeValueRows,
+  };
+}
+
+export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
+  return prisma.$transaction(
+    async (tx) => {
+      if (plan.newAttributeValueRows.length) {
+        await tx.attributeValue.createMany({ data: plan.newAttributeValueRows });
+      }
+
+      const productIdByModelNumber = new Map(plan.existingProductIdByModelNumber);
+      for (const { modelNumber, name, ...rest } of plan.newProducts) {
+        const created = await tx.product.create({
+          data: { ...rest, name, modelNumber, slug: slugify(`${name}-${modelNumber}`) },
+        });
+        productIdByModelNumber.set(modelNumber, created.id);
+      }
+
+      const allVariants: (VariantInput & { productId: string })[] = [];
+      for (const [modelNumber, variants] of plan.newVariantsByModelNumber) {
+        const productId = productIdByModelNumber.get(modelNumber);
+        if (!productId) continue;
+        for (const v of variants) allVariants.push({ ...v, productId });
+      }
+
+      const CHUNK = 500;
+      for (let i = 0; i < allVariants.length; i += CHUNK) {
+        await tx.productVariant.createMany({ data: allVariants.slice(i, i + CHUNK) });
+      }
+
+      return {
+        createdProductCount: plan.newProducts.length,
+        createdVariantCount: allVariants.length,
+        createdAttributeValueCount: plan.newAttributeValueRows.length,
+      };
+    },
+    { timeout: 30_000 }
+  );
+}
