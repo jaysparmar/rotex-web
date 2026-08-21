@@ -9,7 +9,7 @@ import { PRODUCT_ATTRIBUTES, PRODUCT_FAMILIES } from "@/lib/product-constants";
 import type { ColumnDestination } from "@/lib/variable-product-import";
 import type { ClassificationFieldState, ClassificationState, CompanyOption, IndustryOption } from "./types";
 
-const MULTI_USE: ReadonlySet<ColumnDestination> = new Set(["ignore", "specification"]);
+const MULTI_USE: ReadonlySet<ColumnDestination> = new Set(["ignore"]);
 
 const BASE_DESTINATIONS: { value: ColumnDestination; label: string }[] = [
   { value: "ignore", label: "— Ignore —" },
@@ -18,7 +18,6 @@ const BASE_DESTINATIONS: { value: ColumnDestination; label: string }[] = [
   { value: "image", label: "Product Image" },
   { value: "certificates", label: "Certificates" },
   { value: "features", label: "Features" },
-  { value: "specification", label: "Specification" },
   ...PRODUCT_ATTRIBUTES.map((a) => ({ value: a.key as ColumnDestination, label: a.label })),
 ];
 
@@ -286,10 +285,7 @@ export function ImportMappingStep({
       <Card>
         <CardHeader>
           <CardTitle>4. Column mapping</CardTitle>
-          <CardDescription>
-            Map each spreadsheet column to a product field. Mark as many columns as you like as
-            &ldquo;Specification&rdquo; — each becomes a spec entry keyed by its column label.
-          </CardDescription>
+          <CardDescription>Map each spreadsheet column to a product field.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="max-h-[32rem] overflow-auto rounded-lg border border-border">
@@ -328,7 +324,7 @@ export function ImportMappingStep({
               Back
             </Button>
             <Button type="button" size="sm" onClick={onNext}>
-              Next: Preview
+              Next: Specifications
             </Button>
           </div>
         </CardContent>

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { PRODUCT_ATTRIBUTES } from "@/lib/product-constants";
 import type { VariableImportSummary } from "@/lib/variable-product-import";
 
-const ERROR_DISPLAY_LIMIT = 50;
+const LIST_DISPLAY_LIMIT = 50;
 
 function StatTile({ label, value }: { label: string; value: number }) {
   return (
@@ -30,7 +30,12 @@ export function ImportPreviewStep({
   summary: VariableImportSummary | null;
   loading: boolean;
   committing: boolean;
-  committedResult: { createdProductCount: number; createdVariantCount: number; createdAttributeValueCount: number } | null;
+  committedResult: {
+    createdProductCount: number;
+    createdVariantCount: number;
+    updatedVariantCount: number;
+    createdAttributeValueCount: number;
+  } | null;
   onBack: () => void;
   onRefreshPreview: () => void;
   onCommit: () => void;
@@ -53,9 +58,10 @@ export function ImportPreviewStep({
           <CardDescription>The products below were created or updated.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatTile label="Products created" value={committedResult.createdProductCount} />
             <StatTile label="Variants created" value={committedResult.createdVariantCount} />
+            <StatTile label="Variants updated" value={committedResult.updatedVariantCount} />
             <StatTile label="Attribute values added" value={committedResult.createdAttributeValueCount} />
           </div>
           <Link href="/admin/products">
@@ -69,14 +75,15 @@ export function ImportPreviewStep({
   }
 
   const attrLabel = (key: string) => PRODUCT_ATTRIBUTES.find((a) => a.key === key)?.label ?? key;
-  const nothingToDo = summary.productsToCreate === 0 && summary.variantsToCreate === 0;
-  const shownErrors = summary.errors.slice(0, ERROR_DISPLAY_LIMIT);
+  const nothingToDo = summary.productsToCreate === 0 && summary.variantsToCreate === 0 && summary.variantsToUpdate === 0;
+  const shownErrors = summary.errors.slice(0, LIST_DISPLAY_LIMIT);
+  const shownDuplicates = summary.duplicates.slice(0, LIST_DISPLAY_LIMIT);
 
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>5. Preview</CardTitle>
+          <CardTitle>6. Preview</CardTitle>
           <CardDescription>Nothing is written to the database until you confirm.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -84,7 +91,7 @@ export function ImportPreviewStep({
             <StatTile label="Products to create" value={summary.productsToCreate} />
             <StatTile label="Products reused" value={summary.productsReused} />
             <StatTile label="Variants to create" value={summary.variantsToCreate} />
-            <StatTile label="Variants skipped (duplicate)" value={summary.variantsSkipped} />
+            <StatTile label="Variants to update" value={summary.variantsToUpdate} />
           </div>
 
           {summary.newAttributeValues.length > 0 && (
@@ -97,6 +104,42 @@ export function ImportPreviewStep({
                   </Badge>
                 ))}
               </div>
+            </div>
+          )}
+
+          {summary.duplicates.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="text-sm font-medium">
+                {summary.duplicates.length} row{summary.duplicates.length === 1 ? "" : "s"} matched an existing
+                variant — that variant will be updated instead of a new one being created
+              </div>
+              <div className="max-h-56 overflow-auto rounded-lg border border-border">
+                <table className="w-full text-left text-xs">
+                  <thead className="sticky top-0 bg-background">
+                    <tr className="border-b border-border bg-muted/30">
+                      <th className="px-2 py-1.5 font-medium text-muted-foreground">Row</th>
+                      <th className="px-2 py-1.5 font-medium text-muted-foreground">Model Number</th>
+                      <th className="px-2 py-1.5 font-medium text-muted-foreground">Variant</th>
+                      <th className="px-2 py-1.5 font-medium text-muted-foreground">Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {shownDuplicates.map((d, i) => (
+                      <tr key={i}>
+                        <td className="px-2 py-1.5">{d.rowNumber}</td>
+                        <td className="px-2 py-1.5">{d.modelNumber}</td>
+                        <td className="px-2 py-1.5">{d.variantLabel || "—"}</td>
+                        <td className="px-2 py-1.5">{d.reason}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {summary.duplicates.length > LIST_DISPLAY_LIMIT && (
+                <p className="text-xs text-muted-foreground">
+                  +{summary.duplicates.length - LIST_DISPLAY_LIMIT} more
+                </p>
+              )}
             </div>
           )}
 
@@ -125,9 +168,9 @@ export function ImportPreviewStep({
                   </tbody>
                 </table>
               </div>
-              {summary.errors.length > ERROR_DISPLAY_LIMIT && (
+              {summary.errors.length > LIST_DISPLAY_LIMIT && (
                 <p className="text-xs text-muted-foreground">
-                  +{summary.errors.length - ERROR_DISPLAY_LIMIT} more
+                  +{summary.errors.length - LIST_DISPLAY_LIMIT} more
                 </p>
               )}
             </div>

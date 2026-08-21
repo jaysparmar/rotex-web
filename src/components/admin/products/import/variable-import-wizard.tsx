@@ -6,11 +6,17 @@ import { PRODUCT_FAMILIES } from "@/lib/product-constants";
 import type { ColumnDestination, ImportGrid, VariableImportMapping, VariableImportSummary } from "@/lib/variable-product-import";
 import { ImportUploadStep } from "./import-upload-step";
 import { ImportMappingStep } from "./import-mapping-step";
+import { ImportSpecificationsStep } from "./import-specifications-step";
 import { ImportPreviewStep } from "./import-preview-step";
 import type { ClassificationState, CompanyOption, IndustryOption, SheetData } from "./types";
 
-type Step = "upload" | "mapping" | "preview";
-type CommitResult = { createdProductCount: number; createdVariantCount: number; createdAttributeValueCount: number };
+type Step = "upload" | "mapping" | "specifications" | "preview";
+type CommitResult = {
+  createdProductCount: number;
+  createdVariantCount: number;
+  updatedVariantCount: number;
+  createdAttributeValueCount: number;
+};
 
 type FieldOutcome<T> = { ok: true; config: T } | { ok: false; error: string };
 
@@ -28,6 +34,7 @@ async function postImport<T>(path: "preview" | "commit", grid: ImportGrid, mappi
 function buildMapping(
   headerRow: number,
   columnDestinations: Record<number, ColumnDestination>,
+  specificationColumns: number[],
   classification: ClassificationState
 ): { mapping: VariableImportMapping } | { error: string } {
   function findColumn(dest: ColumnDestination): number | undefined {
@@ -83,6 +90,7 @@ function buildMapping(
     mapping: {
       headerRow,
       columnDestinations,
+      specificationColumns,
       classification: {
         company: company.config,
         category: category.config,
@@ -107,6 +115,7 @@ export function VariableImportWizard({
   const [selectedSheetIndex, setSelectedSheetIndex] = useState(0);
   const [headerRow, setHeaderRow] = useState(1);
   const [columnDestinations, setColumnDestinations] = useState<Record<number, ColumnDestination>>({});
+  const [specificationColumns, setSpecificationColumns] = useState<number[]>([]);
   const [classification, setClassification] = useState<ClassificationState>({
     company: { mode: "fixed", fixedValue: companies[0]?.id ?? null },
     category: { mode: "fixed", fixedValue: null },
@@ -128,12 +137,14 @@ export function VariableImportWizard({
     setSelectedSheetIndex(0);
     setHeaderRow(1);
     setColumnDestinations({});
+    setSpecificationColumns([]);
   }
 
   async function handleRunPreview() {
-    const result = buildMapping(headerRow, columnDestinations, classification);
+    const result = buildMapping(headerRow, columnDestinations, specificationColumns, classification);
     if ("error" in result) {
       setMappingError(result.error);
+      setStep("mapping");
       return;
     }
     setMappingError(undefined);
@@ -153,7 +164,7 @@ export function VariableImportWizard({
   }
 
   async function handleCommit() {
-    const result = buildMapping(headerRow, columnDestinations, classification);
+    const result = buildMapping(headerRow, columnDestinations, specificationColumns, classification);
     if ("error" in result) {
       toast.error(result.error);
       return;
@@ -182,6 +193,7 @@ export function VariableImportWizard({
           onSelectSheet={(i) => {
             setSelectedSheetIndex(i);
             setColumnDestinations({});
+            setSpecificationColumns([]);
           }}
           onHeaderRowChange={setHeaderRow}
           onNext={() => setStep("mapping")}
@@ -200,6 +212,17 @@ export function VariableImportWizard({
           industries={industries}
           error={mappingError}
           onBack={() => setStep("upload")}
+          onNext={() => setStep("specifications")}
+        />
+      )}
+
+      {step === "specifications" && sheets && (
+        <ImportSpecificationsStep
+          grid={grid}
+          headerRow={headerRow}
+          specificationColumns={specificationColumns}
+          onChange={setSpecificationColumns}
+          onBack={() => setStep("mapping")}
           onNext={handleRunPreview}
         />
       )}
@@ -210,7 +233,7 @@ export function VariableImportWizard({
           loading={previewing}
           committing={committing}
           committedResult={committedResult}
-          onBack={() => setStep("mapping")}
+          onBack={() => setStep("specifications")}
           onRefreshPreview={handleRunPreview}
           onCommit={handleCommit}
         />

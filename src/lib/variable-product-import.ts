@@ -17,7 +17,6 @@ export type ColumnDestination =
   | "image"
   | "certificates"
   | "features"
-  | "specification"
   | ClassificationField
   | ProductAttributeKey;
 
@@ -27,6 +26,7 @@ export type OptionalClassificationFieldConfig = ClassificationFieldConfig | { mo
 export type VariableImportMapping = {
   headerRow: number; // 1-indexed row number containing column labels
   columnDestinations: Record<number, ColumnDestination>; // 0-indexed column -> destination
+  specificationColumns: number[]; // 0-indexed columns whose {header, cell} becomes a spec entry per variant
   classification: {
     company: ClassificationFieldConfig;
     category: ClassificationFieldConfig;
@@ -39,23 +39,33 @@ export type VariableImportMapping = {
 
 export type VariableImportRowError = { rowNumber: number; modelNumber: string | null; reason: string };
 
+export type VariableImportDuplicateDetail = {
+  rowNumber: number;
+  modelNumber: string;
+  variantLabel: string;
+  reason: string;
+};
+
 export type VariableImportSummary = {
   totalDataRows: number;
   groupCount: number;
   productsToCreate: number;
   productsReused: number;
   variantsToCreate: number;
-  variantsSkipped: number;
+  variantsToUpdate: number;
   newAttributeValues: { attribute: string; value: string }[];
   errors: VariableImportRowError[];
+  duplicates: VariableImportDuplicateDetail[];
 };
 
 type StagedProduct = ProductInput & { modelNumber: string };
+type StagedVariantUpdate = { variantId: string; data: VariantInput };
 
 export type VariableImportPlan = {
   summary: VariableImportSummary;
   newProducts: StagedProduct[];
-  newVariantsByModelNumber: Map<string, VariantInput[]>;
+  variantsToCreate: Map<string, VariantInput[]>;
+  variantsToUpdate: StagedVariantUpdate[];
   existingProductIdByModelNumber: Map<string, string>;
   newAttributeValueRows: { attribute: string; value: string; order: number }[];
 };
@@ -68,15 +78,30 @@ function emptyPlan(reason: string): VariableImportPlan {
       productsToCreate: 0,
       productsReused: 0,
       variantsToCreate: 0,
-      variantsSkipped: 0,
+      variantsToUpdate: 0,
       newAttributeValues: [],
       errors: [{ rowNumber: 0, modelNumber: null, reason }],
+      duplicates: [],
     },
     newProducts: [],
-    newVariantsByModelNumber: new Map(),
+    variantsToCreate: new Map(),
+    variantsToUpdate: [],
     existingProductIdByModelNumber: new Map(),
     newAttributeValueRows: [],
   };
+}
+
+function variantLabel(v: {
+  size: string | null;
+  variantType: string | null;
+  orifice: string | null;
+  minOperatingTemp: string | null;
+  maxOperatingTemp: string | null;
+  flowFactor: string | null;
+}) {
+  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor]
+    .filter(Boolean)
+    .join(" / ");
 }
 
 function findSingleColumn(mapping: VariableImportMapping, dest: ColumnDestination): number | undefined {
@@ -84,12 +109,6 @@ function findSingleColumn(mapping: VariableImportMapping, dest: ColumnDestinatio
     if (d === dest) return Number(col);
   }
   return undefined;
-}
-
-function findAllColumns(mapping: VariableImportMapping, dest: ColumnDestination): number[] {
-  return Object.entries(mapping.columnDestinations)
-    .filter(([, d]) => d === dest)
-    .map(([col]) => Number(col));
 }
 
 function variantKey(v: {
@@ -152,7 +171,7 @@ export async function analyzeVariableProductImport(
   const imageCol = findSingleColumn(mapping, "image");
   const certificatesCol = findSingleColumn(mapping, "certificates");
   const featuresCol = findSingleColumn(mapping, "features");
-  const specCols = findAllColumns(mapping, "specification");
+  const specCols = mapping.specificationColumns;
   const attributeCols: Partial<Record<ProductAttributeKey, number>> = {};
   for (const key of ATTRIBUTE_KEYS) {
     const col = findSingleColumn(mapping, key);
@@ -223,6 +242,7 @@ export async function analyzeVariableProductImport(
     ? await prisma.productVariant.findMany({
         where: { productId: { in: existingProductIds } },
         select: {
+          id: true,
           productId: true,
           size: true,
           variantType: true,
@@ -233,19 +253,21 @@ export async function analyzeVariableProductImport(
         },
       })
     : [];
-  const existingVariantKeysByProduct = new Map<string, Set<string>>();
+  const existingVariantIdsByProduct = new Map<string, Map<string, string>>();
   for (const v of existingVariantRows) {
-    if (!existingVariantKeysByProduct.has(v.productId)) existingVariantKeysByProduct.set(v.productId, new Set());
-    existingVariantKeysByProduct.get(v.productId)!.add(variantKey(v));
+    if (!existingVariantIdsByProduct.has(v.productId)) existingVariantIdsByProduct.set(v.productId, new Map());
+    existingVariantIdsByProduct.get(v.productId)!.set(variantKey(v), v.id);
   }
 
   const newProducts: StagedProduct[] = [];
-  const newVariantsByModelNumber = new Map<string, VariantInput[]>();
+  const variantsToCreate = new Map<string, VariantInput[]>();
+  const variantsToUpdate: StagedVariantUpdate[] = [];
+  const duplicates: VariableImportDuplicateDetail[] = [];
   const newAttributeValueRows: { attribute: string; value: string; order: number }[] = [];
   let productsToCreate = 0;
   let productsReused = 0;
-  let variantsToCreate = 0;
-  let variantsSkipped = 0;
+  let variantsToCreateCount = 0;
+  let variantsToUpdateCount = 0;
 
   for (const [modelNumber, rows] of groups) {
     const firstRow = rows[0].cells;
@@ -346,8 +368,11 @@ export async function analyzeVariableProductImport(
       productsToCreate++;
     }
 
-    const seenKeys = new Set(existingProductId ? existingVariantKeysByProduct.get(existingProductId) ?? [] : []);
-    const stagedVariants: VariantInput[] = [];
+    const existingKeyIds = existingProductId ? existingVariantIdsByProduct.get(existingProductId) ?? new Map() : new Map();
+    const working = new Map<
+      string,
+      { status: "create" | "update"; variantId?: string; data: VariantInput; rowNumber: number }
+    >();
 
     for (const row of rows) {
       const attrs: Record<ProductAttributeKey, string | null> = {
@@ -370,12 +395,6 @@ export async function analyzeVariableProductImport(
       }
 
       const key = variantKey(attrs);
-      if (seenKeys.has(key)) {
-        variantsSkipped++;
-        continue;
-      }
-      seenKeys.add(key);
-
       const certificates = certificatesCol != null
         ? (row.cells[certificatesCol] ?? "").split(/[;,]/).map((s) => s.trim()).filter(Boolean)
         : [];
@@ -384,7 +403,7 @@ export async function analyzeVariableProductImport(
         .map((col) => ({ key: columnLabel(col), value: (row.cells[col] ?? "").trim() }))
         .filter((s) => s.value);
 
-      stagedVariants.push({
+      const data: VariantInput = {
         size: attrs.size,
         variantType: attrs.variantType,
         orifice: attrs.orifice,
@@ -395,11 +414,39 @@ export async function analyzeVariableProductImport(
         features,
         specifications,
         downloads: [],
+      };
+
+      const existing = working.get(key);
+      if (existing) {
+        const reason =
+          existing.status === "update"
+            ? `Matches an existing variant — data from row ${row.rowNumber} will be used`
+            : `Duplicate of row ${existing.rowNumber} in this file — data from row ${row.rowNumber} will be used`;
+        duplicates.push({ rowNumber: row.rowNumber, modelNumber, variantLabel: variantLabel(attrs), reason });
+        working.set(key, { ...existing, data, rowNumber: row.rowNumber });
+        continue;
+      }
+
+      const existingVariantId = existingKeyIds.get(key);
+      working.set(key, {
+        status: existingVariantId ? "update" : "create",
+        variantId: existingVariantId,
+        data,
+        rowNumber: row.rowNumber,
       });
-      variantsToCreate++;
     }
 
-    if (stagedVariants.length) newVariantsByModelNumber.set(modelNumber, stagedVariants);
+    const stagedCreates: VariantInput[] = [];
+    for (const entry of working.values()) {
+      if (entry.status === "create") {
+        stagedCreates.push(entry.data);
+        variantsToCreateCount++;
+      } else {
+        variantsToUpdate.push({ variantId: entry.variantId!, data: entry.data });
+        variantsToUpdateCount++;
+      }
+    }
+    if (stagedCreates.length) variantsToCreate.set(modelNumber, stagedCreates);
   }
 
   return {
@@ -408,13 +455,15 @@ export async function analyzeVariableProductImport(
       groupCount: groups.size,
       productsToCreate,
       productsReused,
-      variantsToCreate,
-      variantsSkipped,
+      variantsToCreate: variantsToCreateCount,
+      variantsToUpdate: variantsToUpdateCount,
       newAttributeValues: newAttributeValueRows.map(({ attribute, value }) => ({ attribute, value })),
       errors,
+      duplicates,
     },
     newProducts,
-    newVariantsByModelNumber,
+    variantsToCreate,
+    variantsToUpdate,
     existingProductIdByModelNumber,
     newAttributeValueRows,
   };
@@ -436,7 +485,7 @@ export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
       }
 
       const allVariants: (VariantInput & { productId: string })[] = [];
-      for (const [modelNumber, variants] of plan.newVariantsByModelNumber) {
+      for (const [modelNumber, variants] of plan.variantsToCreate) {
         const productId = productIdByModelNumber.get(modelNumber);
         if (!productId) continue;
         for (const v of variants) allVariants.push({ ...v, productId });
@@ -447,9 +496,14 @@ export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
         await tx.productVariant.createMany({ data: allVariants.slice(i, i + CHUNK) });
       }
 
+      for (const { variantId, data } of plan.variantsToUpdate) {
+        await tx.productVariant.update({ where: { id: variantId }, data });
+      }
+
       return {
         createdProductCount: plan.newProducts.length,
         createdVariantCount: allVariants.length,
+        updatedVariantCount: plan.variantsToUpdate.length,
         createdAttributeValueCount: plan.newAttributeValueRows.length,
       };
     },
