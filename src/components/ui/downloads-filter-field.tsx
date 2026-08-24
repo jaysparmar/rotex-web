@@ -15,7 +15,11 @@ export function DownloadsFilterField({ label, placeholder, options, value, onCha
   return (
     <div className="self-stretch flex flex-col gap-2.5">
       <span className="text-neutral-400 text-xs font-semibold font-montserrat uppercase leading-5">{label}</span>
-      <Select value={value} onValueChange={(v) => onChange(v ?? ALL)}>
+      <Select
+        items={[{ value: ALL, label: placeholder }, ...options.map((opt) => ({ value: opt, label: opt }))]}
+        value={value}
+        onValueChange={(v) => onChange(v ?? ALL)}
+      >
         <SelectTrigger className="w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline-1 -outline-offset-1 outline-gray-200 text-sm font-medium font-montserrat text-neutral-400">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

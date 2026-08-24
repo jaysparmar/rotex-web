@@ -283,7 +283,11 @@ function FormSelect({
       control={control}
       name={name}
       render={({ field }) => (
-        <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v ?? "")}>
+        <Select
+          items={options.map((o) => ({ value: o, label: o }))}
+          value={field.value ?? ""}
+          onValueChange={(v) => field.onChange(v ?? "")}
+        >
           <SelectTrigger
             className={`w-full h-11 px-3 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat leading-5 text-stone-900 data-placeholder:text-stone-400 ${
               hasError ? "outline-red-400" : "outline-gray-200"

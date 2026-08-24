@@ -26,6 +26,7 @@ export function AwardsGrid({ awards }: { awards: AwardCardProps[] }) {
       <div className="flex justify-end items-center gap-5">
         <span className="text-black text-base font-medium font-montserrat leading-6">Filter by:</span>
         <Select
+          items={[{ value: "All Years", label: "All Years" }, ...years.map((y) => ({ value: y, label: y }))]}
           value={yearFilter || "All Years"}
           onValueChange={(v) => {
             setYearFilter(v === "All Years" ? "" : (v ?? ""));

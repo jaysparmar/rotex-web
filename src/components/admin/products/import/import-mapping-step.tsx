@@ -45,7 +45,7 @@ function PlainSelect({
   className?: string;
 }) {
   return (
-    <Select value={value} onValueChange={(v) => onValueChange(v as string)}>
+    <Select items={options} value={value} onValueChange={(v) => onValueChange(v as string)}>
       <SelectTrigger className={cn("h-8 w-full text-xs", className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

@@ -77,7 +77,14 @@ function MultiFilter({
 
 function SortSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
-    <Select value={value} onValueChange={(v) => onChange((v as string) ?? "Newest")}>
+    <Select
+      items={[
+        { value: "Newest", label: "Newest" },
+        { value: "Oldest", label: "Oldest" },
+      ]}
+      value={value}
+      onValueChange={(v) => onChange((v as string) ?? "Newest")}
+    >
       <SelectTrigger className={`${TRIGGER_CLS} border-0`}>
         <SelectValue placeholder="Sort" />
       </SelectTrigger>

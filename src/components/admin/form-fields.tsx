@@ -62,6 +62,7 @@ export function SelectField({
   return (
     <Field label={label}>
       <Select
+        items={options}
         value={value as string | undefined}
         defaultValue={defaultValue as string | undefined}
         disabled={disabled}

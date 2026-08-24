@@ -68,7 +68,11 @@ function FormSelect({
       control={control}
       name={name}
       render={({ field }) => (
-        <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v ?? "")}>
+        <Select
+          items={options.map((o) => ({ value: o, label: o }))}
+          value={field.value ?? ""}
+          onValueChange={(v) => field.onChange(v ?? "")}
+        >
           <SelectTrigger className={selectTriggerCls(hasError)}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>

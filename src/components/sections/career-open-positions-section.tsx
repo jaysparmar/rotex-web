@@ -73,7 +73,11 @@ export function CareerOpenPositionsSection({
 
           {companies.length > 0 && (
             <div className="w-full lg:w-64 lg:shrink-0">
-              <Select value={company} onValueChange={(v) => setCompany(v ?? "")}>
+              <Select
+                items={companies.map((c) => ({ value: c, label: c }))}
+                value={company}
+                onValueChange={(v) => setCompany(v ?? "")}
+              >
                 <SelectTrigger className="w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-stone-900 data-placeholder:text-neutral-400">
                   <SelectValue placeholder="Select Company" />
                 </SelectTrigger>

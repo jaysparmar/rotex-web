@@ -32,7 +32,11 @@ function FormSelect({
   onValueChange: (value: string) => void;
 }) {
   return (
-    <Select value={value} onValueChange={(v) => onValueChange(v ?? "")}>
+    <Select
+      items={options.map((o) => ({ value: o, label: o }))}
+      value={value}
+      onValueChange={(v) => onValueChange(v ?? "")}
+    >
       <SelectTrigger className={selectTriggerCls}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
