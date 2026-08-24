@@ -18,7 +18,6 @@ export type ClassificationFieldState = { mode: "fixed" | "mapped" | "none"; fixe
 export type MatchBy = "name" | "importReference";
 
 export type ClassificationState = {
-  company: ClassificationFieldState;
   category: ClassificationFieldState;
   subCategory: ClassificationFieldState;
   productFamily: ClassificationFieldState;

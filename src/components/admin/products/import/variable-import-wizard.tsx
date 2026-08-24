@@ -46,7 +46,7 @@ function buildMapping(
   }
 
   function requiredField(
-    field: "company" | "category" | "productFamily",
+    field: "category" | "productFamily",
     label: string
   ): FieldOutcome<{ mode: "fixed"; value: string } | { mode: "mapped"; column: number }> {
     const c = classification[field];
@@ -74,8 +74,6 @@ function buildMapping(
   const modelNumberCol = findColumn("modelNumber");
   if (modelNumberCol == null) return { error: "Map exactly one column to Model Number." };
 
-  const company = requiredField("company", "Company");
-  if (!company.ok) return { error: company.error };
   const category = requiredField("category", "Category");
   if (!category.ok) return { error: category.error };
   const productFamily = requiredField("productFamily", "Product Family");
@@ -103,7 +101,6 @@ function buildMapping(
       columnDestinations,
       specificationColumns,
       classification: {
-        company: company.config,
         category: category.config,
         subCategory: subCategory.config,
         productFamily: productFamily.config,
@@ -130,7 +127,6 @@ export function VariableImportWizard({
   const [columnDestinations, setColumnDestinations] = useState<Record<number, ColumnDestination>>({});
   const [specificationColumns, setSpecificationColumns] = useState<number[]>([]);
   const [classification, setClassification] = useState<ClassificationState>({
-    company: { mode: "fixed", fixedValue: companies[0]?.id ?? null },
     category: { mode: "fixed", fixedValue: null },
     subCategory: { mode: "none", fixedValue: null },
     productFamily: { mode: "fixed", fixedValue: PRODUCT_FAMILIES[0] },

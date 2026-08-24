@@ -8,7 +8,7 @@ const ATTRIBUTE_KEYS = PRODUCT_ATTRIBUTES.map((a) => a.key);
 
 export type ImportGrid = string[][];
 
-type ClassificationField = "company" | "category" | "subCategory" | "productFamily" | "industry" | "subIndustry";
+type ClassificationField = "category" | "subCategory" | "productFamily" | "industry" | "subIndustry";
 
 export type ColumnDestination =
   | "ignore"
@@ -28,7 +28,6 @@ export type VariableImportMapping = {
   columnDestinations: Record<number, ColumnDestination>; // 0-indexed column -> destination
   specificationColumns: number[]; // 0-indexed columns whose {header, cell} becomes a spec entry per variant
   classification: {
-    company: ClassificationFieldConfig;
     category: ClassificationFieldConfig;
     subCategory: OptionalClassificationFieldConfig;
     productFamily: ClassificationFieldConfig;
@@ -197,28 +196,39 @@ export async function analyzeVariableProductImport(
     groups.get(modelNumber)!.push(row);
   }
 
-  // Classification lookups (case-insensitive name matching, scoped to already-resolved parents)
+  // Classification lookups (case-insensitive name matching, scoped to already-resolved parents).
+  // Category is looked up across all companies at once (the company is derived from whichever
+  // category matches), so a name/reference that matches more than one company's category is
+  // excluded from the lookup entirely rather than silently picking one.
   const companies = await prisma.company.findMany({ include: { categories: { include: { subCategories: true } } } });
-  const companyByName = new Map(companies.map((c) => [c.name.toLowerCase(), c.id]));
-  const categoriesByCompany = new Map<string, Map<string, string>>();
-  const categoriesByCompanyByImportReference = new Map<string, Map<string, string>>();
+
+  function addUnique(map: Map<string, string>, seen: Set<string>, key: string, id: string) {
+    if (seen.has(key)) {
+      map.delete(key);
+      return;
+    }
+    seen.add(key);
+    map.set(key, id);
+  }
+
+  const categoryByName = new Map<string, string>();
+  const categoryByImportReference = new Map<string, string>();
+  const seenCategoryNames = new Set<string>();
+  const seenCategoryImportReferences = new Set<string>();
+  const categoryCompanyId = new Map<string, string>();
+  const categoryNameById = new Map<string, string>();
   const subCategoriesByCategory = new Map<string, Map<string, string>>();
   const subCategoriesByCategoryByImportReference = new Map<string, Map<string, string>>();
-  const categoryNameById = new Map<string, string>();
   const subCategoryNameById = new Map<string, string>();
   const subCategoryParentCategoryId = new Map<string, string>();
   for (const c of companies) {
-    categoriesByCompany.set(c.id, new Map(c.categories.map((cat) => [cat.name.toLowerCase(), cat.id])));
-    categoriesByCompanyByImportReference.set(
-      c.id,
-      new Map(
-        c.categories
-          .filter((cat) => cat.importReference && cat.importReference.trim())
-          .map((cat) => [cat.importReference!.trim().toLowerCase(), cat.id])
-      )
-    );
     for (const cat of c.categories) {
+      categoryCompanyId.set(cat.id, c.id);
       categoryNameById.set(cat.id, cat.name);
+      addUnique(categoryByName, seenCategoryNames, cat.name.toLowerCase(), cat.id);
+      if (cat.importReference && cat.importReference.trim()) {
+        addUnique(categoryByImportReference, seenCategoryImportReferences, cat.importReference.trim().toLowerCase(), cat.id);
+      }
       subCategoriesByCategory.set(cat.id, new Map(cat.subCategories.map((s) => [s.name.toLowerCase(), s.id])));
       subCategoriesByCategoryByImportReference.set(
         cat.id,
@@ -301,22 +311,7 @@ export async function analyzeVariableProductImport(
     const firstRow = rows[0].cells;
     const firstRowNumber = rows[0].rowNumber;
 
-    const company = resolveClassificationValue(
-      "Company",
-      mapping.classification.company,
-      firstRow,
-      companyByName,
-      true
-    );
-    if (!company.ok) {
-      errors.push({ rowNumber: firstRowNumber, modelNumber, reason: company.reason });
-      continue;
-    }
-
-    const categoryLookup =
-      mapping.categoryMatchBy === "importReference"
-        ? (categoriesByCompanyByImportReference.get(company.id!) ?? new Map())
-        : (categoriesByCompany.get(company.id!) ?? new Map());
+    const categoryLookup = mapping.categoryMatchBy === "importReference" ? categoryByImportReference : categoryByName;
     const category = resolveClassificationValue(
       mapping.categoryMatchBy === "importReference" ? "Category (Import Reference)" : "Category",
       mapping.classification.category,
@@ -328,6 +323,7 @@ export async function analyzeVariableProductImport(
       errors.push({ rowNumber: firstRowNumber, modelNumber, reason: category.reason });
       continue;
     }
+    const companyId = categoryCompanyId.get(category.id!)!;
 
     const subCategoryLookup =
       mapping.subCategoryMatchBy === "importReference"
@@ -398,7 +394,7 @@ export async function analyzeVariableProductImport(
         image,
         productFamily: productFamily.id!,
         productType: "variable",
-        companyId: company.id!,
+        companyId,
         categoryId: category.id!,
         subCategoryId: subCategory.id,
         industryId: industry.id,

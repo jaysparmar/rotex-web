@@ -24,7 +24,6 @@ const BASE_DESTINATIONS: { value: ColumnDestination; label: string }[] = [
 type ClassificationFieldKey = Exclude<keyof ClassificationState, "categoryMatchBy" | "subCategoryMatchBy">;
 
 const CLASSIFICATION_DESTINATIONS: { value: ColumnDestination; label: string; field: ClassificationFieldKey }[] = [
-  { value: "company", label: "Company", field: "company" },
   { value: "category", label: "Category", field: "category" },
   { value: "subCategory", label: "Sub-Category", field: "subCategory" },
   { value: "productFamily", label: "Product Family", field: "productFamily" },
@@ -218,15 +217,9 @@ export function ImportMappingStep({
     return industries.find((i) => i.id === industryId);
   }
 
-  const companyOptions = companies.map((c) => ({ value: c.id, label: c.name }));
-
-  const categoryOptions =
-    classification.company.mode === "fixed" && classification.company.fixedValue
-      ? (companies.find((c) => c.id === classification.company.fixedValue)?.categories ?? []).map((cat) => ({
-          value: cat.id,
-          label: cat.name,
-        }))
-      : companies.flatMap((c) => c.categories.map((cat) => ({ value: cat.id, label: `${c.name} — ${cat.name}` })));
+  const categoryOptions = companies.flatMap((c) =>
+    c.categories.map((cat) => ({ value: cat.id, label: `${c.name} — ${cat.name}` }))
+  );
 
   const subCategoryOptions = (() => {
     if (classification.category.mode === "fixed" && classification.category.fixedValue) {
@@ -259,17 +252,10 @@ export function ImportMappingStep({
           <CardTitle>3. Batch defaults</CardTitle>
           <CardDescription>
             For each field, either set one fixed value for every product in this upload, or map it to a spreadsheet
-            column.
+            column. Company is set automatically from the matched Category.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2">
-          <ClassificationFieldControl
-            label="Company"
-            state={classification.company}
-            onChange={(next) => setField("company", next)}
-            allowNone={false}
-            fixedOptions={companyOptions}
-          />
           <div className="space-y-2">
             <ClassificationFieldControl
               label="Category"
