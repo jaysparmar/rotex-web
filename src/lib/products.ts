@@ -12,9 +12,10 @@ export async function getCompanyCategoryTree() {
         select: {
           id: true,
           name: true,
+          importReference: true,
           subCategories: {
             orderBy: [{ order: "asc" }, { name: "asc" }],
-            select: { id: true, name: true },
+            select: { id: true, name: true, importReference: true },
           },
         },
       },

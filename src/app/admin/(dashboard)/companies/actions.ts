@@ -15,6 +15,7 @@ type CategoryData = {
   mobileImage?: string;
   description?: string;
   order: number;
+  importReference?: string;
 };
 
 type SubCategoryData = CategoryData;

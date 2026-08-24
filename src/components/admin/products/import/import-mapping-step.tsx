@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { excelColumnLabel } from "@/lib/excel-columns";
 import { PRODUCT_ATTRIBUTES, PRODUCT_FAMILIES } from "@/lib/product-constants";
 import type { ColumnDestination } from "@/lib/variable-product-import";
-import type { ClassificationFieldState, ClassificationState, CompanyOption, IndustryOption } from "./types";
+import type { MatchBy, ClassificationFieldState, ClassificationState, CompanyOption, IndustryOption } from "./types";
 
 const MULTI_USE: ReadonlySet<ColumnDestination> = new Set(["ignore"]);
 
@@ -21,7 +21,7 @@ const BASE_DESTINATIONS: { value: ColumnDestination; label: string }[] = [
   ...PRODUCT_ATTRIBUTES.map((a) => ({ value: a.key as ColumnDestination, label: a.label })),
 ];
 
-type ClassificationFieldKey = keyof ClassificationState;
+type ClassificationFieldKey = Exclude<keyof ClassificationState, "categoryMatchBy" | "subCategoryMatchBy">;
 
 const CLASSIFICATION_DESTINATIONS: { value: ColumnDestination; label: string; field: ClassificationFieldKey }[] = [
   { value: "company", label: "Company", field: "company" },
@@ -58,6 +58,32 @@ function PlainSelect({
         ))}
       </SelectContent>
     </Select>
+  );
+}
+
+const MATCH_BY_OPTIONS: { value: MatchBy; label: string }[] = [
+  { value: "name", label: "Name" },
+  { value: "importReference", label: "Import Reference" },
+];
+
+function MatchByToggle({ value, onChange }: { value: MatchBy; onChange: (v: MatchBy) => void }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border p-3">
+      <span className="text-xs font-medium text-muted-foreground">Match by:</span>
+      <div className="flex gap-1">
+        {MATCH_BY_OPTIONS.map((opt) => (
+          <Button
+            key={opt.value}
+            type="button"
+            size="xs"
+            variant={value === opt.value ? "secondary" : "outline"}
+            onClick={() => onChange(opt.value)}
+          >
+            {opt.label}
+          </Button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -244,20 +270,36 @@ export function ImportMappingStep({
             allowNone={false}
             fixedOptions={companyOptions}
           />
-          <ClassificationFieldControl
-            label="Category"
-            state={classification.category}
-            onChange={(next) => setField("category", next)}
-            allowNone={false}
-            fixedOptions={categoryOptions}
-          />
-          <ClassificationFieldControl
-            label="Sub-Category"
-            state={classification.subCategory}
-            onChange={(next) => setField("subCategory", next)}
-            allowNone
-            fixedOptions={subCategoryOptions}
-          />
+          <div className="space-y-2">
+            <ClassificationFieldControl
+              label="Category"
+              state={classification.category}
+              onChange={(next) => setField("category", next)}
+              allowNone={false}
+              fixedOptions={categoryOptions}
+            />
+            {classification.category.mode === "mapped" && (
+              <MatchByToggle
+                value={classification.categoryMatchBy}
+                onChange={(v) => onClassificationChange({ ...classification, categoryMatchBy: v })}
+              />
+            )}
+          </div>
+          <div className="space-y-2">
+            <ClassificationFieldControl
+              label="Sub-Category"
+              state={classification.subCategory}
+              onChange={(next) => setField("subCategory", next)}
+              allowNone
+              fixedOptions={subCategoryOptions}
+            />
+            {classification.subCategory.mode === "mapped" && (
+              <MatchByToggle
+                value={classification.subCategoryMatchBy}
+                onChange={(v) => onClassificationChange({ ...classification, subCategoryMatchBy: v })}
+              />
+            )}
+          </div>
           <ClassificationFieldControl
             label="Product Family"
             state={classification.productFamily}

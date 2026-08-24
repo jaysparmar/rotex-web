@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider } from "react-hook-form";
-import { TextField, TextAreaField, FieldGrid } from "@/components/admin/form-fields";
+import { TextField, TextAreaField, FieldGrid, Field } from "@/components/admin/form-fields";
+import { Input } from "@/components/ui/input";
 import { ImageUrlField } from "@/components/admin/image-url-field";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { SaveBar } from "@/components/admin/section-form-shell";
@@ -16,6 +17,7 @@ type FormValues = {
   mobileImage: string;
   description: string;
   order: number;
+  importReference: string;
 };
 
 type SubCategoryInput = {
@@ -26,6 +28,7 @@ type SubCategoryInput = {
   mobileImage: string | null;
   description: string | null;
   order: number;
+  importReference: string | null;
 };
 
 export function SubCategoryEditForm({
@@ -49,6 +52,7 @@ export function SubCategoryEditForm({
       mobileImage: subCategory?.mobileImage ?? "",
       description: subCategory?.description ?? "",
       order: subCategory?.order ?? 0,
+      importReference: subCategory?.importReference ?? "",
     },
   });
   const { pending, error, success, run } = useSaveAction();
@@ -84,6 +88,14 @@ export function SubCategoryEditForm({
             <FieldGrid>
               <TextAreaField label="Description" {...form.register("description")} />
               <TextField type="number" label="Order" {...form.register("order", { valueAsNumber: true })} />
+            </FieldGrid>
+            <FieldGrid>
+              <Field label="Import Reference">
+                <Input {...form.register("importReference")} className="h-9" />
+                <p className="text-xs text-muted-foreground">
+                  Optional code used to match this sub-category to a spreadsheet column during bulk product import.
+                </p>
+              </Field>
             </FieldGrid>
           </CardContent>
         </Card>

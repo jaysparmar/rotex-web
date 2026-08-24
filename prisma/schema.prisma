@@ -113,13 +113,14 @@ model Company {
 }
 
 model Category {
-  id          String   @id @default(cuid())
-  slug        String
-  name        String
-  image       String?
-  mobileImage String?
-  description String?
-  order       Int      @default(0)
+  id              String   @id @default(cuid())
+  slug            String
+  name            String
+  image           String?
+  mobileImage     String?
+  description     String?
+  order           Int      @default(0)
+  importReference String?
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
@@ -134,13 +135,14 @@ model Category {
 }
 
 model SubCategory {
-  id          String   @id @default(cuid())
-  slug        String
-  name        String
-  image       String?
-  mobileImage String?
-  description String?
-  order       Int      @default(0)
+  id              String   @id @default(cuid())
+  slug            String
+  name            String
+  image           String?
+  mobileImage     String?
+  description     String?
+  order           Int      @default(0)
+  importReference String?
 
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId String

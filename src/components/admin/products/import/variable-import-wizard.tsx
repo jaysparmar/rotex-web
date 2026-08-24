@@ -35,7 +35,8 @@ function buildMapping(
   headerRow: number,
   columnDestinations: Record<number, ColumnDestination>,
   specificationColumns: number[],
-  classification: ClassificationState
+  classification: ClassificationState,
+  companies: CompanyOption[]
 ): { mapping: VariableImportMapping } | { error: string } {
   function findColumn(dest: ColumnDestination): number | undefined {
     for (const [col, d] of Object.entries(columnDestinations)) {
@@ -86,6 +87,16 @@ function buildMapping(
   const subIndustry = optionalField("subIndustry", "Sub-Industry");
   if (!subIndustry.ok) return { error: subIndustry.error };
 
+  if (category.config.mode === "fixed" && subCategory.config.mode === "fixed" && subCategory.config.value) {
+    const categoryId = category.config.value;
+    const subCategoryId = subCategory.config.value;
+    const owningCategory = companies.flatMap((c) => c.categories).find((cat) => cat.id === categoryId);
+    const belongs = owningCategory?.subCategories.some((s) => s.id === subCategoryId) ?? false;
+    if (!belongs) {
+      return { error: "The selected Sub-Category does not belong to the selected Category." };
+    }
+  }
+
   return {
     mapping: {
       headerRow,
@@ -99,6 +110,8 @@ function buildMapping(
         industry: industry.config,
         subIndustry: subIndustry.config,
       },
+      categoryMatchBy: classification.categoryMatchBy,
+      subCategoryMatchBy: classification.subCategoryMatchBy,
     },
   };
 }
@@ -123,6 +136,8 @@ export function VariableImportWizard({
     productFamily: { mode: "fixed", fixedValue: PRODUCT_FAMILIES[0] },
     industry: { mode: "none", fixedValue: null },
     subIndustry: { mode: "none", fixedValue: null },
+    categoryMatchBy: "name",
+    subCategoryMatchBy: "name",
   });
   const [mappingError, setMappingError] = useState<string>();
   const [summary, setSummary] = useState<VariableImportSummary | null>(null);
@@ -141,7 +156,7 @@ export function VariableImportWizard({
   }
 
   async function handleRunPreview() {
-    const result = buildMapping(headerRow, columnDestinations, specificationColumns, classification);
+    const result = buildMapping(headerRow, columnDestinations, specificationColumns, classification, companies);
     if ("error" in result) {
       setMappingError(result.error);
       setStep("mapping");
@@ -164,7 +179,7 @@ export function VariableImportWizard({
   }
 
   async function handleCommit() {
-    const result = buildMapping(headerRow, columnDestinations, specificationColumns, classification);
+    const result = buildMapping(headerRow, columnDestinations, specificationColumns, classification, companies);
     if ("error" in result) {
       toast.error(result.error);
       return;

@@ -35,6 +35,8 @@ export type VariableImportMapping = {
     industry: OptionalClassificationFieldConfig;
     subIndustry: OptionalClassificationFieldConfig;
   };
+  categoryMatchBy: "name" | "importReference";
+  subCategoryMatchBy: "name" | "importReference";
 };
 
 export type VariableImportRowError = { rowNumber: number; modelNumber: string | null; reason: string };
@@ -199,11 +201,37 @@ export async function analyzeVariableProductImport(
   const companies = await prisma.company.findMany({ include: { categories: { include: { subCategories: true } } } });
   const companyByName = new Map(companies.map((c) => [c.name.toLowerCase(), c.id]));
   const categoriesByCompany = new Map<string, Map<string, string>>();
+  const categoriesByCompanyByImportReference = new Map<string, Map<string, string>>();
   const subCategoriesByCategory = new Map<string, Map<string, string>>();
+  const subCategoriesByCategoryByImportReference = new Map<string, Map<string, string>>();
+  const categoryNameById = new Map<string, string>();
+  const subCategoryNameById = new Map<string, string>();
+  const subCategoryParentCategoryId = new Map<string, string>();
   for (const c of companies) {
     categoriesByCompany.set(c.id, new Map(c.categories.map((cat) => [cat.name.toLowerCase(), cat.id])));
+    categoriesByCompanyByImportReference.set(
+      c.id,
+      new Map(
+        c.categories
+          .filter((cat) => cat.importReference && cat.importReference.trim())
+          .map((cat) => [cat.importReference!.trim().toLowerCase(), cat.id])
+      )
+    );
     for (const cat of c.categories) {
+      categoryNameById.set(cat.id, cat.name);
       subCategoriesByCategory.set(cat.id, new Map(cat.subCategories.map((s) => [s.name.toLowerCase(), s.id])));
+      subCategoriesByCategoryByImportReference.set(
+        cat.id,
+        new Map(
+          cat.subCategories
+            .filter((s) => s.importReference && s.importReference.trim())
+            .map((s) => [s.importReference!.trim().toLowerCase(), s.id])
+        )
+      );
+      for (const s of cat.subCategories) {
+        subCategoryNameById.set(s.id, s.name);
+        subCategoryParentCategoryId.set(s.id, cat.id);
+      }
     }
   }
 
@@ -285,11 +313,15 @@ export async function analyzeVariableProductImport(
       continue;
     }
 
+    const categoryLookup =
+      mapping.categoryMatchBy === "importReference"
+        ? (categoriesByCompanyByImportReference.get(company.id!) ?? new Map())
+        : (categoriesByCompany.get(company.id!) ?? new Map());
     const category = resolveClassificationValue(
-      "Category",
+      mapping.categoryMatchBy === "importReference" ? "Category (Import Reference)" : "Category",
       mapping.classification.category,
       firstRow,
-      categoriesByCompany.get(company.id!) ?? new Map(),
+      categoryLookup,
       true
     );
     if (!category.ok) {
@@ -297,15 +329,27 @@ export async function analyzeVariableProductImport(
       continue;
     }
 
+    const subCategoryLookup =
+      mapping.subCategoryMatchBy === "importReference"
+        ? (subCategoriesByCategoryByImportReference.get(category.id!) ?? new Map())
+        : (subCategoriesByCategory.get(category.id!) ?? new Map());
     const subCategory = resolveClassificationValue(
-      "Sub-Category",
+      mapping.subCategoryMatchBy === "importReference" ? "Sub-Category (Import Reference)" : "Sub-Category",
       mapping.classification.subCategory,
       firstRow,
-      subCategoriesByCategory.get(category.id!) ?? new Map(),
+      subCategoryLookup,
       false
     );
     if (!subCategory.ok) {
       errors.push({ rowNumber: firstRowNumber, modelNumber, reason: subCategory.reason });
+      continue;
+    }
+    if (subCategory.id && subCategoryParentCategoryId.get(subCategory.id) !== category.id) {
+      errors.push({
+        rowNumber: firstRowNumber,
+        modelNumber,
+        reason: `Sub-Category "${subCategoryNameById.get(subCategory.id) ?? subCategory.id}" does not belong to Category "${categoryNameById.get(category.id!) ?? category.id}"`,
+      });
       continue;
     }
 
