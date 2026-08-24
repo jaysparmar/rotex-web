@@ -29,6 +29,7 @@ export default async function AdminProductsPage({
       include: {
         company: { select: { name: true } },
         category: { select: { name: true } },
+        subCategory: { select: { name: true } },
         _count: { select: { variants: true } },
       },
     }),

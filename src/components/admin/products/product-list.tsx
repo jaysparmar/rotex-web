@@ -42,6 +42,7 @@ type ProductRow = {
   productType: string;
   company: { name: string };
   category: { name: string };
+  subCategory: { name: string } | null;
   variantCount: number;
 };
 
@@ -395,7 +396,7 @@ export function ProductList({
               <th className="py-2.5 pr-3 font-medium">Product</th>
               <th className="py-2.5 pr-3 font-medium">Model Number</th>
               <th className="py-2.5 pr-3 font-medium">Family</th>
-              <th className="py-2.5 pr-3 font-medium">Company / Category</th>
+              <th className="py-2.5 pr-3 font-medium">Company / Category / Subcategory</th>
               <th className="py-2.5 pr-3 font-medium">Type</th>
               <th className="py-2.5 pr-3 font-medium">Variants</th>
               <th className="py-2.5 pr-4 font-medium text-right">Actions</th>
@@ -441,6 +442,7 @@ export function ProductList({
                 </td>
                 <td className="py-2.5 pr-3 text-muted-foreground">
                   {product.company.name} / {product.category.name}
+                  {product.subCategory ? ` / ${product.subCategory.name}` : ""}
                 </td>
                 <td className="py-2.5 pr-3 capitalize text-muted-foreground">{product.productType}</td>
                 <td className="py-2.5 pr-3">
