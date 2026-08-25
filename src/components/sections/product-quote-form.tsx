@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import { useForm, Controller, type Control } from "react-hook-form";
+import { useForm, Controller, type Control, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 
@@ -28,28 +29,13 @@ type RequestType = "datasheet" | "enquiry";
 
 const COUNTRIES = ["United States", "India", "UAE", "Saudi Arabia", "United Kingdom", "Germany"];
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// ── Shared submit logic ─────────────────────────────────────────────────────────
 
-export function ProductQuoteForm({
-  productCode,
-  productName,
-  industries,
-}: {
-  productCode: string;
-  productName: string;
-  industries: string[];
-}) {
+function useQuoteForm(productCode: string, productName: string) {
   const [submitError, setSubmitError] = useState<string>();
   const [requestType, setRequestType] = useState<RequestType>("enquiry");
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  });
+  const form = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(undefined);
@@ -72,119 +58,210 @@ export function ProductQuoteForm({
     }
   };
 
+  return { form, submitError, setRequestType, onSubmit };
+}
+
+// ── Form fields (shared between inline section and sheet) ───────────────────────
+
+function QuoteFormFields({
+  form,
+  submitError,
+  setRequestType,
+  onSubmit,
+  industries,
+}: {
+  form: UseFormReturn<FormData>;
+  submitError: string | undefined;
+  setRequestType: (type: RequestType) => void;
+  onSubmit: (data: FormData) => void;
+  industries: string[];
+}) {
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting, isSubmitSuccessful },
+  } = form;
+
   return (
-    <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
-        <div className="flex lg:w-116 shrink-0 flex-col gap-4">
-          <h2 className="text-gradient-orange-dark text-3xl lg:text-5xl font-normal font-montserrat leading-tight">
-            Request a Quote
-          </h2>
-          <p className="text-stone-500 text-base font-medium font-montserrat leading-6">
-            Submit your application details to receive accurate pricing, lead time, and configuration options
-          </p>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+      <Field label="Full Name" error={errors.fullName?.message}>
+        <input {...register("fullName")} placeholder="e.g. John Doe" className={inputCls(!!errors.fullName)} />
+      </Field>
+
+      <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
+        <Field label="Industry" error={errors.industry?.message} className="flex-1">
+          <FormSelect
+            control={control}
+            name="industry"
+            placeholder="Select"
+            options={industries}
+            hasError={!!errors.industry}
+          />
+        </Field>
+        <Field label="Company" className="flex-1">
+          <input {...register("company")} placeholder="e.g. Rotex automation" className={inputCls(false)} />
+        </Field>
+      </div>
+
+      <div className="flex flex-col gap-5 sm:flex-row">
+        <div className="flex-1 flex flex-col gap-2">
+          <label className={labelCls}>Phone number</label>
+          <div className={`flex h-12 bg-gray-50 rounded-xl shadow-[0px_0px_0px_2px_rgba(0,0,0,0.05)] outline outline-1 -outline-offset-1 overflow-hidden ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
+            <div className="px-3 border-r border-gray-200 flex items-center gap-2 shrink-0">
+              <span className="text-stone-900 text-sm font-medium font-montserrat leading-5">+91</span>
+              <ChevronDown />
+            </div>
+            <input
+              {...register("phone")}
+              type="tel"
+              placeholder="Enter phone number"
+              className={`flex-1 px-4 bg-transparent ${placeholderCls} text-stone-900 outline-none`}
+            />
+          </div>
+          {errors.phone && <p className={errorCls}>{errors.phone.message}</p>}
         </div>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="w-full lg:max-w-158 p-5 lg:p-7 bg-white rounded-[20px] shadow-[0px_1px_3px_0px_rgba(0,0,0,0.10),0px_1px_2px_-1px_rgba(0,0,0,0.10)] outline outline-1 -outline-offset-1 outline-neutral-200 flex flex-col gap-6"
-        >
-          <Field label="Full Name" error={errors.fullName?.message}>
-            <input {...register("fullName")} placeholder="e.g. John Doe" className={inputCls(!!errors.fullName)} />
-          </Field>
+        <Field label="Email" error={errors.email?.message} className="flex-1">
+          <input {...register("email")} type="email" placeholder="e.g. abc@gmail.com" className={inputCls(!!errors.email)} />
+        </Field>
+      </div>
 
-          <div className="flex flex-col gap-5 lg:flex-row lg:gap-6">
-            <Field label="Industry" error={errors.industry?.message} className="flex-1">
-              <FormSelect
-                control={control}
-                name="industry"
-                placeholder="Select"
-                options={industries}
-                hasError={!!errors.industry}
-              />
-            </Field>
-            <Field label="Company" className="flex-1">
-              <input {...register("company")} placeholder="e.g. Rotex automation" className={inputCls(false)} />
-            </Field>
-          </div>
+      <div className="flex flex-col gap-5 sm:flex-row">
+        <Field label="Country" error={errors.country?.message} className="flex-1">
+          <FormSelect
+            control={control}
+            name="country"
+            placeholder="Select"
+            options={COUNTRIES}
+            hasError={!!errors.country}
+          />
+        </Field>
+        <Field label="City" error={errors.city?.message} className="flex-1">
+          <input {...register("city")} placeholder="Select City" className={selectLikeCls(!!errors.city)} />
+        </Field>
+      </div>
 
-          <div className="flex flex-col gap-5 lg:flex-row">
-            <div className="flex-1 flex flex-col gap-2">
-              <label className={labelCls}>Phone number</label>
-              <div className={`flex h-12 bg-gray-50 rounded-xl shadow-[0px_0px_0px_2px_rgba(0,0,0,0.05)] outline outline-1 -outline-offset-1 overflow-hidden ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
-                <div className="px-3 border-r border-gray-200 flex items-center gap-2 shrink-0">
-                  <span className="text-stone-900 text-sm font-medium font-montserrat leading-5">+91</span>
-                  <ChevronDown />
-                </div>
-                <input
-                  {...register("phone")}
-                  type="tel"
-                  placeholder="Enter phone number"
-                  className={`flex-1 px-4 bg-transparent ${placeholderCls} text-stone-900 outline-none`}
-                />
-              </div>
-              {errors.phone && <p className={errorCls}>{errors.phone.message}</p>}
-            </div>
+      <Field label="Quantity Requirement">
+        <input {...register("quantity")} placeholder="e.g 500" className={inputCls(false)} />
+      </Field>
 
-            <Field label="Email" error={errors.email?.message} className="flex-1">
-              <input {...register("email")} type="email" placeholder="e.g. abc@gmail.com" className={inputCls(!!errors.email)} />
-            </Field>
-          </div>
+      <Field label="Inquiry Details" error={errors.message?.message}>
+        <textarea
+          {...register("message")}
+          rows={4}
+          placeholder="Outline your application requirements and specifications..."
+          className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 outline-none resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
+        />
+      </Field>
 
-          <div className="flex flex-col gap-5 lg:flex-row">
-            <Field label="Country" error={errors.country?.message} className="flex-1">
-              <FormSelect
-                control={control}
-                name="country"
-                placeholder="Select"
-                options={COUNTRIES}
-                hasError={!!errors.country}
-              />
-            </Field>
-            <Field label="City" error={errors.city?.message} className="flex-1">
-              <input {...register("city")} placeholder="Select City" className={selectLikeCls(!!errors.city)} />
-            </Field>
-          </div>
+      {submitError && <p className="text-sm font-medium font-montserrat text-red-600">{submitError}</p>}
 
-          <Field label="Quantity Requirement">
-            <input {...register("quantity")} placeholder="e.g 500" className={inputCls(false)} />
-          </Field>
+      {isSubmitSuccessful ? (
+        <p className="text-sm font-medium font-montserrat text-green-600">
+          Enquiry sent! We&apos;ll be in touch soon.
+        </p>
+      ) : (
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            onClick={() => setRequestType("datasheet")}
+            className="px-6 py-3.5 bg-stone-900 rounded-full flex justify-center items-center gap-5 text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-800 transition-colors disabled:opacity-60"
+          >
+            Email me a Datasheet
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            onClick={() => setRequestType("enquiry")}
+            className="px-6 py-3.5 bg-orange-600 rounded-full flex justify-center items-center gap-5 text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-orange-700 transition-colors disabled:opacity-60"
+          >
+            {isSubmitting ? "Sending…" : "Send Enquiry"}
+          </button>
+        </div>
+      )}
+    </form>
+  );
+}
 
-          <Field label="Inquiry Details" error={errors.message?.message}>
-            <textarea
-              {...register("message")}
-              rows={4}
-              placeholder="Outline your application requirements and specifications..."
-              className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 outline-none resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
-            />
-          </Field>
+// ── Inline section (simple products) ─────────────────────────────────────────────
 
-          {submitError && <p className="text-sm font-medium font-montserrat text-red-600">{submitError}</p>}
+export function ProductQuoteFormInline({
+  productCode,
+  productName,
+  industries,
+}: {
+  productCode: string;
+  productName: string;
+  industries: string[];
+}) {
+  const { form, submitError, setRequestType, onSubmit } = useQuoteForm(productCode, productName);
 
-          {isSubmitSuccessful ? (
-            <p className="text-sm font-medium font-montserrat text-green-600">
-              Enquiry sent! We&apos;ll be in touch soon.
-            </p>
-          ) : (
-            <div className="flex flex-wrap items-center gap-6">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                onClick={() => setRequestType("datasheet")}
-                className="w-56 px-6 py-3.5 bg-stone-900 rounded-full flex justify-center items-center gap-5 text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-800 transition-colors disabled:opacity-60"
-              >
-                Email me a Datasheet
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                onClick={() => setRequestType("enquiry")}
-                className="px-6 py-3.5 bg-orange-600 rounded-full flex justify-center items-center gap-5 text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-orange-700 transition-colors disabled:opacity-60"
-              >
-                {isSubmitting ? "Sending…" : "Send Enquiry"}
-              </button>
-            </div>
-          )}
-        </form>
+  return (
+    <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+      <div className="flex lg:w-116 shrink-0 flex-col gap-4">
+        <h2 className="text-gradient-orange-dark text-3xl lg:text-5xl font-normal font-montserrat leading-tight">
+          Request a Quote
+        </h2>
+        <p className="text-stone-500 text-base font-medium font-montserrat leading-6">
+          Submit your application details to receive accurate pricing, lead time, and configuration options
+        </p>
+      </div>
+
+      <div className="w-full lg:max-w-158 p-5 lg:p-7 bg-white rounded-[20px] shadow-[0px_1px_3px_0px_rgba(0,0,0,0.10),0px_1px_2px_-1px_rgba(0,0,0,0.10)] outline outline-1 -outline-offset-1 outline-neutral-200">
+        <QuoteFormFields
+          form={form}
+          submitError={submitError}
+          setRequestType={setRequestType}
+          onSubmit={onSubmit}
+          industries={industries}
+        />
+      </div>
     </div>
+  );
+}
+
+// ── Sheet / drawer (variant products) ─────────────────────────────────────────────
+
+export function ProductQuoteFormSheet({
+  open,
+  onOpenChange,
+  productCode,
+  productName,
+  industries,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  productCode: string;
+  productName: string;
+  industries: string[];
+}) {
+  const { form, submitError, setRequestType, onSubmit } = useQuoteForm(productCode, productName);
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="w-full data-[side=right]:sm:max-w-2xl overflow-y-auto p-0 gap-0">
+        <SheetHeader className="p-6 pb-0 gap-2">
+          <SheetTitle className="text-orange-600 text-3xl font-normal font-montserrat leading-tight">
+            Request a Quote
+          </SheetTitle>
+          <SheetDescription className="text-stone-500 text-sm font-medium font-montserrat leading-6">
+            Submit your application details to receive accurate pricing, lead time, and configuration options
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className="p-6">
+          <QuoteFormFields
+            form={form}
+            submitError={submitError}
+            setRequestType={setRequestType}
+            onSubmit={onSubmit}
+            industries={industries}
+          />
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 

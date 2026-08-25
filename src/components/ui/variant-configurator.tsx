@@ -25,9 +25,11 @@ function firstVariantSelection(variants: ProductVariant[]): Selection {
 export function VariantConfigurator({
   variants,
   onVariantChange,
+  onRequestQuote,
 }: {
   variants: ProductVariant[];
   onVariantChange: (variant: ProductVariant) => void;
+  onRequestQuote: () => void;
 }) {
   const [selection, setSelection] = useState<Selection>(() => firstVariantSelection(variants));
 
@@ -109,6 +111,7 @@ export function VariantConfigurator({
 
       <button
         type="button"
+        onClick={onRequestQuote}
         className="w-fit px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
       >
         <span className="text-center text-white text-sm font-semibold font-montserrat uppercase leading-5">

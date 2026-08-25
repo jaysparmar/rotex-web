@@ -1,46 +1,26 @@
 "use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { IoChevronForwardOutline, IoChevronBackOutline } from "react-icons/io5";
-import type { StaticImageData } from "next/image";
 import { cn } from "@/lib/utils";
 import { ProductListCard } from "@/components/ui/product-list-card";
 import { FilterCombobox } from "@/components/ui/filter-combobox";
 import { PageHero } from "@/components/ui/page-hero";
+import { ALL_PRODUCT_DETAILS } from "@/lib/product-detail-data";
 import breadcrumbBg from "@/assets/Images/breadcurmbBackgrounds/default_bg.jpg";
-import product1 from "@/assets/Images/products/product_1.png";
-import product2 from "@/assets/Images/products/product_2.png";
-import product3 from "@/assets/Images/products/product_3.png";
-import product4 from "@/assets/Images/products/product_4.png";
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ── Data ─────────────────────────────────────────────────────────────────────
+// Sourced from the same catalog as the product detail pages, so every card
+// here links to a real, working detail page and every category tab reflects
+// what actually exists in the catalog.
 
-type Product = {
-  slug: string;
-  code: string;
-  name: string;
-  category: string;
-  image: StaticImageData;
-  tags: string[];
-};
-
-// ── Dummy data ────────────────────────────────────────────────────────────────
-
-const productImages = [product1, product2, product3, product4];
-
-const ALL_PRODUCTS: Product[] = [
-  { slug: "pneumatic-scotch-yoke-actuator-20101",   code: "20101", name: "Pneumatic Scotch Yoke Actuator", category: "Actuators",        image: product3, tags: [] },
-  { slug: "direct-acting-solenoid-valve-20101",     code: "20101", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product1, tags: ["2 Way", "Normally Close"] },
-  { slug: "direct-acting-solenoid-valve-20102",     code: "20102", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product2, tags: ["2 Way", "Normally Close"] },
-  { slug: "direct-acting-solenoid-valve-20103",     code: "20103", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product4, tags: ["2 Way", "Normally Close"] },
-  { slug: "direct-acting-solenoid-valve-20104",     code: "20104", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product1, tags: ["2 Way", "Normally Close"] },
-  { slug: "direct-acting-solenoid-valve-20105",     code: "20105", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product2, tags: ["2 Way", "Normally Close"] },
-  { slug: "direct-acting-solenoid-valve-20106",     code: "20106", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product3, tags: ["2 Way", "Normally Close"] },
-  { slug: "direct-acting-solenoid-valve-20107",     code: "20107", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product4, tags: ["2 Way", "Normally Close"] },
-  { slug: "direct-acting-solenoid-valve-20108",     code: "20108", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product1, tags: ["2 Way", "Normally Close"] },
-  { slug: "direct-acting-solenoid-valve-20109",     code: "20109", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product2, tags: ["2 Way", "Normally Close"] },
-  { slug: "direct-acting-solenoid-valve-20110",     code: "20110", name: "Direct Acting Solenoid Valve",   category: "Solenoid Valve",   image: product3, tags: ["2 Way", "Normally Close"] },
-  { slug: "angle-seat-valve-20201",                 code: "20201", name: "Angle Seat Valve",               category: "Angle Seat Valve", image: product4, tags: ["2 Way", "Normally Open"] },
-];
+const ALL_PRODUCTS = ALL_PRODUCT_DETAILS.map((p) => ({
+  slug: p.slug,
+  code: p.code,
+  name: p.name,
+  category: p.category,
+  image: p.images[0],
+  tags: p.tags,
+}));
 
 const TABS = ["All Products", "Solenoid Valve", "Angle Seat Valve", "Actuators", "Positioners", "Automotive Solutions"];
 

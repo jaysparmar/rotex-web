@@ -6,14 +6,25 @@ import { useSearchParams } from "next/navigation";
 import { ProductGallery } from "@/components/ui/product-gallery";
 import { VariantConfigurator } from "@/components/ui/variant-configurator";
 import { ProductTabs } from "@/components/ui/product-tabs";
-import { ProductQuoteForm } from "@/components/sections/product-quote-form";
+import { ProductQuoteFormInline, ProductQuoteFormSheet } from "@/components/sections/product-quote-form";
 import { crumbsFromCategory } from "@/lib/breadcrumb";
 import type { ProductDetail, ProductVariant } from "@/lib/product-detail-data";
 
 export function ProductDetailContent({ product }: { product: ProductDetail }) {
+  const isVariable = product.productType === "variable" && !!product.variants;
+
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
-    product.productType === "variable" ? product.variants?.[0] : undefined
+    isVariable ? product.variants?.[0] : undefined
   );
+  const [quoteOpen, setQuoteOpen] = useState(false);
+
+  const handleHeroQuoteClick = () => {
+    if (isVariable) {
+      setQuoteOpen(true);
+    } else {
+      document.getElementById("quote-form")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const searchParams = useSearchParams();
   const navCrumbs = crumbsFromCategory(searchParams.get("category"));
@@ -102,6 +113,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
 
           <button
             type="button"
+            onClick={handleHeroQuoteClick}
             className="w-60 px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
           >
             <span className="text-center text-white text-sm font-semibold font-montserrat uppercase">
@@ -114,24 +126,43 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
       </div>
 
       {/* Variant configurator + tabs */}
-      {product.productType === "variable" && product.variants ? (
-        <div className="flex justify-between items-start gap-10 flex-wrap lg:flex-nowrap">
-          <div className="w-full lg:max-w-120">
-            <VariantConfigurator variants={product.variants} onVariantChange={setSelectedVariant} />
-          </div>
-          <div className="w-full lg:max-w-170">
-            <ProductTabs features={features} specifications={specifications} downloads={downloads} />
+      {isVariable && product.variants ? (
+        <div className="flex flex-col gap-7">
+          <h2 className="text-stone-900 text-4xl font-normal font-montserrat leading-10">Configure Product Variant</h2>
+          <div className="flex justify-between items-start gap-10 flex-wrap lg:flex-nowrap">
+            <div className="w-full lg:max-w-120">
+              <VariantConfigurator
+                variants={product.variants}
+                onVariantChange={setSelectedVariant}
+                onRequestQuote={() => setQuoteOpen(true)}
+              />
+            </div>
+            <div className="w-full lg:max-w-170">
+              <ProductTabs features={features} specifications={specifications} downloads={downloads} />
+            </div>
           </div>
         </div>
       ) : (
         <ProductTabs features={features} specifications={specifications} downloads={downloads} />
       )}
 
-      <ProductQuoteForm
-        productCode={product.code}
-        productName={product.name}
-        industries={product.industriesServed}
-      />
+      {isVariable ? (
+        <ProductQuoteFormSheet
+          open={quoteOpen}
+          onOpenChange={setQuoteOpen}
+          productCode={product.code}
+          productName={product.name}
+          industries={product.industriesServed}
+        />
+      ) : (
+        <div id="quote-form">
+          <ProductQuoteFormInline
+            productCode={product.code}
+            productName={product.name}
+            industries={product.industriesServed}
+          />
+        </div>
+      )}
     </div>
   );
 }
