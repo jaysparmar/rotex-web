@@ -17,7 +17,7 @@ export function ProductTabs({
   specifications: SpecItem[];
   downloads: DownloadItem[];
 }) {
-  const [activeTab, setActiveTab] = useState<Tab>("Downloads");
+  const [activeTab, setActiveTab] = useState<Tab>("Features");
   const [category, setCategory] = useState("All Documents");
 
   const categories = useMemo(() => ["All Documents", ...Array.from(new Set(downloads.map((d) => d.category)))], [
@@ -29,14 +29,14 @@ export function ProductTabs({
 
   return (
     <div className="w-full flex flex-col gap-8">
-      <div className="border-b border-stone-300 flex items-start gap-5">
+      <div className="no-scrollbar border-b border-stone-300 flex items-start gap-5 overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab}
             type="button"
             onClick={() => setActiveTab(tab)}
             className={cn(
-              "px-2.5 py-5 border-b-2 -mb-px text-base font-semibold font-montserrat leading-6 transition-colors",
+              "shrink-0 whitespace-nowrap px-2.5 py-5 border-b-2 -mb-px text-base sm:text-lg font-semibold font-montserrat leading-6 transition-colors",
               activeTab === tab ? "border-red-600 text-red-600" : "border-transparent text-stone-900 hover:text-red-600"
             )}
           >
@@ -46,15 +46,22 @@ export function ProductTabs({
       </div>
 
       {activeTab === "Features" && (
-        <p className="text-stone-600 text-sm font-medium font-montserrat leading-6">{features}</p>
+        <p className="max-w-170 text-stone-900 text-sm font-medium font-montserrat leading-5">{features}</p>
       )}
 
       {activeTab === "Specifications" && (
-        <div className="flex flex-col gap-px rounded-lg overflow-hidden border border-neutral-200">
+        <div className="max-h-137.5 flex flex-col overflow-y-auto">
           {specifications.map((spec) => (
-            <div key={spec.key} className="flex justify-between gap-4 px-6 py-3 bg-white odd:bg-stone-50">
-              <span className="text-neutral-400 text-xs font-semibold font-montserrat uppercase">{spec.key}</span>
-              <span className="text-zinc-800 text-sm font-medium font-montserrat">{spec.value}</span>
+            <div
+              key={spec.key}
+              className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-14 py-3.5 border-t border-neutral-200 last:border-b"
+            >
+              <span className="sm:w-48 shrink-0 text-stone-900 text-sm font-semibold font-montserrat leading-5">
+                {spec.key}
+              </span>
+              <span className="flex-1 text-stone-900 text-sm font-medium font-montserrat leading-5">
+                {spec.value}
+              </span>
             </div>
           ))}
         </div>
@@ -78,7 +85,7 @@ export function ProductTabs({
             {visibleDownloads.map((d, i) => (
               <div
                 key={i}
-                className="px-6 py-3 bg-white rounded-[10px] outline outline-1 -outline-offset-1 outline-neutral-200 flex justify-between items-start gap-4"
+                className="px-6 py-3 bg-white rounded-[10px] outline outline-1 -outline-offset-1 outline-neutral-200 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4"
               >
                 <div className="flex-1 flex flex-col gap-1.5">
                   <span className="text-neutral-400 text-xs font-semibold font-montserrat uppercase">
@@ -88,7 +95,7 @@ export function ProductTabs({
                 </div>
                 <a
                   href={d.url}
-                  className="px-5 py-2 bg-stone-100 rounded-full flex items-center gap-2.5 shrink-0 hover:bg-stone-200 transition-colors"
+                  className="self-start px-5 py-2 bg-stone-100 rounded-full shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] flex items-center gap-2.5 shrink-0 hover:bg-stone-200 transition-colors"
                 >
                   <IoDownloadOutline className="text-red-600" size={18} />
                   <span className="text-red-600 text-sm font-semibold font-montserrat">Download</span>

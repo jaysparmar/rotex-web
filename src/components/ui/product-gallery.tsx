@@ -16,7 +16,7 @@ export function ProductGallery({ images, alt }: { images: StaticImageData[]; alt
   };
 
   return (
-    <div className="w-full aspect-[630/530] max-w-158 bg-neutral-100 rounded-3xl relative overflow-hidden">
+    <div className="w-full aspect-[630/530] max-w-158 bg-neutral-100 rounded-3xl relative">
       <div className="absolute inset-0 flex items-center justify-center p-14">
         <div className={cn("relative w-full h-full transition-transform duration-200", zoomed && "scale-125")}>
           <Image src={images[activeIndex]} alt={alt} fill className="object-contain" sizes="630px" />
@@ -24,49 +24,49 @@ export function ProductGallery({ images, alt }: { images: StaticImageData[]; alt
       </div>
 
       {/* Zoom controls */}
-      <div className="absolute top-5 right-5 flex items-center gap-2.5">
+      <div className="absolute top-4 right-4 flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => setZoomed(true)}
           aria-label="Zoom in"
-          className="size-8 flex items-center justify-center text-stone-500 hover:text-stone-900 transition-colors"
+          className="size-7 flex items-center justify-center rounded-md bg-white border border-neutral-200 text-stone-500 hover:text-stone-900 transition-colors"
         >
-          <IoAddOutline size={20} />
+          <IoAddOutline size={16} />
         </button>
         <button
           type="button"
           onClick={() => setZoomed(false)}
           aria-label="Zoom out"
-          className="size-8 flex items-center justify-center text-stone-500 hover:text-stone-900 transition-colors"
+          className="size-7 flex items-center justify-center rounded-md bg-white border border-neutral-200 text-stone-500 hover:text-stone-900 transition-colors"
         >
-          <IoRemoveOutline size={20} />
+          <IoRemoveOutline size={16} />
         </button>
       </div>
 
       {/* Thumbnails */}
       {showArrows && (
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-5">
+        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
           <button
             type="button"
             onClick={() => goTo(-1)}
             aria-label="Previous image"
-            className="size-6 rounded-full bg-white flex items-center justify-center text-stone-900 shadow"
+            className="size-8 flex items-center justify-center text-neutral-400 hover:text-stone-900 border rounded-full bg-white border-neutral-500 hover:border-stone-900 transition-colors"
           >
-            <IoChevronBackOutline size={14} />
+            <IoChevronBackOutline size={16} />
           </button>
 
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-2">
             {images.map((img, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => setActiveIndex(i)}
                 className={cn(
-                  "w-16 h-20 relative rounded-md overflow-hidden border bg-white",
-                  i === activeIndex ? "border-stone-900" : "border-zinc-300"
+                  "size-16 relative rounded-lg overflow-hidden border bg-white",
+                  i === activeIndex ? "border-stone-900" : "border-transparent"
                 )}
               >
-                <Image src={img} alt="" fill className="object-contain p-1" sizes="64px" />
+                <Image src={img} alt="" fill className="object-contain p-1.5" sizes="64px" />
               </button>
             ))}
           </div>
@@ -75,9 +75,9 @@ export function ProductGallery({ images, alt }: { images: StaticImageData[]; alt
             type="button"
             onClick={() => goTo(1)}
             aria-label="Next image"
-            className="size-6 rounded-full bg-white flex items-center justify-center text-stone-900 shadow"
+            className="size-8 flex items-center justify-center text-neutral-400 hover:text-stone-900 border rounded-full bg-white border-neutral-500 hover:border-stone-900 transition-colors"
           >
-            <IoChevronForwardOutline size={14} />
+            <IoChevronForwardOutline size={16} />
           </button>
         </div>
       )}

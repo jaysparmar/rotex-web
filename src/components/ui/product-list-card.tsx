@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { StaticImageData } from "next/image";
+import { productHref } from "@/lib/breadcrumb";
 
 export type ProductListCardProps = {
   slug: string;
@@ -14,7 +15,7 @@ export type ProductListCardProps = {
 export function ProductListCard({ slug, code, name, category, image, tags = [] }: ProductListCardProps) {
   return (
     <Link
-      href={`/product/${slug}`}
+      href={productHref(slug, category)}
       className="group w-full h-96 p-5 bg-white hover:bg-stone-50 rounded-2xl outline outline-1 -outline-offset-1 outline-neutral-200 hover:outline-primary flex flex-col justify-between items-start shadow-[0px_2px_0px_0px_rgba(229,229,229,1)] hover:shadow-[0px_4px_0px_0px_rgba(239,62,35,1)] hover:-translate-y-0.5 transition-all duration-200"
     >
       {/* Top: category badge + product image */}
