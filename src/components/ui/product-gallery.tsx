@@ -5,7 +5,7 @@ import Image, { type StaticImageData } from "next/image";
 import { IoChevronBackOutline, IoChevronForwardOutline, IoAddOutline, IoRemoveOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 
-export function ProductGallery({ images, alt }: { images: StaticImageData[]; alt: string }) {
+export function ProductGallery({ images, alt }: { images: (StaticImageData | string)[]; alt: string }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [zoomed, setZoomed] = useState(false);
 

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Field, TextField } from "@/components/admin/form-fields";
 import { cn } from "@/lib/utils";
 import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
+import { adminFetch } from "@/lib/admin-fetch";
 
 export function MediaField({
   name,
@@ -40,7 +41,7 @@ export function MediaField({
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const res = await adminFetch("/api/admin/upload", { method: "POST", body: formData });
       const json = await res.json();
 
       if (!json.success) {

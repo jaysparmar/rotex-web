@@ -9,6 +9,7 @@ import { TextField, TextAreaField, FieldGrid, Field } from "@/components/admin/f
 import { Button } from "@/components/ui/button";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveAboutSection } from "@/app/admin/(dashboard)/about/actions";
+import { adminFetch } from "@/lib/admin-fetch";
 
 type CtaButton = { label: string; href: string };
 type FormValues = { enabled: boolean; title: string; description: string; image: string; cta: CtaButton };
@@ -33,7 +34,7 @@ export function GrowWithRotexForm({
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const res = await adminFetch("/api/admin/upload", { method: "POST", body: formData });
       const json = await res.json();
       if (json.success) form.setValue("image", json.data.url, { shouldDirty: true });
     } finally {

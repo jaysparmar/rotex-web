@@ -5,6 +5,7 @@ import { TrustedLeaders } from "@/components/sections/trusted-leaders";
 import { RedefiningSection } from "@/components/sections/redefining-section";
 import { IndustriesSection } from "@/components/sections/industries-section";
 import { ProductsSection } from "@/components/sections/products-section";
+import { getFeaturedProducts } from "@/lib/products-data";
 import { CustomerStoriesSection } from "@/components/sections/customer-stories-section";
 import { LearnSection } from "@/components/sections/learn-section";
 import { CtaSection } from "@/components/sections/cta-section";
@@ -64,6 +65,7 @@ export default async function Home() {
     .map((id) => industriesList?.industries.find((i) => i.id === id))
     .filter((i): i is IndustryCard => Boolean(i));
   const products = await fetchHomeSection<object>("products");
+  const featuredProducts = await getFeaturedProducts();
   const certifications = await fetchHomeSection<CertificationsData>("certifications");
   const customerStories = await fetchHomeSection<CustomerStoriesData>("customer-stories");
   const resources = await fetchHomeSection<ResourcesData>("resources");
@@ -113,7 +115,10 @@ export default async function Home() {
     {
       id: "products",
       order: products?.order ?? 0,
-      node: products?.enabled ? <ProductsSection key="products" /> : null,
+      node:
+        products?.enabled && featuredProducts.length > 0 ? (
+          <ProductsSection key="products" products={featuredProducts} />
+        ) : null,
     },
     {
       id: "certifications",

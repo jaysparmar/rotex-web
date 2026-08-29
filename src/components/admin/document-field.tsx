@@ -5,6 +5,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { Upload, Loader2, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, TextField } from "@/components/admin/form-fields";
+import { adminFetch } from "@/lib/admin-fetch";
 
 export function DocumentField({ name, label = "File" }: { name: string; label?: string }) {
   const form = useFormContext();
@@ -25,7 +26,7 @@ export function DocumentField({ name, label = "File" }: { name: string; label?: 
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const res = await adminFetch("/api/admin/upload", { method: "POST", body: formData });
       const json = await res.json();
 
       if (!json.success) {

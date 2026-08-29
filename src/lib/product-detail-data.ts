@@ -34,7 +34,7 @@ export type ProductDetail = {
   description: string;
   industriesServed: string[];
   certificates: string[];
-  images: StaticImageData[];
+  images: (StaticImageData | string)[];
   breadcrumb: Crumb[];
   productType: "simple" | "variable";
   // simple products only

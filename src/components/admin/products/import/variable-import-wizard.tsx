@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { adminFetch } from "@/lib/admin-fetch";
 import { PRODUCT_FAMILIES } from "@/lib/product-constants";
 import type { ColumnDestination, ImportGrid, VariableImportMapping, VariableImportSummary } from "@/lib/variable-product-import";
 import { ImportUploadStep } from "./import-upload-step";
@@ -21,7 +22,7 @@ type CommitResult = {
 type FieldOutcome<T> = { ok: true; config: T } | { ok: false; error: string };
 
 async function postImport<T>(path: "preview" | "commit", grid: ImportGrid, mapping: VariableImportMapping): Promise<T> {
-  const res = await fetch(`/api/admin/products/import/${path}`, {
+  const res = await adminFetch(`/api/admin/products/import/${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ grid, mapping }),

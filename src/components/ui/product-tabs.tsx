@@ -51,9 +51,9 @@ export function ProductTabs({
 
       {activeTab === "Specifications" && (
         <div className="max-h-137.5 flex flex-col overflow-y-auto">
-          {specifications.map((spec) => (
+          {specifications.map((spec, i) => (
             <div
-              key={spec.key}
+              key={`${spec.key}-${i}`}
               className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-14 py-3.5 border-t border-neutral-200 last:border-b"
             >
               <span className="sm:w-48 shrink-0 text-stone-900 text-sm font-semibold font-montserrat leading-5">

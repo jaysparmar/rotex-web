@@ -3,61 +3,12 @@ import { useRef } from "react";
 import Link from "next/link";
 import { ProductCard } from "@/components/ui/product-card";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
-import product1 from "@/assets/Images/products/product_1.png";
-import product2 from "@/assets/Images/products/product_2.png";
-import product3 from "@/assets/Images/products/product_3.png";
-import product4 from "@/assets/Images/products/product_4.png";
-
-const productImages = [product1, product2, product3, product4];
-
-const products = [
-  {
-    id: "solenoid-valve",
-    name: "Solenoid Valve",
-    description: "The Component Inside Valves That Cannot Fail",
-    href: "/products/solenoid-valve",
-  },
-  {
-    id: "angle-seat-valve",
-    name: "Angle Seat Valve",
-    description: "Durable flow control for demanding needs",
-    href: "/products/angle-seat-valve",
-  },
-  {
-    id: "actuators",
-    name: "Actuators",
-    description: "Powerful mechanical devices for valve movement",
-    href: "/products/actuators",
-  },
-  {
-    id: "positioners",
-    name: "Positioners",
-    description: "Precise, digital control for valve positioning",
-    href: "/products/positioners",
-  },
-  {
-    id: "controllers",
-    name: "Controllers",
-    description: "Smart process control for industrial systems",
-    href: "/products/controllers",
-  },
-  {
-    id: "sensors",
-    name: "Sensors",
-    description: "Accurate measurement for critical processes",
-    href: "/products/sensors",
-  },
-  {
-    id: "automation",
-    name: "Automation Systems",
-    description: "End-to-end automation for flow operations",
-    href: "/products/automation",
-  },
-].map((product, i) => ({ ...product, image: productImages[i % productImages.length] }));
+import { productHref } from "@/lib/breadcrumb";
+import type { ProductSummary } from "@/lib/products-data";
 
 const SCROLL_AMOUNT = 308; // card width (288) + gap (20)
 
-export function ProductsSection() {
+export function ProductsSection({ products }: { products: ProductSummary[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: "left" | "right") => {
@@ -107,7 +58,13 @@ export function ProductsSection() {
         }}
       >
         {products.map((product) => (
-          <ProductCard key={product.id} {...product} />
+          <ProductCard
+            key={product.slug}
+            name={product.name}
+            description={product.category}
+            image={product.image}
+            href={productHref(product.slug, product.category)}
+          />
         ))}
         {/* Trailing spacer so last card doesn't sit flush against viewport */}
         <div className="shrink-0 w-4" />

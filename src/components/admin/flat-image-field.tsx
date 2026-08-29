@@ -7,6 +7,7 @@ import { Field, TextField } from "@/components/admin/form-fields";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
+import { adminFetch } from "@/lib/admin-fetch";
 
 // Uploads to a flat string form path (e.g. "sidebarLogoLight"), unlike MediaField
 // which expects a nested { src, alt } object.
@@ -28,7 +29,7 @@ export function FlatImageField({ name, label }: { name: string; label: string })
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const res = await adminFetch("/api/admin/upload", { method: "POST", body: formData });
       const json = await res.json();
       if (!json.success) {
         setError(json.error?.message ?? "Upload failed");

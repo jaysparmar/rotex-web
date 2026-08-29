@@ -7,6 +7,7 @@ import { Field } from "@/components/admin/form-fields";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
+import { adminFetch } from "@/lib/admin-fetch";
 
 export function ImageUrlField({ name, label }: { name: string; label: string }) {
   const form = useFormContext();
@@ -27,7 +28,7 @@ export function ImageUrlField({ name, label }: { name: string; label: string }) 
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const res = await adminFetch("/api/admin/upload", { method: "POST", body: formData });
       const json = await res.json();
 
       if (!json.success) {

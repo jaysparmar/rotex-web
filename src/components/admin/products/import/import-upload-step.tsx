@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Field, SelectField } from "@/components/admin/form-fields";
 import { excelColumnLabel } from "@/lib/excel-columns";
+import { adminFetch } from "@/lib/admin-fetch";
 import type { SheetData } from "./types";
 
 export function ImportUploadStep({
@@ -36,7 +37,7 @@ export function ImportUploadStep({
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("/api/admin/products/import/parse", { method: "POST", body: formData });
+      const res = await adminFetch("/api/admin/products/import/parse", { method: "POST", body: formData });
       const json = await res.json();
       if (!json.success) throw new Error(json.error?.message ?? "Failed to parse file");
       onParsed(json.data.sheets as SheetData[]);

@@ -7,6 +7,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import { marked } from "marked";
 import "@/components/admin/resources/tinymce-theme.css";
 import { Field } from "@/components/admin/form-fields";
+import { adminFetch } from "@/lib/admin-fetch";
 
 function looksLikeHtml(value: string): boolean {
   return /<[a-z][\s\S]*>/i.test(value);
@@ -66,7 +67,7 @@ export function RichTextField({ name, label }: { name: string; label: string }) 
           images_upload_handler: async (blobInfo) => {
             const formData = new FormData();
             formData.append("file", blobInfo.blob(), blobInfo.filename());
-            const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+            const res = await adminFetch("/api/admin/upload", { method: "POST", body: formData });
             const json = await res.json();
             if (!json.success) throw new Error(json.error?.message ?? "Upload failed");
             return json.data.url as string;

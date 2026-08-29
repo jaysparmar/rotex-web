@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { TextField, FieldGrid, SwitchField, SelectField, Field } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
 import { SaveBar } from "@/components/admin/section-form-shell";
+import { adminFetch } from "@/lib/admin-fetch";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { slugify } from "@/lib/utils";
 import { createResource, updateResource } from "@/app/admin/(dashboard)/resources/actions";
@@ -232,7 +233,7 @@ function ContentField() {
           images_upload_handler: async (blobInfo) => {
             const formData = new FormData();
             formData.append("file", blobInfo.blob(), blobInfo.filename());
-            const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+            const res = await adminFetch("/api/admin/upload", { method: "POST", body: formData });
             const json = await res.json();
             if (!json.success) throw new Error(json.error?.message ?? "Upload failed");
             return json.data.url as string;
