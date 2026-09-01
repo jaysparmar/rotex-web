@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { apiSuccess, apiError } from "@/lib/api-response";
 
 const schema = z.object({
-  source: z.enum(["industry", "supplier", "contact"]).default("industry"),
+  source: z.enum(["industry", "supplier", "contact", "product-quote"]).default("industry"),
   industryName: z.string().min(1),
   fullName: z.string().min(2),
   enquiryType: z.string().min(1),

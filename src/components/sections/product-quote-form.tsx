@@ -42,9 +42,9 @@ function useQuoteForm(productCode: string, productName: string) {
 
     const body = new FormData();
     body.append("source", "product-quote");
-    body.append("requestType", requestType);
-    body.append("productCode", productCode);
-    body.append("productName", productName);
+    body.append("industryName", data.industry);
+    body.append("enquiryType", requestType);
+    body.append("product", `${productName} (${productCode})`);
     for (const [key, value] of Object.entries(data)) {
       if (value !== undefined) body.append(key, value);
     }
@@ -91,13 +91,21 @@ function QuoteFormFields({
 
       <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
         <Field label="Industry" error={errors.industry?.message} className="flex-1">
-          <FormSelect
-            control={control}
-            name="industry"
-            placeholder="Select"
-            options={industries}
-            hasError={!!errors.industry}
-          />
+          {industries.length > 0 ? (
+            <FormSelect
+              control={control}
+              name="industry"
+              placeholder="Select"
+              options={industries}
+              hasError={!!errors.industry}
+            />
+          ) : (
+            <input
+              {...register("industry")}
+              placeholder="e.g. Automotive"
+              className={inputCls(!!errors.industry)}
+            />
+          )}
         </Field>
         <Field label="Company" className="flex-1">
           <input {...register("company")} placeholder="e.g. Rotex automation" className={inputCls(false)} />

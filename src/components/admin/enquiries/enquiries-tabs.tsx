@@ -114,7 +114,20 @@ export function EnquiriesTabs({ industries, enquiries }: { industries: Industry[
     return nonSupplier.filter((e) => e.industryName === name);
   }
 
-  const filtered = enquiriesForTab(active);
+  const tabEnquiries = enquiriesForTab(active);
+
+  const productNames = Array.from(
+    new Set(
+      tabEnquiries
+        .map((e) => e.product)
+        .filter((p) => p && p !== NO_PRODUCT_PLACEHOLDER)
+    )
+  ).sort();
+
+  const [productFilter, setProductFilter] = useState("");
+  const filtered = productFilter
+    ? tabEnquiries.filter((e) => e.product === productFilter)
+    : tabEnquiries;
 
   return (
     <div className="space-y-4">
@@ -122,7 +135,10 @@ export function EnquiriesTabs({ industries, enquiries }: { industries: Industry[
         {tabs.map((name) => (
           <button
             key={name}
-            onClick={() => setActive(name)}
+            onClick={() => {
+              setActive(name);
+              setProductFilter("");
+            }}
             className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
               active === name
                 ? "border-primary text-primary"
@@ -134,6 +150,21 @@ export function EnquiriesTabs({ industries, enquiries }: { industries: Industry[
           </button>
         ))}
       </div>
+
+      {productNames.length > 0 && (
+        <select
+          value={productFilter}
+          onChange={(e) => setProductFilter(e.target.value)}
+          className="rounded-md border border-border bg-background px-3 py-1.5 text-sm"
+        >
+          <option value="">All products</option>
+          {productNames.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      )}
 
       {filtered.length === 0 ? (
         <p className="rounded-lg border border-border py-8 text-center text-sm text-muted-foreground">
