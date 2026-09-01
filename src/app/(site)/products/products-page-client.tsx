@@ -1,94 +1,215 @@
 "use client";
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRef, useEffect, useCallback, useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { IoChevronForwardOutline, IoChevronBackOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import { ProductListCard } from "@/components/ui/product-list-card";
 import { FilterCombobox } from "@/components/ui/filter-combobox";
 import { PageHero } from "@/components/ui/page-hero";
-import type { ProductSummary, CategoryWithCount } from "@/lib/products-data";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { PRODUCT_ATTRIBUTES, type ProductAttributeKey } from "@/lib/product-constants";
+import type { ProductSummary, CategoryWithCount, SubCategoryWithCount } from "@/lib/products-data";
 import breadcrumbBg from "@/assets/Images/breadcurmbBackgrounds/default_bg.jpg";
-
-// ── Filter config ─────────────────────────────────────────────────────────────
-// These pill/select filters are decorative placeholders (not wired to product
-// attributes yet) — kept as-is from the original design pending a real filter
-// pass over variant attributes (size, orifice, temp range, flow factor).
-
-const FILTER_PILLS: { key: string; label: string; options: string[] }[] = [
-  { key: "subType",       label: "Sub-type",      options: ["Standard", "Special", "Namur", "Pulse", "Gas", "Pneumatic", "Magnet"] },
-  { key: "operatingType", label: "Operating Type", options: ["Direct Acting", "Pilot Operated", "External Pilot Operated", "Air Operated"] },
-  { key: "actionType",    label: "Action Type",    options: ["Normally Close", "Normally Open", "Universal"] },
-];
-
-const FILTER_SELECTS: { key: string; label: string; placeholder: string; options: string[] }[] = [
-  { key: "portSize",    label: "Port Size",          placeholder: "Select Port Size",         options: ['1/8"', '1/4"', '3/8"', '1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"'] },
-  { key: "minPressure", label: "Min Pressure (Bar)", placeholder: "Select Min. Pressure Bar", options: ["0", "0.5", "1", "2", "3", "5"] },
-  { key: "maxPressure", label: "Max Pressure (Bar)", placeholder: "Select Max. Pressure Bar", options: ["5", "10", "16", "25", "40", "63"] },
-  { key: "operatorSize",label: "Operator Size",      placeholder: "Select Operator Size",     options: ["DN15", "DN20", "DN25", "DN32", "DN40", "DN50", "DN65", "DN80"] },
-];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function FilterPill({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+function TypePillGroup({
+  subCategories,
+  activeSlug,
+  onChange,
+}: {
+  subCategories: SubCategoryWithCount[];
+  activeSlug: string | null;
+  onChange: (slug: string | null) => void;
+}) {
+  if (subCategories.length === 0) return null;
   return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "px-3 py-1.5 rounded-full text-xs font-medium font-montserrat leading-4 transition-colors duration-200",
-        selected
-          ? "bg-zinc-800 text-white"
-          : "ring-1 ring-inset ring-neutral-200 text-stone-900 hover:bg-stone-50"
-      )}
-    >
-      {label}
-    </button>
+    <div className="flex flex-col gap-3">
+      <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
+        Type
+      </p>
+      <div className="flex flex-wrap gap-3">
+        <button
+          onClick={() => onChange(null)}
+          className={cn(
+            "px-3 py-1.5 rounded-full text-xs font-medium font-montserrat leading-4 transition-colors duration-200",
+            activeSlug === null
+              ? "bg-zinc-800 text-white"
+              : "ring-1 ring-inset ring-neutral-200 text-stone-900 hover:bg-stone-50"
+          )}
+        >
+          All
+        </button>
+        {subCategories.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => onChange(s.slug)}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium font-montserrat leading-4 transition-colors duration-200",
+              activeSlug === s.slug
+                ? "bg-zinc-800 text-white"
+                : "ring-1 ring-inset ring-neutral-200 text-stone-900 hover:bg-stone-50"
+            )}
+          >
+            {s.name}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
-function FilterSidebar({
-  pillState,
-  onPillToggle,
-  selectState,
-  onSelectChange,
-}: {
-  pillState: Record<string, string[]>;
-  onPillToggle: (key: string, value: string) => void;
-  selectState: Record<string, string[]>;
-  onSelectChange: (key: string, value: string[]) => void;
-}) {
-  return (
-    <aside className="w-80 shrink-0 flex flex-col gap-7 sticky top-24 self-start pt-3">
-      {/* Pill filter groups */}
-      {FILTER_PILLS.map(({ key, label, options }) => (
-        <div key={key} className="flex flex-col gap-3">
-          <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
-            {label}
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {options.map((opt) => (
-              <FilterPill
-                key={opt}
-                label={opt}
-                selected={pillState[key]?.includes(opt) ?? false}
-                onClick={() => onPillToggle(key, opt)}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
+type FilterFieldsProps = {
+  subCategories: SubCategoryWithCount[];
+  activeSubCategorySlug: string | null;
+  onSubCategoryChange: (slug: string | null) => void;
+  attributeValues: Record<string, string[]>;
+  activeFilters: Partial<Record<ProductAttributeKey, string>>;
+  onFilterChange: (key: ProductAttributeKey, value: string | undefined) => void;
+  onClearFilters: () => void;
+  hasActiveFilters: boolean;
+};
 
-      {/* Combobox (searchable) filters */}
-      {FILTER_SELECTS.map((s) => (
-        <FilterCombobox
-          key={s.key}
-          label={s.label}
-          placeholder={s.placeholder}
-          options={s.options}
-          value={selectState[s.key] ?? []}
-          onChange={(val) => onSelectChange(s.key, val)}
-        />
-      ))}
+function FilterFields({
+  subCategories,
+  activeSubCategorySlug,
+  onSubCategoryChange,
+  attributeValues,
+  activeFilters,
+  onFilterChange,
+  onClearFilters,
+  hasActiveFilters,
+}: FilterFieldsProps) {
+  return (
+    <>
+      <TypePillGroup
+        subCategories={subCategories}
+        activeSlug={activeSubCategorySlug}
+        onChange={onSubCategoryChange}
+      />
+
+      <div className="flex items-center justify-between">
+        <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
+          Filter by attribute
+        </p>
+        {hasActiveFilters && (
+          <button
+            onClick={onClearFilters}
+            className="text-xs font-medium font-montserrat text-red-600 hover:underline"
+          >
+            Clear all
+          </button>
+        )}
+      </div>
+
+      {PRODUCT_ATTRIBUTES.map(({ key, label }) => {
+        const options = attributeValues[key] ?? [];
+        if (options.length === 0) return null;
+        return (
+          <FilterCombobox
+            key={key}
+            label={label}
+            placeholder={`Select ${label}`}
+            options={options}
+            value={activeFilters[key] ? [activeFilters[key] as string] : []}
+            onChange={(val) => onFilterChange(key, val[0])}
+            multiple={false}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+function FilterSidebar(props: FilterFieldsProps) {
+  return (
+    <aside className="hidden lg:flex w-full lg:w-80 shrink-0 flex-col gap-7 pt-3">
+      <FilterFields {...props} />
     </aside>
+  );
+}
+
+function ProductCardSkeleton() {
+  return (
+    <div className="w-full h-96 p-5 bg-white rounded-2xl outline outline-1 -outline-offset-1 outline-neutral-200 flex flex-col justify-between items-start animate-pulse">
+      <div className="flex flex-col gap-5 items-start w-full">
+        <div className="h-6 w-20 rounded-full bg-stone-200" />
+        <div className="w-64 h-48 max-w-full rounded-lg bg-stone-200" />
+      </div>
+      <div className="self-stretch flex flex-col gap-1.5">
+        <div className="h-4 w-16 rounded bg-stone-200" />
+        <div className="h-5 w-3/4 rounded bg-stone-200" />
+      </div>
+    </div>
+  );
+}
+
+function pageWindow(page: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const pages = new Set([1, totalPages, page, page - 1, page + 1]);
+  const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+  const result: (number | "ellipsis")[] = [];
+  sorted.forEach((p, i) => {
+    if (i > 0 && p - sorted[i - 1] > 1) result.push("ellipsis");
+    result.push(p);
+  });
+  return result;
+}
+
+function Pagination({
+  page,
+  totalPages,
+  onPageChange,
+}: {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  return (
+    <div className="flex justify-center lg:justify-end items-center gap-3 pt-4">
+      <button
+        onClick={() => onPageChange(page - 1)}
+        disabled={page <= 1}
+        aria-label="Previous page"
+        className="size-10 rounded-full flex items-center justify-center bg-stone-100 text-stone-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-stone-200 transition-colors"
+      >
+        <IoChevronBackOutline size={16} />
+      </button>
+
+      {pageWindow(page, totalPages).map((p, i) =>
+        p === "ellipsis" ? (
+          <span key={`e-${i}`} className="text-stone-400 text-sm font-medium font-montserrat">
+            …
+          </span>
+        ) : (
+          <button
+            key={p}
+            onClick={() => onPageChange(p)}
+            aria-current={p === page ? "page" : undefined}
+            className={cn(
+              "size-10 rounded-full flex items-center justify-center text-sm font-medium font-montserrat transition-colors",
+              p === page
+                ? "bg-red-600 text-white"
+                : "outline outline-1 -outline-offset-1 outline-neutral-200 text-stone-500 hover:bg-stone-50"
+            )}
+          >
+            {p}
+          </button>
+        )
+      )}
+
+      <button
+        onClick={() => onPageChange(page + 1)}
+        disabled={page >= totalPages}
+        aria-label="Next page"
+        className="size-10 rounded-full flex items-center justify-center bg-stone-100 text-stone-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-stone-200 transition-colors"
+      >
+        <IoChevronForwardOutline size={16} />
+      </button>
+    </div>
   );
 }
 
@@ -100,22 +221,29 @@ export function ProductsPageClient({
   products,
   categories,
   activeCategorySlug,
+  subCategories,
+  activeSubCategorySlug,
+  attributeValues,
+  activeFilters,
+  page,
+  totalPages,
 }: {
   products: ProductSummary[];
   categories: CategoryWithCount[];
   activeCategorySlug: string | null;
+  subCategories: SubCategoryWithCount[];
+  activeSubCategorySlug: string | null;
+  attributeValues: Record<string, string[]>;
+  activeFilters: Partial<Record<ProductAttributeKey, string>>;
+  page: number;
+  totalPages: number;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const tabs: Tab[] = [{ slug: null, name: "All Products" }, ...categories.map((c) => ({ slug: c.slug, name: c.name }))];
 
-  const [pillState, setPillState] = useState<Record<string, string[]>>({
-    subType: ["Standard"],
-    operatingType: ["Direct Acting"],
-    actionType: ["Normally Close"],
-  });
-  const [selectState, setSelectState] = useState<Record<string, string[]>>({
-    portSize: [], minPressure: [], maxPressure: [], operatorSize: [],
-  });
   const tabsRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -137,23 +265,58 @@ export function ProductsPageClient({
     return () => { el.removeEventListener("scroll", updateScrollState); ro.disconnect(); };
   }, [updateScrollState]);
 
-  const handlePillToggle = (key: string, value: string) => {
-    setPillState((prev) => {
-      const current = prev[key] ?? [];
-      return {
-        ...prev,
-        [key]: current.includes(value) ? current.filter((v) => v !== value) : [...current, value],
-      };
+  const navigate = (params: URLSearchParams) => {
+    startTransition(() => {
+      router.push(params.size ? `/products?${params.toString()}` : "/products", { scroll: false });
     });
   };
 
   const goToTab = (slug: string | null) => {
-    router.push(slug ? `/products?category=${slug}` : "/products");
+    const params = new URLSearchParams(searchParams);
+    if (slug) params.set("category", slug);
+    else params.delete("category");
+    params.delete("type");
+    params.delete("page");
+    navigate(params);
+  };
+
+  const handleSubCategoryChange = (slug: string | null) => {
+    const params = new URLSearchParams(searchParams);
+    if (slug) params.set("type", slug);
+    else params.delete("type");
+    params.delete("page");
+    navigate(params);
+  };
+
+  const handleFilterChange = (key: ProductAttributeKey, value: string | undefined) => {
+    const params = new URLSearchParams(searchParams);
+    if (value) params.set(key, value);
+    else params.delete(key);
+    params.delete("page");
+    navigate(params);
+  };
+
+  const clearFilters = () => {
+    const params = new URLSearchParams(searchParams);
+    for (const { key } of PRODUCT_ATTRIBUTES) params.delete(key);
+    params.delete("type");
+    params.delete("page");
+    navigate(params);
+  };
+
+  const goToPage = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams);
+    if (nextPage > 1) params.set("page", String(nextPage));
+    else params.delete("page");
+    navigate(params);
   };
 
   const scrollTabs = (dir: "left" | "right") => {
     tabsRef.current?.scrollBy({ left: dir === "right" ? 200 : -200, behavior: "smooth" });
   };
+
+  const hasActiveFilters =
+    Boolean(activeSubCategorySlug) || PRODUCT_ATTRIBUTES.some(({ key }) => Boolean(activeFilters[key]));
 
   return (
     <div>
@@ -163,20 +326,58 @@ export function ProductsPageClient({
         description="Precision on–off control engineered by Rotex for safety-critical and high-duty industrial environments."
       />
 
-      <div className="container flex gap-8 py-12 items-start">
-        {/* Sidebar */}
+      <div className="container flex flex-col lg:flex-row gap-8 py-8 sm:py-12 items-start">
+        {/* Sidebar (desktop) */}
         <FilterSidebar
-          pillState={pillState}
-          onPillToggle={handlePillToggle}
-          selectState={selectState}
-          onSelectChange={(key, val) => setSelectState((prev) => ({ ...prev, [key]: val } as Record<string, string[]>))}
+          subCategories={subCategories}
+          activeSubCategorySlug={activeSubCategorySlug}
+          onSubCategoryChange={handleSubCategoryChange}
+          attributeValues={attributeValues}
+          activeFilters={activeFilters}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
         />
 
         {/* Main content */}
-        <div className="flex-1 min-w-0 flex flex-col gap-6">
+        <div className="flex-1 min-w-0 w-full flex flex-col gap-6">
 
-          {/* Category tabs — sticky below navbar */}
-          <div className="sticky top-24 z-30 bg-white border-b border-stone-200 pt-3">
+          {/* Filters trigger (mobile) */}
+          <button
+            type="button"
+            onClick={() => setFiltersOpen(true)}
+            className="lg:hidden w-full px-5 py-3 bg-neutral-100 rounded-sm text-center text-stone-900 text-sm font-semibold font-montserrat leading-6"
+          >
+            Filters{hasActiveFilters ? " •" : ""}
+          </button>
+
+          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+            <SheetContent side="bottom" className="lg:hidden max-h-[85vh] rounded-t-2xl">
+              <SheetHeader>
+                <SheetTitle>Filters</SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 flex flex-col gap-7 overflow-y-auto px-4">
+                <FilterFields
+                  subCategories={subCategories}
+                  activeSubCategorySlug={activeSubCategorySlug}
+                  onSubCategoryChange={handleSubCategoryChange}
+                  attributeValues={attributeValues}
+                  activeFilters={activeFilters}
+                  onFilterChange={handleFilterChange}
+                  onClearFilters={clearFilters}
+                  hasActiveFilters={hasActiveFilters}
+                />
+              </div>
+              <SheetFooter>
+                <Button type="button" onClick={() => setFiltersOpen(false)}>
+                  Show Results
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+
+          {/* Category tabs */}
+          <div className="relative bg-white border-b border-stone-200 pt-3">
             <div
               ref={tabsRef}
               className="no-scrollbar flex gap-5 overflow-x-auto"
@@ -187,7 +388,7 @@ export function ProductsPageClient({
                   key={tab.slug ?? "all"}
                   onClick={() => goToTab(tab.slug)}
                   className={cn(
-                    "shrink-0 px-2.5 py-6 border-b-2 -mb-px text-lg font-semibold font-montserrat leading-5 whitespace-nowrap transition-colors duration-150",
+                    "shrink-0 px-2.5 py-4 sm:py-6 border-b-2 -mb-px text-base sm:text-lg font-semibold font-montserrat leading-5 whitespace-nowrap transition-colors duration-150",
                     tab.slug === activeCategorySlug
                       ? "border-red-600 text-red-600"
                       : "border-transparent text-stone-900 hover:text-red-600"
@@ -228,14 +429,24 @@ export function ProductsPageClient({
           </div>
 
           {/* Products grid */}
-          {products.length > 0 ? (
-            <div className="grid grid-cols-3 gap-5 relative z-0">
+          {isPending ? (
+            <div className="grid grid-cols-2 xl:grid-cols-3 gap-5 relative z-0">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : products.length > 0 ? (
+            <div className="grid grid-cols-2 xl:grid-cols-3 gap-5 relative z-0">
               {products.map((product) => (
                 <ProductListCard key={product.slug} {...product} />
               ))}
             </div>
           ) : (
             <p className="text-stone-400 text-center py-20">No products found.</p>
+          )}
+
+          {!isPending && products.length > 0 && (
+            <Pagination page={page} totalPages={totalPages} onPageChange={goToPage} />
           )}
 
         </div>

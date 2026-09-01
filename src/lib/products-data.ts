@@ -65,14 +65,69 @@ export async function getCategoriesWithProducts(): Promise<CategoryWithCount[]> 
     .map((c) => ({ id: c.id, slug: c.slug, name: c.name, productCount: c._count.products }));
 }
 
-/** All products, optionally scoped to a category slug, for the /products listing. */
-export async function getProductsList(params: { categorySlug?: string } = {}): Promise<ProductSummary[]> {
-  const products = await prisma.product.findMany({
-    where: params.categorySlug ? { category: { slug: params.categorySlug } } : undefined,
-    orderBy: { createdAt: "desc" },
-    include: { category: true, subCategory: true },
+export type SubCategoryWithCount = {
+  id: string;
+  slug: string;
+  name: string;
+  productCount: number;
+};
+
+/** Sub-categories (e.g. "2 Way", "3 Way") that currently have at least one product, optionally scoped to a category, for the "Type" filter. */
+export async function getSubCategoriesWithProducts(categorySlug?: string | null): Promise<SubCategoryWithCount[]> {
+  const subCategories = await prisma.subCategory.findMany({
+    where: categorySlug ? { category: { slug: categorySlug } } : undefined,
+    include: { _count: { select: { products: true } } },
+    orderBy: { order: "asc" },
   });
-  return products.map(toSummary);
+  return subCategories
+    .filter((s) => s._count.products > 0)
+    .map((s) => ({ id: s.id, slug: s.slug, name: s.name, productCount: s._count.products }));
+}
+
+export type ProductListFilterParams = {
+  categorySlug?: string;
+  subCategorySlug?: string;
+  size?: string;
+  variantType?: string;
+  orifice?: string;
+  minOperatingTemp?: string;
+  maxOperatingTemp?: string;
+  flowFactor?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export type ProductListResult = {
+  products: ProductSummary[];
+  total: number;
+};
+
+/** Paginated products, optionally scoped to a category slug and variant attributes, for the /products listing. */
+export async function getProductsList(params: ProductListFilterParams = {}): Promise<ProductListResult> {
+  const { categorySlug, subCategorySlug, page = 1, pageSize = 12, ...attrs } = params;
+  const attrFilter: Record<string, string> = {};
+  for (const [key, value] of Object.entries(attrs)) {
+    if (value) attrFilter[key] = value;
+  }
+
+  const where = {
+    ...(categorySlug ? { category: { slug: categorySlug } } : {}),
+    ...(subCategorySlug ? { subCategory: { slug: subCategorySlug } } : {}),
+    ...(Object.keys(attrFilter).length ? { variants: { some: attrFilter } } : {}),
+  };
+
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      include: { category: true, subCategory: true },
+      skip: (Math.max(1, page) - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  return { products: products.map(toSummary), total };
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductDetail | null> {

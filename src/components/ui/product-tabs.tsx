@@ -17,7 +17,18 @@ export function ProductTabs({
   specifications: SpecItem[];
   downloads: DownloadItem[];
 }) {
-  const [activeTab, setActiveTab] = useState<Tab>("Features");
+  const visibleTabs = useMemo(
+    () =>
+      TABS.filter((tab) => {
+        if (tab === "Features") return features.trim().length > 0;
+        if (tab === "Specifications") return specifications.length > 0;
+        return downloads.length > 0;
+      }),
+    [features, specifications, downloads]
+  );
+
+  const [requestedTab, setRequestedTab] = useState<Tab | undefined>(visibleTabs[0]);
+  const activeTab = requestedTab && visibleTabs.includes(requestedTab) ? requestedTab : visibleTabs[0];
   const [category, setCategory] = useState("All Documents");
 
   const categories = useMemo(() => ["All Documents", ...Array.from(new Set(downloads.map((d) => d.category)))], [
@@ -27,14 +38,16 @@ export function ProductTabs({
   const visibleDownloads =
     category === "All Documents" ? downloads : downloads.filter((d) => d.category === category);
 
+  if (visibleTabs.length === 0) return null;
+
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="no-scrollbar border-b border-stone-300 flex items-start gap-5 overflow-x-auto">
-        {TABS.map((tab) => (
+        {visibleTabs.map((tab) => (
           <button
             key={tab}
             type="button"
-            onClick={() => setActiveTab(tab)}
+            onClick={() => setRequestedTab(tab)}
             className={cn(
               "shrink-0 whitespace-nowrap px-2.5 py-5 border-b-2 -mb-px text-base sm:text-lg font-semibold font-montserrat leading-6 transition-colors",
               activeTab === tab ? "border-red-600 text-red-600" : "border-transparent text-stone-900 hover:text-red-600"

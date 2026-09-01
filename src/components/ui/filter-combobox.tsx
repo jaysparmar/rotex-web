@@ -17,9 +17,11 @@ type FilterComboboxProps = {
   options: string[];
   value: string[];
   onChange: (value: string[]) => void;
+  /** When false, selecting an option replaces the current selection instead of toggling it. Defaults to true. */
+  multiple?: boolean;
 };
 
-export function FilterCombobox({ label, placeholder, options, value, onChange }: FilterComboboxProps) {
+export function FilterCombobox({ label, placeholder, options, value, onChange, multiple = true }: FilterComboboxProps) {
   const [open, setOpen] = useState(false);
   const [dropUp, setDropUp] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,6 +48,11 @@ export function FilterCombobox({ label, placeholder, options, value, onChange }:
   };
 
   const toggle = (opt: string) => {
+    if (!multiple) {
+      onChange(value.includes(opt) ? [] : [opt]);
+      setOpen(false);
+      return;
+    }
     onChange(value.includes(opt) ? value.filter((v) => v !== opt) : [...value, opt]);
   };
 
