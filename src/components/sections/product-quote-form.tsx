@@ -5,6 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { FilterCombobox } from "@/components/ui/filter-combobox";
+import { PhoneCodeSelect } from "@/components/ui/phone-code-select";
+import { COUNTRY_NAMES } from "@/lib/world-countries";
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 
@@ -26,8 +29,6 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 type RequestType = "datasheet" | "enquiry";
-
-const COUNTRIES = ["United States", "India", "UAE", "Saudi Arabia", "United Kingdom", "Germany"];
 
 // ── Shared submit logic ─────────────────────────────────────────────────────────
 
@@ -83,6 +84,8 @@ function QuoteFormFields({
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = form;
 
+  const [dialCode, setDialCode] = useState("+91");
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       <Field label="Full Name" error={errors.fullName?.message}>
@@ -115,11 +118,8 @@ function QuoteFormFields({
       <div className="flex flex-col gap-5 sm:flex-row">
         <div className="flex-1 flex flex-col gap-2">
           <label className={labelCls}>Phone number</label>
-          <div className={`flex h-12 bg-gray-50 rounded-xl shadow-[0px_0px_0px_2px_rgba(0,0,0,0.05)] outline outline-1 -outline-offset-1 overflow-hidden ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
-            <div className="px-3 border-r border-gray-200 flex items-center gap-2 shrink-0">
-              <span className="text-stone-900 text-sm font-medium font-montserrat leading-5">+91</span>
-              <ChevronDown />
-            </div>
+          <div className={`relative flex h-12 bg-gray-50 rounded-xl shadow-[0px_0px_0px_2px_rgba(0,0,0,0.05)] outline outline-1 -outline-offset-1 ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
+            <PhoneCodeSelect value={dialCode} onChange={setDialCode} />
             <input
               {...register("phone")}
               type="tel"
@@ -136,15 +136,23 @@ function QuoteFormFields({
       </div>
 
       <div className="flex flex-col gap-5 sm:flex-row">
-        <Field label="Country" error={errors.country?.message} className="flex-1">
-          <FormSelect
+        <div className="flex-1 flex flex-col gap-2">
+          <Controller
             control={control}
             name="country"
-            placeholder="Select"
-            options={COUNTRIES}
-            hasError={!!errors.country}
+            render={({ field }) => (
+              <FilterCombobox
+                label="Country"
+                placeholder="Select"
+                options={COUNTRY_NAMES}
+                value={field.value ? [field.value] : []}
+                onChange={(v) => field.onChange(v[0] ?? "")}
+                multiple={false}
+              />
+            )}
           />
-        </Field>
+          {errors.country && <p className={errorCls}>{errors.country.message}</p>}
+        </div>
         <Field label="City" error={errors.city?.message} className="flex-1">
           <input {...register("city")} placeholder="Select City" className={selectLikeCls(!!errors.city)} />
         </Field>
@@ -341,13 +349,5 @@ function FormSelect({
         </Select>
       )}
     />
-  );
-}
-
-function ChevronDown() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M2 4L6 8L10 4" stroke="#1c1917" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }

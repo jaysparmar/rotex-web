@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useEffect, useCallback, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { IoChevronForwardOutline, IoChevronBackOutline } from "react-icons/io5";
+import { IoChevronForwardOutline, IoChevronBackOutline, IoSearchOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import { ProductListCard } from "@/components/ui/product-list-card";
 import { FilterCombobox } from "@/components/ui/filter-combobox";
@@ -69,7 +69,32 @@ type FilterFieldsProps = {
   onFilterChange: (key: ProductAttributeKey, value: string | undefined) => void;
   onClearFilters: () => void;
   hasActiveFilters: boolean;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
 };
+
+function SearchField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
+        Search
+      </p>
+      <div className="relative">
+        <IoSearchOutline
+          size={16}
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
+        />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Search by model or product name"
+          className="w-full pl-9 pr-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 outline-gray-200 focus:outline-stone-400 text-sm font-medium font-montserrat leading-5 text-stone-900 placeholder:text-neutral-400"
+        />
+      </div>
+    </div>
+  );
+}
 
 function FilterFields({
   subCategories,
@@ -80,9 +105,13 @@ function FilterFields({
   onFilterChange,
   onClearFilters,
   hasActiveFilters,
+  searchValue,
+  onSearchChange,
 }: FilterFieldsProps) {
   return (
     <>
+      <SearchField value={searchValue} onChange={onSearchChange} />
+
       <TypePillGroup
         subCategories={subCategories}
         activeSlug={activeSubCategorySlug}
@@ -225,6 +254,7 @@ export function ProductsPageClient({
   activeSubCategorySlug,
   attributeValues,
   activeFilters,
+  activeSearch,
   page,
   totalPages,
 }: {
@@ -235,6 +265,7 @@ export function ProductsPageClient({
   activeSubCategorySlug: string | null;
   attributeValues: Record<string, string[]>;
   activeFilters: Partial<Record<ProductAttributeKey, string>>;
+  activeSearch: string;
   page: number;
   totalPages: number;
 }) {
@@ -242,6 +273,7 @@ export function ProductsPageClient({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState(activeSearch);
   const tabs: Tab[] = [{ slug: null, name: "All Products" }, ...categories.map((c) => ({ slug: c.slug, name: c.name }))];
 
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -304,11 +336,29 @@ export function ProductsPageClient({
     navigate(params);
   };
 
+  useEffect(() => {
+    setSearchInput(activeSearch);
+  }, [activeSearch]);
+
+  useEffect(() => {
+    if (searchInput === activeSearch) return;
+    const timeout = setTimeout(() => {
+      const params = new URLSearchParams(searchParams);
+      if (searchInput.trim()) params.set("search", searchInput.trim());
+      else params.delete("search");
+      params.delete("page");
+      navigate(params);
+    }, 400);
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
+
   const goToPage = (nextPage: number) => {
     const params = new URLSearchParams(searchParams);
     if (nextPage > 1) params.set("page", String(nextPage));
     else params.delete("page");
     navigate(params);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const scrollTabs = (dir: "left" | "right") => {
@@ -337,6 +387,8 @@ export function ProductsPageClient({
           onFilterChange={handleFilterChange}
           onClearFilters={clearFilters}
           hasActiveFilters={hasActiveFilters}
+          searchValue={searchInput}
+          onSearchChange={setSearchInput}
         />
 
         {/* Main content */}
@@ -366,6 +418,8 @@ export function ProductsPageClient({
                   onFilterChange={handleFilterChange}
                   onClearFilters={clearFilters}
                   hasActiveFilters={hasActiveFilters}
+                  searchValue={searchInput}
+                  onSearchChange={setSearchInput}
                 />
               </div>
               <SheetFooter>

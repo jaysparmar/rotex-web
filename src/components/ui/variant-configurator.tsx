@@ -34,24 +34,22 @@ export function VariantConfigurator({
   const [selection, setSelection] = useState<Selection>(() => firstVariantSelection(variants));
 
   const handleSelect = (key: VariantAxisKey, value: string) => {
-    setSelection((prev) => {
-      const next = { ...prev, [key]: value };
+    const next = { ...selection, [key]: value };
 
-      // Auto-correct any other axis whose current value no longer has a matching variant.
-      for (const axis of VARIANT_AXES) {
-        if (axis.key === key) continue;
-        const stillValid = variants.some((v) => matches(v, next, axis.key) && v[axis.key] === next[axis.key]);
-        if (!stillValid) {
-          const fallback = variants.find((v) => matches(v, next, axis.key));
-          if (fallback) next[axis.key] = fallback[axis.key];
-        }
+    // Auto-correct any other axis whose current value no longer has a matching variant.
+    for (const axis of VARIANT_AXES) {
+      if (axis.key === key) continue;
+      const stillValid = variants.some((v) => matches(v, next, axis.key) && v[axis.key] === next[axis.key]);
+      if (!stillValid) {
+        const fallback = variants.find((v) => matches(v, next, axis.key));
+        if (fallback) next[axis.key] = fallback[axis.key];
       }
+    }
 
-      const resolved = variants.find((v) => matches(v, next));
-      if (resolved) onVariantChange(resolved);
+    setSelection(next);
 
-      return next;
-    });
+    const resolved = variants.find((v) => matches(v, next));
+    if (resolved) onVariantChange(resolved);
   };
 
   const optionsByAxis = useMemo(() => {

@@ -87,6 +87,7 @@ export async function getSubCategoriesWithProducts(categorySlug?: string | null)
 export type ProductListFilterParams = {
   categorySlug?: string;
   subCategorySlug?: string;
+  search?: string;
   size?: string;
   variantType?: string;
   orifice?: string;
@@ -104,7 +105,7 @@ export type ProductListResult = {
 
 /** Paginated products, optionally scoped to a category slug and variant attributes, for the /products listing. */
 export async function getProductsList(params: ProductListFilterParams = {}): Promise<ProductListResult> {
-  const { categorySlug, subCategorySlug, page = 1, pageSize = 12, ...attrs } = params;
+  const { categorySlug, subCategorySlug, search, page = 1, pageSize = 12, ...attrs } = params;
   const attrFilter: Record<string, string> = {};
   for (const [key, value] of Object.entries(attrs)) {
     if (value) attrFilter[key] = value;
@@ -114,6 +115,14 @@ export async function getProductsList(params: ProductListFilterParams = {}): Pro
     ...(categorySlug ? { category: { slug: categorySlug } } : {}),
     ...(subCategorySlug ? { subCategory: { slug: subCategorySlug } } : {}),
     ...(Object.keys(attrFilter).length ? { variants: { some: attrFilter } } : {}),
+    ...(search?.trim()
+      ? {
+          OR: [
+            { name: { contains: search.trim() } },
+            { modelNumber: { contains: search.trim() } },
+          ],
+        }
+      : {}),
   };
 
   const [products, total] = await Promise.all([

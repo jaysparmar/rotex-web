@@ -31,7 +31,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
   const breadcrumb = navCrumbs ? [...navCrumbs, { label: product.name }] : product.breadcrumb;
 
   const tags = selectedVariant
-    ? [selectedVariant.size, selectedVariant.variantType]
+    ? [...product.tags.filter((t) => /\bway\b/i.test(t))].filter(Boolean)
     : product.tags;
   const features = selectedVariant?.features ?? product.features ?? "";
   const specifications = selectedVariant?.specifications ?? product.specifications ?? [];
