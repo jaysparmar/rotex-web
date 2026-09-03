@@ -50,7 +50,7 @@ export default async function AdminProductDetailPage({
               { label: product.name },
             ]}
           />
-          <ProductDetailHeader id={product.id} name={product.name} modelNumber={product.modelNumber} />
+          <ProductDetailHeader id={product.id} name={product.name} modelNumber={product.modelNumber} slug={product.slug} />
         </div>
       </div>
 
