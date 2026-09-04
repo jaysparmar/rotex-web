@@ -1,25 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { VARIANT_AXES, type ProductVariant, type VariantAxisKey } from "@/lib/product-detail-data";
 
 type Selection = Record<VariantAxisKey, string>;
 
-function matches(variant: ProductVariant, selection: Partial<Selection>, exclude?: VariantAxisKey) {
+function matches(variant: ProductVariant, selection: Partial<Selection>) {
   return VARIANT_AXES.every(({ key }) => {
-    if (key === exclude) return true;
     const want = selection[key];
     return want === undefined || variant[key] === want;
   });
-}
-
-function firstVariantSelection(variants: ProductVariant[]): Selection {
-  const first = variants[0];
-  return VARIANT_AXES.reduce((acc, { key }) => {
-    acc[key] = first[key];
-    return acc;
-  }, {} as Selection);
 }
 
 export function VariantConfigurator({
@@ -31,25 +22,46 @@ export function VariantConfigurator({
   onVariantChange: (variant: ProductVariant) => void;
   onRequestQuote: () => void;
 }) {
-  const [selection, setSelection] = useState<Selection>(() => firstVariantSelection(variants));
+  // Only axes the user has explicitly picked are hard constraints; everything
+  // else is derived from whichever variant currently resolves, so unrelated
+  // (or dependent) axes never falsely lock out options on other axes.
+  const [selection, setSelection] = useState<Partial<Selection>>({});
+
+  const resolved = useMemo(
+    () => variants.find((v) => matches(v, selection)) ?? variants[0],
+    [variants, selection]
+  );
+
+  useEffect(() => {
+    if (resolved) onVariantChange(resolved);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolved]);
+
+  const effective: Selection = useMemo(
+    () =>
+      VARIANT_AXES.reduce((acc, { key }) => {
+        acc[key] = selection[key] ?? resolved[key];
+        return acc;
+      }, {} as Selection),
+    [selection, resolved]
+  );
 
   const handleSelect = (key: VariantAxisKey, value: string) => {
-    const next = { ...selection, [key]: value };
+    const next: Partial<Selection> = { [key]: value };
 
-    // Auto-correct any other axis whose current value no longer has a matching variant.
+    // Keep every other pinned axis whose value is still reachable together
+    // with the new pick; drop (un-pin) any that's no longer available.
     for (const axis of VARIANT_AXES) {
       if (axis.key === key) continue;
-      const stillValid = variants.some((v) => matches(v, next, axis.key) && v[axis.key] === next[axis.key]);
-      if (!stillValid) {
-        const fallback = variants.find((v) => matches(v, next, axis.key));
-        if (fallback) next[axis.key] = fallback[axis.key];
+      const oldVal = selection[axis.key];
+      if (oldVal === undefined) continue;
+      const candidate = { ...next, [axis.key]: oldVal };
+      if (variants.some((v) => matches(v, candidate))) {
+        next[axis.key] = oldVal;
       }
     }
 
     setSelection(next);
-
-    const resolved = variants.find((v) => matches(v, next));
-    if (resolved) onVariantChange(resolved);
   };
 
   const optionsByAxis = useMemo(() => {
@@ -80,21 +92,17 @@ export function VariantConfigurator({
               </p>
               <div className="flex flex-wrap gap-3">
                 {options.map((opt) => {
-                  const isSelected = selection[key] === opt;
-                  const isValid = variants.some((v) => matches(v, selection, key) && v[key] === opt);
+                  const isSelected = effective[key] === opt;
                   return (
                     <button
                       key={opt}
                       type="button"
-                      disabled={!isValid}
                       onClick={() => handleSelect(key, opt)}
                       className={cn(
                         "px-3 py-1.5 rounded-full text-xs font-medium font-montserrat leading-4 transition-colors duration-200",
                         isSelected
                           ? "bg-zinc-800 text-white"
-                          : isValid
-                            ? "ring-1 ring-inset ring-neutral-200 text-stone-900 hover:bg-stone-50"
-                            : "ring-1 ring-inset ring-neutral-100 text-stone-300 cursor-not-allowed"
+                          : "ring-1 ring-inset ring-neutral-200 text-stone-900 hover:bg-stone-50"
                       )}
                     >
                       {opt}

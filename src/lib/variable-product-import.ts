@@ -17,6 +17,7 @@ export type ColumnDestination =
   | "image"
   | "certificates"
   | "features"
+  | "description"
   | ClassificationField
   | ProductAttributeKey;
 
@@ -172,6 +173,7 @@ export async function analyzeVariableProductImport(
   const imageCol = findSingleColumn(mapping, "image");
   const certificatesCol = findSingleColumn(mapping, "certificates");
   const featuresCol = findSingleColumn(mapping, "features");
+  const descriptionCol = findSingleColumn(mapping, "description");
   const specCols = mapping.specificationColumns;
   const attributeCols: Partial<Record<ProductAttributeKey, number>> = {};
   for (const key of ATTRIBUTE_KEYS) {
@@ -402,6 +404,7 @@ export async function analyzeVariableProductImport(
         industriesServed: null,
         certificates: [],
         features: null,
+        description: null,
         specifications: [],
         downloads: [],
       });
@@ -439,6 +442,7 @@ export async function analyzeVariableProductImport(
         ? (row.cells[certificatesCol] ?? "").split(/[;,]/).map((s) => s.trim()).filter(Boolean)
         : [];
       const features = featuresCol != null ? (row.cells[featuresCol] ?? "").trim() || null : null;
+      const description = descriptionCol != null ? (row.cells[descriptionCol] ?? "").trim() || null : null;
       const specifications = specCols
         .map((col) => ({ key: columnLabel(col), value: (row.cells[col] ?? "").trim() }))
         .filter((s) => s.value);
@@ -452,6 +456,7 @@ export async function analyzeVariableProductImport(
         flowFactor: attrs.flowFactor,
         certificates,
         features,
+        description,
         specifications,
         downloads: [],
       };

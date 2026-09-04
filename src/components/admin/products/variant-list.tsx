@@ -3,9 +3,10 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Pencil, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { EmptyState } from "@/components/admin/empty-state";
 import { deleteVariant } from "@/app/admin/(dashboard)/products/actions";
 
 type VariantRow = {
@@ -44,7 +45,7 @@ export function VariantList({ productId, variants }: { productId: string; varian
 
   return (
     <div className="rounded-lg border border-border">
-      <div className="flex items-center justify-between gap-4 border-b border-border p-5">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border p-5">
         <h2 className="text-sm font-semibold">Variants ({variants.length})</h2>
         <Link href={`/admin/products/${productId}/variants/new`}>
           <Button size="sm" className="shrink-0 gap-1.5">
@@ -53,25 +54,27 @@ export function VariantList({ productId, variants }: { productId: string; varian
           </Button>
         </Link>
       </div>
-      <div className="divide-y divide-border">
-        {variants.length === 0 && <p className="p-5 text-sm text-muted-foreground">No variants.</p>}
-        {variants.map((v) => (
-          <div key={v.id} className="flex items-center justify-between gap-4 p-5">
-            <p className="text-sm font-medium">{variantLabel(v)}</p>
-            <div className="flex items-center gap-3">
-              <Link
-                href={`/admin/products/${productId}/variants/${v.id}`}
-                className="text-sm font-medium text-primary hover:underline"
-              >
-                Edit
-              </Link>
-              <Button variant="ghost" size="icon-sm" disabled={pending} onClick={() => setToDelete(v)}>
-                <Trash2 className="size-3.5 text-destructive" />
-              </Button>
+      {variants.length === 0 ? (
+        <EmptyState icon={Layers} title="No variants yet" description="Add a variant to get started." />
+      ) : (
+        <div className="divide-y divide-border">
+          {variants.map((v) => (
+            <div key={v.id} className="flex flex-wrap items-center justify-between gap-4 p-5">
+              <p className="text-sm font-medium">{variantLabel(v)}</p>
+              <div className="flex items-center gap-1">
+                <Link href={`/admin/products/${productId}/variants/${v.id}`}>
+                  <Button variant="ghost" size="icon-sm">
+                    <Pencil className="size-3.5" />
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="icon-sm" disabled={pending} onClick={() => setToDelete(v)}>
+                  <Trash2 className="size-3.5 text-destructive" />
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}

@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 export type ProductContentFormValues = {
   certificates: string[];
   features: string;
+  description: string;
   specifications: { key: string; value: string }[];
   downloads: { title: string; description: string; url: { src: string } }[];
 };
@@ -26,6 +27,7 @@ export function ProductContentFields() {
         </CardHeader>
         <CardContent className="space-y-4">
           <PillsInput name="certificates" label="Certificates" />
+          <TextAreaField label="Description" rows={4} {...form.register("description")} />
           <TextAreaField label="Features" rows={4} {...form.register("features")} />
         </CardContent>
       </Card>

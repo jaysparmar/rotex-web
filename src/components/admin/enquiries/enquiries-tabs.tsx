@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Mail, Phone, MapPin, Building2, FileText, Calendar } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const ALL_PRODUCTS = "__all__";
 
 type Industry = { id: string; name: string };
 type Enquiry = {
@@ -152,18 +155,22 @@ export function EnquiriesTabs({ industries, enquiries }: { industries: Industry[
       </div>
 
       {productNames.length > 0 && (
-        <select
-          value={productFilter}
-          onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-md border border-border bg-background px-3 py-1.5 text-sm"
+        <Select
+          value={productFilter || ALL_PRODUCTS}
+          onValueChange={(v) => setProductFilter(v === ALL_PRODUCTS ? "" : (v as string))}
         >
-          <option value="">All products</option>
-          {productNames.map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="w-56">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL_PRODUCTS}>All products</SelectItem>
+            {productNames.map((p) => (
+              <SelectItem key={p} value={p as string}>
+                {p}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       )}
 
       {filtered.length === 0 ? (

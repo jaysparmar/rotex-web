@@ -50,6 +50,7 @@ type ProductRecord = {
   industriesServed: string | null;
   certificates: unknown;
   features: string | null;
+  description: string | null;
   specifications: unknown;
   downloads: unknown;
 };
@@ -80,6 +81,7 @@ export function ProductEditForm({
       industriesServed: product?.industriesServed ?? "",
       certificates: (product?.certificates as string[] | null) ?? [],
       features: product?.features ?? "",
+      description: product?.description ?? "",
       specifications: (product?.specifications as { key: string; value: string }[] | null) ?? [],
       downloads: ((product?.downloads as { title: string; description: string; url: string }[] | null) ?? []).map(
         (d) => ({ title: d.title, description: d.description, url: { src: d.url } })
@@ -122,6 +124,7 @@ export function ProductEditForm({
       industriesServed: values.industriesServed || null,
       certificates: values.certificates,
       features: values.features || null,
+      description: values.description || null,
       specifications: values.specifications.filter((s) => s.key.trim()),
       downloads: values.downloads.filter((d) => d.title.trim()).map((d) => ({ ...d, url: d.url.src })),
     };

@@ -3,9 +3,11 @@
 import { useState, useTransition, Fragment } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Trash2, Plus, ChevronRight } from "lucide-react";
+import { Trash2, Plus, Pencil, ChevronRight, Factory } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { EmptyState } from "@/components/admin/empty-state";
 import { deleteIndustry, deleteSubIndustry } from "@/app/admin/(dashboard)/industries/actions";
 
 type SubIndustryRow = { id: string; name: string; slug: string };
@@ -48,35 +50,32 @@ export function IndustryList({ industries }: { industries: IndustryRow[] }) {
         <Link href="/admin/industries/new">
           <Button size="sm" className="gap-1.5">
             <Plus className="size-3.5" />
-            New Industry
+            Add Industry
           </Button>
         </Link>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-border">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/30 text-xs uppercase tracking-wide text-muted-foreground">
-              <th className="py-2.5 pl-5 pr-3 font-medium">Name</th>
-              <th className="py-2.5 pr-3 font-medium">Slug</th>
-              <th className="py-2.5 pr-3 font-medium">Sub-Industries</th>
-              <th className="py-2.5 pr-5 font-medium" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {industries.length === 0 && (
-              <tr>
-                <td colSpan={4} className="py-8 text-center text-sm text-muted-foreground">
-                  No industries yet.
-                </td>
-              </tr>
-            )}
+      {industries.length === 0 ? (
+        <div className="overflow-hidden rounded-lg border border-border">
+          <EmptyState icon={Factory} title="No industries yet" description="Add an industry to get started." />
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="pl-5">Name</TableHead>
+              <TableHead>Slug</TableHead>
+              <TableHead>Sub-Industries</TableHead>
+              <TableHead className="pr-5" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {industries.map((industry) => {
               const isExpanded = expanded.has(industry.id);
               return (
                 <Fragment key={industry.id}>
-                  <tr>
-                    <td className="py-2.5 pl-5 pr-3 font-medium">
+                  <TableRow hoverable>
+                    <TableCell className="pl-5 font-medium">
                       <button
                         type="button"
                         onClick={() => toggleExpanded(industry.id)}
@@ -90,13 +89,15 @@ export function IndustryList({ industries }: { industries: IndustryRow[] }) {
                         )}
                         {industry.name}
                       </button>
-                    </td>
-                    <td className="py-2.5 pr-3 text-muted-foreground">{industry.slug}</td>
-                    <td className="py-2.5 pr-3">{industry.subIndustryCount}</td>
-                    <td className="py-2.5 pr-5">
-                      <div className="flex items-center justify-end gap-3">
-                        <Link href={`/admin/industries/${industry.id}`} className="text-sm font-medium text-primary hover:underline">
-                          Edit
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{industry.slug}</TableCell>
+                    <TableCell>{industry.subIndustryCount}</TableCell>
+                    <TableCell className="pr-5">
+                      <div className="flex items-center justify-end gap-1">
+                        <Link href={`/admin/industries/${industry.id}`}>
+                          <Button variant="ghost" size="icon-sm">
+                            <Pencil className="size-3.5" />
+                          </Button>
                         </Link>
                         <Button
                           variant="ghost"
@@ -107,21 +108,20 @@ export function IndustryList({ industries }: { industries: IndustryRow[] }) {
                           <Trash2 className="size-3.5 text-destructive" />
                         </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                   {isExpanded &&
                     industry.subIndustries.map((sub) => (
-                      <tr key={sub.id} className="bg-muted/20">
-                        <td className="py-2 pl-11 pr-3 text-muted-foreground">{sub.name}</td>
-                        <td className="py-2 pr-3 text-xs text-muted-foreground">{sub.slug}</td>
-                        <td className="py-2 pr-3" />
-                        <td className="py-2 pr-5">
-                          <div className="flex items-center justify-end gap-3">
-                            <Link
-                              href={`/admin/industries/${industry.id}/sub-industries/${sub.id}`}
-                              className="text-sm font-medium text-primary hover:underline"
-                            >
-                              Edit
+                      <TableRow key={sub.id} className="bg-muted/20">
+                        <TableCell className="pl-11 text-muted-foreground">{sub.name}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">{sub.slug}</TableCell>
+                        <TableCell />
+                        <TableCell className="pr-5">
+                          <div className="flex items-center justify-end gap-1">
+                            <Link href={`/admin/industries/${industry.id}/sub-industries/${sub.id}`}>
+                              <Button variant="ghost" size="icon-sm">
+                                <Pencil className="size-3.5" />
+                              </Button>
                             </Link>
                             <Button
                               variant="ghost"
@@ -132,15 +132,15 @@ export function IndustryList({ industries }: { industries: IndustryRow[] }) {
                               <Trash2 className="size-3.5 text-destructive" />
                             </Button>
                           </div>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
                 </Fragment>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}

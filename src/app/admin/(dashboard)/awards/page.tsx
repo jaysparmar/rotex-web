@@ -4,15 +4,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AwardList } from "@/components/admin/awards/award-list";
 import { AwardsHeroForm } from "@/components/admin/about-sections/awards-hero-form";
 
-export default async function AdminAwardsPage() {
-  const [awards, heroSection] = await Promise.all([
-    prisma.award.findMany({ orderBy: { createdAt: "desc" } }),
+const PAGE_SIZE = 20;
+
+export default async function AdminAwardsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const [awards, total, heroSection] = await Promise.all([
+    prisma.award.findMany({
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.award.count(),
     prisma.aboutSection.findUnique({ where: { key: "awards" } }),
   ]);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Awards</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -22,7 +36,7 @@ export default async function AdminAwardsPage() {
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Awards" }]} />
       </div>
 
-      <AwardList awards={awards} />
+      <AwardList awards={awards} total={total} page={page} pageSize={PAGE_SIZE} />
 
       {heroSection && (
         <Card>

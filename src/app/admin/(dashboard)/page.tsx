@@ -1,7 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, Factory } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const [productCount, industryCount] = await Promise.all([
+    prisma.product.count(),
+    prisma.industry.count(),
+  ]);
+
   return (
     <div className="space-y-6">
       <div>
@@ -17,7 +23,7 @@ export default function AdminDashboardPage() {
             <CardTitle>Products</CardTitle>
             <Package className="size-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent className="text-2xl font-semibold">—</CardContent>
+          <CardContent className="text-2xl font-semibold">{productCount}</CardContent>
         </Card>
 
         <Card>
@@ -25,7 +31,7 @@ export default function AdminDashboardPage() {
             <CardTitle>Industries</CardTitle>
             <Factory className="size-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent className="text-2xl font-semibold">—</CardContent>
+          <CardContent className="text-2xl font-semibold">{industryCount}</CardContent>
         </Card>
       </div>
     </div>

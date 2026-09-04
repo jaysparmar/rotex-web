@@ -56,7 +56,7 @@ export function ImportUploadStep({
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>1. Upload spreadsheet</CardTitle>
+          <CardTitle>Upload spreadsheet</CardTitle>
           <CardDescription>.xlsx or .xls, one row per variant.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -88,7 +88,7 @@ export function ImportUploadStep({
       {sheets && (
         <Card>
           <CardHeader>
-            <CardTitle>2. Sheet &amp; header row</CardTitle>
+            <CardTitle>Sheet &amp; header row</CardTitle>
             <CardDescription>Pick the sheet, then the row number that holds the column labels.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

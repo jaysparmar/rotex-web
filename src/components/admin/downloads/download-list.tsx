@@ -3,13 +3,14 @@
 import { useMemo, useState, useTransition } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Download as DownloadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DownloadFormDialog } from "@/components/admin/downloads/download-form-dialog";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { EmptyState } from "@/components/admin/empty-state";
 import { deleteDownloadItem, toggleDownloadItemPublished } from "@/app/admin/(dashboard)/downloads/actions";
 import { DOWNLOAD_TABS } from "@/lib/downloads-data";
 
@@ -76,23 +77,17 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1">
-          {filters.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              onClick={() => setTabFilter(f.id)}
-              className={cn(
-                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                tabFilter === f.id ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {f.label}
-              <span className="text-[10px] text-muted-foreground">{f.count}</span>
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <Tabs value={tabFilter} onValueChange={(v) => setTabFilter(v as string)}>
+          <TabsList className="h-auto flex-wrap">
+            {filters.map((f) => (
+              <TabsTrigger key={f.id} value={f.id} className="gap-1.5">
+                {f.label}
+                <span className="text-[10px] opacity-70">{f.count}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
         <DownloadFormDialog
           trigger={
@@ -104,10 +99,14 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
         />
       </div>
 
-      <div className="divide-y divide-border rounded-lg border border-border">
-        {filteredItems.length === 0 && <p className="p-6 text-sm text-muted-foreground">No downloads yet.</p>}
-        {filteredItems.map((item) => (
-          <div key={item.id} className="flex items-center gap-4 p-4">
+      {filteredItems.length === 0 ? (
+        <div className="rounded-lg border border-border">
+          <EmptyState icon={DownloadIcon} title="No downloads yet" description="Add a download to get started." />
+        </div>
+      ) : (
+        <div className="divide-y divide-border rounded-lg border border-border">
+          {filteredItems.map((item) => (
+          <div key={item.id} className="flex flex-wrap items-center gap-4 p-4">
             <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
               {item.image && (
                 <Image src={item.image} alt={item.title} width={48} height={48} className="size-full object-cover" unoptimized />
@@ -143,8 +142,9 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}

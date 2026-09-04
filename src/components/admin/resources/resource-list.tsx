@@ -4,13 +4,14 @@ import { useMemo, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RESOURCE_TYPES } from "@/components/admin/resources/resource-edit-form";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { EmptyState } from "@/components/admin/empty-state";
 import { deleteResource, toggleResourcePublished } from "@/app/admin/(dashboard)/resources/actions";
 
 type Resource = {
@@ -77,23 +78,17 @@ export function ResourceList({ resources }: { resources: Resource[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
-          {filters.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              onClick={() => setTypeFilter(f.id)}
-              className={cn(
-                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                typeFilter === f.id ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {f.label}
-              <span className="text-[10px] text-muted-foreground">{f.count}</span>
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <Tabs value={typeFilter} onValueChange={(v) => setTypeFilter(v as string)}>
+          <TabsList className="h-auto flex-wrap">
+            {filters.map((f) => (
+              <TabsTrigger key={f.id} value={f.id} className="gap-1.5">
+                {f.label}
+                <span className="text-[10px] opacity-70">{f.count}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
         <Link href={typeFilter === "all" ? "/admin/resources/new" : `/admin/resources/new?type=${typeFilter}`}>
           <Button size="sm" className="gap-1.5">
@@ -103,12 +98,14 @@ export function ResourceList({ resources }: { resources: Resource[] }) {
         </Link>
       </div>
 
-      <div className="divide-y divide-border rounded-lg border border-border">
-        {filteredResources.length === 0 && (
-          <p className="p-6 text-sm text-muted-foreground">No resources yet.</p>
-        )}
-        {filteredResources.map((resource) => (
-          <div key={resource.id} className="flex items-center gap-4 p-4">
+      {filteredResources.length === 0 ? (
+        <div className="rounded-lg border border-border">
+          <EmptyState icon={BookOpen} title="No resources yet" description="Add a resource to get started." />
+        </div>
+      ) : (
+        <div className="divide-y divide-border rounded-lg border border-border">
+          {filteredResources.map((resource) => (
+          <div key={resource.id} className="flex flex-wrap items-center gap-4 p-4">
             <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
               {resource.image && (
                 <Image
@@ -151,8 +148,9 @@ export function ResourceList({ resources }: { resources: Resource[] }) {
               <Trash2 className="size-3.5 text-destructive" />
             </Button>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}

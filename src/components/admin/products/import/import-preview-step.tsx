@@ -43,6 +43,10 @@ export function ImportPreviewStep({
   if (loading || !summary) {
     return (
       <Card>
+        <CardHeader>
+          <CardTitle>Preview</CardTitle>
+          <CardDescription>Nothing is written to the database until you confirm.</CardDescription>
+        </CardHeader>
         <CardContent className="py-10 text-center text-sm text-muted-foreground">
           Analyzing spreadsheet...
         </CardContent>
@@ -83,7 +87,7 @@ export function ImportPreviewStep({
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>6. Preview</CardTitle>
+          <CardTitle>Preview</CardTitle>
           <CardDescription>Nothing is written to the database until you confirm.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

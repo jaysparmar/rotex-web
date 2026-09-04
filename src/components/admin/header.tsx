@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/admin/theme-toggle";
+import { MobileSidebarTrigger } from "@/components/admin/mobile-sidebar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -16,12 +17,20 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-export function AdminHeader({ email }: { email?: string | null }) {
+export function AdminHeader({
+  email,
+  logoLight,
+  logoDark,
+}: {
+  email?: string | null;
+  logoLight: string;
+  logoDark: string;
+}) {
   const initial = email?.[0]?.toUpperCase() ?? "A";
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
-      <span />
+      <MobileSidebarTrigger logoLight={logoLight} logoDark={logoDark} />
 
       <div className="flex items-center gap-3">
         <ThemeToggle />

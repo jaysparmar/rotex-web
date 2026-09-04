@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableEmpty } from "@/components/ui/table";
+import { AdminPagination } from "@/components/ui/admin-pagination";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -273,18 +275,18 @@ export function ProductList({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full max-w-xs">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search by name or model number..."
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="h-9 pl-8"
+            className="pl-8"
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setFilterSheetOpen(true)}>
             <SlidersHorizontal className="size-3.5" />
             Filters
@@ -383,114 +385,90 @@ export function ProductList({
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/30 text-xs uppercase tracking-wide text-muted-foreground">
-              <th className="w-10 py-2.5 pl-4 pr-1 font-medium">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-10 pl-4 pr-1">
+              <Checkbox
+                checked={selectAllAcrossPages || allPageSelected}
+                onCheckedChange={toggleSelectAllOnPage}
+              />
+            </TableHead>
+            <TableHead>Product</TableHead>
+            <TableHead>Model Number</TableHead>
+            <TableHead>Family</TableHead>
+            <TableHead>Company / Category / Subcategory</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Variants</TableHead>
+            <TableHead className="pr-4 text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {products.length === 0 && <TableEmpty colSpan={8}>No products found.</TableEmpty>}
+          {products.map((product) => (
+            <TableRow key={product.id} hoverable>
+              <TableCell className="pl-4 pr-1">
                 <Checkbox
-                  checked={selectAllAcrossPages || allPageSelected}
-                  onCheckedChange={toggleSelectAllOnPage}
+                  checked={selectAllAcrossPages || selectedIds.has(product.id)}
+                  onCheckedChange={() => toggleRow(product.id)}
+                  disabled={selectAllAcrossPages}
                 />
-              </th>
-              <th className="py-2.5 pr-3 font-medium">Product</th>
-              <th className="py-2.5 pr-3 font-medium">Model Number</th>
-              <th className="py-2.5 pr-3 font-medium">Family</th>
-              <th className="py-2.5 pr-3 font-medium">Company / Category / Subcategory</th>
-              <th className="py-2.5 pr-3 font-medium">Type</th>
-              <th className="py-2.5 pr-3 font-medium">Variants</th>
-              <th className="py-2.5 pr-4 font-medium text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {products.length === 0 && (
-              <tr>
-                <td colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
-                  No products found.
-                </td>
-              </tr>
-            )}
-            {products.map((product) => (
-              <tr key={product.id} className="transition-colors hover:bg-muted/20">
-                <td className="py-2.5 pl-4 pr-1">
-                  <Checkbox
-                    checked={selectAllAcrossPages || selectedIds.has(product.id)}
-                    onCheckedChange={() => toggleRow(product.id)}
-                    disabled={selectAllAcrossPages}
-                  />
-                </td>
-                <td className="py-2.5 pr-3">
-                  <Link href={`/admin/products/${product.id}`} className="flex items-center gap-3">
-                    <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                      {product.image && (
-                        <Image
-                          src={product.image}
-                          alt={product.name}
-                          width={36}
-                          height={36}
-                          className="size-full object-contain"
-                          unoptimized
-                        />
-                      )}
-                    </div>
-                    <span className="font-medium hover:underline">{product.name}</span>
-                  </Link>
-                </td>
-                <td className="py-2.5 pr-3 text-muted-foreground">{product.modelNumber}</td>
-                <td className="py-2.5 pr-3">
-                  <Badge variant="outline">{product.productFamily}</Badge>
-                </td>
-                <td className="py-2.5 pr-3 text-muted-foreground">
-                  {product.company.name} / {product.category.name}
-                  {product.subCategory ? ` / ${product.subCategory.name}` : ""}
-                </td>
-                <td className="py-2.5 pr-3 capitalize text-muted-foreground">{product.productType}</td>
-                <td className="py-2.5 pr-3">
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <Layers className="size-3.5" />
-                    {product.variantCount}
-                  </span>
-                </td>
-                <td className="py-2.5 pr-4">
-                  <div className="flex items-center justify-end gap-1">
-                    <Link href={`/admin/products/${product.id}`}>
-                      <Button variant="ghost" size="icon-sm">
-                        <ChevronRight className="size-3.5" />
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      disabled={pending}
-                      onClick={() => setToDelete(product)}
-                    >
-                      <Trash2 className="size-3.5 text-destructive" />
-                    </Button>
+              </TableCell>
+              <TableCell>
+                <Link href={`/admin/products/${product.id}`} className="flex items-center gap-3">
+                  <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
+                    {product.image && (
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        width={36}
+                        height={36}
+                        className="size-full object-contain"
+                        unoptimized
+                      />
+                    )}
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  <span className="font-medium hover:underline">{product.name}</span>
+                </Link>
+              </TableCell>
+              <TableCell className="text-muted-foreground">{product.modelNumber}</TableCell>
+              <TableCell>
+                <Badge variant="outline">{product.productFamily}</Badge>
+              </TableCell>
+              <TableCell className="text-muted-foreground">
+                {product.company.name} / {product.category.name}
+                {product.subCategory ? ` / ${product.subCategory.name}` : ""}
+              </TableCell>
+              <TableCell className="capitalize text-muted-foreground">{product.productType}</TableCell>
+              <TableCell>
+                <span className="flex items-center gap-1 text-muted-foreground">
+                  <Layers className="size-3.5" />
+                  {product.variantCount}
+                </span>
+              </TableCell>
+              <TableCell className="pr-4">
+                <div className="flex items-center justify-end gap-1">
+                  <Link href={`/admin/products/${product.id}`}>
+                    <Button variant="ghost" size="icon-sm">
+                      <ChevronRight className="size-3.5" />
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    disabled={pending}
+                    onClick={() => setToDelete(product)}
+                  >
+                    <Trash2 className="size-3.5 text-destructive" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>
-          {total} product{total === 1 ? "" : "s"} · Page {page} of {totalPages}
-        </span>
-        <div className="flex items-center gap-2">
-          <Link href={pageHref(Math.max(1, page - 1))} aria-disabled={page <= 1}>
-            <Button variant="outline" size="sm" disabled={page <= 1}>
-              Previous
-            </Button>
-          </Link>
-          <Link href={pageHref(Math.min(totalPages, page + 1))} aria-disabled={page >= totalPages}>
-            <Button variant="outline" size="sm" disabled={page >= totalPages}>
-              Next
-            </Button>
-          </Link>
-        </div>
-      </div>
+      <AdminPagination page={page} totalPages={totalPages} total={total} itemLabel="product" pageHref={pageHref} />
 
       <ConfirmDialog
         open={toDelete !== null}

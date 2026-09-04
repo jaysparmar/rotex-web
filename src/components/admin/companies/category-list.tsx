@@ -3,9 +3,11 @@
 import { useState, useTransition, Fragment } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Trash2, Plus, ChevronRight } from "lucide-react";
+import { Trash2, Plus, Pencil, ChevronRight, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { EmptyState } from "@/components/admin/empty-state";
 import { deleteCategory, deleteSubCategory } from "@/app/admin/(dashboard)/companies/actions";
 
 type SubCategoryRow = { id: string; name: string; slug: string };
@@ -57,87 +59,86 @@ export function CategoryList({ companyId, categories }: { companyId: string; cat
         </Link>
       </div>
 
-      <div className="overflow-hidden">
-        <table className="w-full text-left text-sm">
-          <tbody className="divide-y divide-border">
-            {categories.length === 0 && (
-              <tr>
-                <td className="py-8 text-center text-sm text-muted-foreground">No categories yet.</td>
-              </tr>
-            )}
-            {categories.map((category) => {
-              const isExpanded = expanded.has(category.id);
-              return (
-                <Fragment key={category.id}>
-                  <tr>
-                    <td className="py-2.5 pl-5 pr-3 font-medium">
-                      <button
-                        type="button"
-                        onClick={() => toggleExpanded(category.id)}
-                        disabled={category.subCategories.length === 0}
-                        className="flex items-center gap-1.5 disabled:cursor-default"
-                      >
-                        {category.subCategories.length > 0 && (
-                          <ChevronRight
-                            className={`size-3.5 shrink-0 text-muted-foreground transition-transform ${isExpanded ? "rotate-90" : ""}`}
-                          />
-                        )}
-                        {category.name}
-                      </button>
-                    </td>
-                    <td className="py-2.5 pr-3 text-muted-foreground">{category.slug}</td>
-                    <td className="py-2.5 pr-3">{category.subCategories.length} sub-categories</td>
-                    <td className="py-2.5 pr-5">
-                      <div className="flex items-center justify-end gap-3">
-                        <Link
-                          href={`/admin/companies/${companyId}/categories/${category.id}`}
-                          className="text-sm font-medium text-primary hover:underline"
+      {categories.length === 0 ? (
+        <EmptyState icon={Layers} title="No categories yet" description="Add a category to get started." />
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <TableBody>
+              {categories.map((category) => {
+                const isExpanded = expanded.has(category.id);
+                return (
+                  <Fragment key={category.id}>
+                    <TableRow hoverable>
+                      <TableCell className="pl-5 font-medium">
+                        <button
+                          type="button"
+                          onClick={() => toggleExpanded(category.id)}
+                          disabled={category.subCategories.length === 0}
+                          className="flex items-center gap-1.5 disabled:cursor-default"
                         >
-                          Edit
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          disabled={pending}
-                          onClick={() => setToDelete({ kind: "category", category })}
-                        >
-                          <Trash2 className="size-3.5 text-destructive" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                  {isExpanded &&
-                    category.subCategories.map((sub) => (
-                      <tr key={sub.id} className="bg-muted/20">
-                        <td className="py-2 pl-11 pr-3 text-muted-foreground">{sub.name}</td>
-                        <td className="py-2 pr-3 text-xs text-muted-foreground">{sub.slug}</td>
-                        <td className="py-2 pr-3" />
-                        <td className="py-2 pr-5">
-                          <div className="flex items-center justify-end gap-3">
-                            <Link
-                              href={`/admin/companies/${companyId}/categories/${category.id}/sub-categories/${sub.id}`}
-                              className="text-sm font-medium text-primary hover:underline"
-                            >
-                              Edit
-                            </Link>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              disabled={pending}
-                              onClick={() => setToDelete({ kind: "sub", sub })}
-                            >
-                              <Trash2 className="size-3.5 text-destructive" />
+                          {category.subCategories.length > 0 && (
+                            <ChevronRight
+                              className={`size-3.5 shrink-0 text-muted-foreground transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                            />
+                          )}
+                          {category.name}
+                        </button>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{category.slug}</TableCell>
+                      <TableCell>{category.subCategories.length} sub-categories</TableCell>
+                      <TableCell className="pr-5">
+                        <div className="flex items-center justify-end gap-1">
+                          <Link href={`/admin/companies/${companyId}/categories/${category.id}`}>
+                            <Button variant="ghost" size="icon-sm">
+                              <Pencil className="size-3.5" />
                             </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                </Fragment>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            disabled={pending}
+                            onClick={() => setToDelete({ kind: "category", category })}
+                          >
+                            <Trash2 className="size-3.5 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                    {isExpanded &&
+                      category.subCategories.map((sub) => (
+                        <TableRow key={sub.id} className="bg-muted/20">
+                          <TableCell className="pl-11 text-muted-foreground">{sub.name}</TableCell>
+                          <TableCell className="text-xs text-muted-foreground">{sub.slug}</TableCell>
+                          <TableCell />
+                          <TableCell className="pr-5">
+                            <div className="flex items-center justify-end gap-1">
+                              <Link
+                                href={`/admin/companies/${companyId}/categories/${category.id}/sub-categories/${sub.id}`}
+                              >
+                                <Button variant="ghost" size="icon-sm">
+                                  <Pencil className="size-3.5" />
+                                </Button>
+                              </Link>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                disabled={pending}
+                                onClick={() => setToDelete({ kind: "sub", sub })}
+                              >
+                                <Trash2 className="size-3.5 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </Fragment>
+                );
+              })}
+            </TableBody>
+          </table>
+        </div>
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}

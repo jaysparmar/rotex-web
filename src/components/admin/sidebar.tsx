@@ -64,82 +64,96 @@ const NAV_ITEMS = [
   { href: "/admin/global", label: "Global Config", icon: Settings },
 ];
 
-export function AdminSidebar({ logoLight, logoDark }: { logoLight: string; logoDark: string }) {
+export function AdminNavContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const pagesActive = PAGE_ITEMS.some(({ href }) => pathname.startsWith(href));
   const [pagesOpen, setPagesOpen] = useState(pagesActive);
 
-  useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (pagesActive) setPagesOpen(true);
   }, [pagesActive]);
 
+  return (
+    <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+      <Link href="/admin" className="block" onClick={onNavigate}>
+        <Button
+          variant={pathname === "/admin" ? "secondary" : "ghost"}
+          className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
+        >
+          <LayoutDashboard className="size-4" />
+          Dashboard
+        </Button>
+      </Link>
+
+      <div>
+        <Button
+          variant={pagesActive && !pagesOpen ? "secondary" : "ghost"}
+          onClick={() => setPagesOpen((v) => !v)}
+          className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
+        >
+          <Layers className="size-4" />
+          Pages
+          <ChevronDown className={cn("ml-auto size-3.5 transition-transform", pagesOpen && "rotate-180")} />
+        </Button>
+        {pagesOpen && (
+          <div className="mt-1 space-y-1 border-l border-border pl-3">
+            {PAGE_ITEMS.map(({ href, label, icon: Icon }) => {
+              const active = pathname.startsWith(href);
+              return (
+                <Link key={href} href={href} className="block" onClick={onNavigate}>
+                  <Button
+                    variant={active ? "secondary" : "ghost"}
+                    className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
+                  >
+                    <Icon className="size-4" />
+                    {label}
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        const active = pathname.startsWith(href);
+        return (
+          <Link key={href} href={href} className="block" onClick={onNavigate}>
+            <Button
+              variant={active ? "secondary" : "ghost"}
+              className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
+            >
+              <Icon className="size-4" />
+              {label}
+            </Button>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function AdminSidebarLogo({ logoLight, logoDark }: { logoLight: string; logoDark: string }) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
   const logo = mounted && resolvedTheme === "light" ? logoLight : logoDark;
 
   return (
+    <Image src={logo} alt="Rotex" width={120} height={28} unoptimized className="h-7 w-auto object-contain" priority />
+  );
+}
+
+export function AdminSidebar({ logoLight, logoDark }: { logoLight: string; logoDark: string }) {
+  return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-card lg:flex">
       <div className="flex h-14 items-center border-b border-border px-5">
-        <Image src={logo} alt="Rotex" width={120} height={28} unoptimized className="h-7 w-auto object-contain" priority />
+        <AdminSidebarLogo logoLight={logoLight} logoDark={logoDark} />
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        <Link href="/admin" className="block">
-          <Button
-            variant={pathname === "/admin" ? "secondary" : "ghost"}
-            className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
-          >
-            <LayoutDashboard className="size-4" />
-            Dashboard
-          </Button>
-        </Link>
-
-        <div>
-          <Button
-            variant={pagesActive && !pagesOpen ? "secondary" : "ghost"}
-            onClick={() => setPagesOpen((v) => !v)}
-            className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
-          >
-            <Layers className="size-4" />
-            Pages
-            <ChevronDown className={cn("ml-auto size-3.5 transition-transform", pagesOpen && "rotate-180")} />
-          </Button>
-          {pagesOpen && (
-            <div className="mt-1 space-y-1 border-l border-border pl-3">
-              {PAGE_ITEMS.map(({ href, label, icon: Icon }) => {
-                const active = pathname.startsWith(href);
-                return (
-                  <Link key={href} href={href} className="block">
-                    <Button
-                      variant={active ? "secondary" : "ghost"}
-                      className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
-                    >
-                      <Icon className="size-4" />
-                      {label}
-                    </Button>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-          const active = pathname.startsWith(href);
-          return (
-            <Link key={href} href={href} className="block">
-              <Button
-                variant={active ? "secondary" : "ghost"}
-                className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
-              >
-                <Icon className="size-4" />
-                {label}
-              </Button>
-            </Link>
-          );
-        })}
-      </nav>
+      <AdminNavContent />
     </aside>
   );
 }

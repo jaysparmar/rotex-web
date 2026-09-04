@@ -8,6 +8,7 @@ import { buildProductWhere, type ProductFilterParams } from "@/lib/product-filte
 type ContentFields = {
   certificates: string[];
   features: string | null;
+  description: string | null;
   specifications: { key: string; value: string }[];
   downloads: { title: string; description: string; url: string }[];
 };

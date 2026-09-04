@@ -92,7 +92,7 @@ export function SortableSectionList({ sections }: { sections: Section[] }) {
           <Button size="sm" variant="outline" onClick={handleReset} disabled={pending}>
             Reset Order
           </Button>
-          {saved && <span className="text-sm text-green-600">Saved.</span>}
+          {saved && <span className="text-sm text-success">Saved.</span>}
         </div>
       )}
     </div>

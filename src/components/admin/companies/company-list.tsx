@@ -3,9 +3,11 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Pencil, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { EmptyState } from "@/components/admin/empty-state";
 import { deleteCompany } from "@/app/admin/(dashboard)/companies/actions";
 
 type CompanyRow = { id: string; name: string; slug: string; categoryCount: number };
@@ -34,38 +36,37 @@ export function CompanyList({ companies }: { companies: CompanyRow[] }) {
         <Link href="/admin/companies/new">
           <Button size="sm" className="gap-1.5">
             <Plus className="size-3.5" />
-            New Company
+            Add Company
           </Button>
         </Link>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-border">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/30 text-xs uppercase tracking-wide text-muted-foreground">
-              <th className="py-2.5 pl-5 pr-3 font-medium">Name</th>
-              <th className="py-2.5 pr-3 font-medium">Slug</th>
-              <th className="py-2.5 pr-3 font-medium">Categories</th>
-              <th className="py-2.5 pr-5 font-medium" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {companies.length === 0 && (
-              <tr>
-                <td colSpan={4} className="py-8 text-center text-sm text-muted-foreground">
-                  No companies yet.
-                </td>
-              </tr>
-            )}
+      {companies.length === 0 ? (
+        <div className="overflow-hidden rounded-lg border border-border">
+          <EmptyState icon={Building2} title="No companies yet" description="Add a company to get started." />
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="pl-5">Name</TableHead>
+              <TableHead>Slug</TableHead>
+              <TableHead>Categories</TableHead>
+              <TableHead className="pr-5" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {companies.map((company) => (
-              <tr key={company.id}>
-                <td className="py-2.5 pl-5 pr-3 font-medium">{company.name}</td>
-                <td className="py-2.5 pr-3 text-muted-foreground">{company.slug}</td>
-                <td className="py-2.5 pr-3">{company.categoryCount}</td>
-                <td className="py-2.5 pr-5">
-                  <div className="flex items-center justify-end gap-3">
-                    <Link href={`/admin/companies/${company.id}`} className="text-sm font-medium text-primary hover:underline">
-                      Edit
+              <TableRow key={company.id} hoverable>
+                <TableCell className="pl-5 font-medium">{company.name}</TableCell>
+                <TableCell className="text-muted-foreground">{company.slug}</TableCell>
+                <TableCell>{company.categoryCount}</TableCell>
+                <TableCell className="pr-5">
+                  <div className="flex items-center justify-end gap-1">
+                    <Link href={`/admin/companies/${company.id}`}>
+                      <Button variant="ghost" size="icon-sm">
+                        <Pencil className="size-3.5" />
+                      </Button>
                     </Link>
                     <Button
                       variant="ghost"
@@ -76,12 +77,12 @@ export function CompanyList({ companies }: { companies: CompanyRow[] }) {
                       <Trash2 className="size-3.5 text-destructive" />
                     </Button>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}

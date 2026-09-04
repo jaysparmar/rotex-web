@@ -18,12 +18,16 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     (adminConfigRecord?.data as PrismaJson.AdminConfigData | undefined) ?? DEFAULT_ADMIN_CONFIG;
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex h-screen overflow-hidden bg-background">
       <AdminSidebar logoLight={adminConfig.sidebarLogoLight} logoDark={adminConfig.sidebarLogoDark} />
 
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-        <AdminHeader email={session?.user?.email} />
-        <main className="flex-1 p-6">{children}</main>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <AdminHeader
+          email={session?.user?.email}
+          logoLight={adminConfig.sidebarLogoLight}
+          logoDark={adminConfig.sidebarLogoDark}
+        />
+        <main className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
         <AdminFooter />
       </div>
 

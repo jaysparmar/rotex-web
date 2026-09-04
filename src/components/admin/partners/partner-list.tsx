@@ -2,15 +2,16 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { AdminPagination } from "@/components/ui/admin-pagination";
 import { PartnerFormDialog } from "@/components/admin/partners/partner-form-dialog";
 import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { EmptyState } from "@/components/admin/empty-state";
 import { deletePartner, togglePartnerPublished } from "@/app/admin/(dashboard)/partners/actions";
 
 type Partner = { id: string; name: string; logo: string; published: boolean };
@@ -78,9 +79,9 @@ export function PartnerList({
       </div>
 
       {total === 0 ? (
-        <p className="rounded-lg border border-border p-6 text-sm text-muted-foreground">
-          No partners yet.
-        </p>
+        <div className="rounded-lg border border-border">
+          <EmptyState icon={Handshake} title="No partners yet" description="Add a partner to get started." />
+        </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
           {partners.map((partner) => (
@@ -138,23 +139,7 @@ export function PartnerList({
       )}
 
       {total > 0 && (
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>
-            {total} partner{total === 1 ? "" : "s"} · Page {page} of {totalPages}
-          </span>
-          <div className="flex items-center gap-2">
-            <Link href={pageHref(Math.max(1, page - 1))} aria-disabled={page <= 1}>
-              <Button variant="outline" size="sm" disabled={page <= 1}>
-                Previous
-              </Button>
-            </Link>
-            <Link href={pageHref(Math.min(totalPages, page + 1))} aria-disabled={page >= totalPages}>
-              <Button variant="outline" size="sm" disabled={page >= totalPages}>
-                Next
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <AdminPagination page={page} totalPages={totalPages} total={total} itemLabel="partner" pageHref={pageHref} />
       )}
 
       <ConfirmDialog

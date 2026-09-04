@@ -30,7 +30,7 @@ export function SaveBar({ pending, error, success }: { pending: boolean; error?:
         {pending ? "Saving..." : "Save changes"}
       </Button>
       {error && <span className="text-sm text-destructive">{error}</span>}
-      {success && <span className="text-sm text-green-600">Saved.</span>}
+      {success && <span className="text-sm text-success">Saved.</span>}
     </div>
   );
 }

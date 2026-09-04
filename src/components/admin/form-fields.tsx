@@ -26,7 +26,7 @@ export function TextField(props: React.ComponentProps<typeof Input> & { label: s
   const { label, ...rest } = props;
   return (
     <Field label={label}>
-      <Input {...rest} className="h-9" />
+      <Input {...rest} />
     </Field>
   );
 }

@@ -53,6 +53,7 @@ model Product {
   /// [StringList]
   certificates Json @default("[]")
   features     String?
+  description  String?
   /// [SpecList]
   specifications Json @default("[]")
   /// [DownloadList]
@@ -81,6 +82,7 @@ model ProductVariant {
   /// [StringList]
   certificates Json @default("[]")
   features     String?
+  description  String?
   /// [SpecList]
   specifications Json @default("[]")
   /// [DownloadList]

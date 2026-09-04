@@ -5,6 +5,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import {
   Dialog,
+  DialogClose,
   DialogTrigger,
   DialogContent,
   DialogHeader,
@@ -107,8 +108,9 @@ export function CountryFormDialog({
             />
             {error && <p className="text-sm text-destructive">{error}</p>}
             <DialogFooter>
+              <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
               <Button type="submit" disabled={pending}>
-                {pending ? "Saving..." : "Save"}
+                {pending ? "Saving..." : "Save changes"}
               </Button>
             </DialogFooter>
           </form>

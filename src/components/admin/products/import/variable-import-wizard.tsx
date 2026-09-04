@@ -5,13 +5,23 @@ import { toast } from "sonner";
 import { adminFetch } from "@/lib/admin-fetch";
 import { PRODUCT_FAMILIES } from "@/lib/product-constants";
 import type { ColumnDestination, ImportGrid, VariableImportMapping, VariableImportSummary } from "@/lib/variable-product-import";
+import { Stepper, type StepperStep } from "@/components/ui/stepper";
 import { ImportUploadStep } from "./import-upload-step";
-import { ImportMappingStep } from "./import-mapping-step";
+import { ImportBatchDefaultsStep } from "./import-batch-defaults-step";
+import { ImportColumnMappingStep } from "./import-column-mapping-step";
 import { ImportSpecificationsStep } from "./import-specifications-step";
 import { ImportPreviewStep } from "./import-preview-step";
 import type { ClassificationState, CompanyOption, IndustryOption, SheetData } from "./types";
 
-type Step = "upload" | "mapping" | "specifications" | "preview";
+type Step = "upload" | "defaults" | "columns" | "specifications" | "preview";
+
+const STEPS: StepperStep[] = [
+  { id: "upload", label: "Upload" },
+  { id: "defaults", label: "Batch Defaults" },
+  { id: "columns", label: "Map Columns" },
+  { id: "specifications", label: "Specifications" },
+  { id: "preview", label: "Preview & Import" },
+];
 type CommitResult = {
   createdProductCount: number;
   createdVariantCount: number;
@@ -38,7 +48,7 @@ function buildMapping(
   specificationColumns: number[],
   classification: ClassificationState,
   companies: CompanyOption[]
-): { mapping: VariableImportMapping } | { error: string } {
+): { mapping: VariableImportMapping } | { error: string; step: "defaults" | "columns" } {
   function findColumn(dest: ColumnDestination): number | undefined {
     for (const [col, d] of Object.entries(columnDestinations)) {
       if (d === dest) return Number(col);
@@ -73,18 +83,18 @@ function buildMapping(
   }
 
   const modelNumberCol = findColumn("modelNumber");
-  if (modelNumberCol == null) return { error: "Map exactly one column to Model Number." };
+  if (modelNumberCol == null) return { error: "Map exactly one column to Model Number.", step: "columns" };
 
   const category = requiredField("category", "Category");
-  if (!category.ok) return { error: category.error };
+  if (!category.ok) return { error: category.error, step: "defaults" };
   const productFamily = requiredField("productFamily", "Product Family");
-  if (!productFamily.ok) return { error: productFamily.error };
+  if (!productFamily.ok) return { error: productFamily.error, step: "defaults" };
   const subCategory = optionalField("subCategory", "Sub-Category");
-  if (!subCategory.ok) return { error: subCategory.error };
+  if (!subCategory.ok) return { error: subCategory.error, step: "defaults" };
   const industry = optionalField("industry", "Industry");
-  if (!industry.ok) return { error: industry.error };
+  if (!industry.ok) return { error: industry.error, step: "defaults" };
   const subIndustry = optionalField("subIndustry", "Sub-Industry");
-  if (!subIndustry.ok) return { error: subIndustry.error };
+  if (!subIndustry.ok) return { error: subIndustry.error, step: "defaults" };
 
   if (category.config.mode === "fixed" && subCategory.config.mode === "fixed" && subCategory.config.value) {
     const categoryId = category.config.value;
@@ -92,7 +102,7 @@ function buildMapping(
     const owningCategory = companies.flatMap((c) => c.categories).find((cat) => cat.id === categoryId);
     const belongs = owningCategory?.subCategories.some((s) => s.id === subCategoryId) ?? false;
     if (!belongs) {
-      return { error: "The selected Sub-Category does not belong to the selected Category." };
+      return { error: "The selected Sub-Category does not belong to the selected Category.", step: "defaults" };
     }
   }
 
@@ -156,7 +166,7 @@ export function VariableImportWizard({
     const result = buildMapping(headerRow, columnDestinations, specificationColumns, classification, companies);
     if ("error" in result) {
       setMappingError(result.error);
-      setStep("mapping");
+      setStep(result.step);
       return;
     }
     setMappingError(undefined);
@@ -167,9 +177,9 @@ export function VariableImportWizard({
     try {
       const preview = await postImport<VariableImportSummary>("preview", grid, result.mapping);
       setSummary(preview);
-    } catch {
-      toast.error("Failed to analyze the spreadsheet");
-      setStep("mapping");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to analyze the spreadsheet");
+      setStep("columns");
     } finally {
       setPreviewing(false);
     }
@@ -187,8 +197,8 @@ export function VariableImportWizard({
       setSummary(outcome);
       setCommittedResult(outcome);
       toast.success("Import complete");
-    } catch {
-      toast.error("Import failed");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Import failed");
     } finally {
       setCommitting(false);
     }
@@ -196,6 +206,16 @@ export function VariableImportWizard({
 
   return (
     <div className="space-y-6">
+      <Stepper
+        steps={STEPS}
+        currentId={step}
+        onStepClick={(id) => {
+          const targetIndex = STEPS.findIndex((s) => s.id === id);
+          const currentIndex = STEPS.findIndex((s) => s.id === step);
+          if (targetIndex < currentIndex) setStep(id as Step);
+        }}
+      />
+
       {step === "upload" && (
         <ImportUploadStep
           sheets={sheets}
@@ -208,22 +228,32 @@ export function VariableImportWizard({
             setSpecificationColumns([]);
           }}
           onHeaderRowChange={setHeaderRow}
-          onNext={() => setStep("mapping")}
+          onNext={() => setStep("defaults")}
         />
       )}
 
-      {step === "mapping" && sheets && (
-        <ImportMappingStep
-          grid={grid}
-          headerRow={headerRow}
+      {step === "defaults" && sheets && (
+        <ImportBatchDefaultsStep
           columnDestinations={columnDestinations}
-          onColumnDestinationsChange={setColumnDestinations}
           classification={classification}
           onClassificationChange={setClassification}
           companies={companies}
           industries={industries}
           error={mappingError}
           onBack={() => setStep("upload")}
+          onNext={() => setStep("columns")}
+        />
+      )}
+
+      {step === "columns" && sheets && (
+        <ImportColumnMappingStep
+          grid={grid}
+          headerRow={headerRow}
+          columnDestinations={columnDestinations}
+          onColumnDestinationsChange={setColumnDestinations}
+          classification={classification}
+          error={mappingError}
+          onBack={() => setStep("defaults")}
           onNext={() => setStep("specifications")}
         />
       )}
@@ -232,9 +262,10 @@ export function VariableImportWizard({
         <ImportSpecificationsStep
           grid={grid}
           headerRow={headerRow}
+          columnDestinations={columnDestinations}
           specificationColumns={specificationColumns}
           onChange={setSpecificationColumns}
-          onBack={() => setStep("mapping")}
+          onBack={() => setStep("columns")}
           onNext={handleRunPreview}
         />
       )}

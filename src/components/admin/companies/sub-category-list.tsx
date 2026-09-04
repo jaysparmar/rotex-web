@@ -3,9 +3,10 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Pencil, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { EmptyState } from "@/components/admin/empty-state";
 import { deleteSubCategory } from "@/app/admin/(dashboard)/companies/actions";
 
 type SubCategoryRow = { id: string; name: string; slug: string };
@@ -49,35 +50,35 @@ export function SubCategoryList({
           </Button>
         </Link>
       </div>
-      <div className="divide-y divide-border">
-        {subCategories.length === 0 && (
-          <p className="p-5 text-sm text-muted-foreground">No sub-categories.</p>
-        )}
-        {subCategories.map((sub) => (
-          <div key={sub.id} className="flex items-center justify-between gap-4 p-5">
-            <div>
-              <p className="text-sm font-medium">{sub.name}</p>
-              <p className="text-xs text-muted-foreground">{sub.slug}</p>
+      {subCategories.length === 0 ? (
+        <EmptyState icon={Layers} title="No sub-categories yet" description="Add a sub-category to get started." />
+      ) : (
+        <div className="divide-y divide-border">
+          {subCategories.map((sub) => (
+            <div key={sub.id} className="flex flex-wrap items-center justify-between gap-4 p-5">
+              <div>
+                <p className="text-sm font-medium">{sub.name}</p>
+                <p className="text-xs text-muted-foreground">{sub.slug}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <Link href={`/admin/companies/${companyId}/categories/${categoryId}/sub-categories/${sub.id}`}>
+                  <Button variant="ghost" size="icon-sm">
+                    <Pencil className="size-3.5" />
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  disabled={pending}
+                  onClick={() => setToDelete(sub)}
+                >
+                  <Trash2 className="size-3.5 text-destructive" />
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Link
-                href={`/admin/companies/${companyId}/categories/${categoryId}/sub-categories/${sub.id}`}
-                className="text-sm font-medium text-primary hover:underline"
-              >
-                Edit
-              </Link>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                disabled={pending}
-                onClick={() => setToDelete(sub)}
-              >
-                <Trash2 className="size-3.5 text-destructive" />
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}

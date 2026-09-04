@@ -32,6 +32,7 @@ type VariantRecord = {
   flowFactor: string | null;
   certificates: unknown;
   features: string | null;
+  description: string | null;
   specifications: unknown;
   downloads: unknown;
 };
@@ -59,6 +60,7 @@ export function VariantEditForm({
       flowFactor: variant?.flowFactor ?? NONE,
       certificates: (variant?.certificates as string[] | null) ?? [],
       features: variant?.features ?? "",
+      description: variant?.description ?? "",
       specifications: (variant?.specifications as { key: string; value: string }[] | null) ?? [],
       downloads: ((variant?.downloads as { title: string; description: string; url: string }[] | null) ?? []).map(
         (d) => ({ title: d.title, description: d.description, url: { src: d.url } })
@@ -77,6 +79,7 @@ export function VariantEditForm({
       flowFactor: values.flowFactor === NONE ? null : values.flowFactor,
       certificates: values.certificates,
       features: values.features || null,
+      description: values.description || null,
       specifications: values.specifications.filter((s) => s.key.trim()),
       downloads: values.downloads.filter((d) => d.title.trim()).map((d) => ({ ...d, url: d.url.src })),
     };

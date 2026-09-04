@@ -20,7 +20,7 @@ export function Breadcrumb({
       )}
 
       {rest.map((item, i) => (
-        <span key={i} className="flex items-center gap-1.5 capitalize">
+        <span key={i} className="flex items-center gap-1.5">
           <ChevronRight className="size-3.5 text-muted-foreground" />
           {item.href ? (
             <Link href={item.href} className="text-muted-foreground transition-colors hover:text-foreground">
