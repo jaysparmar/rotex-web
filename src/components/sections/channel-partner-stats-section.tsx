@@ -85,7 +85,7 @@ export function ChannelPartnerStatsSection({
           </div>
           {stats.slice(0, 3).map((stat) => (
             <div key={stat.label} className="flex flex-col gap-2">
-              <p className="text-stone-900 text-3xl lg:text-4xl font-semibold font-montserrat leading-tight">
+              <p className="text-stone-900 text-3xl lg:text-4xl font-medium font-montserrat leading-tight">
                 <StatValue value={stat.value} />
               </p>
               <p className="text-stone-500 text-sm font-medium font-montserrat leading-5 max-w-50">
@@ -104,7 +104,7 @@ export function ChannelPartnerStatsSection({
           </div>
           {stats.slice(3, 6).map((stat) => (
             <div key={stat.label} className="flex flex-col gap-2">
-              <p className="text-stone-900 text-3xl lg:text-4xl font-semibold font-montserrat leading-tight">
+              <p className="text-stone-900 text-3xl lg:text-4xl font-medium font-montserrat leading-tight">
                 <StatValue value={stat.value} />
               </p>
               <p className="text-stone-500 text-sm font-medium font-montserrat leading-5 max-w-50">
