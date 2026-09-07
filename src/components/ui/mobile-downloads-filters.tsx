@@ -133,7 +133,7 @@ export function MobileDownloadsFilters({
       {/* Main filters bottom sheet */}
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
         <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl">
-          <SheetHeader className="flex-row items-center justify-between">
+          <SheetHeader className="flex-row items-center justify-between pr-9">
             <SheetTitle>Filters</SheetTitle>
             {hasActiveFilters && (
               <button
@@ -176,7 +176,7 @@ export function MobileDownloadsFilters({
         <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl">
           {activePanel && (
             <>
-              <SheetHeader className="flex-row items-center gap-2">
+              <SheetHeader className="flex-row items-center gap-2 pr-9">
                 <button type="button" onClick={() => setPanel(null)} className="text-red-600">
                   <ChevronLeft className="size-4" />
                 </button>
