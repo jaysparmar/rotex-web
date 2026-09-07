@@ -1,3 +1,5 @@
+import { HexIcon } from "@/components/ui/hex-icon";
+
 type WhyCard = { title: string; points: string[] };
 
 const CARDS: WhyCard[] = [
@@ -72,7 +74,9 @@ export function ChannelPartnerWhySection({
                 <ul className="flex flex-col gap-4">
                   {card.points.map((point) => (
                     <li key={point} className="flex items-start gap-3">
-                      <span className="mt-1.5 ml-1.5 size-3 shrink-0 bg-neutral-200" />
+                      <span className="mt-1.5 shrink-0">
+                        <HexIcon size={12} color="#E5E5E5" />
+                      </span>
                       <span className="flex-1 text-stone-900 font-montserrat font-medium text-base leading-6">
                         {point}
                       </span>
