@@ -9,20 +9,18 @@ import bg from "@/assets/footer_bg.svg";
 // Pages not built yet — render as disabled text instead of a broken link.
 const DISABLED_HREFS = new Set<string>([]);
 
-/* Figma: base fill #110101, radial gradient #FF9A00 → #F03900 → #950000 → #000000.
-   Origin pulled to 50%: Figma's 57% is near-centre on its 1440px frame, but the
-   footer is full-bleed, so 57% pushed the circle right and left the top-right
-   corner red while the top-left went black. At 50% both corners sit the same
-   distance out and reach black together.
-   `ellipse` rather than `circle` so the radii scale with the box — a circle sized
-   to the farthest corner overshoots on wide viewports and washes the ramp out. */
+/* Exact Figma spec: radial-gradient(90.32% 171.7% at 56.6% 162.26%,
+   #FF9A00 0%, #F03900 28%, #950000 61%, #000 87%), #110101
+   Percentage size (not the `ellipse`/farthest-corner keyword) gives an explicit
+   radius on each axis relative to the box, so it scales correctly with the
+   full-bleed footer instead of only matching Figma's fixed 1440px frame. */
 const FOOTER_BASE_COLOR = "#110101";
 const FOOTER_GRADIENT = `
   radial-gradient(
-    ellipse at 50% 162%,
+    90.32% 171.7% at 56.6% 162.26%,
     #ff9a00 0%,
-    #f03900 14%,
-    #950000 28%,
+    #f03900 28%,
+    #950000 61%,
     #000000 87%
   )
 `.trim();
