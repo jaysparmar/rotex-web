@@ -108,7 +108,7 @@ export function PageHero({ title, description, bg, children }: PageHeroProps) {
               {title}
             </h1>
             {description && (
-              <p className="w-full lg:w-121.25 text-subtext text-sm lg:text-lg font-medium font-montserrat leading-5 lg:leading-6">
+              <p className="w-full lg:w-121.25 text-stone-300 text-sm lg:text-base font-normal font-montserrat leading-6 lg:leading-7">
                 {description}
               </p>
             )}
