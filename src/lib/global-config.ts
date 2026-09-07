@@ -81,15 +81,30 @@ async function resolveProductsMenu(source: PrismaJson.MegaMenuSource): Promise<P
   };
 }
 
+async function resolveFeaturedBlog(menu: PrismaJson.FlatMenu): Promise<PrismaJson.FlatMenu> {
+  if (!menu.featuredBlogSlug) return menu;
+  const blog = await prisma.resource.findFirst({
+    where: { type: "blogs", slug: menu.featuredBlogSlug, published: true },
+    select: { slug: true, title: true, image: true },
+  });
+  if (!blog) return menu;
+  return { ...menu, image: blog.image, imageCaption: blog.title, imageHref: `/blogs/${blog.slug}` };
+}
+
 export async function resolveNavItems(nav: PrismaJson.NavItem[]): Promise<PrismaJson.NavItem[]> {
   return Promise.all(
     nav.map(async (item) => {
-      if (!item.megaMenuSource) return item;
-      const megaMenu =
-        item.megaMenuSource.type === "industries"
-          ? await resolveIndustriesMenu(item.megaMenuSource)
-          : await resolveProductsMenu(item.megaMenuSource);
-      return { ...item, megaMenu };
+      if (item.megaMenuSource) {
+        const megaMenu =
+          item.megaMenuSource.type === "industries"
+            ? await resolveIndustriesMenu(item.megaMenuSource)
+            : await resolveProductsMenu(item.megaMenuSource);
+        return { ...item, megaMenu };
+      }
+      if (item.megaMenu?.type === "flat" && item.megaMenu.featuredBlogSlug) {
+        return { ...item, megaMenu: await resolveFeaturedBlog(item.megaMenu) };
+      }
+      return item;
     })
   );
 }

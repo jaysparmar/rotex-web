@@ -8,6 +8,7 @@ import { FlatImageField } from "@/components/admin/flat-image-field";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
 type IndustryOption = { id: string; name: string; subIndustries: { id: string; name: string }[] };
+type BlogOption = { slug: string; title: string };
 
 type Mode = "none" | "industries" | "products" | "custom" | "legacy";
 
@@ -30,10 +31,12 @@ export function MegaMenuEditor({
   navIndex,
   industries,
   productCategories,
+  blogs,
 }: {
   navIndex: number;
   industries: IndustryOption[];
   productCategories: string[];
+  blogs: BlogOption[];
 }) {
   const form = useFormContext();
   const menuPath = `header.nav.${navIndex}.megaMenu`;
@@ -85,7 +88,7 @@ export function MegaMenuEditor({
       </Field>
       {mode === "industries" && <IndustriesPicker navIndex={navIndex} industries={industries} />}
       {mode === "products" && <ProductsPicker navIndex={navIndex} categories={productCategories} />}
-      {mode === "custom" && <CustomMenuEditor navIndex={navIndex} />}
+      {mode === "custom" && <CustomMenuEditor navIndex={navIndex} blogs={blogs} />}
     </div>
   );
 }
@@ -245,15 +248,40 @@ function ProductsPicker({ navIndex, categories }: { navIndex: number; categories
 // Each column holds exactly one card (heading + description + image), matching
 // how these menus are laid out. Hrefs stay fixed to the pages already coded.
 
-function CustomMenuEditor({ navIndex }: { navIndex: number }) {
+function CustomMenuEditor({ navIndex, blogs }: { navIndex: number; blogs: BlogOption[] }) {
   const form = useFormContext();
   const base = `header.nav.${navIndex}.megaMenu`;
   const columns = useFieldArray({ control: form.control, name: `${base}.columns` });
+  const featuredBlogSlug: string | undefined = useWatch({ control: form.control, name: `${base}.featuredBlogSlug` });
 
   return (
     <div className="space-y-4">
+      <Field label="Featured Blog">
+        <Select
+          items={[{ value: "__none__", label: "None" }, ...blogs.map((b) => ({ value: b.slug, label: b.title }))]}
+          value={featuredBlogSlug || "__none__"}
+          onValueChange={(v) => form.setValue(`${base}.featuredBlogSlug`, v === "__none__" ? undefined : v)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__none__">None</SelectItem>
+            {blogs.map((b) => (
+              <SelectItem key={b.slug} value={b.slug}>
+                {b.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          When set, the default image/caption below is replaced by this blog&apos;s image + title, and it links to
+          the blog post.
+        </p>
+      </Field>
       <p className="text-xs text-muted-foreground">
-        Default image shows whenever a card below doesn&apos;t have its own image set.
+        Default image shows whenever a card below doesn&apos;t have its own image set (or as a fallback if no
+        Featured Blog is picked above).
       </p>
       <FlatImageField name={`${base}.image`} label="Default Image" />
       <TextField label="Default Image Caption" {...form.register(`${base}.imageCaption`)} />

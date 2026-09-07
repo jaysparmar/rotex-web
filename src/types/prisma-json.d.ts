@@ -46,6 +46,10 @@ declare global {
       image?: string;
       imageCaption?: string;
       cta?: { text: string; href: string };
+      /* Admin-picked blog slug (Resource type "blogs"). Resolved into image/imageCaption/imageHref at read time. */
+      featuredBlogSlug?: string;
+      /* Resolved server-side from featuredBlogSlug — not admin-edited directly. */
+      imageHref?: string;
     };
 
     type MegaMenuConfig = CategorySwitcherMenu | FlatMenu;

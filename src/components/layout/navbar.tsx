@@ -253,38 +253,65 @@ function FlatMegaMenuPanel({
             </div>
           </Link>
         ) : hoveredImage ? (
-          <div className="w-115 h-87.5 shrink-0 self-start ml-auto relative overflow-hidden">
-            <AnimatePresence mode="sync">
-              <motion.div
-                key={hoveredImage}
-                className="absolute inset-0"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-              >
-                <Image
-                  src={hoveredImage}
-                  alt={config.imageCaption ?? ""}
-                  fill
-                  className="object-cover"
-                  sizes="350px"
-                  unoptimized
-                />
-              </motion.div>
-            </AnimatePresence>
-            {config.imageCaption && hoveredImage === defaultImage && (
-              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-5">
-                <span className="text-white text-lg font-semibold font-montserrat leading-5">
-                  {config.imageCaption}
-                </span>
-              </div>
-            )}
-          </div>
+          <MegaMenuImagePanel
+            src={hoveredImage}
+            caption={config.imageCaption}
+            href={hoveredImage === defaultImage ? config.imageHref : undefined}
+            showCaption={hoveredImage === defaultImage}
+            onClose={onClose}
+          />
         ) : null}
       </div>
     </div>
   );
+}
+
+function MegaMenuImagePanel({
+  src,
+  caption,
+  href,
+  showCaption,
+  onClose,
+}: {
+  src: string;
+  caption?: string;
+  href?: string;
+  showCaption: boolean;
+  onClose: () => void;
+}) {
+  const content = (
+    <>
+      <AnimatePresence mode="sync">
+        <motion.div
+          key={src}
+          className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
+          <Image src={src} alt={caption ?? ""} fill className="object-cover" sizes="350px" unoptimized />
+        </motion.div>
+      </AnimatePresence>
+      {caption && showCaption && (
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-5">
+          <span className="text-white text-lg font-semibold font-montserrat leading-5">{caption}</span>
+        </div>
+      )}
+    </>
+  );
+
+  const className = "w-115 h-87.5 shrink-0 self-start ml-auto relative overflow-hidden block";
+
+  if (href) {
+    return (
+      <Link href={href} onClick={onClose} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className={className}>{content}</div>;
 }
 
 // ─── Animation constants ──────────────────────────────────────────────────────

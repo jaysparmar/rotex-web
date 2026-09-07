@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { HeaderConfigForm } from "@/components/admin/home-sections/header-config-form";
+import { getPublishedResources } from "@/lib/resources";
 
 export default async function AdminGlobalHeaderPage() {
   const record = await prisma.globalConfig.findUniqueOrThrow({ where: { id: "global" } });
@@ -21,6 +22,8 @@ export default async function AdminGlobalHeaderPage() {
     orderBy: { name: "asc" },
   });
   const productCategories = categoryRows.map((r) => r.name);
+
+  const blogs = await getPublishedResources("blogs");
 
   return (
     <div className="space-y-6">
@@ -43,6 +46,7 @@ export default async function AdminGlobalHeaderPage() {
         footer={config.footer}
         industries={industries}
         productCategories={productCategories}
+        blogs={blogs.map((b) => ({ slug: b.slug, title: b.title }))}
       />
     </div>
   );

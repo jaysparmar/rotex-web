@@ -15,11 +15,13 @@ import { TextField, SwitchField, FieldGrid } from "@/components/admin/form-field
 import { MegaMenuEditor } from "@/components/admin/home-sections/mega-menu-editor";
 
 type IndustryOption = { id: string; name: string; subIndustries: { id: string; name: string }[] };
+type BlogOption = { slug: string; title: string };
 
 export function NavItemDialog({
   navIndex,
   industries,
   productCategories,
+  blogs,
   onSave,
   pending,
   trigger,
@@ -27,6 +29,7 @@ export function NavItemDialog({
   navIndex: number;
   industries: IndustryOption[];
   productCategories: string[];
+  blogs: BlogOption[];
   onSave: () => Promise<void> | void;
   pending: boolean;
   trigger: React.ReactNode;
@@ -63,7 +66,7 @@ export function NavItemDialog({
               {...form.register(`header.nav.${navIndex}.href`)}
             />
           </FieldGrid>
-          <MegaMenuEditor navIndex={navIndex} industries={industries} productCategories={productCategories} />
+          <MegaMenuEditor navIndex={navIndex} industries={industries} productCategories={productCategories} blogs={blogs} />
         </div>
 
         <DialogFooter>
