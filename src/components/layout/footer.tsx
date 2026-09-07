@@ -9,17 +9,19 @@ import bg from "@/assets/footer_bg.svg";
 // Pages not built yet — render as disabled text instead of a broken link.
 const DISABLED_HREFS = new Set<string>([]);
 
-/* Figma: bg-radial-[at_57%_162%] from-amber-500 via-orange-600 28% to-black 87%
+/* Figma: base fill #110101, radial gradient #FF9A00 → #F03900 → #950000 → #000000.
    Origin pulled to 50%: Figma's 57% is near-centre on its 1440px frame, but the
    footer is full-bleed, so 57% pushed the circle right and left the top-right
    corner red while the top-left went black. At 50% both corners sit the same
    distance out and reach black together.
    `ellipse` rather than `circle` so the radii scale with the box — a circle sized
    to the farthest corner overshoots on wide viewports and washes the ramp out. */
+const FOOTER_BASE_COLOR = "#110101";
 const FOOTER_GRADIENT = `
   radial-gradient(
     ellipse at 50% 162%,
     #ff9a00 0%,
+    #f03900 14%,
     #950000 28%,
     #000000 87%
   )
@@ -43,7 +45,7 @@ export function Footer({ config }: { config: PrismaJson.GlobalConfigData }) {
   return (
     <footer
       className="relative overflow-hidden"
-      style={{ background: FOOTER_GRADIENT, minHeight: "650px" }}
+      style={{ backgroundColor: FOOTER_BASE_COLOR, backgroundImage: FOOTER_GRADIENT, minHeight: "650px" }}
     >
       {/* Decorative background SVG */}
       <Image
