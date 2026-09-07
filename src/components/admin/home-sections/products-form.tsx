@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
@@ -74,7 +75,11 @@ export function ProductsForm({
 
         <p className="text-xs text-muted-foreground">
           Cards shown are pulled live from Categories (name, description, image, slug) — pick which ones show
-          here and their order. Edit a category&apos;s content at Admin → Companies → a company → Categories.
+          here and their order. Edit a category&apos;s content at{" "}
+          <Link href="/admin/categories" className="underline">
+            Admin → Categories
+          </Link>
+          .
         </p>
 
         <div className="space-y-1 rounded-lg border border-border">

@@ -22,6 +22,9 @@ type SubCategoryData = CategoryData;
 
 function revalidateCompanies() {
   revalidatePath("/admin/companies");
+  revalidatePath("/admin/categories");
+  revalidatePath("/downloads");
+  revalidatePath("/");
 }
 
 export async function createCompany(data: CompanyData) {

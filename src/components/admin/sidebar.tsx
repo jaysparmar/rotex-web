@@ -51,6 +51,7 @@ const NAV_ITEMS = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/attributes", label: "Attributes", icon: SlidersHorizontal },
   { href: "/admin/companies", label: "Companies", icon: Building2 },
+  { href: "/admin/categories", label: "Categories", icon: Layers },
   { href: "/admin/industries", label: "Industries", icon: Factory },
   { href: "/admin/partners", label: "Partners", icon: Handshake },
   { href: "/admin/certifications", label: "Certifications", icon: Award },
