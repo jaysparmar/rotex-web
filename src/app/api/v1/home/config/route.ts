@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { apiSuccess, apiError } from "@/lib/api-response";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const [seo, sections] = await Promise.all([
     prisma.homeSeo.findUnique({ where: { id: "home" } }),
