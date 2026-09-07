@@ -25,7 +25,7 @@ export function ChannelPartnerMapSection({
     <section className="bg-white py-14 lg:py-20">
       <div className="container">
         <div className="text-center mb-6o">
-          <h2 className="text-stone-900 font-montserrat font-semibold text-2xl lg:text-3xl leading-8 lg:leading-10">
+          <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
             {heading}
           </h2>
           <p className="mt-3 text-stone-500 font-montserrat font-medium text-sm lg:text-base leading-6 max-w-lg mx-auto">

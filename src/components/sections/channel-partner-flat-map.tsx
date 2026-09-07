@@ -66,19 +66,25 @@ function ChannelPartnerFlatMap({ pins }: { pins: Pin[] }) {
                   className={`flex flex-col gap-1.5 ${flip ? "items-end" : "items-start"}`}
                   style={{ pointerEvents: "none" }}
                 >
-                  <button
-                    type="button"
-                    onClick={() => setOpenPin(isOpen ? null : index)}
-                    className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-white px-2.5 py-1 shadow-[0_1px_3px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.2)] transition-shadow"
-                    style={{ pointerEvents: "auto" }}
-                  >
-                    <span className="text-xs font-medium font-montserrat text-stone-800">{pin.name}</span>
-                    {isOpen ? (
-                      <Minus className="size-3 text-stone-500" strokeWidth={2} />
-                    ) : (
-                      <Plus className="size-3 text-stone-500" strokeWidth={2} />
-                    )}
-                  </button>
+                  {detail ? (
+                    <button
+                      type="button"
+                      onClick={() => setOpenPin(isOpen ? null : index)}
+                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-white px-2.5 py-1 shadow-[0_1px_3px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.2)] transition-shadow"
+                      style={{ pointerEvents: "auto" }}
+                    >
+                      <span className="text-xs font-medium font-montserrat text-stone-800">{pin.name}</span>
+                      {isOpen ? (
+                        <Minus className="size-3 text-stone-500" strokeWidth={2} />
+                      ) : (
+                        <Plus className="size-3 text-stone-500" strokeWidth={2} />
+                      )}
+                    </button>
+                  ) : (
+                    <span className="inline-flex items-center whitespace-nowrap rounded-md bg-white px-2.5 py-1 shadow-[0_1px_3px_rgba(0,0,0,0.15)]">
+                      <span className="text-xs font-medium font-montserrat text-stone-800">{pin.name}</span>
+                    </span>
+                  )}
 
                   <AnimatePresence>
                     {isOpen && detail && (
