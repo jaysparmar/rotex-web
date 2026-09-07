@@ -1,7 +1,9 @@
 import { SupplierHeroSection } from "@/components/sections/supplier-hero-section";
 import { SupplierBenefitsSection } from "@/components/sections/supplier-benefits-section";
 import { SupplierFormSection } from "@/components/sections/supplier-form-section";
-import { fetchSupplierSection } from "@/lib/site-api";
+import { fetchSupplierSection, fetchIndustries } from "@/lib/site-api";
+
+type IndustriesData = { industries: { id: string; name: string }[] };
 
 type CtaButton = { label: string; href: string };
 type HeroData = { title: string; description: string; image: string; mobileImage?: string; cta: CtaButton };
@@ -24,11 +26,15 @@ type FormData = {
 };
 
 export default async function SupplierPage() {
-  const [hero, benefits, form] = await Promise.all([
+  const [hero, benefits, form, industriesData] = await Promise.all([
     fetchSupplierSection<HeroData>("hero"),
     fetchSupplierSection<BenefitsData>("benefits"),
     fetchSupplierSection<FormData>("form"),
+    fetchIndustries<IndustriesData>(),
   ]);
+
+  const liveIndustryNames = industriesData?.industries.map((i) => i.name) ?? [];
+  const industryOptions = liveIndustryNames.length > 0 ? liveIndustryNames : form?.industryOptions;
 
   return (
     <div>
@@ -60,7 +66,7 @@ export default async function SupplierPage() {
           countryOptions={form.countryOptions}
           cityOptions={form.cityOptions}
           businessTypeOptions={form.businessTypeOptions}
-          industryOptions={form.industryOptions}
+          industryOptions={industryOptions}
           defaultCountry={form.defaultCountry}
         />
       )}

@@ -5,7 +5,9 @@ import { ChannelPartnerBenefitsSection } from "@/components/sections/channel-par
 import { ChannelPartnerMapSection } from "@/components/sections/channel-partner-map-section";
 import { CustomerStoriesSection } from "@/components/sections/customer-stories-section";
 import { ChannelPartnerFormSection } from "@/components/sections/channel-partner-form-section";
-import { fetchChannelPartnerSection } from "@/lib/site-api";
+import { fetchChannelPartnerSection, fetchIndustries } from "@/lib/site-api";
+
+type IndustriesData = { industries: { id: string; name: string }[] };
 
 type CtaButton = { label: string; href: string };
 type HeroData = { title: string; description: string; image: string; mobileImage?: string; cta: CtaButton };
@@ -34,7 +36,7 @@ type FormData = {
 };
 
 export default async function ChannelPartnerPage() {
-  const [hero, stats, why, benefits, map, stories, form] = await Promise.all([
+  const [hero, stats, why, benefits, map, stories, form, industriesData] = await Promise.all([
     fetchChannelPartnerSection<HeroData>("hero"),
     fetchChannelPartnerSection<StatsData>("stats"),
     fetchChannelPartnerSection<WhyData>("why"),
@@ -42,7 +44,11 @@ export default async function ChannelPartnerPage() {
     fetchChannelPartnerSection<MapData>("map"),
     fetchChannelPartnerSection<StoriesData>("stories"),
     fetchChannelPartnerSection<FormData>("form"),
+    fetchIndustries<IndustriesData>(),
   ]);
+
+  const liveIndustryNames = industriesData?.industries.map((i) => i.name) ?? [];
+  const industryOptions = liveIndustryNames.length > 0 ? liveIndustryNames : form?.industryOptions;
 
   return (
     <div>
@@ -93,7 +99,7 @@ export default async function ChannelPartnerPage() {
           countryOptions={form.countryOptions}
           cityOptions={form.cityOptions}
           businessTypeOptions={form.businessTypeOptions}
-          industryOptions={form.industryOptions}
+          industryOptions={industryOptions}
           defaultCountry={form.defaultCountry}
         />
       )}
