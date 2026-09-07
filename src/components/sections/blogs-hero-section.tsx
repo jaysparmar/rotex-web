@@ -32,7 +32,7 @@ export function BlogsHeroSection({ featured }: { featured?: ResourceItem }) {
                 <ArrowUpRight />
               </span>
             </Link>
-            <div className="flex-1 p-8 flex flex-col justify-end gap-5">
+            <div className="flex-1 p-8 flex flex-col justify-center gap-5">
               <div className="flex flex-col gap-5">
                 <span className="text-neutral-400 text-sm font-semibold font-montserrat uppercase leading-5">
                   {formatResourceDate(featured.createdAt)}
