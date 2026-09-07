@@ -82,8 +82,8 @@ export function IndustryChallengesSolutions({
 
         {/* Solutions */}
         {/* Figma: bg-red-50 / text-red-600 */}
-        <div className="flex-1 p-5 lg:p-7 bg-red-50 rounded-xl flex flex-col gap-5 lg:gap-6">
-          <h3 className="text-red-600 text-xl lg:text-2xl font-medium font-montserrat leading-7 lg:leading-8 line-clamp-5">
+        <div className="flex-1 p-5 lg:p-7 bg-[#FFF7F4] rounded-xl flex flex-col gap-5 lg:gap-6">
+          <h3 className="text-[#EF3E23] text-xl lg:text-2xl font-medium font-montserrat leading-7 lg:leading-8 line-clamp-5">
             {solutionsTitle}
           </h3>
           <div className="flex flex-col">
@@ -100,7 +100,7 @@ export function IndustryChallengesSolutions({
                   className="overflow-hidden"
                 >
                   {restSolutions.map((s, i) => (
-                    <CardRow key={i} card={s} color="#dc2626" />
+                    <CardRow key={i} card={s} color="#EF3E23" />
                   ))}
                 </motion.div>
               )}

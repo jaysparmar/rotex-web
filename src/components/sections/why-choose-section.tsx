@@ -27,7 +27,7 @@ function WhyChooseCardItem({
 }) {
   return (
     <div className="relative w-full bg-white rounded-lg p-5 overflow-hidden">
-      <div className="flex flex-col gap-5 pr-8">
+      <div className="flex flex-col gap-2.5 pr-8">
         <h3 className={`text-stone-900 font-medium font-montserrat ${titleClass}`}>
           {card.title}
         </h3>

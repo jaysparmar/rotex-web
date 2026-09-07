@@ -25,7 +25,7 @@ function AnimatedCounter({ value, suffix }: { value: string; suffix?: string }) 
     <span ref={ref} className="text-stone-900 text-3xl font-normal font-montserrat leading-10">
       <motion.span>{rounded}</motion.span>
       {unit}
-      {suffix && <span className="text-primary -ml-1.5">{suffix}</span>}
+      {suffix && <span className="text-primary ">{suffix}</span>}
     </span>
   );
 }
@@ -80,7 +80,7 @@ export function IndustryOverview({ sectionTitle, overview, stats }: IndustryOver
         </div>
 
         {/* Stats: 2 per row, wraps to new row as more stats are added */}
-        <div className="shrink-0 grid grid-cols-2 gap-x-7 gap-y-6 lg:gap-x-12 lg:gap-y-10">
+        <div className="shrink-0 grid grid-cols-2 gap-x-2 gap-y-6 lg:gap-y-10">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
