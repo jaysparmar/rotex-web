@@ -124,7 +124,7 @@ function QuoteFormFields({
               {...register("phone")}
               type="tel"
               placeholder="Enter phone number"
-              className={`flex-1 px-4 bg-transparent ${placeholderCls} text-stone-900 outline-none`}
+              className={`flex-1 px-4 bg-transparent ${placeholderCls} text-stone-900`}
             />
           </div>
           {errors.phone && <p className={errorCls}>{errors.phone.message}</p>}
@@ -167,7 +167,7 @@ function QuoteFormFields({
           {...register("message")}
           rows={4}
           placeholder="Outline your application requirements and specifications..."
-          className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 outline-none resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
+          className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
         />
       </Field>
 
@@ -288,11 +288,11 @@ const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
 const placeholderCls = "text-base font-medium font-montserrat leading-6 placeholder:text-neutral-400";
 
 function inputCls(hasError: boolean) {
-  return `w-full h-12 px-5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 outline-none ${hasError ? "outline-red-400" : "outline-gray-200"}`;
+  return `w-full h-12 px-5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 ${hasError ? "outline-red-400" : "outline-gray-200"}`;
 }
 
 function selectLikeCls(hasError: boolean) {
-  return `w-full px-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 text-base font-medium font-montserrat leading-6 placeholder:text-neutral-400 text-stone-900 outline-none ${hasError ? "outline-red-400" : "outline-gray-200"}`;
+  return `w-full px-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 text-base font-medium font-montserrat leading-6 placeholder:text-neutral-400 text-stone-900 ${hasError ? "outline-red-400" : "outline-gray-200"}`;
 }
 
 function Field({

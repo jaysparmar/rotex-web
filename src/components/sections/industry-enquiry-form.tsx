@@ -188,7 +188,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
               {...register("message")}
               rows={4}
               placeholder="Your Message"
-              className={`w-full px-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 outline-none resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
+              className={`w-full px-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
             />
           </Field>
 
@@ -243,7 +243,7 @@ const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
 const placeholderCls = "text-sm font-medium font-montserrat leading-5 placeholder:text-stone-400";
 
 function inputCls(hasError: boolean) {
-  return `w-full h-11 px-3 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 outline-none ${hasError ? "outline-red-400" : "outline-gray-200"}`;
+  return `w-full h-11 px-3 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 ${hasError ? "outline-red-400" : "outline-gray-200"}`;
 }
 
 function Field({

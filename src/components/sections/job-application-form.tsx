@@ -11,7 +11,7 @@ const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
 
 function inputCls(hasError: boolean) {
-  return `w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none ${
+  return `w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 ${
     hasError ? "outline-red-400" : "outline-gray-200"
   }`;
 }
@@ -200,7 +200,7 @@ export function JobApplicationForm({
           {...register("message")}
           rows={4}
           placeholder="Share your application, specifications, or problem you're trying to solve"
-          className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
+          className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
         />
       </Field>
 

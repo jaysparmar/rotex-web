@@ -8,7 +8,7 @@ const DEFAULT_BUSINESS_TYPES = ["Distributor", "Supplier", "System Integrator", 
 const DEFAULT_INDUSTRIES = ["Oil & Gas", "Chemical", "Power", "Mining", "Industrial Automation"];
 
 const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
-const inputCls = "w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none";
+const inputCls = "w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400";
 const selectTriggerCls = "w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-zinc-800 data-placeholder:text-neutral-400";
 
 function Field({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
@@ -162,7 +162,7 @@ export function ChannelPartnerFormSection({
               name="message"
               rows={4}
               placeholder="Share any additional details about your business or partnership interest..."
-              className="w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none resize-none"
+              className="w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 resize-none"
             />
           </Field>
 
