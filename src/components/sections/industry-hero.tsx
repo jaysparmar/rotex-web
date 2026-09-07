@@ -46,13 +46,13 @@ export function IndustryHero({ name, description, bg, mobileBg }: Props) {
           <div className="container pt-16 pb-10 flex items-end justify-between gap-8">
             <h2 className="text-white text-4xl font-medium font-montserrat leading-10">{name}</h2>
             <div className="max-w-131 flex flex-col gap-1.5">
-              <p className="text-subtext text-base font-medium font-montserrat leading-6 line-clamp-3">
+              <p className="text-stone-300 text-sm font-normal font-montserrat leading-7 line-clamp-3">
                 {description}
               </p>
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="self-start text-subtext text-base font-medium font-montserrat leading-6 underline underline-offset-2 hover:text-white transition-colors duration-150"
+                className="self-start text-stone-300 text-sm font-normal font-montserrat leading-7 underline underline-offset-2 hover:text-white transition-colors duration-150"
               >
                 Read more
               </button>
