@@ -8,14 +8,19 @@ import { Pagination } from "@/components/ui/pagination";
 import { DOWNLOAD_TABS, type DownloadTab, type DownloadItem } from "@/lib/downloads-data";
 
 const ALL = "All";
+const ALL_TAB = "all" as const;
 const PAGE_SIZE = 9;
+
+type PublicTab = DownloadTab | typeof ALL_TAB;
+
+const PUBLIC_TABS: { id: PublicTab; label: string }[] = [{ id: ALL_TAB, label: "All" }, ...DOWNLOAD_TABS];
 
 function uniqueOptions(items: DownloadItem[], key: keyof DownloadItem): string[] {
   return Array.from(new Set(items.map((i) => String(i[key])).filter(Boolean)));
 }
 
 export function DownloadsSection({ items }: { items: DownloadItem[] }) {
-  const [activeTab, setActiveTab] = useState<DownloadTab>("certificates");
+  const [activeTab, setActiveTab] = useState<PublicTab>(ALL_TAB);
   const [product, setProduct] = useState(ALL);
   const [subCategory, setSubCategory] = useState(ALL);
   const [productCert, setProductCert] = useState(ALL);
@@ -33,7 +38,7 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
     () =>
       items.filter(
         (item) =>
-          item.tab === activeTab &&
+          (activeTab === ALL_TAB || item.tab === activeTab) &&
           (product === ALL || item.product === product) &&
           (subCategory === ALL || item.subCategory === subCategory) &&
           (productCert === ALL || item.productCertificateType === productCert) &&
@@ -46,7 +51,7 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
   const visibleItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const changeTab = (tab: DownloadTab) => {
+  const changeTab = (tab: PublicTab) => {
     setActiveTab(tab);
     setPage(1);
   };
@@ -85,7 +90,7 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
         {/* Content */}
         <div className="flex-1 flex flex-col gap-5">
           <div className="border-b border-stone-300 flex items-center gap-5 overflow-x-auto">
-            {DOWNLOAD_TABS.map((tab) => (
+            {PUBLIC_TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => changeTab(tab.id)}
