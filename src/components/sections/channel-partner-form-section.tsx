@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PRODUCT_FAMILIES } from "@/lib/product-constants";
 
 const DEFAULT_COUNTRIES = ["United States", "India", "UAE", "Saudi Arabia", "United Kingdom", "Germany"];
 const DEFAULT_CITIES = ["Mumbai", "Delhi", "Dubai", "London", "Berlin", "New York"];
 const DEFAULT_BUSINESS_TYPES = ["Distributor", "Supplier", "System Integrator", "OEM Partner"];
 const DEFAULT_INDUSTRIES = ["Oil & Gas", "Chemical", "Power", "Mining", "Industrial Automation"];
+const DEFAULT_PRODUCT_TYPES = [...PRODUCT_FAMILIES];
 
 const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const inputCls = "w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400";
@@ -65,6 +67,7 @@ type ChannelPartnerFormSectionProps = {
   cityOptions?: string[];
   businessTypeOptions?: string[];
   industryOptions?: string[];
+  productTypeOptions?: string[];
   defaultCountry?: string;
 };
 
@@ -76,19 +79,21 @@ export function ChannelPartnerFormSection({
   cityOptions = DEFAULT_CITIES,
   businessTypeOptions = DEFAULT_BUSINESS_TYPES,
   industryOptions = DEFAULT_INDUSTRIES,
+  productTypeOptions = DEFAULT_PRODUCT_TYPES,
   defaultCountry = "United States",
 }: ChannelPartnerFormSectionProps) {
   const [country, setCountry] = useState(defaultCountry);
   const [city, setCity] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [industriesServed, setIndustriesServed] = useState("");
+  const [productType, setProductType] = useState("");
 
   return (
     <section id="form" className="scroll-mt-24 lg:scroll-mt-32 bg-white py-14 lg:py-20">
       <div className="container flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16">
         {/* Left copy */}
         <div className="lg:w-121.75 lg:shrink-0 flex flex-col gap-4">
-          <h2 className="text-stone-900 text-2xl lg:text-4xl font-normal font-montserrat leading-9 lg:leading-10">
+          <h2 className="text-stone-900 text-2xl lg:text-4xl font-normal font-montserrat leading-10 lg:leading-[3.25rem]">
             {headingPrefix}{" "}
             <span className="text-gradient-orange-dark">{headingHighlight}</span>
           </h2>
@@ -141,21 +146,27 @@ export function ChannelPartnerFormSection({
 
           <div className="flex flex-col gap-5 lg:flex-row">
             <Field label="Business Type" className="flex-1">
-              <FormSelect placeholder="Business Type" options={businessTypeOptions} value={businessType} onValueChange={setBusinessType} />
+              <FormSelect placeholder="Select Business Type" options={businessTypeOptions} value={businessType} onValueChange={setBusinessType} />
             </Field>
 
             <Field label="Industries Served" className="flex-1">
-              <FormSelect placeholder="Select" options={industryOptions} value={industriesServed} onValueChange={setIndustriesServed} />
+              <FormSelect placeholder="Select Industries Served" options={industryOptions} value={industriesServed} onValueChange={setIndustriesServed} />
             </Field>
           </div>
 
-          <Field label="Other Industries Served">
-            <input
-              name="otherIndustriesServed"
-              placeholder="e.g. Energy, Chemicals, Packaging, Textiles"
-              className={inputCls}
-            />
-          </Field>
+          <div className="flex flex-col gap-5 lg:flex-row">
+            <Field label="Product Type" className="flex-1">
+              <FormSelect placeholder="Select Product Type" options={productTypeOptions} value={productType} onValueChange={setProductType} />
+            </Field>
+
+            <Field label="Other Industries Served" className="flex-1">
+              <input
+                name="otherIndustriesServed"
+                placeholder="e.g. Energy, Chemicals, Packaging, Textiles"
+                className={inputCls}
+              />
+            </Field>
+          </div>
 
           <Field label="Your Message">
             <textarea
