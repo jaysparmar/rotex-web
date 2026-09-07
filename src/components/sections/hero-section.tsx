@@ -107,27 +107,41 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
             arrow nav flush right — always on the same line as the buttons. */}
         <div className="relative lg:absolute z-30 flex flex-col gap-5 lg:gap-9 px-5 pt-26 pb-0 lg:px-0 lg:pt-0 lg:left-[80px] lg:right-[5.49%] lg:top-[404px]">
 
-          <div className="flex flex-col gap-1 lg:gap-5">
-            {/* Figma — mobile: 24px / leading-8; desktop: 48px / leading-[58px] */}
-            <h1
-              className="max-w-[597px] text-white font-normal leading-8 lg:leading-[58px]"
-              style={{
-                fontFamily: "'Montserrat', sans-serif",
-                fontSize: "clamp(24px, 3.33vw, 48px)",
-                letterSpacing: "-1.3px",
-              }}
-            >
-              <span className="">{titleLead}</span>
-              {titleRest && <span className="block lg:inline lg:ml-2">{titleRest}</span>}
-            </h1>
+          {/* Fixed min-height so the button/nav row below stays put across slides —
+              text length varies per slide, so without this the row shifted up/down
+              on every Next/Prev click. */}
+          <div className="relative min-h-[128px] lg:min-h-[210px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className="flex flex-col gap-1 lg:gap-5"
+              >
+                {/* Figma — mobile: 24px / leading-8; desktop: 48px / leading-[58px] */}
+                <h1
+                  className="max-w-[597px] text-white font-normal leading-8 lg:leading-[58px]"
+                  style={{
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontSize: "clamp(24px, 3.33vw, 48px)",
+                    letterSpacing: "-1.3px",
+                  }}
+                >
+                  <span className="">{titleLead}</span>
+                  {titleRest && <span className="block lg:inline lg:ml-2">{titleRest}</span>}
+                </h1>
 
-            {/* Figma — mobile: 12px / leading-5 / stone-300; desktop: 16px / leading-6 */}
-            <p
-              className="max-w-[547px] text-stone-300 lg:text-subtext text-xs lg:text-base font-medium leading-5 lg:leading-6"
-              style={{ fontFamily: "'Montserrat', sans-serif" }}
-            >
-              {slide.description}
-            </p>
+                {/* Figma — mobile: 12px / leading-5 / stone-300; desktop: 16px / leading-6 */}
+                <p
+                  className="max-w-[547px] text-stone-300 lg:text-subtext text-xs lg:text-base font-medium leading-5 lg:leading-6"
+                  style={{ fontFamily: "'Montserrat', sans-serif" }}
+                >
+                  {slide.description}
+                </p>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Mobile: stacked, content-width buttons */}
