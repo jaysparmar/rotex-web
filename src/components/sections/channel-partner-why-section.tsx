@@ -50,7 +50,7 @@ export function ChannelPartnerWhySection({
         {/* Heading — pinned while cards scroll past */}
         <div className="lg:w-1/2 lg:shrink-0">
           <div className="lg:sticky lg:top-32 flex flex-col gap-3">
-            <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
+            <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-4xl leading-9 lg:leading-[3.25rem]">
               {heading}
             </h2>
             <p className="text-stone-500 font-montserrat font-medium text-sm lg:text-base leading-6">
