@@ -11,6 +11,12 @@ export default async function AdminGlobalFooterPage() {
     select: { id: true, name: true },
   });
 
+  const categories = await prisma.category.findMany({
+    where: { products: { some: {} } },
+    orderBy: { order: "asc" },
+    select: { id: true, name: true },
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -34,6 +40,7 @@ export default async function AdminGlobalFooterPage() {
         logo={config.logo}
         header={config.header}
         industries={industries}
+        categories={categories}
       />
     </div>
   );

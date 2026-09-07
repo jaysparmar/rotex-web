@@ -66,11 +66,11 @@ async function resolveIndustriesMenu(source: PrismaJson.MegaMenuSource): Promise
 
 async function resolveProductsMenu(source: PrismaJson.MegaMenuSource): Promise<PrismaJson.CategorySwitcherMenu> {
   const rows = await prisma.category.findMany({
+    where: { products: { some: {} } },
     select: { name: true },
     orderBy: { name: "asc" },
   });
-  const categories = rows
-    .map((r) => r.name)
+  const categories = [...new Set(rows.map((r) => r.name))]
     .filter((c) => source.selectedIds.includes(c))
     .map((label) => ({ label, items: [] }));
 
@@ -112,11 +112,25 @@ export async function resolveNavItems(nav: PrismaJson.NavItem[]): Promise<Prisma
 async function resolveFooterIndustriesLinks(source: PrismaJson.FooterColumnSource): Promise<PrismaJson.FooterLink[]> {
   const industries = await prisma.industry.findMany({
     where: { id: { in: source.selectedIds } },
-    select: { name: true, slug: true },
-    // Match the canonical industry order used by the admin list and /api/v1/industries.
-    orderBy: { createdAt: "asc" },
+    select: { id: true, name: true, slug: true },
   });
-  return industries.map((industry) => ({ label: industry.name, href: `/industries/${industry.slug}` }));
+  const byId = new Map(industries.map((i) => [i.id, i]));
+  return source.selectedIds
+    .map((id) => byId.get(id))
+    .filter((i): i is NonNullable<typeof i> => Boolean(i))
+    .map((industry) => ({ label: industry.name, href: `/industries/${industry.slug}` }));
+}
+
+async function resolveFooterCategoriesLinks(source: PrismaJson.FooterColumnSource): Promise<PrismaJson.FooterLink[]> {
+  const categories = await prisma.category.findMany({
+    where: { id: { in: source.selectedIds }, products: { some: {} } },
+    select: { id: true, name: true, slug: true },
+  });
+  const byId = new Map(categories.map((c) => [c.id, c]));
+  return source.selectedIds
+    .map((id) => byId.get(id))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c))
+    .map((category) => ({ label: category.name, href: `/products?category=${category.slug}` }));
 }
 
 export async function resolveFooterColumns(columns: PrismaJson.FooterColumn[]): Promise<PrismaJson.FooterColumn[]> {
@@ -124,7 +138,11 @@ export async function resolveFooterColumns(columns: PrismaJson.FooterColumn[]): 
     columns.map(async (column) => {
       if (!column.source) return column;
       const links =
-        column.source.type === "industries" ? await resolveFooterIndustriesLinks(column.source) : column.links;
+        column.source.type === "industries"
+          ? await resolveFooterIndustriesLinks(column.source)
+          : column.source.type === "categories"
+            ? await resolveFooterCategoriesLinks(column.source)
+            : column.links;
       return { ...column, links };
     })
   );

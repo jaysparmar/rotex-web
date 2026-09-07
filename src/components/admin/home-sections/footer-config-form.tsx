@@ -13,6 +13,7 @@ import { useSaveAction } from "@/hooks/use-save-action";
 import { saveGlobalConfig } from "@/app/admin/(dashboard)/home/actions";
 
 type IndustryOption = { id: string; name: string };
+type CategoryOption = { id: string; name: string };
 
 type FormValues = {
   footer: PrismaJson.GlobalConfigData["footer"];
@@ -23,11 +24,13 @@ export function FooterConfigForm({
   logo,
   header,
   industries,
+  categories,
 }: {
   initialData: FormValues;
   logo: PrismaJson.GlobalConfigData["logo"];
   header: PrismaJson.GlobalConfigData["header"];
   industries: IndustryOption[];
+  categories: CategoryOption[];
 }) {
   const form = useForm<FormValues>({ defaultValues: initialData });
   const { pending, error, success, run } = useSaveAction();
@@ -68,6 +71,7 @@ export function FooterConfigForm({
                 key={field.id}
                 columnIndex={i}
                 industries={industries}
+                categories={categories}
                 onSave={form.handleSubmit(onSubmit)}
                 pending={pending}
                 onRemove={() => columns.remove(i)}
@@ -143,12 +147,14 @@ export function FooterConfigForm({
 function FooterColumnRow({
   columnIndex,
   industries,
+  categories,
   onSave,
   pending,
   onRemove,
 }: {
   columnIndex: number;
   industries: IndustryOption[];
+  categories: CategoryOption[];
   onSave: () => Promise<void>;
   pending: boolean;
   onRemove: () => void;
@@ -177,6 +183,7 @@ function FooterColumnRow({
       <FooterColumnDialog
         columnIndex={columnIndex}
         industries={industries}
+        categories={categories}
         onSave={onSave}
         pending={pending}
         trigger={

@@ -18,10 +18,11 @@ export default async function AdminGlobalHeaderPage() {
   });
 
   const categoryRows = await prisma.category.findMany({
+    where: { products: { some: {} } },
     select: { name: true },
     orderBy: { name: "asc" },
   });
-  const productCategories = categoryRows.map((r) => r.name);
+  const productCategories = [...new Set(categoryRows.map((r) => r.name))];
 
   const blogs = await getPublishedResources("blogs");
 

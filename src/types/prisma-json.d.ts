@@ -71,7 +71,9 @@ declare global {
       megaMenuSource?: MegaMenuSource | null;
     };
 
-    type FooterColumnSource = { type: "industries"; selectedIds: string[] };
+    type FooterColumnSource =
+      | { type: "industries"; selectedIds: string[] }
+      | { type: "categories"; selectedIds: string[] };
     type FooterColumn = {
       id: string;
       heading: string;

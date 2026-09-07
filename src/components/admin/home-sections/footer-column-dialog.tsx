@@ -14,26 +14,30 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Field, TextField, SwitchField } from "@/components/admin/form-fields";
-import { Trash2 } from "lucide-react";
+import { Trash2, ChevronUp, ChevronDown } from "lucide-react";
 
 type IndustryOption = { id: string; name: string };
+type CategoryOption = { id: string; name: string };
 
-type Mode = "manual" | "industries";
+type Mode = "manual" | "industries" | "categories";
 
 const MODE_LABELS: Record<Mode, string> = {
   manual: "Manual links",
   industries: "Industries (live data, main only)",
+  categories: "Product Categories (live data)",
 };
 
 export function FooterColumnDialog({
   columnIndex,
   industries,
+  categories,
   onSave,
   pending,
   trigger,
 }: {
   columnIndex: number;
   industries: IndustryOption[];
+  categories: CategoryOption[];
   onSave: () => Promise<void> | void;
   pending: boolean;
   trigger: React.ReactNode;
@@ -43,13 +47,13 @@ export function FooterColumnDialog({
   const base = `footer.columns.${columnIndex}`;
   const enabled = useWatch({ control: form.control, name: `${base}.enabled` });
   const sourceType = useWatch({ control: form.control, name: `${base}.source.type` });
-  const mode: Mode = sourceType === "industries" ? "industries" : "manual";
+  const mode: Mode = sourceType === "industries" || sourceType === "categories" ? sourceType : "manual";
 
   function setMode(newMode: Mode) {
     if (newMode === "manual") {
       form.setValue(`${base}.source`, null);
     } else {
-      form.setValue(`${base}.source`, { type: "industries", selectedIds: [] });
+      form.setValue(`${base}.source`, { type: newMode, selectedIds: [] });
       form.setValue(`${base}.links`, []);
     }
   }
@@ -92,6 +96,8 @@ export function FooterColumnDialog({
 
           {mode === "industries" ? (
             <IndustriesLinksPicker columnIndex={columnIndex} industries={industries} />
+          ) : mode === "categories" ? (
+            <CategoriesLinksPicker columnIndex={columnIndex} categories={categories} />
           ) : (
             <ManualLinksEditor columnIndex={columnIndex} />
           )}
@@ -110,15 +116,8 @@ export function FooterColumnDialog({
   );
 }
 
-function IndustriesLinksPicker({
-  columnIndex,
-  industries,
-}: {
-  columnIndex: number;
-  industries: IndustryOption[];
-}) {
+function useOrderedPicker(base: string) {
   const form = useFormContext();
-  const base = `footer.columns.${columnIndex}.source`;
   const selected: string[] = useWatch({ control: form.control, name: `${base}.selectedIds` }) ?? [];
 
   function toggle(id: string, checked: boolean) {
@@ -126,20 +125,139 @@ function IndustriesLinksPicker({
     form.setValue(`${base}.selectedIds`, checked ? [...current, id] : current.filter((v) => v !== id));
   }
 
+  function move(id: string, direction: -1 | 1) {
+    const current: string[] = form.getValues(`${base}.selectedIds`) ?? [];
+    const idx = current.indexOf(id);
+    const swapWith = idx + direction;
+    if (idx === -1 || swapWith < 0 || swapWith >= current.length) return;
+    const next = [...current];
+    [next[idx], next[swapWith]] = [next[swapWith], next[idx]];
+    form.setValue(`${base}.selectedIds`, next);
+  }
+
+  return { selected, toggle, move };
+}
+
+function IndustriesLinksPicker({
+  columnIndex,
+  industries,
+}: {
+  columnIndex: number;
+  industries: IndustryOption[];
+}) {
+  const base = `footer.columns.${columnIndex}.source`;
+  const { selected, toggle, move } = useOrderedPicker(base);
+
+  const ordered = [...industries].sort((a, b) => {
+    const aChecked = selected.includes(a.id);
+    const bChecked = selected.includes(b.id);
+    if (aChecked && bChecked) return selected.indexOf(a.id) - selected.indexOf(b.id);
+    if (aChecked) return -1;
+    if (bChecked) return 1;
+    return 0;
+  });
+
   return (
     <div className="space-y-1 rounded-lg border border-border">
       {industries.length === 0 && (
         <p className="p-4 text-sm text-muted-foreground">No industries yet. Add some on the Industries page first.</p>
       )}
-      {industries.map((industry) => (
-        <label key={industry.id} className="flex items-center gap-2.5 border-b border-border p-4 last:border-b-0">
-          <Checkbox
-            checked={selected.includes(industry.id)}
-            onCheckedChange={(checked) => toggle(industry.id, checked === true)}
-          />
-          <span className="text-sm font-medium">{industry.name}</span>
-        </label>
-      ))}
+      {ordered.map((industry) => {
+        const checked = selected.includes(industry.id);
+        const orderIdx = selected.indexOf(industry.id);
+        return (
+          <div key={industry.id} className="flex items-center gap-2.5 border-b border-border p-4 last:border-b-0">
+            <label className="flex flex-1 items-center gap-2.5">
+              <Checkbox checked={checked} onCheckedChange={(v) => toggle(industry.id, v === true)} />
+              <span className="text-sm font-medium">{industry.name}</span>
+            </label>
+            {checked && (
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  aria-label="Move up"
+                  disabled={orderIdx === 0}
+                  onClick={() => move(industry.id, -1)}
+                  className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
+                >
+                  <ChevronUp className="size-3.5" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Move down"
+                  disabled={orderIdx === selected.length - 1}
+                  onClick={() => move(industry.id, 1)}
+                  className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
+                >
+                  <ChevronDown className="size-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function CategoriesLinksPicker({
+  columnIndex,
+  categories,
+}: {
+  columnIndex: number;
+  categories: CategoryOption[];
+}) {
+  const base = `footer.columns.${columnIndex}.source`;
+  const { selected, toggle, move } = useOrderedPicker(base);
+
+  const ordered = [...categories].sort((a, b) => {
+    const aChecked = selected.includes(a.id);
+    const bChecked = selected.includes(b.id);
+    if (aChecked && bChecked) return selected.indexOf(a.id) - selected.indexOf(b.id);
+    if (aChecked) return -1;
+    if (bChecked) return 1;
+    return 0;
+  });
+
+  return (
+    <div className="space-y-1 rounded-lg border border-border">
+      {categories.length === 0 && (
+        <p className="p-4 text-sm text-muted-foreground">No categories with products yet.</p>
+      )}
+      {ordered.map((category) => {
+        const checked = selected.includes(category.id);
+        const orderIdx = selected.indexOf(category.id);
+        return (
+          <div key={category.id} className="flex items-center gap-2.5 border-b border-border p-4 last:border-b-0">
+            <label className="flex flex-1 items-center gap-2.5">
+              <Checkbox checked={checked} onCheckedChange={(v) => toggle(category.id, v === true)} />
+              <span className="text-sm font-medium">{category.name}</span>
+            </label>
+            {checked && (
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  aria-label="Move up"
+                  disabled={orderIdx === 0}
+                  onClick={() => move(category.id, -1)}
+                  className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
+                >
+                  <ChevronUp className="size-3.5" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Move down"
+                  disabled={orderIdx === selected.length - 1}
+                  onClick={() => move(category.id, 1)}
+                  className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
+                >
+                  <ChevronDown className="size-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
