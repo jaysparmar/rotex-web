@@ -74,7 +74,7 @@ export default async function AdminHomeSectionPage({
     key === "products"
       ? await prisma.category.findMany({
           orderBy: { order: "asc" },
-          select: { slug: true, name: true },
+          select: { id: true, slug: true, name: true },
         })
       : [];
 

@@ -63,6 +63,22 @@ export async function getHomeSection(key: string) {
     );
   }
 
+  if (key === "products") {
+    const categoryIds = (data.categoryIds as string[]) ?? [];
+    const categories = categoryIds.length
+      ? await prisma.category.findMany({
+          where: { id: { in: categoryIds } },
+          select: { id: true, slug: true, name: true, description: true, image: true },
+        })
+      : [];
+    const byId = new Map(categories.map((c) => [c.id, c]));
+    const ordered = categoryIds.map((id) => byId.get(id)).filter((c): c is NonNullable<typeof c> => Boolean(c));
+    return apiSuccess(
+      { enabled: section.enabled, order: section.order, heading: data.heading, cta: data.cta, categories: ordered },
+      section.updatedAt
+    );
+  }
+
   if (key === "hero") {
     const firstEnabled = await prisma.homeSection.findFirst({
       where: { enabled: true },

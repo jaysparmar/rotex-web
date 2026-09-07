@@ -48,14 +48,7 @@ type IndustriesHeadingData = { heading: { title: string; subtitle: string }; ind
 type ProductsData = {
   heading: { title: string };
   cta: { label: string; href: string };
-  products: {
-    id: string;
-    published: boolean;
-    slug: string;
-    name: string;
-    description: string;
-    image: { src: string; alt: string };
-  }[];
+  categories: { id: string; slug: string; name: string; description: string | null; image: string | null }[];
 };
 type IndustryCard = {
   id: string;
@@ -76,13 +69,13 @@ export default async function Home() {
     .map((id) => industriesList?.industries.find((i) => i.id === id))
     .filter((i): i is IndustryCard => Boolean(i));
   const products = await fetchHomeSection<ProductsData>("products");
-  const featuredProducts = (products?.products ?? [])
-    .filter((p) => p.published && p.slug)
-    .map((p) => ({
-      name: p.name,
-      description: p.description,
-      image: p.image.src,
-      href: `/products?category=${p.slug}`,
+  const featuredProducts = (products?.categories ?? [])
+    .filter((c) => c.image)
+    .map((c) => ({
+      name: c.name,
+      description: c.description ?? "",
+      image: c.image as string,
+      href: `/products?category=${c.slug}`,
     }));
   const certifications = await fetchHomeSection<CertificationsData>("certifications");
   const customerStories = await fetchHomeSection<CustomerStoriesData>("customer-stories");
