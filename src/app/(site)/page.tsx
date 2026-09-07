@@ -69,14 +69,12 @@ export default async function Home() {
     .map((id) => industriesList?.industries.find((i) => i.id === id))
     .filter((i): i is IndustryCard => Boolean(i));
   const products = await fetchHomeSection<ProductsData>("products");
-  const featuredProducts = (products?.categories ?? [])
-    .filter((c) => c.image)
-    .map((c) => ({
-      name: c.name,
-      description: c.description ?? "",
-      image: c.image as string,
-      href: `/products?category=${c.slug}`,
-    }));
+  const featuredProducts = (products?.categories ?? []).map((c) => ({
+    name: c.name,
+    description: c.description ?? "",
+    image: c.image ?? "/file.svg",
+    href: `/products?category=${c.slug}`,
+  }));
   const certifications = await fetchHomeSection<CertificationsData>("certifications");
   const customerStories = await fetchHomeSection<CustomerStoriesData>("customer-stories");
   const resources = await fetchHomeSection<ResourcesData>("resources");
