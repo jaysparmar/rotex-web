@@ -25,7 +25,7 @@ function AnimatedCounter({ value, suffix }: { value: string; suffix?: string }) 
     <span ref={ref} className="text-stone-900 text-3xl font-normal font-montserrat leading-10">
       <motion.span>{rounded}</motion.span>
       {unit}
-      {suffix && <span className="text-primary">{suffix}</span>}
+      {suffix && <span className="text-primary -ml-1.5">{suffix}</span>}
     </span>
   );
 }

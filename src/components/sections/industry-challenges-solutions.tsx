@@ -81,14 +81,14 @@ export function IndustryChallengesSolutions({
         </div>
 
         {/* Solutions */}
-        {/* brand-50 / primary, not red-50 / red-600 — Tailwind's reds are pink-toned and clash with the #ee3e23 bullets */}
-        <div className="flex-1 p-5 lg:p-7 bg-brand-50 rounded-xl flex flex-col gap-5 lg:gap-6">
-          <h3 className="text-primary text-xl lg:text-2xl font-medium font-montserrat leading-7 lg:leading-8 line-clamp-5">
+        {/* Figma: bg-red-50 / text-red-600 */}
+        <div className="flex-1 p-5 lg:p-7 bg-red-50 rounded-xl flex flex-col gap-5 lg:gap-6">
+          <h3 className="text-red-600 text-xl lg:text-2xl font-medium font-montserrat leading-7 lg:leading-8 line-clamp-5">
             {solutionsTitle}
           </h3>
           <div className="flex flex-col">
             {visibleSolutions.map((s, i) => (
-              <CardRow key={i} card={s} />
+              <CardRow key={i} card={s} color="#dc2626" />
             ))}
             <AnimatePresence initial={false}>
               {expanded && restSolutions.length > 0 && (
@@ -100,7 +100,7 @@ export function IndustryChallengesSolutions({
                   className="overflow-hidden"
                 >
                   {restSolutions.map((s, i) => (
-                    <CardRow key={i} card={s} />
+                    <CardRow key={i} card={s} color="#dc2626" />
                   ))}
                 </motion.div>
               )}

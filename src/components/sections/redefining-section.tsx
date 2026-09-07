@@ -75,7 +75,7 @@ function Counter({ raw, suffix, comma, suffixClassName }: { raw: number; suffix:
   return (
     <span ref={ref}>
       {display}
-      {suffix && <span className={suffixClassName}>{suffix}</span>}
+      {suffix && <span className={`${suffixClassName ?? ""} -ml-1.5`}>{suffix}</span>}
     </span>
   );
 }
