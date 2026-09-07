@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { DownloadCard } from "@/components/ui/download-card";
 import { DownloadsFilterField } from "@/components/ui/downloads-filter-field";
+import { MobileDownloadsFilters } from "@/components/ui/mobile-downloads-filters";
 import { Pagination } from "@/components/ui/pagination";
 import { DOWNLOAD_TABS, type DownloadTab, type DownloadItem } from "@/lib/downloads-data";
 
@@ -71,8 +72,29 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
   return (
     <section className="py-16 lg:py-20">
       <div className="container flex flex-col lg:flex-row gap-10">
-        {/* Sidebar filters */}
-        <aside className="w-full lg:w-80 shrink-0 flex flex-col gap-7">
+        {/* Mobile filters */}
+        <MobileDownloadsFilters
+          productOptions={productOptions}
+          subCategoryOptions={subCategoryOptions}
+          productCertOptions={productCertOptions}
+          qmsCertOptions={qmsCertOptions}
+          industryOptions={industryOptions}
+          product={product}
+          setProduct={setProduct}
+          subCategory={subCategory}
+          setSubCategory={setSubCategory}
+          productCert={productCert}
+          setProductCert={setProductCert}
+          qmsCert={qmsCert}
+          setQmsCert={setQmsCert}
+          industry={industry}
+          setIndustry={setIndustry}
+          hasActiveFilters={hasActiveFilters}
+          clearFilters={clearFilters}
+        />
+
+        {/* Sidebar filters (desktop) */}
+        <aside className="hidden lg:flex w-full lg:w-80 shrink-0 flex-col gap-7">
           <div className="flex items-center justify-between">
             <h2 className="text-stone-900 text-base font-semibold font-montserrat leading-6">Filters</h2>
             {hasActiveFilters && (
