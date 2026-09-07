@@ -3,12 +3,12 @@ import { useRef } from "react";
 import Link from "next/link";
 import { ProductCard } from "@/components/ui/product-card";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
-import { productHref } from "@/lib/breadcrumb";
-import type { ProductSummary } from "@/lib/products-data";
 
 const SCROLL_AMOUNT = 308; // card width (288) + gap (20)
 
-export function ProductsSection({ products }: { products: ProductSummary[] }) {
+type ProductCardData = { name: string; description: string; image: string; href: string };
+
+export function ProductsSection({ products }: { products: ProductCardData[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: "left" | "right") => {
@@ -59,11 +59,11 @@ export function ProductsSection({ products }: { products: ProductSummary[] }) {
       >
         {products.map((product) => (
           <ProductCard
-            key={product.slug}
+            key={product.href}
             name={product.name}
-            description={product.category}
+            description={product.description}
             image={product.image}
-            href={productHref(product.slug, product.category)}
+            href={product.href}
           />
         ))}
         {/* Trailing spacer so last card doesn't sit flush against viewport */}

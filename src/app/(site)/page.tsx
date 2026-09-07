@@ -5,7 +5,6 @@ import { TrustedLeaders } from "@/components/sections/trusted-leaders";
 import { RedefiningSection } from "@/components/sections/redefining-section";
 import { IndustriesSection } from "@/components/sections/industries-section";
 import { ProductsSection } from "@/components/sections/products-section";
-import { getFeaturedProducts } from "@/lib/products-data";
 import { CustomerStoriesSection } from "@/components/sections/customer-stories-section";
 import { LearnSection } from "@/components/sections/learn-section";
 import { CtaSection } from "@/components/sections/cta-section";
@@ -46,6 +45,18 @@ type ResourcesData = {
   }[];
 };
 type IndustriesHeadingData = { heading: { title: string; subtitle: string }; industryIds: string[] };
+type ProductsData = {
+  heading: { title: string };
+  cta: { label: string; href: string };
+  products: {
+    id: string;
+    published: boolean;
+    slug: string;
+    name: string;
+    description: string;
+    image: { src: string; alt: string };
+  }[];
+};
 type IndustryCard = {
   id: string;
   slug: string;
@@ -64,8 +75,15 @@ export default async function Home() {
   const orderedIndustries = (industriesSection?.industryIds ?? [])
     .map((id) => industriesList?.industries.find((i) => i.id === id))
     .filter((i): i is IndustryCard => Boolean(i));
-  const products = await fetchHomeSection<object>("products");
-  const featuredProducts = await getFeaturedProducts();
+  const products = await fetchHomeSection<ProductsData>("products");
+  const featuredProducts = (products?.products ?? [])
+    .filter((p) => p.published && p.slug)
+    .map((p) => ({
+      name: p.name,
+      description: p.description,
+      image: p.image.src,
+      href: `/products?category=${p.slug}`,
+    }));
   const certifications = await fetchHomeSection<CertificationsData>("certifications");
   const customerStories = await fetchHomeSection<CustomerStoriesData>("customer-stories");
   const resources = await fetchHomeSection<ResourcesData>("resources");

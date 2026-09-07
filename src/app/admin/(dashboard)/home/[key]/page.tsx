@@ -70,6 +70,14 @@ export default async function AdminHomeSectionPage({
         })
       : [];
 
+  const allCategories =
+    key === "products"
+      ? await prisma.category.findMany({
+          orderBy: { order: "asc" },
+          select: { slug: true, name: true },
+        })
+      : [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -91,7 +99,7 @@ export default async function AdminHomeSectionPage({
       {key === "industries" && (
         <IndustriesForm {...meta} initialData={data} allIndustries={allIndustries} />
       )}
-      {key === "products" && <ProductsForm {...meta} initialData={data} />}
+      {key === "products" && <ProductsForm {...meta} initialData={data} categories={allCategories} />}
       {key === "customer-stories" && (
         <CustomerStoriesPickerForm {...meta} initialData={data} allStories={allStories} />
       )}

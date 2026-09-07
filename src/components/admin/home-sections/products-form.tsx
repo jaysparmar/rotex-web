@@ -2,9 +2,20 @@
 
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
-import { TextField, TextAreaField, SwitchField, RepeaterItem, AddButton, FieldGrid } from "@/components/admin/form-fields";
+import {
+  TextField,
+  TextAreaField,
+  SwitchField,
+  SelectField,
+  RepeaterItem,
+  AddButton,
+  FieldGrid,
+} from "@/components/admin/form-fields";
+import { MediaField } from "@/components/admin/media-field";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveHomeSection } from "@/app/admin/(dashboard)/home/actions";
+
+type CategoryOption = { slug: string; name: string };
 
 type ProductCard = {
   id: string;
@@ -24,15 +35,23 @@ type FormValues = {
 export function ProductsForm({
   initialEnabled,
   initialData,
+  categories,
 }: {
   initialEnabled: boolean;
   initialData: Omit<FormValues, "enabled">;
+  categories: CategoryOption[];
 }) {
   const form = useForm<FormValues>({
     defaultValues: { enabled: initialEnabled, ...initialData },
   });
   const { fields, append, remove } = useFieldArray({ control: form.control, name: "products" });
   const { pending, error, success, run } = useSaveAction();
+
+  function selectCategory(index: number, slug: string) {
+    const category = categories.find((c) => c.slug === slug);
+    form.setValue(`products.${index}.slug`, slug);
+    form.setValue(`products.${index}.name`, category?.name ?? "");
+  }
 
   function onSubmit(values: FormValues) {
     const { enabled, ...data } = values;
@@ -50,28 +69,40 @@ export function ProductsForm({
           <TextField label="CTA Href" {...form.register("cta.href")} />
         </FieldGrid>
 
+        <p className="text-xs text-muted-foreground">
+          Cards shown here are product categories, not individual products — pick which category each card
+          links to (browsing that category on /products), and give it a short description.
+        </p>
+
         <div className="space-y-4">
           {fields.map((field, i) => (
-            <RepeaterItem key={field.id} title={`Product ${i + 1}`} onRemove={() => remove(i)}>
+            <RepeaterItem
+              key={field.id}
+              title={form.watch(`products.${i}.name`) || `Card ${i + 1}`}
+              onRemove={() => remove(i)}
+            >
               <SwitchField
                 label="Published"
                 checked={form.watch(`products.${i}.published`)}
                 onCheckedChange={(v) => form.setValue(`products.${i}.published`, v)}
               />
-              <FieldGrid>
-                <TextField label="Slug" {...form.register(`products.${i}.slug`)} />
-                <TextField label="Name" {...form.register(`products.${i}.name`)} />
-              </FieldGrid>
-              <TextAreaField label="Description" {...form.register(`products.${i}.description`)} />
-              <FieldGrid>
-                <TextField label="Image Src" {...form.register(`products.${i}.image.src`)} />
-                <TextField label="Image Alt" {...form.register(`products.${i}.image.alt`)} />
-              </FieldGrid>
+              <SelectField
+                label="Category"
+                options={categories.map((c) => ({ value: c.slug, label: c.name }))}
+                value={form.watch(`products.${i}.slug`)}
+                onChange={(e) => selectCategory(i, e.target.value)}
+              />
+              <TextAreaField
+                label="Short Description"
+                rows={2}
+                {...form.register(`products.${i}.description`)}
+              />
+              <MediaField name={`products.${i}.image`} mediaType="image" showAlt />
             </RepeaterItem>
           ))}
 
           <AddButton
-            label="Add Product"
+            label="Add Card"
             onClick={() =>
               append({
                 id: `prod_${Date.now()}`,
