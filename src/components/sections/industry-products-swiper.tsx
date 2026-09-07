@@ -25,7 +25,7 @@ export function IndustryProductsSwiper({ products }: Props) {
             href="/products"
             className="px-4 py-2 lg:px-5 lg:py-2.5 rounded-full ring-1 ring-stone-300 text-stone-900 text-xs font-semibold font-montserrat uppercase leading-5 hover:bg-stone-50 transition-colors duration-150"
           >
-            View All
+            View All Products
           </Link>
         </div>
         <div className="relative">
