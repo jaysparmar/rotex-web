@@ -18,9 +18,14 @@ export default async function AdminSubIndustryDetailPage({
   const subIndustry = await prisma.subIndustry.findUnique({ where: { id: subId } });
   if (!subIndustry || subIndustry.industryId !== industry.id) notFound();
 
-  const [allPartners, allStories] = await Promise.all([
+  const [allPartners, allStories, categories] = await Promise.all([
     getPublishedPartners(),
     getPublishedCustomerStories(),
+    prisma.category.findMany({
+      where: { products: { some: {} } },
+      orderBy: { order: "asc" },
+      select: { id: true, name: true, image: true },
+    }),
   ]);
 
   return (
@@ -46,6 +51,7 @@ export default async function AdminSubIndustryDetailPage({
         subIndustry={subIndustry}
         allPartners={allPartners}
         allStories={allStories}
+        categories={categories}
       />
     </div>
   );

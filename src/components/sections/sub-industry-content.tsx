@@ -1,11 +1,12 @@
 import type { Industry, SubIndustry } from "@/generated/prisma/client";
 import type { StaticImageData } from "next/image";
+import { prisma } from "@/lib/prisma";
 import { getSelectedPartners } from "@/lib/partners";
 import { getSelectedCustomerStories } from "@/lib/customer-stories";
 import { IndustryHero } from "@/components/sections/industry-hero";
 import { TrustedLeaders } from "@/components/sections/trusted-leaders";
 import { IndustryChallengesSolutions } from "@/components/sections/industry-challenges-solutions";
-// import { IndustryProductsSwiper } from "@/components/sections/industry-products-swiper"; // TODO: re-enable once wired to the real Product catalog
+import { IndustryProductsSwiper } from "@/components/sections/industry-products-swiper";
 import { IndustryCustomerStories } from "@/components/sections/industry-customer-stories";
 
 import oilBg        from "@/assets/Images/breadcurmbBackgrounds/oil_bg.jpg";
@@ -44,6 +45,19 @@ export async function SubIndustryContent({
 
   const stories = await getSelectedCustomerStories(subIndustry.storyIds as unknown as string[]);
 
+  const recommendedCategoryIds = (subIndustry.recommendedProducts as unknown as string[]) ?? [];
+  const recommendedCategories = recommendedCategoryIds.length
+    ? await prisma.category.findMany({
+        where: { id: { in: recommendedCategoryIds }, products: { some: {} } },
+        select: { id: true, name: true, slug: true, image: true },
+      })
+    : [];
+  const categoryById = new Map(recommendedCategories.map((c) => [c.id, c]));
+  const recommendedProducts = recommendedCategoryIds
+    .map((id) => categoryById.get(id))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c))
+    .map((c) => ({ name: c.name, image: c.image ?? "", href: `/products?category=${c.slug}` }));
+
   return (
     <>
       {bg && (
@@ -64,11 +78,9 @@ export async function SubIndustryContent({
         solutions={subIndustry.solutions as unknown as { title: string; description: string }[]}
       />
 
-      {/* TODO: re-enable once recommended products are wired to the real Product catalog
       <div id="recommended-products">
-        <IndustryProductsSwiper products={subIndustry.recommendedProducts as unknown as string[]} />
+        <IndustryProductsSwiper products={recommendedProducts} />
       </div>
-      */}
 
       <IndustryCustomerStories stories={stories} />
     </>

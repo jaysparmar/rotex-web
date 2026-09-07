@@ -28,6 +28,7 @@ type SubIndustryData = {
   solutionsTitle: string;
   challenges: { title: string; description: string }[];
   solutions: { title: string; description: string }[];
+  recommendedProducts: string[];
 };
 
 function revalidateIndustry(slug: string) {
@@ -57,7 +58,6 @@ export async function createSubIndustry(industryId: string, data: SubIndustryDat
   const subIndustry = await prisma.subIndustry.create({
     data: {
       ...data,
-      recommendedProducts: [],
       industryId,
     },
   });

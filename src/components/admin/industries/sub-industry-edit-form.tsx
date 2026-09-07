@@ -13,6 +13,7 @@ import { createSubIndustry, updateSubIndustry } from "@/app/admin/(dashboard)/in
 
 type Partner = { id: string; name: string; logo: string };
 type Story = { id: string; quote: string; author: string; company: string; image: string };
+type CategoryOption = { id: string; name: string; image: string | null };
 type CardItem = { title: string; description: string };
 
 type FormValues = {
@@ -27,7 +28,7 @@ type FormValues = {
   challenges: CardItem[];
   solutionsTitle: string;
   solutions: CardItem[];
-  // recommendedProducts: string; // TODO: re-enable once wired to the real Product catalog
+  recommendedProducts: string[];
 };
 
 type SubIndustryInput = {
@@ -43,7 +44,7 @@ type SubIndustryInput = {
   solutionsTitle: string;
   challenges: unknown;
   solutions: unknown;
-  // recommendedProducts: unknown; // TODO: re-enable once wired to the real Product catalog
+  recommendedProducts: unknown;
 };
 
 export function SubIndustryEditForm({
@@ -52,12 +53,14 @@ export function SubIndustryEditForm({
   subIndustry,
   allPartners,
   allStories,
+  categories,
 }: {
   industryId: string;
   industryName: string;
   subIndustry?: SubIndustryInput;
   allPartners: Partner[];
   allStories: Story[];
+  categories: CategoryOption[];
 }) {
   const router = useRouter();
 
@@ -74,13 +77,14 @@ export function SubIndustryEditForm({
       challenges: (subIndustry?.challenges as CardItem[] | null) ?? [],
       solutionsTitle: subIndustry?.solutionsTitle ?? "",
       solutions: (subIndustry?.solutions as CardItem[] | null) ?? [],
-      // recommendedProducts: toLines(subIndustry?.recommendedProducts), // TODO: re-enable once wired to the real Product catalog
+      recommendedProducts: (subIndustry?.recommendedProducts as string[] | null) ?? [],
     },
   });
   const { pending, error, success, run } = useSaveAction();
 
   const selectedPartnerIds = form.watch("partnerIds");
   const selectedStoryIds = form.watch("storyIds");
+  const selectedProductCategoryIds = form.watch("recommendedProducts");
   const challengesArray = useFieldArray({ control: form.control, name: "challenges" });
   const solutionsArray = useFieldArray({ control: form.control, name: "solutions" });
 
@@ -92,6 +96,11 @@ export function SubIndustryEditForm({
   function toggleStory(id: string, checked: boolean) {
     const current = form.getValues("storyIds");
     form.setValue("storyIds", checked ? [...current, id] : current.filter((s) => s !== id));
+  }
+
+  function toggleProductCategory(id: string, checked: boolean) {
+    const current = form.getValues("recommendedProducts");
+    form.setValue("recommendedProducts", checked ? [...current, id] : current.filter((c) => c !== id));
   }
 
   function onSubmit(values: FormValues) {
@@ -107,7 +116,7 @@ export function SubIndustryEditForm({
       solutionsTitle: values.solutionsTitle,
       challenges: values.challenges,
       solutions: values.solutions,
-      // recommendedProducts: fromLines(values.recommendedProducts), // TODO: re-enable once wired to the real Product catalog
+      recommendedProducts: values.recommendedProducts,
     };
 
     run(async () => {
@@ -198,24 +207,24 @@ export function SubIndustryEditForm({
           </CardContent>
         </Card>
 
-        {/* TODO: re-enable once recommended products are wired to the real Product catalog
         <Card>
           <CardHeader>
             <CardTitle>Recommended Products</CardTitle>
+            <CardDescription>
+              Pick which product categories show in the &quot;Products recommended for you&quot; swiper on this
+              sub-industry page. Sourced live from Categories — edit a category&apos;s image/name at Admin →
+              Categories.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Controller
-              control={form.control}
-              name="recommendedProducts"
-              render={({ field }) => (
-                <Field label="Recommended Products (one per line)">
-                  <Textarea {...field} rows={4} />
-                </Field>
-              )}
+            <ItemPickerGrid
+              items={categories.map((c) => ({ id: c.id, image: c.image ?? "", label: c.name }))}
+              selectedIds={selectedProductCategoryIds}
+              onToggle={toggleProductCategory}
+              emptyMessage="No categories with products yet."
             />
           </CardContent>
         </Card>
-        */}
 
         <Card>
           <CardHeader>
