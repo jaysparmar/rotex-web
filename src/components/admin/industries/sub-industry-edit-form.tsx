@@ -157,7 +157,7 @@ export function SubIndustryEditForm({
         <Card>
           <CardHeader>
             <CardTitle>Application</CardTitle>
-            <CardDescription>Cards shown in the left column of the challenges vs. solutions section.</CardDescription>
+            <CardDescription>Cards shown in the left column of the applications v/s why choose Rotex section.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <TextField label="Application Title" {...form.register("challengesTitle")} />
