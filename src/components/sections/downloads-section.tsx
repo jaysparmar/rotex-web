@@ -56,12 +56,35 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
     setPage(1);
   };
 
+  const hasActiveFilters =
+    product !== ALL || subCategory !== ALL || productCert !== ALL || qmsCert !== ALL || industry !== ALL;
+
+  const clearFilters = () => {
+    setProduct(ALL);
+    setSubCategory(ALL);
+    setProductCert(ALL);
+    setQmsCert(ALL);
+    setIndustry(ALL);
+    setPage(1);
+  };
+
   return (
     <section className="py-16 lg:py-20">
       <div className="container flex flex-col lg:flex-row gap-10">
         {/* Sidebar filters */}
         <aside className="w-full lg:w-80 shrink-0 flex flex-col gap-7">
-          <h2 className="text-stone-900 text-base font-semibold font-montserrat leading-6">Filters</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-stone-900 text-base font-semibold font-montserrat leading-6">Filters</h2>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-red-600 text-xs font-semibold font-montserrat leading-5 hover:underline"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
           <DownloadsFilterField label="Product" placeholder="Select Product" options={productOptions} value={product} onChange={setProduct} />
           <DownloadsFilterField
             label="Sub Category Product"
