@@ -103,7 +103,13 @@ declare global {
     };
 
     type SpecList = { key: string; value: string }[];
-    type DownloadList = { title: string; description: string; url: string }[];
+    type DownloadList = {
+      title: string;
+      description: string;
+      url: string;
+      tab?: string;
+      showOnDownloadsPage?: boolean;
+    }[];
 
     type JobPerks = { icon: string; label: string }[];
 

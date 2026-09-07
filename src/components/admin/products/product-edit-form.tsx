@@ -83,9 +83,17 @@ export function ProductEditForm({
       features: product?.features ?? "",
       description: product?.description ?? "",
       specifications: (product?.specifications as { key: string; value: string }[] | null) ?? [],
-      downloads: ((product?.downloads as { title: string; description: string; url: string }[] | null) ?? []).map(
-        (d) => ({ title: d.title, description: d.description, url: { src: d.url } })
-      ) as never,
+      downloads: (
+        (product?.downloads as
+          | { title: string; description: string; url: string; tab?: string; showOnDownloadsPage?: boolean }[]
+          | null) ?? []
+      ).map((d) => ({
+        title: d.title,
+        description: d.description,
+        url: { src: d.url },
+        tab: d.tab ?? "certificates",
+        showOnDownloadsPage: d.showOnDownloadsPage ?? false,
+      })) as never,
     },
   });
   const { pending, error, success, run } = useSaveAction();

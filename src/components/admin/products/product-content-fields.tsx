@@ -1,17 +1,24 @@
 "use client";
 
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { TextField, TextAreaField, RepeaterItem, AddButton } from "@/components/admin/form-fields";
+import { TextField, TextAreaField, RepeaterItem, AddButton, SelectField, SwitchField } from "@/components/admin/form-fields";
 import { PillsInput } from "@/components/admin/pills-input";
 import { DocumentField } from "@/components/admin/document-field";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { DOWNLOAD_TABS } from "@/lib/downloads-data";
 
 export type ProductContentFormValues = {
   certificates: string[];
   features: string;
   description: string;
   specifications: { key: string; value: string }[];
-  downloads: { title: string; description: string; url: { src: string } }[];
+  downloads: {
+    title: string;
+    description: string;
+    url: { src: string };
+    tab: string;
+    showOnDownloadsPage: boolean;
+  }[];
 };
 
 export function ProductContentFields() {
@@ -53,6 +60,10 @@ export function ProductContentFields() {
       <Card>
         <CardHeader>
           <CardTitle>Downloads</CardTitle>
+          <CardDescription>
+            Toggle &quot;Show on Downloads page&quot; to also list a file on the public /downloads library, under the
+            chosen category.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {downloads.fields.map((field, i) => (
@@ -60,11 +71,32 @@ export function ProductContentFields() {
               <TextField label="Title" {...form.register(`downloads.${i}.title`)} />
               <TextAreaField label="Description" {...form.register(`downloads.${i}.description`)} />
               <DocumentField name={`downloads.${i}.url`} label="Download File" />
+              <SwitchField
+                label="Show on Downloads page"
+                checked={form.watch(`downloads.${i}.showOnDownloadsPage`)}
+                onCheckedChange={(v) => form.setValue(`downloads.${i}.showOnDownloadsPage`, v)}
+              />
+              {form.watch(`downloads.${i}.showOnDownloadsPage`) && (
+                <SelectField
+                  label="Downloads Page Category"
+                  options={DOWNLOAD_TABS.map((t) => ({ value: t.id, label: t.label }))}
+                  value={form.watch(`downloads.${i}.tab`) || DOWNLOAD_TABS[0].id}
+                  onChange={(e) => form.setValue(`downloads.${i}.tab`, e.target.value)}
+                />
+              )}
             </RepeaterItem>
           ))}
           <AddButton
             label="Add Download"
-            onClick={() => downloads.append({ title: "", description: "", url: { src: "" } })}
+            onClick={() =>
+              downloads.append({
+                title: "",
+                description: "",
+                url: { src: "" },
+                tab: DOWNLOAD_TABS[0].id,
+                showOnDownloadsPage: false,
+              })
+            }
           />
         </CardContent>
       </Card>

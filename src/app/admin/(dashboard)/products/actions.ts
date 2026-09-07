@@ -10,7 +10,7 @@ type ContentFields = {
   features: string | null;
   description: string | null;
   specifications: { key: string; value: string }[];
-  downloads: { title: string; description: string; url: string }[];
+  downloads: { title: string; description: string; url: string; tab?: string; showOnDownloadsPage?: boolean }[];
 };
 
 export type ProductInput = ContentFields & {
@@ -39,6 +39,7 @@ export type VariantInput = ContentFields & {
 function revalidateProducts(id?: string) {
   revalidatePath("/admin/products");
   if (id) revalidatePath(`/admin/products/${id}`);
+  revalidatePath("/downloads");
 }
 
 export async function createProduct(data: ProductInput) {
