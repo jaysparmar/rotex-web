@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { Search, ImageOff } from "lucide-react";
 import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -75,7 +75,7 @@ export function ItemPickerGrid({
             <div key={item.id} className="flex flex-col gap-2 rounded-md border border-border p-2">
               <div className="relative aspect-square overflow-hidden rounded-md border border-border bg-muted/30">
                 <ImageLightboxTrigger src={item.image} alt={item.label} className="size-full">
-                  {item.image && (
+                  {item.image ? (
                     <Image
                       src={item.image}
                       alt={item.label}
@@ -83,6 +83,10 @@ export function ItemPickerGrid({
                       unoptimized
                       className={cn(imageFit === "contain" ? "object-contain p-2" : "object-cover")}
                     />
+                  ) : (
+                    <div className="flex size-full items-center justify-center text-muted-foreground/40">
+                      <ImageOff className="size-6" />
+                    </div>
                   )}
                 </ImageLightboxTrigger>
                 <Switch
