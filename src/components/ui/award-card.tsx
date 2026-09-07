@@ -37,11 +37,11 @@ export function AwardCard({ year, title, description, url, image, className }: A
           <p className="text-stone-900 text-sm font-medium font-montserrat leading-6">{description}</p>
         </div>
 
-        <span className="inline-flex w-fit items-center gap-2.5 px-5 py-3 bg-red-600 rounded-[45px] transition-colors duration-200 group-hover:bg-red-700">
-          <span className="text-white text-base font-medium font-montserrat leading-7">
+        <span className="inline-flex w-fit items-center gap-2.5 px-5 py-3 bg-white rounded-[45px] transition-colors duration-200 group-hover:bg-[#EF3E23]">
+          <span className="text-[#EF3E23] text-base font-medium font-montserrat leading-7 transition-colors duration-200 group-hover:text-white">
             View Details
           </span>
-          <RotexArrow size={8} color="currentColor" className="text-white" />
+          <RotexArrow size={8} color="currentColor" className="text-[#EF3E23] transition-colors duration-200 group-hover:text-white" />
         </span>
       </div>
     </>
