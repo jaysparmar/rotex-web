@@ -49,11 +49,11 @@ export function AwardCard({ year, title, description, url, image, className }: A
 
   /* The red under-stroke is a hover-only accent. It's always a 3px bottom border
      so the card never changes height — it just starts out transparent.
-     Hover also tints the card stone-100 → rose-100 and inverts the pill to red. */
+     Figma: bg #F5F2F0 default, #F2E9E4 on hover; pill inverts to #EF3E23. */
   const shell = cn(
-    "group flex flex-col h-121.75 bg-stone-100 rounded-2xl overflow-hidden",
+    "group flex flex-col h-121.75 bg-[#F5F2F0] rounded-2xl overflow-hidden",
     "border border-neutral-200 border-b-[3px] border-b-transparent",
-    "transition-colors duration-200 hover:bg-rose-100 hover:border-b-[#EE3E23]",
+    "transition-colors duration-200 hover:bg-[#F2E9E4] hover:border-b-[#EE3E23]",
     className
   );
 
