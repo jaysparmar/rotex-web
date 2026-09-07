@@ -118,6 +118,11 @@ export function ProductEditForm({
   ];
 
   function onSubmit(values: ProductFormValues) {
+    if (!values.categoryId) {
+      toast.error("Please select a Category before saving.");
+      return;
+    }
+
     const data: ProductInput = {
       modelNumber: values.modelNumber,
       name: values.name,
@@ -147,7 +152,7 @@ export function ProductEditForm({
         }
         toast.success(product ? "Product updated" : "Product added");
       } catch (err) {
-        toast.error(product ? "Failed to update product" : "Failed to add product");
+        toast.error(err instanceof Error ? err.message : product ? "Failed to update product" : "Failed to add product");
         throw err;
       }
     });

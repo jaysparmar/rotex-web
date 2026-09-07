@@ -1,9 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { slugify } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { buildProductWhere, type ProductFilterParams } from "@/lib/product-filters";
+
+function isDuplicateProductError(err: unknown): boolean {
+  return err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002";
+}
 
 type ContentFields = {
   certificates: string[];
@@ -43,16 +48,30 @@ function revalidateProducts(id?: string) {
 }
 
 export async function createProduct(data: ProductInput) {
-  const product = await prisma.product.create({
-    data: { ...data, slug: slugify(`${data.name}-${data.modelNumber}`) },
-  });
-  revalidateProducts();
-  return { id: product.id };
+  try {
+    const product = await prisma.product.create({
+      data: { ...data, slug: slugify(`${data.name}-${data.modelNumber}`) },
+    });
+    revalidateProducts();
+    return { id: product.id };
+  } catch (err) {
+    if (isDuplicateProductError(err)) {
+      throw new Error("A product with this Model Number already exists.");
+    }
+    throw err;
+  }
 }
 
 export async function updateProduct(id: string, data: ProductInput) {
-  await prisma.product.update({ where: { id }, data });
-  revalidateProducts(id);
+  try {
+    await prisma.product.update({ where: { id }, data });
+    revalidateProducts(id);
+  } catch (err) {
+    if (isDuplicateProductError(err)) {
+      throw new Error("A product with this Model Number already exists.");
+    }
+    throw err;
+  }
 }
 
 export async function deleteProduct(id: string) {
