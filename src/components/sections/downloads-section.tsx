@@ -117,19 +117,19 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
           />
           <DownloadsFilterField
             label="Product Certificate type"
-            placeholder="Select Certificate"
+            placeholder="Select Product Certificate Type"
             options={productCertOptions}
             value={productCert}
             onChange={setProductCert}
           />
           <DownloadsFilterField
             label="Quality Management Certificate type"
-            placeholder="Select Certificate"
+            placeholder="Select Quality Management Certificate Type"
             options={qmsCertOptions}
             value={qmsCert}
             onChange={setQmsCert}
           />
-          <DownloadsFilterField label="Industry Type" placeholder="Select Industry" options={industryOptions} value={industry} onChange={setIndustry} />
+          <DownloadsFilterField label="Industry Type" placeholder="Select Industry Type" options={industryOptions} value={industry} onChange={setIndustry} />
         </aside>
 
         {/* Content */}

@@ -20,7 +20,7 @@ export function DownloadsFilterField({ label, placeholder, options, value, onCha
         value={value}
         onValueChange={(v) => onChange(v ?? ALL)}
       >
-        <SelectTrigger className="w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline-1 -outline-offset-1 outline-gray-200 text-sm font-medium font-montserrat text-neutral-400">
+        <SelectTrigger className="w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 outline-gray-200 text-sm font-medium font-montserrat text-neutral-400">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
