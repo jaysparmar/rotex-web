@@ -156,7 +156,7 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="min-h-171"
+              className="lg:min-h-171"
             >
               {visibleItems.length > 0 ? (
                 <div className="py-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

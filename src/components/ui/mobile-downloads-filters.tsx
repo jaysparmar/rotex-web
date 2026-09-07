@@ -133,17 +133,8 @@ export function MobileDownloadsFilters({
       {/* Main filters bottom sheet */}
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
         <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl">
-          <SheetHeader className="flex-row items-center justify-between pr-9">
+          <SheetHeader>
             <SheetTitle>Filters</SheetTitle>
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-red-600 text-xs font-semibold font-montserrat hover:underline"
-              >
-                Clear Filters
-              </button>
-            )}
           </SheetHeader>
           <div className="flex-1 flex flex-col gap-5 overflow-y-auto px-4">
             {categories.map((cat) => (
@@ -163,8 +154,17 @@ export function MobileDownloadsFilters({
               </div>
             ))}
           </div>
-          <SheetFooter>
-            <Button type="button" onClick={() => setFiltersOpen(false)}>
+          <SheetFooter className="flex-row items-center gap-4">
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="shrink-0 text-red-600 text-xs font-semibold font-montserrat hover:underline"
+              >
+                Clear Filters
+              </button>
+            )}
+            <Button type="button" onClick={() => setFiltersOpen(false)} className="flex-1">
               Show Results
             </Button>
           </SheetFooter>
