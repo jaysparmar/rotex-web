@@ -53,7 +53,7 @@ function ChannelPartnerFlatMap({ pins }: { pins: Pin[] }) {
           const detail = [pin.stateOrCity, pin.partnerCompany].filter(Boolean).join(" — ");
           return (
             <Marker key={pin.name + index} coordinates={pin.coordinates}>
-              <circle r={4} fill="#EE3E23" stroke="#fff" strokeWidth={1} />
+              <circle r={4} fill="#EF3E23" stroke="#fff" strokeWidth={1} />
               <foreignObject
                 x={flip ? -286 : 6}
                 y={-12}

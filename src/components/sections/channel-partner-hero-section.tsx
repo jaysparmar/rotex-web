@@ -50,7 +50,7 @@ export function ChannelPartnerHeroSection({
             Home
           </Link>
           <span className="text-subtext text-sm font-semibold font-montserrat leading-5">/</span>
-          <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">Become a Channel Partner</span>
+          <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">Become a Channel Partner</span>
         </nav>
 
         {/* Copy — bottom-aligned, 685px column on desktop */}
@@ -65,7 +65,7 @@ export function ChannelPartnerHeroSection({
           {/* mobile: 192×40 white pill with a red hairline; desktop: stone-100, auto width */}
           <Link
             href={cta.href}
-            className="inline-flex w-48 lg:w-fit h-10 lg:h-auto items-center justify-center gap-1.5 px-6 lg:py-3.5 rounded-[47px] bg-white lg:bg-stone-100 outline outline-[0.5px] -outline-offset-[0.5px] outline-red-600 lg:outline-0 text-red-600 text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-primary hover:text-white hover:outline-primary transition-colors duration-200"
+            className="inline-flex w-48 lg:w-fit h-10 lg:h-auto items-center justify-center gap-1.5 px-6 lg:py-3.5 rounded-[47px] bg-white lg:bg-stone-100 outline outline-[0.5px] -outline-offset-[0.5px] outline-[#EF3E23] lg:outline-0 text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-primary hover:text-white hover:outline-primary transition-colors duration-200"
           >
             {cta.label}
           </Link>

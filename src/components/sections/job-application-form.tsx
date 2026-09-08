@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
+import { digitsOnlyKeyDown } from "@/lib/utils";
 import { useForm, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,13 +12,13 @@ const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
 
 function inputCls(hasError: boolean) {
-  return `w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 ${
+  return `w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 ${
     hasError ? "outline-red-400" : "outline-gray-200"
   }`;
 }
 
 function selectTriggerCls(hasError: boolean) {
-  return `w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-zinc-800 data-placeholder:text-neutral-400 ${
+  return `w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-zinc-800 data-placeholder:text-stone-400 ${
     hasError ? "outline-red-400" : "outline-gray-200"
   }`;
 }
@@ -163,8 +164,10 @@ export function JobApplicationForm({
             <input
               {...register("phone")}
               type="tel"
+              inputMode="numeric"
+              onKeyDown={digitsOnlyKeyDown}
               placeholder="Enter phone number"
-              className="flex-1 px-4 py-2.5 bg-transparent text-sm font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none"
+              className="flex-1 px-4 py-2.5 bg-transparent text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 outline-none"
             />
           </div>
           {errors.phone && <p className={errorCls}>{errors.phone.message}</p>}
@@ -200,7 +203,7 @@ export function JobApplicationForm({
           {...register("message")}
           rows={4}
           placeholder="Share your application, specifications, or problem you're trying to solve"
-          className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
+          className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
         />
       </Field>
 
@@ -215,7 +218,7 @@ export function JobApplicationForm({
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          className="w-full h-11 px-5 py-2.5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 flex items-center justify-center gap-1 text-red-600 text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-gray-100 transition-colors"
+          className="w-full h-11 px-5 py-2.5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 flex items-center justify-center gap-1 text-[#EF3E23] text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-gray-100 transition-colors"
         >
           {fileName ?? (
             <>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useForm, FormProvider, useFieldArray, useFormContext } from "react-hook-form";
+import { useForm, FormProvider, useFieldArray, useFormContext, Controller, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,13 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { TextField, TextAreaField, FieldGrid, SelectField, SwitchField, Field } from "@/components/admin/form-fields";
 import { SaveBar } from "@/components/admin/section-form-shell";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PERK_ICON_OPTIONS } from "@/lib/job-perk-icons";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { createJobPosting, updateJobPosting } from "@/app/admin/(dashboard)/job-postings/actions";
 
 const EMPLOYMENT_TYPE_OPTIONS = ["Full-time", "Part-time", "Contract", "Internship"].map((v) => ({ value: v, label: v }));
 const WORK_MODE_OPTIONS = ["On-site", "Hybrid", "Remote"].map((v) => ({ value: v, label: v }));
-const PERK_ICON_SELECT_OPTIONS = PERK_ICON_OPTIONS.map((o) => ({ value: o.key, label: o.label }));
 
 type JobPostingFormValues = {
   company: string;
@@ -180,6 +180,44 @@ function StringListField({ name, label, addLabel }: { name: "whatYouDo" | "whatW
   );
 }
 
+/** Icon dropdown for one perk row — shows a small preview of the currently
+ * selected icon next to the trigger, and next to each option in the list,
+ * so the admin can see exactly which glyph they're placing. */
+function PerkIconSelect({ index }: { index: number }) {
+  const form = useFormContext<JobPostingFormValues>();
+  const value = useWatch({ control: form.control, name: `whatYouGet.${index}.icon` });
+  const selected = PERK_ICON_OPTIONS.find((o) => o.key === value) ?? PERK_ICON_OPTIONS[0];
+
+  return (
+    <Controller
+      control={form.control}
+      name={`whatYouGet.${index}.icon`}
+      render={({ field }) => (
+        <Select
+          items={PERK_ICON_OPTIONS.map((o) => ({ value: o.key, label: o.label }))}
+          value={field.value}
+          onValueChange={(v) => field.onChange(v ?? PERK_ICON_OPTIONS[0].key)}
+        >
+          <SelectTrigger className="w-full">
+            <selected.Icon className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.75} />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {PERK_ICON_OPTIONS.map((opt) => (
+              <SelectItem key={opt.key} value={opt.key}>
+                <span className="flex items-center gap-2">
+                  <opt.Icon className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.75} />
+                  {opt.label}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+    />
+  );
+}
+
 function PerksField() {
   const form = useFormContext<JobPostingFormValues>();
   const array = useFieldArray({ control: form.control, name: "whatYouGet" });
@@ -189,12 +227,7 @@ function PerksField() {
       {array.fields.map((field, i) => (
         <div key={field.id} className="flex items-center gap-2">
           <div className="w-52 shrink-0">
-            <SelectField
-              label="Icon"
-              options={PERK_ICON_SELECT_OPTIONS}
-              defaultValue={field.icon}
-              {...form.register(`whatYouGet.${i}.icon`)}
-            />
+            <PerkIconSelect index={i} />
           </div>
           <Input
             {...form.register(`whatYouGet.${i}.label`)}

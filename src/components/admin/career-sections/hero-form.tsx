@@ -3,7 +3,7 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
-import { TextField, TextAreaField, FieldGrid } from "@/components/admin/form-fields";
+import { TextField, TextAreaField } from "@/components/admin/form-fields";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveCareerSection } from "@/app/admin/(dashboard)/career/actions";
 
@@ -43,10 +43,9 @@ export function CareerHeroForm({
         <SectionMeta />
         <TextField label="Title" {...form.register("title")} />
         <TextAreaField label="Description" {...form.register("description")} />
-        <FieldGrid>
-          <TextField label="CTA Label" {...form.register("cta.label")} />
-          <TextField label="CTA Href" {...form.register("cta.href")} />
-        </FieldGrid>
+        <TextField label="CTA Label" {...form.register("cta.label")} />
+        {/* No CTA Href field — the button always jumps to the Open Positions
+            section, and is hidden automatically when there are none. */}
         <SaveBar pending={pending} error={error} success={success} />
       </form>
     </FormProvider>

@@ -31,7 +31,12 @@ export default async function CareerPage() {
   return (
     <div>
       {hero?.enabled && (
-        <CareerHeroSection title={hero.title} description={hero.description} cta={hero.cta} />
+        <CareerHeroSection
+          title={hero.title}
+          description={hero.description}
+          cta={hero.cta}
+          hasOpenPositions={jobRecords.length > 0}
+        />
       )}
 
       {values?.enabled && (

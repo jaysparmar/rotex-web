@@ -37,7 +37,7 @@ export function ChannelPartnerMapSection({
           <div className="w-full aspect-[16/9]">
             <ChannelPartnerFlatMap pins={pins} />
           </div>
-          <p className="absolute left-0 bottom-24 max-w-64 text-red-600 font-montserrat font-medium text-sm leading-6">
+          <p className="absolute left-0 bottom-24 max-w-64 text-[#EF3E23] font-montserrat font-medium text-sm leading-6">
             {callout}
           </p>
         </div>

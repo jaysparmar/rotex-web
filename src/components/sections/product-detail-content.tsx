@@ -47,11 +47,11 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
               <span className="text-stone-900 text-xs font-semibold font-montserrat uppercase tracking-wide">/</span>
             )}
             {crumb.href ? (
-              <Link href={crumb.href} className="text-stone-900 text-sm font-semibold font-montserrat leading-5 hover:text-red-600">
+              <Link href={crumb.href} className="text-stone-900 text-sm font-semibold font-montserrat leading-5 hover:text-[#EF3E23]">
                 {crumb.label}
               </Link>
             ) : (
-              <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">{crumb.label}</span>
+              <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">{crumb.label}</span>
             )}
           </span>
         ))}

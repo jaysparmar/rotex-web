@@ -61,7 +61,7 @@ export function AwardsGrid({ awards }: { awards: AwardCardProps[] }) {
         <div className="flex justify-center mt-4">
           <button
             onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-            className="px-6 py-3 rounded-full outline outline-1 -outline-offset-1 outline-red-600 text-red-600 font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-red-600 hover:text-white transition-colors duration-150"
+            className="px-6 py-3 rounded-full outline outline-1 -outline-offset-1 outline-[#EF3E23] text-[#EF3E23] font-montserrat font-semibold text-sm uppercase leading-5 hover:bg-[#EF3E23] hover:text-white transition-colors duration-150"
           >
             Load More
           </button>

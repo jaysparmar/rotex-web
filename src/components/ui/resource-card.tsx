@@ -35,7 +35,7 @@ export function ResourceCard({ post, basePath }: ResourceCardProps) {
           </span>
         )}
       </div>
-      <h3 className="text-stone-900 text-lg font-medium font-montserrat leading-6 group-hover:text-red-600 transition-colors">
+      <h3 className="text-stone-900 text-lg font-medium font-montserrat leading-6 group-hover:text-[#EF3E23] transition-colors">
         {post.title}
       </h3>
       <div className="pt-2">

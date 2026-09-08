@@ -1,10 +1,13 @@
 "use client";
-import { useState } from "react";
-import { useForm, Controller, type Control } from "react-hook-form";
+import { useMemo, useState } from "react";
+import { digitsOnlyKeyDown } from "@/lib/utils";
+import { useForm, useWatch, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterCombobox } from "@/components/ui/filter-combobox";
 import { ImageView } from "@/components/ui/image-view";
+import { COUNTRY_NAMES, getCitiesForCountry } from "@/lib/world-countries";
 import partner1 from "@/assets/Images/trustPartners/img_1.png";
 import partner2 from "@/assets/Images/trustPartners/img_2.png";
 import partner3 from "@/assets/Images/trustPartners/img_3.png";
@@ -14,8 +17,6 @@ import partner6 from "@/assets/Images/trustPartners/img_6.png";
 import {
   ENQUIRY_TYPE_OPTIONS,
   PRODUCT_TYPE_OPTIONS,
-  COUNTRY_OPTIONS,
-  CITY_OPTIONS,
   INDUSTRY_OPTIONS,
 } from "@/lib/contact-data";
 
@@ -23,13 +24,13 @@ const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
 
 function inputCls(hasError: boolean) {
-  return `w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 ${
+  return `w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 ${
     hasError ? "outline-red-400" : "outline-gray-200"
   }`;
 }
 
 function selectTriggerCls(hasError: boolean) {
-  return `w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-zinc-800 data-placeholder:text-neutral-400 ${
+  return `w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-zinc-800 data-placeholder:text-stone-400 ${
     hasError ? "outline-red-400" : "outline-gray-200"
   }`;
 }
@@ -128,9 +129,12 @@ type ContactFormSectionProps = {
   logos?: Logo[];
   enquiryTypeOptions?: string[];
   productTypeOptions?: string[];
+  /** @deprecated Country field now uses the full world country list with search. */
   countryOptions?: string[];
+  /** @deprecated City options are now derived from the selected country. */
   cityOptions?: string[];
   industryOptions?: string[];
+  /** @deprecated Country field no longer preselects a value; placeholder shows by default. */
   defaultCountry?: string;
 };
 
@@ -144,21 +148,21 @@ export function ContactFormSection({
   logos = defaultLogos,
   enquiryTypeOptions = ENQUIRY_TYPE_OPTIONS,
   productTypeOptions = PRODUCT_TYPE_OPTIONS,
-  countryOptions = COUNTRY_OPTIONS,
-  cityOptions = CITY_OPTIONS,
   industryOptions = INDUSTRY_OPTIONS,
-  defaultCountry = "United States",
 }: ContactFormSectionProps) {
   const [submitError, setSubmitError] = useState<string>();
   const {
     register,
     control,
+    setValue,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { country: defaultCountry },
   });
+
+  const selectedCountry = useWatch({ control, name: "country" });
+  const cityOptions = useMemo(() => getCitiesForCountry(selectedCountry ?? ""), [selectedCountry]);
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(undefined);
@@ -191,7 +195,7 @@ export function ContactFormSection({
         {/* Left: About Rotex */}
         <div className="lg:w-121.75 lg:shrink-0 flex flex-col gap-14">
           <div className="flex flex-col gap-3">
-            <span className="text-red-600 text-sm font-bold font-montserrat uppercase leading-5 tracking-wide">{eyebrow}</span>
+            <span className="text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 tracking-wide">{eyebrow}</span>
             <h2 className="text-neutral-950 text-3xl font-medium font-montserrat leading-10">{heading}</h2>
             <p className="text-stone-500 text-base font-medium font-montserrat leading-6">
               {description}
@@ -261,8 +265,10 @@ export function ContactFormSection({
                 <input
                   {...register("phone")}
                   type="tel"
+                  inputMode="numeric"
+                  onKeyDown={digitsOnlyKeyDown}
                   placeholder="Enter phone number"
-                  className="flex-1 px-4 py-2.5 bg-transparent text-sm font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none"
+                  className="flex-1 px-4 py-2.5 bg-transparent text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 outline-none"
                 />
               </div>
               {errors.phone && <p className={errorCls}>{errors.phone.message}</p>}
@@ -278,13 +284,44 @@ export function ContactFormSection({
           </Field>
 
           <div className="flex flex-col gap-5 lg:flex-row">
-            <Field label="Country" error={errors.country?.message} className="flex-1">
-              <FormSelect control={control} name="country" placeholder="Select Country" options={countryOptions} hasError={!!errors.country} />
-            </Field>
+            <div className="flex-1 flex flex-col gap-2">
+              <Controller
+                control={control}
+                name="country"
+                render={({ field }) => (
+                  <FilterCombobox
+                    label="Country"
+                    placeholder="Select Country"
+                    options={COUNTRY_NAMES}
+                    value={field.value ? [field.value] : []}
+                    onChange={(v) => {
+                      field.onChange(v[0] ?? "");
+                      setValue("city", "");
+                    }}
+                    multiple={false}
+                  />
+                )}
+              />
+              {errors.country && <p className={errorCls}>{errors.country.message}</p>}
+            </div>
 
-            <Field label="City" error={errors.city?.message} className="flex-1">
-              <FormSelect control={control} name="city" placeholder="Select City" options={cityOptions} hasError={!!errors.city} />
-            </Field>
+            <div className="flex-1 flex flex-col gap-2">
+              <Controller
+                control={control}
+                name="city"
+                render={({ field }) => (
+                  <FilterCombobox
+                    label="City"
+                    placeholder={selectedCountry ? "Select City" : "Select a country first"}
+                    options={cityOptions}
+                    value={field.value ? [field.value] : []}
+                    onChange={(v) => field.onChange(v[0] ?? "")}
+                    multiple={false}
+                  />
+                )}
+              />
+              {errors.city && <p className={errorCls}>{errors.city.message}</p>}
+            </div>
           </div>
 
           <Field label="Industry" error={errors.industryName?.message}>
@@ -296,7 +333,7 @@ export function ContactFormSection({
               {...register("message")}
               rows={4}
               placeholder="Share your application, specifications, or problem you're trying to solve"
-              className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
+              className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
             />
           </Field>
 

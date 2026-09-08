@@ -9,7 +9,10 @@ import { cn } from "@/lib/utils";
 function Select<Value, Multiple extends boolean | undefined = false>(
   props: SelectPrimitive.Root.Props<Value, Multiple>
 ) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />;
+  // modal (base-ui default: true) locks page scroll behind the popup — every
+  // other dropdown on the site (FilterCombobox) leaves the page scrollable,
+  // so match that here.
+  return <SelectPrimitive.Root data-slot="select" modal={false} {...props} />;
 }
 
 function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
@@ -31,7 +34,13 @@ function SelectTrigger({
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        "flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none transition-colors data-placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        // outline-none is scoped to focus-visible only (not static) — a static
+        // "outline-none" here survives tailwind-merge's conflict resolution
+        // against a caller's "outline outline-1 ... outline-{color}" (the bare
+        // "outline" gets deduped against "outline-1" while "outline-none"
+        // itself is untouched), silently killing every custom trigger stroke
+        // site-wide regardless of what color/width callers pass.
+        "flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-input bg-transparent px-2.5 text-sm transition-colors data-placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
       {...props}

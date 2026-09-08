@@ -1,4 +1,5 @@
 import { JobApplicationForm } from "@/components/sections/job-application-form";
+import { HexIcon } from "@/components/ui/hex-icon";
 
 const DEFAULT_BENEFITS = [
   "Work on real, impactful projects",
@@ -41,7 +42,9 @@ export function CareerFormSection({
           <ul className="flex flex-col gap-3">
             {benefits.map((b) => (
               <li key={b} className="flex items-start gap-3">
-                <span className="mt-1.5 size-2.5 shrink-0 bg-red-600" />
+                <span className="mt-1.5 shrink-0">
+                  <HexIcon size={10} />
+                </span>
                 <span className="text-zinc-800 text-sm font-medium font-montserrat leading-5">{b}</span>
               </li>
             ))}

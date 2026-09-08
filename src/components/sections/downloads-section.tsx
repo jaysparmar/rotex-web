@@ -101,7 +101,7 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="text-red-600 text-xs font-semibold font-montserrat leading-5 hover:underline"
+                className="text-[#EF3E23] text-xs font-semibold font-montserrat leading-5 hover:underline"
               >
                 Clear Filters
               </button>
@@ -141,7 +141,7 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
                 onClick={() => changeTab(tab.id)}
                 className={cn(
                   "px-2.5 py-5 border-b-2 whitespace-nowrap text-sm font-medium font-montserrat leading-5 transition-colors",
-                  tab.id === activeTab ? "border-red-600 text-red-600" : "border-transparent text-stone-900 hover:text-red-600"
+                  tab.id === activeTab ? "border-[#EF3E23] text-[#EF3E23]" : "border-transparent text-stone-900 hover:text-[#EF3E23]"
                 )}
               >
                 {tab.label}

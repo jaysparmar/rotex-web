@@ -24,7 +24,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
           page === 1 ? "bg-stone-300 opacity-50" : "bg-stone-100 hover:bg-stone-200"
         )}
       >
-        <IoChevronBackOutline className={cn("size-3", page === 1 ? "text-white" : "text-red-600")} />
+        <IoChevronBackOutline className={cn("size-3", page === 1 ? "text-white" : "text-[#EF3E23]")} />
       </button>
 
       {pages.map((p) => (
@@ -34,7 +34,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
           className={cn(
             "size-10 rounded-full flex justify-center items-center text-sm font-medium font-montserrat leading-5 transition-colors",
             p === page
-              ? "bg-red-600 text-white"
+              ? "bg-[#EF3E23] text-white"
               : "outline-1 -outline-offset-1 outline-neutral-200 text-stone-500 hover:text-stone-900"
           )}
         >
@@ -52,7 +52,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
         )}
       >
         <IoChevronBackOutline
-          className={cn("size-3 rotate-180", page === totalPages ? "text-white" : "text-red-600")}
+          className={cn("size-3 rotate-180", page === totalPages ? "text-white" : "text-[#EF3E23]")}
         />
       </button>
     </div>

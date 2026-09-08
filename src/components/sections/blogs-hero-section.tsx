@@ -28,7 +28,7 @@ export function BlogsHeroSection({ featured }: { featured?: ResourceItem }) {
           <div className="group flex flex-col lg:flex-row items-stretch rounded-lg overflow-hidden outline-1 -outline-offset-1 outline-neutral-200 lg:max-w-3xl lg:mx-auto">
             <Link href={`/blogs/${featured.slug}`} className="relative w-full lg:w-96 h-64 lg:h-80 shrink-0">
               <Image src={featured.image} alt={featured.title} fill className="object-cover" unoptimized />
-              <span className="absolute top-4 right-4 size-10 rounded-full bg-red-600 flex items-center justify-center text-white group-hover:rotate-45 transition-transform duration-300">
+              <span className="absolute top-4 right-4 size-10 rounded-full bg-[#EF3E23] flex items-center justify-center text-white group-hover:rotate-45 transition-transform duration-300">
                 <ArrowUpRight />
               </span>
             </Link>

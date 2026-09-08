@@ -25,7 +25,7 @@ export function AwardsHeroSection({
             About Us
           </Link>
           <span className={crumbClass}>/</span>
-          <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">
+          <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">
             Awards &amp; Recognition
           </span>
         </nav>

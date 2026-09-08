@@ -15,7 +15,7 @@ export function DownloadCard({ item }: { item: DownloadItem }) {
       <div className="flex-1 p-5 border-t border-neutral-200 flex flex-col justify-between gap-5 bg-white transition-colors duration-200 group-hover:bg-[#F5F2F0]">
         <div className="flex flex-col gap-1">
           <span className="text-neutral-400 text-xs font-medium font-montserrat leading-5">{meta}</span>
-          <span className="text-zinc-800 text-lg font-medium font-montserrat leading-6 transition-colors duration-200 group-hover:text-red-600">
+          <span className="text-zinc-800 text-lg font-medium font-montserrat leading-6 transition-colors duration-200 group-hover:text-[#EF3E23]">
             {item.title}
           </span>
         </div>
@@ -24,10 +24,10 @@ export function DownloadCard({ item }: { item: DownloadItem }) {
           target="_blank"
           rel="noopener noreferrer"
           download
-          className="w-full px-6 py-3.5 bg-stone-100 rounded-[47px] flex justify-center items-center gap-2.5 transition-colors duration-200 group-hover:bg-red-600"
+          className="w-full px-6 py-3.5 bg-stone-100 rounded-[47px] flex justify-center items-center gap-2.5 transition-colors duration-200 group-hover:bg-[#EF3E23]"
         >
-          <IoDownloadOutline className="size-5 text-red-600 transition-colors duration-200 group-hover:text-white" />
-          <span className="text-red-600 text-sm font-semibold font-montserrat leading-5 transition-colors duration-200 group-hover:text-white">
+          <IoDownloadOutline className="size-5 text-[#EF3E23] transition-colors duration-200 group-hover:text-white" />
+          <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5 transition-colors duration-200 group-hover:text-white">
             Download
           </span>
         </a>

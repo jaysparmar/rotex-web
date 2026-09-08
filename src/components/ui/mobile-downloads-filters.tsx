@@ -159,7 +159,7 @@ export function MobileDownloadsFilters({
               <button
                 type="button"
                 onClick={clearFilters}
-                className="shrink-0 text-red-600 text-xs font-semibold font-montserrat hover:underline"
+                className="shrink-0 text-[#EF3E23] text-xs font-semibold font-montserrat hover:underline"
               >
                 Clear Filters
               </button>
@@ -177,10 +177,10 @@ export function MobileDownloadsFilters({
           {activePanel && (
             <>
               <SheetHeader className="flex-row items-center gap-2 pr-9">
-                <button type="button" onClick={() => setPanel(null)} className="text-red-600">
+                <button type="button" onClick={() => setPanel(null)} className="text-[#EF3E23]">
                   <ChevronLeft className="size-4" />
                 </button>
-                <SheetTitle className="text-red-600">{activePanel.panelTitle}</SheetTitle>
+                <SheetTitle className="text-[#EF3E23]">{activePanel.panelTitle}</SheetTitle>
               </SheetHeader>
               <div className="flex-1 overflow-y-auto px-4 pb-4">
                 <button
@@ -191,7 +191,7 @@ export function MobileDownloadsFilters({
                   {activePanel.allLabel}
                   <span
                     className={`flex size-4 shrink-0 items-center justify-center rounded-sm border ${
-                      activePanel.value === ALL ? "border-red-600 bg-red-600" : "border-stone-300"
+                      activePanel.value === ALL ? "border-[#EF3E23] bg-[#EF3E23]" : "border-stone-300"
                     }`}
                   >
                     {activePanel.value === ALL && <Check className="size-3 text-white" />}
@@ -207,7 +207,7 @@ export function MobileDownloadsFilters({
                     {opt}
                     <span
                       className={`flex size-4 shrink-0 items-center justify-center rounded-sm border ${
-                        activePanel.value === opt ? "border-red-600 bg-red-600" : "border-stone-300"
+                        activePanel.value === opt ? "border-[#EF3E23] bg-[#EF3E23]" : "border-stone-300"
                       }`}
                     >
                       {activePanel.value === opt && <Check className="size-3 text-white" />}

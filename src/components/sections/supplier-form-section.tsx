@@ -1,12 +1,14 @@
 "use client";
-import { useState } from "react";
-import { useForm, Controller, type Control } from "react-hook-form";
+import { useMemo, useState } from "react";
+import { digitsOnlyKeyDown } from "@/lib/utils";
+import { useForm, useWatch, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterCombobox } from "@/components/ui/filter-combobox";
+import { HexIcon } from "@/components/ui/hex-icon";
+import { COUNTRY_NAMES, getCitiesForCountry } from "@/lib/world-countries";
 
-const DEFAULT_COUNTRIES = ["United States", "India", "UAE", "Saudi Arabia", "United Kingdom", "Germany"];
-const DEFAULT_CITIES = ["Mumbai", "Delhi", "Dubai", "London", "Berlin", "New York"];
 const DEFAULT_BUSINESS_TYPES = ["Distributor", "Supplier", "System Integrator", "OEM Partner"];
 const DEFAULT_INDUSTRIES = ["Oil & Gas", "Chemical", "Power", "Mining", "Industrial Automation"];
 
@@ -14,13 +16,13 @@ const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
 
 function inputCls(hasError: boolean) {
-  return `w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 ${
+  return `w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 ${
     hasError ? "outline-red-400" : "outline-gray-200"
   }`;
 }
 
 function selectTriggerCls(hasError: boolean) {
-  return `w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-zinc-800 data-placeholder:text-neutral-400 ${
+  return `w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-zinc-800 data-placeholder:text-stone-400 ${
     hasError ? "outline-red-400" : "outline-gray-200"
   }`;
 }
@@ -99,10 +101,13 @@ type SupplierFormSectionProps = {
   headingPrefix?: string;
   headingHighlight?: string;
   description?: string;
+  /** @deprecated Country field now uses the full world country list with search. */
   countryOptions?: string[];
+  /** @deprecated City options are now derived from the selected country. */
   cityOptions?: string[];
   businessTypeOptions?: string[];
   industryOptions?: string[];
+  /** @deprecated Country field no longer preselects a value; placeholder shows by default. */
   defaultCountry?: string;
 };
 
@@ -116,25 +121,25 @@ const DEFAULT_BENEFITS = [
 ];
 
 export function SupplierFormSection({
-  headingPrefix = "Grow Your Business as a",
-  headingHighlight = "Supplier",
+  headingPrefix = "Grow Your Business",
+  headingHighlight = "as a Supplier",
   description = "If you are looking to enrich your product offering portfolio. Apply for becoming our prestigious league of channel partners with us.",
-  countryOptions = DEFAULT_COUNTRIES,
-  cityOptions = DEFAULT_CITIES,
   businessTypeOptions = DEFAULT_BUSINESS_TYPES,
   industryOptions = DEFAULT_INDUSTRIES,
-  defaultCountry = "United States",
 }: SupplierFormSectionProps) {
   const [submitError, setSubmitError] = useState<string>();
   const {
     register,
     control,
+    setValue,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { country: defaultCountry },
   });
+
+  const selectedCountry = useWatch({ control, name: "country" });
+  const cityOptions = useMemo(() => getCitiesForCountry(selectedCountry ?? ""), [selectedCountry]);
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(undefined);
@@ -168,7 +173,7 @@ export function SupplierFormSection({
         <div className="lg:w-121.75 lg:shrink-0 flex flex-col gap-8">
           <div className="flex flex-col gap-4">
             <h2 className="text-stone-900 text-2xl lg:text-4xl font-normal font-montserrat leading-9 lg:leading-10">
-              {headingPrefix} <span className="text-gradient-hero">{headingHighlight}</span>
+              {headingPrefix} <span className="text-primary">{headingHighlight}</span>
             </h2>
             <p className="text-stone-500 text-base font-medium font-montserrat leading-6">
               {description}
@@ -178,7 +183,9 @@ export function SupplierFormSection({
           <ul className="max-w-96 flex flex-col gap-4">
             {DEFAULT_BENEFITS.map((b) => (
               <li key={b} className="flex items-start gap-3">
-                <span className="mt-1.5 size-3 shrink-0 bg-red-600" />
+                <span className="mt-1.5 shrink-0">
+                  <HexIcon size={12} />
+                </span>
                 <span className="flex-1 text-stone-900 font-montserrat font-medium text-base leading-6">{b}</span>
               </li>
             ))}
@@ -209,8 +216,10 @@ export function SupplierFormSection({
                 <input
                   {...register("phone")}
                   type="tel"
+                  inputMode="numeric"
+                  onKeyDown={digitsOnlyKeyDown}
                   placeholder="Enter phone number"
-                  className="flex-1 px-4 py-2.5 bg-transparent text-sm font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none"
+                  className="flex-1 px-4 py-2.5 bg-transparent text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 outline-none"
                 />
               </div>
               {errors.phone && <p className={errorCls}>{errors.phone.message}</p>}
@@ -222,13 +231,44 @@ export function SupplierFormSection({
           </div>
 
           <div className="flex flex-col gap-5 lg:flex-row">
-            <Field label="Country" error={errors.country?.message} className="flex-1">
-              <FormSelect control={control} name="country" placeholder="Select Country" options={countryOptions} hasError={!!errors.country} />
-            </Field>
+            <div className="flex-1 flex flex-col gap-2">
+              <Controller
+                control={control}
+                name="country"
+                render={({ field }) => (
+                  <FilterCombobox
+                    label="Country"
+                    placeholder="Select Country"
+                    options={COUNTRY_NAMES}
+                    value={field.value ? [field.value] : []}
+                    onChange={(v) => {
+                      field.onChange(v[0] ?? "");
+                      setValue("city", "");
+                    }}
+                    multiple={false}
+                  />
+                )}
+              />
+              {errors.country && <p className={errorCls}>{errors.country.message}</p>}
+            </div>
 
-            <Field label="City" error={errors.city?.message} className="flex-1">
-              <FormSelect control={control} name="city" placeholder="Select City" options={cityOptions} hasError={!!errors.city} />
-            </Field>
+            <div className="flex-1 flex flex-col gap-2">
+              <Controller
+                control={control}
+                name="city"
+                render={({ field }) => (
+                  <FilterCombobox
+                    label="City"
+                    placeholder={selectedCountry ? "Select City" : "Select a country first"}
+                    options={cityOptions}
+                    value={field.value ? [field.value] : []}
+                    onChange={(v) => field.onChange(v[0] ?? "")}
+                    multiple={false}
+                  />
+                )}
+              />
+              {errors.city && <p className={errorCls}>{errors.city.message}</p>}
+            </div>
           </div>
 
           <div className="flex flex-col gap-5 lg:flex-row">
@@ -254,7 +294,7 @@ export function SupplierFormSection({
               {...register("message")}
               rows={4}
               placeholder="Share any additional details about your business or partnership interest..."
-              className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
+              className={`w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 resize-none ${errors.message ? "outline-red-400" : "outline-gray-200"}`}
             />
           </Field>
 

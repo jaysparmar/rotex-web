@@ -22,7 +22,7 @@ function ArrowBtn({
     >
       <RotexArrow
         size={9}
-        color="#EE3E23"
+        color="#EF3E23"
         className={dir === "prev" ? "rotate-180" : undefined}
       />
     </button>

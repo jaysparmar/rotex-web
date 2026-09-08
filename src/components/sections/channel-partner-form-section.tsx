@@ -1,17 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterCombobox } from "@/components/ui/filter-combobox";
 import { PRODUCT_FAMILIES } from "@/lib/product-constants";
+import { COUNTRY_NAMES, getCitiesForCountry } from "@/lib/world-countries";
+import { digitsOnlyKeyDown } from "@/lib/utils";
 
-const DEFAULT_COUNTRIES = ["United States", "India", "UAE", "Saudi Arabia", "United Kingdom", "Germany"];
-const DEFAULT_CITIES = ["Mumbai", "Delhi", "Dubai", "London", "Berlin", "New York"];
 const DEFAULT_BUSINESS_TYPES = ["Distributor", "Supplier", "System Integrator", "OEM Partner"];
 const DEFAULT_INDUSTRIES = ["Oil & Gas", "Chemical", "Power", "Mining", "Industrial Automation"];
 const DEFAULT_PRODUCT_TYPES = [...PRODUCT_FAMILIES];
 
 const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
-const inputCls = "w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400";
-const selectTriggerCls = "w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-zinc-800 data-placeholder:text-neutral-400";
+const inputCls = "w-full px-5 py-3 h-12 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400";
+const selectTriggerCls = "w-full h-auto px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 outline-gray-200 text-sm font-medium font-montserrat text-zinc-800 data-placeholder:text-stone-400";
 
 function Field({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
   return (
@@ -63,11 +64,14 @@ type ChannelPartnerFormSectionProps = {
   headingPrefix?: string;
   headingHighlight?: string;
   description?: string;
+  /** @deprecated Country field now uses the full world country list with search. */
   countryOptions?: string[];
+  /** @deprecated City options are now derived from the selected country. */
   cityOptions?: string[];
   businessTypeOptions?: string[];
   industryOptions?: string[];
   productTypeOptions?: string[];
+  /** @deprecated Country field no longer preselects a value; placeholder shows by default. */
   defaultCountry?: string;
 };
 
@@ -75,18 +79,16 @@ export function ChannelPartnerFormSection({
   headingPrefix = "Expand Your Industrial Portfolio with a",
   headingHighlight = "Globally Trusted Manufacturer",
   description = "Partner with Rotex to deliver high-performance fluid control solutions backed by engineering excellence, global reach, and consistent demand generation.",
-  countryOptions = DEFAULT_COUNTRIES,
-  cityOptions = DEFAULT_CITIES,
   businessTypeOptions = DEFAULT_BUSINESS_TYPES,
   industryOptions = DEFAULT_INDUSTRIES,
   productTypeOptions = DEFAULT_PRODUCT_TYPES,
-  defaultCountry = "United States",
 }: ChannelPartnerFormSectionProps) {
-  const [country, setCountry] = useState(defaultCountry);
+  const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [industriesServed, setIndustriesServed] = useState("");
   const [productType, setProductType] = useState("");
+  const cityOptions = useMemo(() => getCitiesForCountry(country), [country]);
 
   return (
     <section id="form" className="scroll-mt-24 lg:scroll-mt-32 bg-white py-14 lg:py-20">
@@ -123,8 +125,10 @@ export function ChannelPartnerFormSection({
                 <input
                   name="phone"
                   type="tel"
+                  inputMode="numeric"
+                  onKeyDown={digitsOnlyKeyDown}
                   placeholder="Enter phone number"
-                  className="flex-1 px-4 py-2.5 bg-transparent text-sm font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 outline-none"
+                  className="flex-1 px-4 py-2.5 bg-transparent text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 outline-none"
                 />
               </div>
             </div>
@@ -135,13 +139,30 @@ export function ChannelPartnerFormSection({
           </div>
 
           <div className="flex flex-col gap-5 lg:flex-row">
-            <Field label="Country" className="flex-1">
-              <FormSelect placeholder="Select Country" options={countryOptions} value={country} onValueChange={setCountry} />
-            </Field>
+            <div className="flex-1">
+              <FilterCombobox
+                label="Country"
+                placeholder="Select Country"
+                options={COUNTRY_NAMES}
+                value={country ? [country] : []}
+                onChange={(v) => {
+                  setCountry(v[0] ?? "");
+                  setCity("");
+                }}
+                multiple={false}
+              />
+            </div>
 
-            <Field label="City" className="flex-1">
-              <FormSelect placeholder="Select City" options={cityOptions} value={city} onValueChange={setCity} />
-            </Field>
+            <div className="flex-1">
+              <FilterCombobox
+                label="City"
+                placeholder={country ? "Select City" : "Select a country first"}
+                options={cityOptions}
+                value={city ? [city] : []}
+                onChange={(v) => setCity(v[0] ?? "")}
+                multiple={false}
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-5 lg:flex-row">
@@ -173,7 +194,7 @@ export function ChannelPartnerFormSection({
               name="message"
               rows={4}
               placeholder="Share any additional details about your business or partnership interest..."
-              className="w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-base font-medium font-montserrat text-stone-900 placeholder:text-neutral-400 resize-none"
+              className="w-full px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 text-sm font-medium font-montserrat text-stone-900 placeholder:text-stone-400 resize-none"
             />
           </Field>
 

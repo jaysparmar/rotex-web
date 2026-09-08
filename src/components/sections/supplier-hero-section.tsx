@@ -83,13 +83,13 @@ export function SupplierHeroSection({
             Home
           </Link>
           <span className="text-subtext text-sm font-semibold font-montserrat leading-5">/</span>
-          <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">Become a Supplier</span>
+          <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">Become a Supplier</span>
         </nav>
 
         {/* Copy — top on mobile (mt-5), pushed to the bottom on desktop (lg:mt-auto) */}
         <div className="flex flex-col gap-5 mt-5 lg:mt-auto lg:w-171.25">
-          {/* mobile: 30px / font-normal; desktop: 30px / font-medium */}
-          <h1 className="text-gradient-hero text-3xl font-normal lg:font-medium font-montserrat leading-10">
+          {/* Figma: mobile 30px / font-normal; desktop 60px / font-normal / leading-[57px] / w-143 (572px) */}
+          <h1 className="text-gradient-hero text-3xl lg:text-6xl font-normal font-montserrat leading-10 lg:leading-14.25 lg:w-143">
             {title}
           </h1>
           <p className="text-white text-sm lg:text-base font-normal font-montserrat leading-5 lg:leading-6 lg:w-143">
@@ -102,7 +102,7 @@ export function SupplierHeroSection({
             hairline, desktop a stone-100 auto-width pill. */}
         <Link
           href={cta.href}
-          className="inline-flex w-full lg:w-fit h-10 lg:h-auto mt-auto lg:mt-5 items-center justify-center gap-1.5 px-6 lg:py-3.5 rounded-[47px] bg-white lg:bg-stone-100 outline-[0.5px] outline-offset-[-0.5px] outline-red-600 lg:outline-0 text-red-600 text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-primary hover:text-white hover:outline-primary transition-colors duration-200"
+          className="inline-flex w-full lg:w-fit h-10 lg:h-auto mt-auto lg:mt-5 items-center justify-center gap-1.5 px-6 lg:py-3.5 rounded-[47px] bg-white lg:bg-stone-100 outline-[0.5px] outline-offset-[-0.5px] outline-[#EF3E23] lg:outline-0 text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-primary hover:text-white hover:outline-primary transition-colors duration-200"
         >
           {cta.label}
         </Link>

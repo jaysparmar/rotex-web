@@ -41,7 +41,7 @@ export function NewsUpdatesHeroSection({ highlighted }: { highlighted: ResourceI
                   <span className="relative w-52 lg:w-44 h-24 rounded-lg overflow-hidden shrink-0">
                     <Image src={post.image} alt={post.title} fill className="object-cover" unoptimized />
                   </span>
-                  {/* brand orange (#ee3e23), not red-600 (#dc2626) which reads too dark */}
+                  {/* brand orange (#EF3E23), not [#EF3E23] (#dc2626) which reads too dark */}
                   <span className="size-10 lg:size-8 shrink-0 rounded-full bg-primary flex items-center justify-center text-white group-hover:rotate-45 transition-transform duration-300">
                     <ArrowUpRight />
                   </span>

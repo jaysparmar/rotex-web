@@ -4,6 +4,7 @@ import "../globals.css";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { PageLoader } from "@/components/ui/page-loader";
+import { HashScroll } from "@/components/ui/hash-scroll";
 import { getResolvedGlobalConfig } from "@/lib/global-config";
 
 const montserrat = Montserrat({
@@ -24,6 +25,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <html lang="en" suppressHydrationWarning>
       <body className={`${montserrat.variable} font-montserrat`} suppressHydrationWarning>
         <PageLoader />
+        <HashScroll />
         <Navbar config={config} />
         <main>{children}</main>
         <Footer config={config} />

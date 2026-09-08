@@ -32,7 +32,7 @@ export function AwardCard({ year, title, description, url, image, className }: A
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
             <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{year}</p>
-            <h3 className="text-red-600 text-xl font-semibold font-montserrat leading-7">{title}</h3>
+            <h3 className="text-[#EF3E23] text-xl font-semibold font-montserrat leading-7">{title}</h3>
           </div>
           <p className="text-stone-900 text-sm font-medium font-montserrat leading-6">{description}</p>
         </div>
@@ -53,7 +53,7 @@ export function AwardCard({ year, title, description, url, image, className }: A
   const shell = cn(
     "group flex flex-col h-121.75 bg-[#F5F2F0] rounded-2xl overflow-hidden",
     "border border-neutral-200 border-b-[3px] border-b-transparent",
-    "transition-colors duration-200 hover:bg-[#F2E9E4] hover:border-b-[#EE3E23]",
+    "transition-colors duration-200 hover:bg-[#F2E9E4] hover:border-b-[#EF3E23]",
     className
   );
 
