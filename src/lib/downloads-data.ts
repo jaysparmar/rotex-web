@@ -19,7 +19,5 @@ export type DownloadItem = {
   image: string;
   product: string;
   subCategory: string;
-  productCertificateType: string;
-  qmsCertificateType: string;
   industry: string;
 };

@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
-import { DownloadList } from "@/components/admin/downloads/download-list";
 import { ProductDownloadList, type ProductSourcedDownload } from "@/components/admin/downloads/product-download-list";
 
 function variantLabel(v: {
@@ -15,8 +14,7 @@ function variantLabel(v: {
 }
 
 export default async function AdminDownloadsPage() {
-  const [items, products, variants] = await Promise.all([
-    prisma.downloadItem.findMany({ orderBy: { createdAt: "desc" } }),
+  const [products, variants, downloadCategories] = await Promise.all([
     prisma.product.findMany({
       where: { productType: "simple" },
       select: { id: true, name: true, image: true, downloads: true },
@@ -34,7 +32,10 @@ export default async function AdminDownloadsPage() {
         product: { select: { id: true, name: true, image: true } },
       },
     }),
+    prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
   ]);
+
+  const categoryNameById = new Map(downloadCategories.map((c) => [c.id, c.name]));
 
   const fromProducts: ProductSourcedDownload[] = products.flatMap((p) =>
     (p.downloads ?? [])
@@ -42,7 +43,8 @@ export default async function AdminDownloadsPage() {
       .map((d, i) => ({
         id: `product-${p.id}-${i}`,
         title: d.title,
-        tab: d.tab ?? "certificates",
+        categoryId: d.categoryId ?? "",
+        categoryName: categoryNameById.get(d.categoryId) ?? "Uncategorized",
         fileUrl: d.url,
         image: p.image,
         productName: p.name,
@@ -57,7 +59,8 @@ export default async function AdminDownloadsPage() {
       .map((d, i) => ({
         id: `variant-${v.id}-${i}`,
         title: d.title,
-        tab: d.tab ?? "certificates",
+        categoryId: d.categoryId ?? "",
+        categoryName: categoryNameById.get(d.categoryId) ?? "Uncategorized",
         fileUrl: d.url,
         image: v.product.image,
         productName: v.product.name,
@@ -74,23 +77,13 @@ export default async function AdminDownloadsPage() {
         <div>
           <h1 className="text-2xl font-semibold">Downloads</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage certificates, manuals, brochures, and catalogues shown on the Downloads page.
+            Downloads attached to a product/variant, shown on the public Downloads page.
           </p>
         </div>
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Downloads" }]} />
       </div>
 
-      <DownloadList items={items} />
-
-      <div className="space-y-3">
-        <div>
-          <h2 className="text-lg font-semibold">From Products &amp; Variants</h2>
-          <p className="text-sm text-muted-foreground">
-            Downloads flagged &quot;Show on Downloads page&quot; on a product/variant. Edit them from the product itself.
-          </p>
-        </div>
-        <ProductDownloadList items={productSourcedItems} />
-      </div>
+      <ProductDownloadList items={productSourcedItems} categories={downloadCategories} />
     </div>
   );
 }

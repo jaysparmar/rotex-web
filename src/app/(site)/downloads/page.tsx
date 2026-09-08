@@ -13,8 +13,7 @@ function fileTypeFromUrl(url: string): string {
 }
 
 export default async function DownloadsPage() {
-  const [curatedItems, products, variants] = await Promise.all([
-    prisma.downloadItem.findMany({ where: { published: true }, orderBy: { createdAt: "desc" } }),
+  const [products, variants, industries] = await Promise.all([
     prisma.product.findMany({
       select: {
         id: true,
@@ -41,23 +40,8 @@ export default async function DownloadsPage() {
         },
       },
     }),
+    prisma.industry.findMany({ select: { name: true }, orderBy: { name: "asc" } }),
   ]);
-
-  const curated: DownloadItem[] = curatedItems.map((r) => ({
-    id: r.id,
-    tab: r.tab as DownloadTab,
-    title: r.title,
-    language: r.language,
-    fileType: r.fileType,
-    fileSizeLabel: r.fileSizeLabel,
-    fileUrl: r.fileUrl,
-    image: r.image,
-    product: r.product,
-    subCategory: r.subCategory,
-    productCertificateType: r.productCertificateType,
-    qmsCertificateType: r.qmsCertificateType,
-    industry: r.industry,
-  }));
 
   const fromProducts: DownloadItem[] = products.flatMap((p) =>
     (p.downloads ?? [])
@@ -73,8 +57,6 @@ export default async function DownloadsPage() {
         image: p.image ?? PLACEHOLDER_IMAGE,
         product: p.category?.name ?? "",
         subCategory: p.subCategory?.name ?? "",
-        productCertificateType: "",
-        qmsCertificateType: "",
         industry: p.industry?.name ?? "",
       }))
   );
@@ -93,18 +75,17 @@ export default async function DownloadsPage() {
         image: v.product.image ?? PLACEHOLDER_IMAGE,
         product: v.product.category?.name ?? "",
         subCategory: v.product.subCategory?.name ?? "",
-        productCertificateType: "",
-        qmsCertificateType: "",
         industry: v.product.industry?.name ?? "",
       }))
   );
 
-  const items = [...curated, ...fromProducts, ...fromVariants];
+  const items = [...fromProducts, ...fromVariants];
+  const industryOptions = industries.map((i) => i.name);
 
   return (
     <div>
       <DownloadsHeroSection />
-      <DownloadsSection items={items} />
+      <DownloadsSection items={items} industryOptions={industryOptions} />
     </div>
   );
 }

@@ -20,12 +20,10 @@ function uniqueOptions(items: DownloadItem[], key: keyof DownloadItem): string[]
   return Array.from(new Set(items.map((i) => String(i[key])).filter(Boolean)));
 }
 
-export function DownloadsSection({ items }: { items: DownloadItem[] }) {
+export function DownloadsSection({ items, industryOptions }: { items: DownloadItem[]; industryOptions: string[] }) {
   const [activeTab, setActiveTab] = useState<PublicTab>(ALL_TAB);
   const [product, setProduct] = useState(ALL);
   const [subCategory, setSubCategory] = useState(ALL);
-  const [productCert, setProductCert] = useState(ALL);
-  const [qmsCert, setQmsCert] = useState(ALL);
   const [industry, setIndustry] = useState(ALL);
   const [page, setPage] = useState(1);
   const resultsTopRef = useRef<HTMLDivElement>(null);
@@ -41,9 +39,6 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
 
   const productOptions = useMemo(() => uniqueOptions(items, "product"), [items]);
   const subCategoryOptions = useMemo(() => uniqueOptions(items, "subCategory"), [items]);
-  const productCertOptions = useMemo(() => uniqueOptions(items, "productCertificateType"), [items]);
-  const qmsCertOptions = useMemo(() => uniqueOptions(items, "qmsCertificateType"), [items]);
-  const industryOptions = useMemo(() => uniqueOptions(items, "industry"), [items]);
 
   const filteredItems = useMemo(
     () =>
@@ -52,11 +47,9 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
           (activeTab === ALL_TAB || item.tab === activeTab) &&
           (product === ALL || item.product === product) &&
           (subCategory === ALL || item.subCategory === subCategory) &&
-          (productCert === ALL || item.productCertificateType === productCert) &&
-          (qmsCert === ALL || item.qmsCertificateType === qmsCert) &&
           (industry === ALL || item.industry === industry)
       ),
-    [items, activeTab, product, subCategory, productCert, qmsCert, industry]
+    [items, activeTab, product, subCategory, industry]
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
@@ -67,14 +60,11 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
     setPage(1);
   };
 
-  const hasActiveFilters =
-    product !== ALL || subCategory !== ALL || productCert !== ALL || qmsCert !== ALL || industry !== ALL;
+  const hasActiveFilters = product !== ALL || subCategory !== ALL || industry !== ALL;
 
   const clearFilters = () => {
     setProduct(ALL);
     setSubCategory(ALL);
-    setProductCert(ALL);
-    setQmsCert(ALL);
     setIndustry(ALL);
     setPage(1);
   };
@@ -86,17 +76,11 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
         <MobileDownloadsFilters
           productOptions={productOptions}
           subCategoryOptions={subCategoryOptions}
-          productCertOptions={productCertOptions}
-          qmsCertOptions={qmsCertOptions}
           industryOptions={industryOptions}
           product={product}
           setProduct={setProduct}
           subCategory={subCategory}
           setSubCategory={setSubCategory}
-          productCert={productCert}
-          setProductCert={setProductCert}
-          qmsCert={qmsCert}
-          setQmsCert={setQmsCert}
           industry={industry}
           setIndustry={setIndustry}
           hasActiveFilters={hasActiveFilters}
@@ -124,20 +108,6 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
             options={subCategoryOptions}
             value={subCategory}
             onChange={setSubCategory}
-          />
-          <DownloadsFilterField
-            label="Product Certificate type"
-            placeholder="Select Product Certificate Type"
-            options={productCertOptions}
-            value={productCert}
-            onChange={setProductCert}
-          />
-          <DownloadsFilterField
-            label="Quality Management Certificate type"
-            placeholder="Select Quality Management Certificate Type"
-            options={qmsCertOptions}
-            value={qmsCert}
-            onChange={setQmsCert}
           />
           <DownloadsFilterField label="Industry Type" placeholder="Select Industry Type" options={industryOptions} value={industry} onChange={setIndustry} />
         </aside>

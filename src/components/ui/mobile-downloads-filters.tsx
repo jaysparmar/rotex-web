@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 const ALL = "All";
 
-type FilterCategory = "product" | "subCategory" | "productCert" | "qmsCert" | "industry";
+type FilterCategory = "product" | "subCategory" | "industry";
 
 type CategoryConfig = {
   id: FilterCategory;
@@ -23,17 +23,11 @@ type CategoryConfig = {
 export function MobileDownloadsFilters({
   productOptions,
   subCategoryOptions,
-  productCertOptions,
-  qmsCertOptions,
   industryOptions,
   product,
   setProduct,
   subCategory,
   setSubCategory,
-  productCert,
-  setProductCert,
-  qmsCert,
-  setQmsCert,
   industry,
   setIndustry,
   hasActiveFilters,
@@ -41,17 +35,11 @@ export function MobileDownloadsFilters({
 }: {
   productOptions: string[];
   subCategoryOptions: string[];
-  productCertOptions: string[];
-  qmsCertOptions: string[];
   industryOptions: string[];
   product: string;
   setProduct: (v: string) => void;
   subCategory: string;
   setSubCategory: (v: string) => void;
-  productCert: string;
-  setProductCert: (v: string) => void;
-  qmsCert: string;
-  setQmsCert: (v: string) => void;
   industry: string;
   setIndustry: (v: string) => void;
   hasActiveFilters: boolean;
@@ -80,26 +68,6 @@ export function MobileDownloadsFilters({
       options: subCategoryOptions,
       value: subCategory,
       onChange: setSubCategory,
-    },
-    {
-      id: "productCert",
-      rowLabel: "Product Certificate type",
-      panelTitle: "Select Product Certificate",
-      allLabel: "All Certificates",
-      placeholder: "Select Certificate",
-      options: productCertOptions,
-      value: productCert,
-      onChange: setProductCert,
-    },
-    {
-      id: "qmsCert",
-      rowLabel: "Quality Management Certificate type",
-      panelTitle: "Select Quality Management Certificate",
-      allLabel: "All Certificates",
-      placeholder: "Select Certificate",
-      options: qmsCertOptions,
-      value: qmsCert,
-      onChange: setQmsCert,
     },
     {
       id: "industry",

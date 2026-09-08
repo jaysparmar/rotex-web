@@ -438,22 +438,3 @@ model PartnerToolsSection {
   updatedAt DateTime @updatedAt
 }
 
-model DownloadItem {
-  id                     String   @id @default(cuid())
-  tab                    String
-  title                  String
-  language               String   @default("English")
-  fileType               String   @default("PDF")
-  fileSizeLabel          String   @default("")
-  fileUrl                String
-  image                  String
-  
-  product                String   @default("")
-  subCategory            String   @default("")
-  productCertificateType String   @default("")
-  qmsCertificateType     String   @default("")
-  industry               String   @default("")
-  published              Boolean  @default(true)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-}
