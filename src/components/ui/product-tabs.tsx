@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { IoDownloadOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DownloadIcon } from "@/components/ui/download-icon";
 import type { SpecItem, DownloadItem } from "@/lib/product-detail-data";
 
 const TABS = ["Features", "Specifications", "Certificates", "Downloads"] as const;
@@ -98,17 +99,22 @@ export function ProductTabs({
 
       {activeTab === "Downloads" && (
         <div className="flex flex-col gap-6">
-          <select
+          <Select
+            items={categories.map((c) => ({ value: c, label: c }))}
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-80 h-11 px-5 py-2.5 rounded-full outline outline-1 -outline-offset-1 outline-neutral-200 text-black text-sm font-medium font-montserrat"
+            onValueChange={(v) => setCategory(v ?? "All Documents")}
           >
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="w-80 h-11 px-5 py-2.5 rounded-full border-0 outline outline-1 -outline-offset-1 outline-neutral-200 text-black text-sm font-medium font-montserrat">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
           <div className="flex flex-col gap-5">
             {visibleDownloads.map((d, i) => (
@@ -124,9 +130,9 @@ export function ProductTabs({
                 </div>
                 <a
                   href={d.url}
-                  className="self-start px-5 py-2 bg-stone-100 rounded-full shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] flex items-center gap-2.5 shrink-0 hover:bg-stone-200 transition-colors"
+                  className="self-start px-5 py-2 bg-stone-100 rounded-full flex items-center gap-2.5 shrink-0 hover:bg-stone-200 transition-colors"
                 >
-                  <IoDownloadOutline className="text-[#EF3E23]" size={18} />
+                  <DownloadIcon className="text-[#EF3E23]" size={20} />
                   <span className="text-[#EF3E23] text-sm font-semibold font-montserrat">Download</span>
                 </a>
               </div>

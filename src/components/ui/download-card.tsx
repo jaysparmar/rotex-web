@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { IoDocumentTextOutline, IoDownloadOutline } from "react-icons/io5";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { DownloadIcon } from "@/components/ui/download-icon";
 import type { DownloadItem } from "@/lib/downloads-data";
 
 const NO_IMAGE = new Set(["", "/file.svg"]);
@@ -33,7 +34,7 @@ export function DownloadCard({ item }: { item: DownloadItem }) {
           download
           className="w-full px-6 py-3.5 bg-stone-100 rounded-[47px] flex justify-center items-center gap-2.5 transition-colors duration-200 group-hover:bg-[#EF3E23]"
         >
-          <IoDownloadOutline className="size-5 text-[#EF3E23] transition-colors duration-200 group-hover:text-white" />
+          <DownloadIcon className="size-5 text-[#EF3E23] transition-colors duration-200 group-hover:text-white" />
           <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5 transition-colors duration-200 group-hover:text-white">
             Download
           </span>
