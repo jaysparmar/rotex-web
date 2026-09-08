@@ -5,26 +5,29 @@ import { IoDownloadOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import type { SpecItem, DownloadItem } from "@/lib/product-detail-data";
 
-const TABS = ["Features", "Specifications", "Downloads"] as const;
+const TABS = ["Features", "Specifications", "Certificates", "Downloads"] as const;
 type Tab = (typeof TABS)[number];
 
 export function ProductTabs({
   features,
   specifications,
   downloads,
+  certificates = [],
 }: {
   features: string;
   specifications: SpecItem[];
   downloads: DownloadItem[];
+  certificates?: string[];
 }) {
   const visibleTabs = useMemo(
     () =>
       TABS.filter((tab) => {
         if (tab === "Features") return features.trim().length > 0;
         if (tab === "Specifications") return specifications.length > 0;
+        if (tab === "Certificates") return certificates.length > 0;
         return downloads.length > 0;
       }),
-    [features, specifications, downloads]
+    [features, specifications, downloads, certificates]
   );
 
   const [requestedTab, setRequestedTab] = useState<Tab | undefined>(visibleTabs[0]);
@@ -76,6 +79,19 @@ export function ProductTabs({
                 {spec.value}
               </span>
             </div>
+          ))}
+        </div>
+      )}
+
+      {activeTab === "Certificates" && (
+        <div className="flex flex-wrap items-center gap-2.5">
+          {certificates.map((cert) => (
+            <span
+              key={cert}
+              className="px-4 py-0.5 bg-zinc-100 rounded-full text-stone-900 text-xs font-medium font-montserrat uppercase"
+            >
+              {cert}
+            </span>
           ))}
         </div>
       )}

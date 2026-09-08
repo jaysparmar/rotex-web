@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { DownloadCard } from "@/components/ui/download-card";
@@ -10,7 +10,7 @@ import { DOWNLOAD_TABS, type DownloadTab, type DownloadItem } from "@/lib/downlo
 
 const ALL = "All";
 const ALL_TAB = "all" as const;
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 30;
 
 type PublicTab = DownloadTab | typeof ALL_TAB;
 
@@ -28,6 +28,16 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
   const [qmsCert, setQmsCert] = useState(ALL);
   const [industry, setIndustry] = useState(ALL);
   const [page, setPage] = useState(1);
+  const resultsTopRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    resultsTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [page]);
 
   const productOptions = useMemo(() => uniqueOptions(items, "product"), [items]);
   const subCategoryOptions = useMemo(() => uniqueOptions(items, "subCategory"), [items]);
@@ -94,7 +104,7 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
         />
 
         {/* Sidebar filters (desktop) */}
-        <aside className="hidden lg:flex w-full lg:w-80 shrink-0 flex-col gap-7">
+        <aside className="hidden lg:flex w-full lg:w-80 shrink-0 flex-col gap-7 lg:sticky lg:top-28 lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
           <div className="flex items-center justify-between">
             <h2 className="text-stone-900 text-base font-semibold font-montserrat leading-6">Filters</h2>
             {hasActiveFilters && (
@@ -133,8 +143,8 @@ export function DownloadsSection({ items }: { items: DownloadItem[] }) {
         </aside>
 
         {/* Content */}
-        <div className="flex-1 flex flex-col gap-5">
-          <div className="border-b border-stone-300 flex items-center gap-5 overflow-x-auto">
+        <div className="flex-1 min-w-0 flex flex-col gap-5">
+          <div ref={resultsTopRef} className="scroll-mt-24 lg:scroll-mt-28 border-b border-stone-300 flex items-center gap-5 overflow-x-auto">
             {PUBLIC_TABS.map((tab) => (
               <button
                 key={tab.id}

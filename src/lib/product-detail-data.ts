@@ -20,6 +20,7 @@ export type ProductVariant = {
   minPressure: string;
   maxPressure: string;
   flowFactor: string;
+  certificates: string[];
   features: string;
   specifications: SpecItem[];
   downloads: DownloadItem[];
@@ -81,6 +82,7 @@ const SOLENOID_VARIANTS: ProductVariant[] = [
     minPressure: "0",
     maxPressure: "2.5",
     flowFactor: "8",
+    certificates: CERTS,
     features: "Compact direct-acting construction with fast response time, suited for low-flow instrumentation duty.",
     specifications: [
       { key: "Body Material", value: "Brass" },
@@ -98,6 +100,7 @@ const SOLENOID_VARIANTS: ProductVariant[] = [
     minPressure: "0",
     maxPressure: "4",
     flowFactor: "7",
+    certificates: CERTS,
     features: "Mid-range orifice for general purpose on/off duty in process skids.",
     specifications: [
       { key: "Body Material", value: "Brass" },
@@ -115,6 +118,7 @@ const SOLENOID_VARIANTS: ProductVariant[] = [
     minPressure: "0",
     maxPressure: "6",
     flowFactor: "5",
+    certificates: CERTS,
     features: "Higher flow orifice variant for increased throughput requirements.",
     specifications: [
       { key: "Body Material", value: "Stainless Steel" },
@@ -132,6 +136,7 @@ const SOLENOID_VARIANTS: ProductVariant[] = [
     minPressure: "0",
     maxPressure: "8",
     flowFactor: "3.5",
+    certificates: CERTS,
     features: "Larger body variant intended for higher pressure differential applications.",
     specifications: [
       { key: "Body Material", value: "Stainless Steel" },

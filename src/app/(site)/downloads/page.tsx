@@ -61,7 +61,7 @@ export default async function DownloadsPage() {
 
   const fromProducts: DownloadItem[] = products.flatMap((p) =>
     (p.downloads ?? [])
-      .filter((d) => d.showOnDownloadsPage && d.url)
+      .filter((d) => d.url)
       .map((d, i) => ({
         id: `product-${p.id}-${i}`,
         tab: (d.tab as DownloadTab) ?? DEFAULT_TAB,
@@ -81,7 +81,7 @@ export default async function DownloadsPage() {
 
   const fromVariants: DownloadItem[] = variants.flatMap((v) =>
     (v.downloads ?? [])
-      .filter((d) => d.showOnDownloadsPage && d.url)
+      .filter((d) => d.url)
       .map((d, i) => ({
         id: `variant-${v.id}-${i}`,
         tab: (d.tab as DownloadTab) ?? DEFAULT_TAB,

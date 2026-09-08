@@ -72,7 +72,6 @@ export function VariantEditForm({
               url: string;
               categoryId: string;
               tab?: string;
-              showOnDownloadsPage?: boolean;
             }[]
           | null) ?? []
       ).map((d) => ({
@@ -81,7 +80,6 @@ export function VariantEditForm({
         url: { src: d.url },
         categoryId: d.categoryId ?? "",
         tab: d.tab ?? "certificates",
-        showOnDownloadsPage: d.showOnDownloadsPage ?? false,
       })) as never,
     },
   });

@@ -38,7 +38,7 @@ export default async function AdminDownloadsPage() {
 
   const fromProducts: ProductSourcedDownload[] = products.flatMap((p) =>
     (p.downloads ?? [])
-      .filter((d) => d.showOnDownloadsPage && d.url)
+      .filter((d) => d.url)
       .map((d, i) => ({
         id: `product-${p.id}-${i}`,
         title: d.title,
@@ -53,7 +53,7 @@ export default async function AdminDownloadsPage() {
 
   const fromVariants: ProductSourcedDownload[] = variants.flatMap((v) =>
     (v.downloads ?? [])
-      .filter((d) => d.showOnDownloadsPage && d.url)
+      .filter((d) => d.url)
       .map((d, i) => ({
         id: `variant-${v.id}-${i}`,
         title: d.title,

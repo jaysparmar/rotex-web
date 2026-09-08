@@ -37,6 +37,13 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
   const specifications = selectedVariant?.specifications ?? product.specifications ?? [];
   const downloads = selectedVariant?.downloads ?? product.downloads ?? [];
 
+  // Certificates are per-variant; hero shows the union across every variant so
+  // nothing set on any single variant is hidden. The tabs below show the
+  // currently selected variant's own set so differences are visible.
+  const heroCertificates = isVariable && product.variants
+    ? Array.from(new Set(product.variants.flatMap((v) => v.certificates)))
+    : product.certificates;
+
   return (
     <div className="container flex flex-col gap-16 pt-32 lg:pt-36 pb-12">
       {/* Breadcrumb */}
@@ -99,7 +106,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
                 Certificates
               </p>
               <div className="flex flex-wrap items-center gap-2.5">
-                {product.certificates.map((cert) => (
+                {heroCertificates.map((cert) => (
                   <span
                     key={cert}
                     className="px-4 py-0.5 bg-zinc-100 rounded-full text-stone-900 text-xs font-medium font-montserrat uppercase"
@@ -138,7 +145,12 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
               />
             </div>
             <div className="w-full lg:max-w-170">
-              <ProductTabs features={features} specifications={specifications} downloads={downloads} />
+              <ProductTabs
+                features={features}
+                specifications={specifications}
+                downloads={downloads}
+                certificates={selectedVariant?.certificates ?? []}
+              />
             </div>
           </div>
         </div>

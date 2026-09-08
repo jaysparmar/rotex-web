@@ -93,7 +93,6 @@ export function ProductEditForm({
               url: string;
               categoryId: string;
               tab?: string;
-              showOnDownloadsPage?: boolean;
             }[]
           | null) ?? []
       ).map((d) => ({
@@ -102,7 +101,6 @@ export function ProductEditForm({
         url: { src: d.url },
         categoryId: d.categoryId ?? "",
         tab: d.tab ?? "certificates",
-        showOnDownloadsPage: d.showOnDownloadsPage ?? false,
       })) as never,
     },
   });

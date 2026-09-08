@@ -185,6 +185,7 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
       minPressure: v.minOperatingTemp ?? "",
       maxPressure: v.maxOperatingTemp ?? "",
       flowFactor: v.flowFactor ?? "",
+      certificates: v.certificates as string[],
       features: v.features ?? "",
       specifications: v.specifications as SpecItem[],
       downloads: (v.downloads as { title: string; url: string; categoryId: string }[]).map((d) => ({

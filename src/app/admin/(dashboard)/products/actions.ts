@@ -21,7 +21,6 @@ type ContentFields = {
     url: string;
     categoryId: string;
     tab?: string;
-    showOnDownloadsPage?: boolean;
   }[];
 };
 

@@ -115,7 +115,6 @@ declare global {
       url: string;
       categoryId: string;
       tab?: string;
-      showOnDownloadsPage?: boolean;
     }[];
 
     type JobPerks = { icon: string; label: string }[];
