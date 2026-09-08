@@ -18,25 +18,27 @@ import { createDownloadCategory, updateDownloadCategory } from "@/app/admin/(das
 
 type DownloadCategoryFormValues = {
   name: string;
+  importReference: string;
 };
 
 export function DownloadCategoryFormDialog({
   category,
   trigger,
 }: {
-  category?: { id: string; name: string };
+  category?: { id: string; name: string; importReference?: string | null };
   trigger: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const form = useForm<DownloadCategoryFormValues>({
     defaultValues: {
       name: category?.name ?? "",
+      importReference: category?.importReference ?? "",
     },
   });
   const { pending, error, run } = useSaveAction();
 
   function onSubmit(values: DownloadCategoryFormValues) {
-    const payload = { name: values.name };
+    const payload = { name: values.name, importReference: values.importReference || null };
     run(async () => {
       try {
         if (category) {
@@ -65,6 +67,12 @@ export function DownloadCategoryFormDialog({
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <TextField label="Name" {...form.register("name", { required: true })} />
+            <div className="space-y-1">
+              <TextField label="Import Reference" {...form.register("importReference")} />
+              <p className="text-xs text-muted-foreground">
+                Optional code used to match this category to a spreadsheet column during bulk downloads import.
+              </p>
+            </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <DialogFooter>
               <Button type="submit" disabled={pending}>

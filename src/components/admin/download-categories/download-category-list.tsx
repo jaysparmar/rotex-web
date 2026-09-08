@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Tag } from "lucide-react";
+import { Pencil, Trash2, Plus, Tag, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DownloadCategoryFormDialog } from "@/components/admin/download-categories/download-category-form-dialog";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { deleteDownloadCategory } from "@/app/admin/(dashboard)/download-categories/actions";
 
-type DownloadCategory = { id: string; name: string };
+type DownloadCategory = { id: string; name: string; importReference: string | null };
 
 export function DownloadCategoryList({ categories }: { categories: DownloadCategory[] }) {
   const [pending, startTransition] = useTransition();
@@ -31,7 +32,13 @@ export function DownloadCategoryList({ categories }: { categories: DownloadCateg
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <Link href="/admin/download-categories/import">
+          <Button size="sm" variant="outline" className="gap-1.5">
+            <Upload className="size-3.5" />
+            Import Downloads
+          </Button>
+        </Link>
         <DownloadCategoryFormDialog
           trigger={
             <Button size="sm" className="gap-1.5">
@@ -52,7 +59,12 @@ export function DownloadCategoryList({ categories }: { categories: DownloadCateg
         <div className="divide-y divide-border rounded-lg border border-border">
           {categories.map((category) => (
             <div key={category.id} className="flex items-center justify-between gap-3 px-4 py-2.5">
-              <p className="text-sm font-medium">{category.name}</p>
+              <div>
+                <p className="text-sm font-medium">{category.name}</p>
+                {category.importReference && (
+                  <p className="text-xs text-muted-foreground">Ref: {category.importReference}</p>
+                )}
+              </div>
               <div className="flex items-center gap-1">
                 <DownloadCategoryFormDialog
                   category={category}

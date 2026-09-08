@@ -8,12 +8,12 @@ function revalidateDownloadCategories() {
   revalidatePath("/admin/products");
 }
 
-export async function createDownloadCategory(data: { name: string }) {
+export async function createDownloadCategory(data: { name: string; importReference?: string | null }) {
   await prisma.downloadCategory.create({ data });
   revalidateDownloadCategories();
 }
 
-export async function updateDownloadCategory(id: string, data: { name: string }) {
+export async function updateDownloadCategory(id: string, data: { name: string; importReference?: string | null }) {
   await prisma.downloadCategory.update({ where: { id }, data });
   revalidateDownloadCategories();
 }
