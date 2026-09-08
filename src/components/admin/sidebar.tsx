@@ -30,6 +30,7 @@ import {
   Shield,
   Building2,
   SlidersHorizontal,
+  Tag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -59,6 +60,7 @@ const NAV_ITEMS = [
   { href: "/admin/job-postings", label: "Job Postings", icon: Briefcase },
   { href: "/admin/job-applications", label: "Job Applications", icon: FileText },
   { href: "/admin/downloads", label: "Downloads", icon: Download },
+  { href: "/admin/download-categories", label: "Download Categories", icon: Tag },
   { href: "/admin/customer-stories", label: "Customer Stories", icon: Quote },
   { href: "/admin/resources", label: "Resources", icon: BookOpen },
   { href: "/admin/enquiries", label: "Enquiries", icon: Mail },

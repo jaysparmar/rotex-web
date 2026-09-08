@@ -140,11 +140,16 @@ export async function getProductsList(params: ProductListFilterParams = {}): Pro
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductDetail | null> {
-  const product = await prisma.product.findUnique({
-    where: { slug },
-    include: { category: true, subCategory: true, variants: true },
-  });
+  const [product, downloadCategories] = await Promise.all([
+    prisma.product.findUnique({
+      where: { slug },
+      include: { category: true, subCategory: true, variants: true },
+    }),
+    prisma.downloadCategory.findMany(),
+  ]);
   if (!product) return null;
+
+  const categoryNameById = new Map(downloadCategories.map((c) => [c.id, c.name]));
 
   const breadcrumb: Crumb[] = [
     { label: "Home", href: "/" },
@@ -182,8 +187,8 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
       flowFactor: v.flowFactor ?? "",
       features: v.features ?? "",
       specifications: v.specifications as SpecItem[],
-      downloads: (v.downloads as { title: string; description: string; url: string }[]).map((d) => ({
-        category: d.description || "Document",
+      downloads: (v.downloads as { title: string; url: string; categoryId: string }[]).map((d) => ({
+        category: categoryNameById.get(d.categoryId) ?? "Document",
         title: d.title,
         url: d.url,
       })),
@@ -195,8 +200,8 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
     ...base,
     features: product.features ?? undefined,
     specifications: product.specifications as SpecItem[],
-    downloads: (product.downloads as { title: string; description: string; url: string }[]).map((d) => ({
-      category: d.description || "Document",
+    downloads: (product.downloads as { title: string; url: string; categoryId: string }[]).map((d) => ({
+      category: categoryNameById.get(d.categoryId) ?? "Document",
       title: d.title,
       url: d.url,
     })),

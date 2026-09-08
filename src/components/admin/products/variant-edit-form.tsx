@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, type FieldErrors } from "react-hook-form";
 import { toast } from "sonner";
 import { SelectField, FieldGrid } from "@/components/admin/form-fields";
 import { ProductContentFields, type ProductContentFormValues } from "@/components/admin/products/product-content-fields";
@@ -42,11 +42,13 @@ export function VariantEditForm({
   productName,
   variant,
   attributeValues,
+  downloadCategories,
 }: {
   productId: string;
   productName: string;
   variant?: VariantRecord;
   attributeValues: Record<string, string[]>;
+  downloadCategories: { id: string; name: string }[];
 }) {
   const router = useRouter();
 
@@ -64,12 +66,20 @@ export function VariantEditForm({
       specifications: (variant?.specifications as { key: string; value: string }[] | null) ?? [],
       downloads: (
         (variant?.downloads as
-          | { title: string; description: string; url: string; tab?: string; showOnDownloadsPage?: boolean }[]
+          | {
+              title: string;
+              description: string;
+              url: string;
+              categoryId: string;
+              tab?: string;
+              showOnDownloadsPage?: boolean;
+            }[]
           | null) ?? []
       ).map((d) => ({
         title: d.title,
         description: d.description,
         url: { src: d.url },
+        categoryId: d.categoryId ?? "",
         tab: d.tab ?? "certificates",
         showOnDownloadsPage: d.showOnDownloadsPage ?? false,
       })) as never,
@@ -108,9 +118,17 @@ export function VariantEditForm({
     });
   }
 
+  function onInvalid(errors: FieldErrors<VariantFormValues>) {
+    if (errors.downloads) {
+      toast.error("Select a category for every download before saving.");
+      return;
+    }
+    toast.error("Please fix the highlighted fields before saving.");
+  }
+
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Variant of {productName}</CardTitle>
@@ -134,7 +152,7 @@ export function VariantEditForm({
           </CardContent>
         </Card>
 
-        <ProductContentFields />
+        <ProductContentFields downloadCategories={downloadCategories} />
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>

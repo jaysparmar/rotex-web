@@ -14,7 +14,7 @@ export default async function AdminProductDetailPage({
 }) {
   const { id } = await params;
 
-  const [product, companies, industries] = await Promise.all([
+  const [product, companies, industries, downloadCategories] = await Promise.all([
     prisma.product.findUnique({
       where: { id },
       include: {
@@ -25,6 +25,7 @@ export default async function AdminProductDetailPage({
     }),
     getCompanyCategoryTree(),
     getIndustryTree(),
+    prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   if (!product) notFound();
@@ -54,7 +55,12 @@ export default async function AdminProductDetailPage({
         </div>
       </div>
 
-      <ProductEditForm product={product} companies={companies} industries={industries} />
+      <ProductEditForm
+        product={product}
+        companies={companies}
+        industries={industries}
+        downloadCategories={downloadCategories}
+      />
 
       {product.productType === "variable" && <VariantList productId={product.id} variants={product.variants} />}
     </div>

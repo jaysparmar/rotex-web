@@ -16,15 +16,21 @@ export type ProductContentFormValues = {
     title: string;
     description: string;
     url: { src: string };
+    categoryId: string;
     tab: string;
     showOnDownloadsPage: boolean;
   }[];
 };
 
-export function ProductContentFields() {
+export function ProductContentFields({
+  downloadCategories,
+}: {
+  downloadCategories: { id: string; name: string }[];
+}) {
   const form = useFormContext<ProductContentFormValues>();
   const specs = useFieldArray({ control: form.control, name: "specifications" });
   const downloads = useFieldArray({ control: form.control, name: "downloads" });
+  const downloadErrors = form.formState.errors.downloads;
 
   return (
     <>
@@ -68,6 +74,16 @@ export function ProductContentFields() {
         <CardContent className="space-y-3">
           {downloads.fields.map((field, i) => (
             <RepeaterItem key={field.id} title={`Download ${i + 1}`} onRemove={() => downloads.remove(i)}>
+              <SelectField
+                label="Category"
+                options={downloadCategories.map((c) => ({ value: c.id, label: c.name }))}
+                placeholder="Choose category..."
+                defaultValue={field.categoryId}
+                {...form.register(`downloads.${i}.categoryId`, { required: true })}
+              />
+              {downloadErrors?.[i]?.categoryId && (
+                <p className="text-sm text-destructive">Category is required.</p>
+              )}
               <TextField label="Title" {...form.register(`downloads.${i}.title`)} />
               <TextAreaField label="Description" {...form.register(`downloads.${i}.description`)} />
               <DocumentField name={`downloads.${i}.url`} label="Download File" />
@@ -93,6 +109,7 @@ export function ProductContentFields() {
                 title: "",
                 description: "",
                 url: { src: "" },
+                categoryId: "",
                 tab: DOWNLOAD_TABS[0].id,
                 showOnDownloadsPage: false,
               })

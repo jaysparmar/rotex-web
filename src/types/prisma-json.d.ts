@@ -113,6 +113,7 @@ declare global {
       title: string;
       description: string;
       url: string;
+      categoryId: string;
       tab?: string;
       showOnDownloadsPage?: boolean;
     }[];

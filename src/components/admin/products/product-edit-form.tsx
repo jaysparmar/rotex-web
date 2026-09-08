@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, type FieldErrors } from "react-hook-form";
 import { toast } from "sonner";
 import { TextField, SelectField, FieldGrid } from "@/components/admin/form-fields";
 import { ImageUrlField } from "@/components/admin/image-url-field";
@@ -59,10 +59,12 @@ export function ProductEditForm({
   product,
   companies,
   industries,
+  downloadCategories,
 }: {
   product?: ProductRecord;
   companies: CompanyOption[];
   industries: IndustryOption[];
+  downloadCategories: { id: string; name: string }[];
 }) {
   const router = useRouter();
 
@@ -85,12 +87,20 @@ export function ProductEditForm({
       specifications: (product?.specifications as { key: string; value: string }[] | null) ?? [],
       downloads: (
         (product?.downloads as
-          | { title: string; description: string; url: string; tab?: string; showOnDownloadsPage?: boolean }[]
+          | {
+              title: string;
+              description: string;
+              url: string;
+              categoryId: string;
+              tab?: string;
+              showOnDownloadsPage?: boolean;
+            }[]
           | null) ?? []
       ).map((d) => ({
         title: d.title,
         description: d.description,
         url: { src: d.url },
+        categoryId: d.categoryId ?? "",
         tab: d.tab ?? "certificates",
         showOnDownloadsPage: d.showOnDownloadsPage ?? false,
       })) as never,
@@ -158,9 +168,17 @@ export function ProductEditForm({
     });
   }
 
+  function onInvalid(errors: FieldErrors<ProductFormValues>) {
+    if (errors.downloads) {
+      toast.error("Select a category for every download before saving.");
+      return;
+    }
+    toast.error("Please fix the highlighted fields before saving.");
+  }
+
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Basic Info</CardTitle>
@@ -258,7 +276,7 @@ export function ProductEditForm({
           </CardContent>
         </Card>
 
-        {productType === "simple" && <ProductContentFields />}
+        {productType === "simple" && <ProductContentFields downloadCategories={downloadCategories} />}
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>

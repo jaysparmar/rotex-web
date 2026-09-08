@@ -11,10 +11,11 @@ export default async function AdminVariantDetailPage({
 }) {
   const { id, variantId } = await params;
 
-  const [product, variant, attributeValues] = await Promise.all([
+  const [product, variant, attributeValues, downloadCategories] = await Promise.all([
     prisma.product.findUnique({ where: { id }, select: { id: true, name: true } }),
     prisma.productVariant.findUnique({ where: { id: variantId } }),
     getAttributeValuesByKey(),
+    prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
   ]);
   if (!product) notFound();
   if (!variant || variant.productId !== product.id) notFound();
@@ -41,6 +42,7 @@ export default async function AdminVariantDetailPage({
         productName={product.name}
         variant={variant}
         attributeValues={attributeValues}
+        downloadCategories={downloadCategories}
       />
     </div>
   );

@@ -11,9 +11,10 @@ export default async function AdminNewVariantPage({
 }) {
   const { id } = await params;
 
-  const [product, attributeValues] = await Promise.all([
+  const [product, attributeValues, downloadCategories] = await Promise.all([
     prisma.product.findUnique({ where: { id }, select: { id: true, name: true } }),
     getAttributeValuesByKey(),
+    prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
   ]);
   if (!product) notFound();
 
@@ -34,7 +35,12 @@ export default async function AdminNewVariantPage({
         />
       </div>
 
-      <VariantEditForm productId={product.id} productName={product.name} attributeValues={attributeValues} />
+      <VariantEditForm
+        productId={product.id}
+        productName={product.name}
+        attributeValues={attributeValues}
+        downloadCategories={downloadCategories}
+      />
     </div>
   );
 }
