@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { digitsOnlyKeyDown } from "@/lib/utils";
 import { useForm, Controller, type Control, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -123,6 +124,8 @@ function QuoteFormFields({
             <input
               {...register("phone")}
               type="tel"
+              inputMode="numeric"
+              onKeyDown={digitsOnlyKeyDown}
               placeholder="Enter phone number"
               className={`flex-1 px-4 bg-transparent ${placeholderCls} text-stone-900`}
             />
@@ -143,7 +146,7 @@ function QuoteFormFields({
             render={({ field }) => (
               <FilterCombobox
                 label="Country"
-                placeholder="Select"
+                placeholder="Select Country"
                 options={COUNTRY_NAMES}
                 value={field.value ? [field.value] : []}
                 onChange={(v) => field.onChange(v[0] ?? "")}
@@ -285,14 +288,14 @@ export function ProductQuoteFormSheet({
 
 const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
-const placeholderCls = "text-base font-medium font-montserrat leading-6 placeholder:text-neutral-400";
+const placeholderCls = "text-sm font-medium font-montserrat leading-5 placeholder:text-stone-400";
 
 function inputCls(hasError: boolean) {
   return `w-full h-12 px-5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 ${placeholderCls} text-stone-900 ${hasError ? "outline-red-400" : "outline-gray-200"}`;
 }
 
 function selectLikeCls(hasError: boolean) {
-  return `w-full px-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 text-base font-medium font-montserrat leading-6 placeholder:text-neutral-400 text-stone-900 ${hasError ? "outline-red-400" : "outline-gray-200"}`;
+  return `w-full px-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat leading-5 placeholder:text-stone-400 text-stone-900 ${hasError ? "outline-red-400" : "outline-gray-200"}`;
 }
 
 function Field({
@@ -333,7 +336,7 @@ function FormSelect({
           onValueChange={(v) => field.onChange(v ?? "")}
         >
           <SelectTrigger
-            className={`w-full px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-base font-medium font-montserrat leading-6 text-stone-900 data-placeholder:text-neutral-400 ${
+            className={`w-full px-3 py-2.5 bg-gray-50 rounded-lg border-0 outline outline-1 -outline-offset-1 text-sm font-medium font-montserrat leading-5 text-stone-900 data-placeholder:text-stone-400 ${
               hasError ? "outline-red-400" : "outline-gray-200"
             }`}
           >

@@ -101,14 +101,14 @@ export function LearnSection({ heading = "Resources", tabs = defaultTabs }: Lear
             aria-label="Previous"
             className="size-10 rounded-full bg-orange-600/10 outline-1 -outline-offset-1 outline-stone-200 flex items-center justify-center hover:outline-orange-600 transition-colors duration-150"
           >
-            <RotexArrow size={7} className="rotate-180 text-red-600" />
+            <RotexArrow size={7} className="rotate-180 text-[#EF3E23]" />
           </button>
           <button
             onClick={() => scrollByCard(1)}
             aria-label="Next"
             className="size-10 rounded-full bg-orange-600/10 outline-1 -outline-offset-1 outline-stone-200 flex items-center justify-center hover:outline-orange-600 transition-colors duration-150"
           >
-            <RotexArrow size={7} className="text-red-600" />
+            <RotexArrow size={7} className="text-[#EF3E23]" />
           </button>
         </div>
 

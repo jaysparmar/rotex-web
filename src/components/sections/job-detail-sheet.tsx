@@ -4,6 +4,7 @@ import { MapPin } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PerkIcon, PerkIconGradientDefs } from "@/lib/job-perk-icons";
 import { JobApplicationForm } from "@/components/sections/job-application-form";
+import { HexIcon } from "@/components/ui/hex-icon";
 
 export type JobDetail = {
   id: string;
@@ -43,13 +44,13 @@ export function JobDetailSheet({
           {/* Header */}
           <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-4">
-              <span className="w-fit px-2 py-1 rounded-lg bg-red-50 text-red-600 text-xs font-medium font-montserrat leading-4">
+              <span className="w-fit px-2 py-1 rounded-lg bg-red-50 text-[#EF3E23] text-xs font-medium font-montserrat leading-4">
                 {job.category}
               </span>
               <button
                 type="button"
                 onClick={() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                className="shrink-0 rounded-full px-3.5 py-1.5 outline outline-1 -outline-offset-1 outline-red-200 text-red-600 text-sm font-bold font-montserrat uppercase leading-5 hover:bg-red-50 transition-colors"
+                className="shrink-0 rounded-full px-3.5 py-1.5 outline outline-1 -outline-offset-1 outline-red-200 text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 hover:bg-red-50 transition-colors"
               >
                 Apply Now
               </button>
@@ -90,7 +91,9 @@ export function JobDetailSheet({
               <ul className="flex flex-col gap-3">
                 {whatYouDo.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="mt-1.5 h-2 w-2.5 shrink-0 bg-red-600" />
+                    <span className="mt-1.5 shrink-0">
+                      <HexIcon size={12} />
+                    </span>
                     <span className="text-zinc-800 font-montserrat font-medium text-sm leading-5">{item}</span>
                   </li>
                 ))}
@@ -107,7 +110,9 @@ export function JobDetailSheet({
               <ul className="flex flex-col gap-3">
                 {whatWeLookFor.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="mt-1.5 h-2 w-2.5 shrink-0 bg-red-600" />
+                    <span className="mt-1.5 shrink-0">
+                      <HexIcon size={12} />
+                    </span>
                     <span className="text-zinc-800 font-montserrat font-medium text-sm leading-5">{item}</span>
                   </li>
                 ))}

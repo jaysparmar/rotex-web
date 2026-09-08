@@ -205,14 +205,14 @@ export function JourneyTimelineSection({
             aria-label="Previous"
             className="size-10 rounded-full bg-orange-600/10 outline-1 -outline-offset-1 outline-stone-200 flex items-center justify-center hover:outline-orange-600 transition-colors duration-150"
           >
-            <RotexArrow size={7} className="rotate-180 text-red-600" />
+            <RotexArrow size={7} className="rotate-180 text-[#EF3E23]" />
           </button>
           <button
             onClick={() => scroll("right")}
             aria-label="Next"
             className="size-10 rounded-full bg-orange-600/10 outline-1 -outline-offset-1 outline-stone-200 flex items-center justify-center hover:outline-orange-600 transition-colors duration-150"
           >
-            <RotexArrow size={7} className="text-red-600" />
+            <RotexArrow size={7} className="text-[#EF3E23]" />
           </button>
         </div>
       </div>
@@ -256,7 +256,7 @@ export function JourneyTimelineSection({
                   <h3
                     className={cn(
                       "h-14 font-montserrat font-semibold text-xl leading-7 transition-colors duration-200",
-                      isActive ? "text-red-600" : "text-neutral-400"
+                      isActive ? "text-[#EF3E23]" : "text-neutral-400"
                     )}
                   >
                     {m.title}
@@ -265,7 +265,7 @@ export function JourneyTimelineSection({
                 <div
                   className={cn(
                     "relative z-10 size-2.5 rounded-full ring-4 ring-zinc-100 transition-colors duration-200",
-                    isActive ? "bg-red-600" : "bg-neutral-200"
+                    isActive ? "bg-[#EF3E23]" : "bg-neutral-200"
                   )}
                 />
                 <p

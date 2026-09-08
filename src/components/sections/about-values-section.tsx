@@ -96,7 +96,7 @@ export function AboutValuesSection({
                     <span
                       className={cn(
                         "font-montserrat font-medium text-base lg:text-lg leading-6",
-                        isOpen ? "text-red-600" : "text-stone-900"
+                        isOpen ? "text-[#EF3E23]" : "text-stone-900"
                       )}
                     >
                       {v.title}

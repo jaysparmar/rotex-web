@@ -41,7 +41,7 @@ export function AboutCaseStudiesSection({
           </h2>
           <Link
             href={cta.href}
-            className="hidden lg:inline-block text-red-600 font-montserrat font-semibold text-sm uppercase hover:text-red-700 transition-colors"
+            className="hidden lg:inline-block text-[#EF3E23] font-montserrat font-semibold text-sm uppercase hover:text-red-700 transition-colors"
           >
             {cta.label}
           </Link>

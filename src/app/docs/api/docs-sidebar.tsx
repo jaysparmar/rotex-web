@@ -8,7 +8,7 @@ const METHOD_COLOR: Record<string, string> = {
   GET: "text-emerald-600",
   POST: "text-blue-600",
   PUT: "text-amber-600",
-  DELETE: "text-red-600",
+  DELETE: "text-[#EF3E23]",
 };
 
 export function DocsSidebar({ groups }: { groups: DocGroup[] }) {

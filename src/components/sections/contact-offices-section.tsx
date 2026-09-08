@@ -37,7 +37,7 @@ export function ContactOfficesSection({
               onClick={() => setActiveTab(tab.id)}
               className={cn(
                 "px-2.5 py-5 border-b-2 whitespace-nowrap text-base font-semibold font-montserrat uppercase leading-6 transition-colors",
-                tab.id === activeTab ? "border-red-600 text-red-600" : "border-transparent text-stone-900 hover:text-red-600"
+                tab.id === activeTab ? "border-[#EF3E23] text-[#EF3E23]" : "border-transparent text-stone-900 hover:text-[#EF3E23]"
               )}
             >
               {tab.label}

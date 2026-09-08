@@ -35,14 +35,14 @@ export function ProductsSection({ products }: { products: ProductCardData[] }) {
               aria-label="Previous"
               className="size-11 rounded-full bg-orange-600/10 border border-stone-200 flex items-center justify-center hover:border-orange-600 transition-colors duration-150"
             >
-              <RotexArrow size={7} className="rotate-180 text-red-600" />
+              <RotexArrow size={7} className="rotate-180 text-[#EF3E23]" />
             </button>
             <button
               onClick={() => scroll("right")}
               aria-label="Next"
               className="size-11 rounded-full bg-orange-600/10 border border-stone-200 flex items-center justify-center hover:border-orange-600 transition-colors duration-150"
             >
-              <RotexArrow size={7} className="text-red-600" />
+              <RotexArrow size={7} className="text-[#EF3E23]" />
             </button>
           </div>
         </div>

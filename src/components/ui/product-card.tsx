@@ -35,7 +35,7 @@ export function ProductCard({ name, description, image, href, className }: Produ
 
       {/* Text */}
       <div className="self-stretch flex flex-col items-center gap-1.5">
-        <h3 className="self-stretch text-center text-red-600 font-montserrat font-semibold text-xl leading-6">
+        <h3 className="self-stretch text-center text-[#EF3E23] font-montserrat font-semibold text-xl leading-6">
           {name}
         </h3>
         <p className="w-56 text-center text-black font-montserrat font-medium text-base leading-6">

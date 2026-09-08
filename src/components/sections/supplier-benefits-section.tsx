@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { HexIcon } from "@/components/ui/hex-icon";
 
 const DEFAULT_BENEFITS = [
   "Long-term partnerships built on trust and consistency",
@@ -78,7 +79,7 @@ export function SupplierBenefitsSection({
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-10 gap-y-10">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10">
             {stats.map((stat) => (
               <div key={stat.label} className="flex flex-col gap-1">
                 <p className="text-stone-900 font-montserrat font-medium text-3xl leading-10">
@@ -98,7 +99,9 @@ export function SupplierBenefitsSection({
           <ul className="flex flex-col gap-4">
             {benefits.map((b) => (
               <li key={b} className="flex items-start gap-3">
-                <span className="mt-1.5 size-3 shrink-0 bg-neutral-200" />
+                <span className="mt-1.5 shrink-0">
+                  <HexIcon size={12} color="#FFFFFF" />
+                </span>
                 <span className="text-white font-montserrat font-medium text-base leading-6">{b}</span>
               </li>
             ))}

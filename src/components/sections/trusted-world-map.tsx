@@ -45,10 +45,10 @@ function TrustedWorldMap({ rotateLng = -55, rotateLat = -18, pins }: TrustedWorl
 
       {pins.map((pin) => (
         <Marker key={pin.name} coordinates={pin.coordinates}>
-          <circle r={5} fill="#EE3E23" stroke="#fff" strokeWidth={1.5} />
+          <circle r={5} fill="#EF3E23" stroke="#fff" strokeWidth={1.5} />
           <foreignObject x={-100} y={-34} width={200} height={26} className="pointer-events-none overflow-visible">
             <div className="flex justify-center">
-              <span className="whitespace-nowrap rounded bg-white/90 px-2 py-0.5 text-sm font-semibold font-montserrat text-red-600">
+              <span className="whitespace-nowrap rounded bg-white/90 px-2 py-0.5 text-sm font-semibold font-montserrat text-[#EF3E23]">
                 {pin.name}
               </span>
             </div>

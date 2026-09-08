@@ -112,7 +112,7 @@ export function AboutStorySection({
 
         {/* Trusted by Industry leaders — logo marquee */}
         <div className="mt-10 lg:mt-16 pb-20 flex flex-col items-center gap-5 lg:flex-row lg:gap-16">
-          <p className="lg:w-36 shrink-0 text-red-600 text-center lg:text-left font-montserrat font-semibold text-base leading-6">
+          <p className="lg:w-36 shrink-0 text-[#EF3E23] text-center lg:text-left font-montserrat font-semibold text-base leading-6">
             {trustedLabel}
           </p>
           <div className="relative w-full overflow-hidden h-14 lg:h-16">

@@ -21,8 +21,8 @@ export function TabsNav({ tabs, active, onChange, className }: TabsNavProps) {
             className={cn(
               "p-2.5 lg:py-5 text-sm lg:text-lg font-montserrat font-semibold leading-5 lg:leading-6 border-b-2 -mb-px transition-colors duration-150 whitespace-nowrap",
               tab.id === active
-                ? "border-red-600 text-red-600"
-                : "border-transparent text-stone-900 hover:text-red-600"
+                ? "border-[#EF3E23] text-[#EF3E23]"
+                : "border-transparent text-stone-900 hover:text-[#EF3E23]"
             )}
           >
             {tab.label}

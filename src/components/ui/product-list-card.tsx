@@ -36,8 +36,8 @@ export function ProductListCard({ slug, code, name, category, image, tags = [] }
 
       {/* Bottom: code + name + tags */}
       <div className="self-stretch flex flex-col gap-1 sm:gap-1.5 min-w-0">
-        <p className="text-red-600 text-xs sm:text-sm font-medium font-montserrat leading-4 sm:leading-5 truncate">{code}</p>
-        <p className="text-stone-900 group-hover:text-gradient-orange-dark text-sm sm:text-lg font-medium font-montserrat leading-5 sm:leading-6 line-clamp-2">
+        <p className="text-[#EF3E23] text-xs sm:text-sm font-medium font-montserrat leading-4 sm:leading-5 truncate">{code}</p>
+        <p className="text-stone-900 group-hover:text-[#EF3E23] text-sm sm:text-lg font-medium font-montserrat leading-5 sm:leading-6 line-clamp-2">
           {name}
         </p>
         {tags.length > 0 && (

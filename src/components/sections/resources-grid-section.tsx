@@ -171,7 +171,7 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
           {/* full-width on mobile per Figma, content-width on desktop */}
           <button
             onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-            className="w-full lg:w-auto px-6 py-3.5 bg-white rounded-[47px] shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] outline-[0.5px] -outline-offset-1 outline-red-600 text-red-600 text-sm font-bold font-montserrat uppercase leading-5 hover:bg-red-600 hover:text-white transition-colors duration-150 overflow-hidden"
+            className="w-full lg:w-auto px-6 py-3.5 bg-white rounded-[47px] shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] outline-[0.5px] -outline-offset-1 outline-[#EF3E23] text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 hover:bg-[#EF3E23] hover:text-white transition-colors duration-150 overflow-hidden"
           >
             Load More
           </button>

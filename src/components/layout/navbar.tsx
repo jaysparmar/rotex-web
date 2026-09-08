@@ -59,7 +59,7 @@ function CategorySwitcherPanel({
             onMouseEnter={() => setActiveIdx(i)}
             className={`px-2.5 py-0.5 text-left border-l-2 text-base font-montserrat leading-6 transition-colors ${
               i === activeIdx
-                ? "border-red-600 text-red-600 font-semibold"
+                ? "border-[#EF3E23] text-[#EF3E23] font-semibold"
                 : "border-transparent text-stone-900 font-medium hover:text-stone-600"
             }`}
           >
@@ -78,7 +78,7 @@ function CategorySwitcherPanel({
               onClick={onClose}
               className="group w-64 flex flex-col gap-1"
             >
-              <span className="text-stone-900 text-base font-medium font-montserrat leading-6 group-hover:text-red-600 transition-colors">
+              <span className="text-stone-900 text-base font-medium font-montserrat leading-6 group-hover:text-[#EF3E23] transition-colors">
                 {item.label}
               </span>
               <span className="text-neutral-400 text-xs font-medium font-montserrat leading-5">
@@ -91,7 +91,7 @@ function CategorySwitcherPanel({
           <Link
             href={active.viewAllHref ?? "#"}
             onClick={onClose}
-            className="text-red-600 text-sm font-medium font-montserrat leading-5 hover:underline"
+            className="text-[#EF3E23] text-sm font-medium font-montserrat leading-5 hover:underline"
           >
             {active.viewAllLabel}
           </Link>
@@ -173,7 +173,7 @@ function FlatMegaMenuPanel({
                     <Link
                       href={group.href}
                       onClick={onClose}
-                      className="text-stone-900 text-base font-semibold font-montserrat leading-6 hover:text-red-600 transition-colors"
+                      className="text-stone-900 text-base font-semibold font-montserrat leading-6 hover:text-[#EF3E23] transition-colors"
                     >
                       {group.heading}
                     </Link>

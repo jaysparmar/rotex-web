@@ -81,7 +81,7 @@ export function IndustryChallengesSolutions({
         </div>
 
         {/* Solutions */}
-        {/* Figma: bg-red-50 / text-red-600 */}
+        {/* Figma: bg-red-50 / text-[#EF3E23] */}
         <div className="flex-1 p-5 lg:p-7 bg-[#FFF7F4] rounded-xl flex flex-col gap-5 lg:gap-6">
           <h3 className="text-[#EF3E23] text-xl lg:text-2xl font-medium font-montserrat leading-7 lg:leading-8 line-clamp-5">
             {solutionsTitle}

@@ -70,7 +70,7 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
           <aside className="w-full lg:w-80 shrink-0 flex flex-col gap-5 lg:sticky lg:top-28">
             {toc.length > 0 && (
               <>
-                <h3 className="text-red-600 text-base font-semibold font-montserrat leading-6">In this {typeSingular}</h3>
+                <h3 className="text-[#EF3E23] text-base font-semibold font-montserrat leading-6">In this {typeSingular}</h3>
                 <div className="flex flex-col gap-2">
                   {toc.map((entry, i) => (
                     <a
@@ -78,8 +78,8 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
                       href={`#${entry.id}`}
                       className={
                         i === 0
-                          ? "text-stone-900 text-sm font-semibold font-montserrat leading-5 hover:text-red-600 transition-colors"
-                          : "text-stone-500 text-sm font-medium font-montserrat leading-5 hover:text-red-600 transition-colors"
+                          ? "text-stone-900 text-sm font-semibold font-montserrat leading-5 hover:text-[#EF3E23] transition-colors"
+                          : "text-stone-500 text-sm font-medium font-montserrat leading-5 hover:text-[#EF3E23] transition-colors"
                       }
                     >
                       {entry.text}

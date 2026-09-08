@@ -35,7 +35,7 @@ function TypePillGroup({
           className={cn(
             "px-3 py-1.5 rounded-full text-xs font-medium font-montserrat leading-4 transition-colors duration-200",
             activeSlug === null
-              ? "bg-zinc-800 text-white"
+              ? "bg-[#333333] text-white"
               : "ring-1 ring-inset ring-neutral-200 text-stone-900 hover:bg-stone-50"
           )}
         >
@@ -48,7 +48,7 @@ function TypePillGroup({
             className={cn(
               "px-3 py-1.5 rounded-full text-xs font-medium font-montserrat leading-4 transition-colors duration-200",
               activeSlug === s.slug
-                ? "bg-zinc-800 text-white"
+                ? "bg-[#333333] text-white"
                 : "ring-1 ring-inset ring-neutral-200 text-stone-900 hover:bg-stone-50"
             )}
           >
@@ -125,7 +125,7 @@ function FilterFields({
         {hasActiveFilters && (
           <button
             onClick={onClearFilters}
-            className="text-xs font-medium font-montserrat text-red-600 hover:underline"
+            className="text-xs font-medium font-montserrat text-[#EF3E23] hover:underline"
           >
             Clear all
           </button>
@@ -221,7 +221,7 @@ function Pagination({
             className={cn(
               "size-10 rounded-full flex items-center justify-center text-sm font-medium font-montserrat transition-colors",
               p === page
-                ? "bg-red-600 text-white"
+                ? "bg-[#EF3E23] text-white"
                 : "outline outline-1 -outline-offset-1 outline-neutral-200 text-stone-500 hover:bg-stone-50"
             )}
           >
@@ -444,8 +444,8 @@ export function ProductsPageClient({
                   className={cn(
                     "shrink-0 px-2.5 py-4 sm:py-6 border-b-2 -mb-px text-base sm:text-lg font-semibold font-montserrat leading-5 whitespace-nowrap transition-colors duration-150",
                     tab.slug === activeCategorySlug
-                      ? "border-red-600 text-red-600"
-                      : "border-transparent text-stone-900 hover:text-red-600"
+                      ? "border-[#EF3E23] text-[#EF3E23]"
+                      : "border-transparent text-stone-900 hover:text-[#EF3E23]"
                   )}
                 >
                   {tab.name}
@@ -459,7 +459,7 @@ export function ProductsPageClient({
                 <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white to-transparent pointer-events-none" />
                 <button
                   onClick={() => scrollTabs("left")}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center text-stone-900 hover:text-red-600 transition-colors"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center text-stone-900 hover:text-[#EF3E23] transition-colors"
                   aria-label="Previous tabs"
                 >
                   <IoChevronBackOutline size={18} />
@@ -473,7 +473,7 @@ export function ProductsPageClient({
                 <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none" />
                 <button
                   onClick={() => scrollTabs("right")}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center text-stone-900 hover:text-red-600 transition-colors"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 size-6 flex items-center justify-center text-stone-900 hover:text-[#EF3E23] transition-colors"
                   aria-label="Next tabs"
                 >
                   <IoChevronForwardOutline size={18} />

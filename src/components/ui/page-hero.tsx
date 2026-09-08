@@ -16,6 +16,7 @@ const SEGMENT_LABEL_OVERRIDES: Record<string, string> = {
   about: "About Us",
   awards: "Awards & Recognition",
   "oil-gas": "Oil & Gas",
+  products: "All Products",
 };
 
 // Segments with no landing page of their own — skipped in the trail so it reads
@@ -92,7 +93,7 @@ export function PageHero({ title, description, bg, children }: PageHeroProps) {
                   {item.label}
                 </Link>
               ) : (
-                <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">
+                <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">
                   {item.label}
                 </span>
               )}
@@ -108,7 +109,7 @@ export function PageHero({ title, description, bg, children }: PageHeroProps) {
               {title}
             </h1>
             {description && (
-              <p className="w-full lg:w-121.25 text-stone-300 text-sm lg:text-base font-normal font-montserrat leading-6 lg:leading-7">
+              <p className="w-full lg:w-121.25 text-stone-300 text-sm lg:text-base font-normal font-montserrat leading-7 lg:leading-8">
                 {description}
               </p>
             )}

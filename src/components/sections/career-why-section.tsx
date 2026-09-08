@@ -76,8 +76,8 @@ export function CareerWhySection({
               style={{ top: `calc(8rem + ${i * 5}rem)`, zIndex: i + 1 }}
             >
               <div className="rounded-2xl bg-white outline outline-1 -outline-offset-1 outline-neutral-200 shadow-[0px_-4px_0px_0px_rgba(239,62,35,1.00)] flex flex-col-reverse lg:flex-row items-center overflow-hidden">
-                <div className="flex-1 self-stretch p-8 lg:p-12 flex flex-col justify-between gap-6">
-                  <h3 className="max-w-64 text-gradient-hero font-montserrat font-medium text-2xl leading-8">
+                <div className="flex-1 self-stretch p-8 lg:p-12 flex flex-col justify-between gap-3">
+                  <h3 className="max-w-64 text-gradient-highlight font-montserrat font-medium text-2xl leading-8">
                     {card.title}
                   </h3>
                   <p className="text-zinc-800/80 font-montserrat font-medium text-base leading-6">
@@ -85,7 +85,7 @@ export function CareerWhySection({
                   </p>
                 </div>
 
-                <div className="relative w-full h-56 lg:w-80 lg:h-125 shrink-0 lg:m-5 lg:rounded-2xl overflow-hidden">
+                <div className="relative w-full h-56 lg:w-80 lg:h-80 shrink-0 lg:m-5 lg:rounded-2xl overflow-hidden">
                   {card.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={card.image} alt={card.title} className="h-full w-full object-cover" />

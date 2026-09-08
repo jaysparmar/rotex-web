@@ -24,7 +24,7 @@ export function ContactHeroSection({
             Home
           </Link>
           <span className="text-subtext text-sm font-semibold font-montserrat leading-5">/</span>
-          <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">{breadcrumbLabel}</span>
+          <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">{breadcrumbLabel}</span>
         </nav>
 
         <div className="flex flex-col gap-5 max-w-xl">
@@ -36,7 +36,7 @@ export function ContactHeroSection({
           </p>
           <Link
             href="#contact-form"
-            className="inline-flex w-fit items-center justify-center gap-1.5 px-6 py-3.5 rounded-full bg-stone-100 text-red-600 text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-white transition-colors duration-150"
+            className="inline-flex w-fit items-center justify-center gap-1.5 px-6 py-3.5 rounded-full bg-stone-100 text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-white transition-colors duration-150"
           >
             {ctaLabel}
           </Link>

@@ -14,7 +14,7 @@ export function DownloadsHeroSection() {
           <span className="text-subtext text-sm font-semibold font-montserrat leading-5">
             /
           </span>
-          <span className="text-red-600 text-sm font-semibold font-montserrat leading-5">
+          <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">
             Downloads
           </span>
         </nav>

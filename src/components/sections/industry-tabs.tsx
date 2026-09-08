@@ -50,8 +50,8 @@ export function IndustryTabs({ sectorSlug, subIndustries }: Props) {
                 scroll={false}
                 className={`shrink-0 p-2.5 lg:px-2.5 lg:py-6 border-b-2 -mb-px text-sm lg:text-lg font-semibold font-montserrat leading-5 lg:leading-6 whitespace-nowrap transition-colors duration-150 ${
                   isActive
-                    ? "border-red-600 text-red-600"
-                    : "border-transparent text-stone-900 hover:text-red-600"
+                    ? "border-[#EF3E23] text-[#EF3E23]"
+                    : "border-transparent text-stone-900 hover:text-[#EF3E23]"
                 }`}
               >
                 {sub.name}

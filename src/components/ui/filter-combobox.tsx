@@ -80,7 +80,7 @@ export function FilterCombobox({ label, placeholder, options, value, onChange, m
             open ? "outline-stone-400" : "outline-gray-200 hover:outline-stone-300"
           )}
         >
-          <span className={cn("truncate", value.length > 0 ? "text-stone-900" : "text-neutral-400")}>
+          <span className={cn("truncate", value.length > 0 ? "text-stone-900" : "text-stone-400")}>
             {triggerLabel}
           </span>
           <IoChevronDownOutline

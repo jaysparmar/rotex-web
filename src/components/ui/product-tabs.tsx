@@ -53,7 +53,7 @@ export function ProductTabs({
             onClick={() => setRequestedTab(tab)}
             className={cn(
               "shrink-0 whitespace-nowrap px-2.5 py-5 border-b-2 -mb-px text-base sm:text-lg font-semibold font-montserrat leading-6 transition-colors",
-              activeTab === tab ? "border-red-600 text-red-600" : "border-transparent text-stone-900 hover:text-red-600"
+              activeTab === tab ? "border-[#EF3E23] text-[#EF3E23]" : "border-transparent text-stone-900 hover:text-[#EF3E23]"
             )}
           >
             {tab}
@@ -126,8 +126,8 @@ export function ProductTabs({
                   href={d.url}
                   className="self-start px-5 py-2 bg-stone-100 rounded-full shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] flex items-center gap-2.5 shrink-0 hover:bg-stone-200 transition-colors"
                 >
-                  <IoDownloadOutline className="text-red-600" size={18} />
-                  <span className="text-red-600 text-sm font-semibold font-montserrat">Download</span>
+                  <IoDownloadOutline className="text-[#EF3E23]" size={18} />
+                  <span className="text-[#EF3E23] text-sm font-semibold font-montserrat">Download</span>
                 </a>
               </div>
             ))}

@@ -51,7 +51,7 @@ export function CaseStudiesHeroSection({ featured }: { featured: ResourceItem[] 
                   )}
                 </div>
 
-                {/* brand orange (#ee3e23) — red-600 (#dc2626) reads too dark */}
+                {/* brand orange (#EF3E23) — [#EF3E23] (#dc2626) reads too dark */}
                 <span className="absolute top-5 right-5 size-10 rounded-full bg-primary flex items-center justify-center text-white group-hover:rotate-45 transition-transform duration-300">
                   <ArrowUpRight />
                 </span>

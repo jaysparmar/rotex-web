@@ -1,10 +1,13 @@
 "use client";
 import { useRef, useState } from "react";
+import { digitsOnlyKeyDown } from "@/lib/utils";
 import { useForm, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { HexIcon } from "@/components/ui/hex-icon";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterCombobox } from "@/components/ui/filter-combobox";
+import { COUNTRY_NAMES } from "@/lib/world-countries";
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 
@@ -29,7 +32,6 @@ type FormData = z.infer<typeof schema>;
 
 const ENQUIRY_TYPES = ["General Enquiry", "Product Support", "Technical Query", "Partnership"];
 const PRODUCTS = ["Solenoid Valve", "Angle Seat Valve", "Actuators", "Positioners"];
-const COUNTRIES = ["India", "UAE", "Saudi Arabia", "United Kingdom", "Germany", "USA"];
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -144,6 +146,8 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
                 <input
                   {...register("phone")}
                   type="tel"
+                  inputMode="numeric"
+                  onKeyDown={digitsOnlyKeyDown}
                   placeholder="Enter phone number"
                   className={`flex-1 px-3 bg-transparent ${placeholderCls} text-stone-900 outline-none`}
                 />
@@ -158,15 +162,23 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
 
           {/* Country + City */}
           <div className="flex flex-col gap-5 lg:flex-row">
-            <Field label="Country" error={errors.country?.message} className="flex-1">
-              <FormSelect
+            <div className="flex-1 flex flex-col gap-2">
+              <Controller
                 control={control}
                 name="country"
-                placeholder="Select Country"
-                options={COUNTRIES}
-                hasError={!!errors.country}
+                render={({ field }) => (
+                  <FilterCombobox
+                    label="Country"
+                    placeholder="Select Country"
+                    options={COUNTRY_NAMES}
+                    value={field.value ? [field.value] : []}
+                    onChange={(v) => field.onChange(v[0] ?? "")}
+                    multiple={false}
+                  />
+                )}
               />
-            </Field>
+              {errors.country && <p className={errorCls}>{errors.country.message}</p>}
+            </div>
 
             <Field label="City" error={errors.city?.message} className="flex-1">
               <input {...register("city")} placeholder="Select City" className={inputCls(!!errors.city)} />
@@ -204,7 +216,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-full h-11 px-5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 flex items-center justify-center gap-2 text-red-600 text-xs font-semibold font-montserrat uppercase leading-5 hover:bg-gray-100 transition-colors"
+              className="w-full h-11 px-5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 flex items-center justify-center gap-2 text-[#EF3E23] text-xs font-semibold font-montserrat uppercase leading-5 hover:bg-gray-100 transition-colors"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 4l3-3 3 3M1 10v1.5A1.5 1.5 0 002.5 13h9A1.5 1.5 0 0013 11.5V10" stroke="#dc2626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               {fileName ?? "Upload File"}

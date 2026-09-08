@@ -13,7 +13,7 @@ const SECTIONS: { key: string; order: number; data: unknown }[] = [
     data: {
       title: "Build Your Future With Us",
       description: "Take the next step in your career and work on meaningful projects that drive real impact across industries.",
-      cta: { label: "See Open Roles", href: "#form" },
+      cta: { label: "See Open Roles", href: "#positions" },
     },
   },
   {
