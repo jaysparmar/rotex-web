@@ -7,6 +7,8 @@ import { PRODUCT_FAMILIES } from "@/lib/product-constants";
 import {
   type ColumnDestination,
   type ImportGrid,
+  type IndustryReferenceMapping,
+  type SubIndustryReferenceMapping,
   type VariableImportMapping,
   type VariableImportSummary,
 } from "@/lib/variable-product-import";
@@ -15,17 +17,26 @@ import { Stepper, type StepperStep } from "@/components/ui/stepper";
 import { ImportUploadStep } from "./import-upload-step";
 import { ImportBatchDefaultsStep } from "./import-batch-defaults-step";
 import { ImportColumnMappingStep } from "./import-column-mapping-step";
+import { ImportIndustriesStep } from "./import-industries-step";
 import { ImportDownloadsStep } from "./import-downloads-step";
 import { ImportSpecificationsStep } from "./import-specifications-step";
 import { ImportPreviewStep } from "./import-preview-step";
-import type { ClassificationState, CompanyOption, IndustryOption } from "./types";
+import type {
+  ClassificationState,
+  CompanyOption,
+  IndustryOption,
+  SubIndustryOption,
+  IndustryReferenceRowState,
+  SubIndustryReferenceRowState,
+} from "./types";
 
-type Step = "upload" | "defaults" | "columns" | "downloads" | "specifications" | "preview";
+type Step = "upload" | "defaults" | "columns" | "industries" | "downloads" | "specifications" | "preview";
 
 const STEPS: StepperStep[] = [
   { id: "upload", label: "Upload" },
   { id: "defaults", label: "Batch Defaults" },
   { id: "columns", label: "Map Columns" },
+  { id: "industries", label: "Map Industries" },
   { id: "downloads", label: "Map Downloads" },
   { id: "specifications", label: "Specifications" },
   { id: "preview", label: "Preview & Import" },
@@ -35,6 +46,8 @@ type CommitResult = {
   createdVariantCount: number;
   updatedVariantCount: number;
   createdAttributeValueCount: number;
+  createdIndustryCount?: number;
+  createdSubIndustryCount?: number;
   createdCategoryCount?: number;
   updatedTargetCount?: number;
   addedEntryCount?: number;
@@ -67,10 +80,12 @@ function buildMapping(
   specificationColumns: number[],
   classification: ClassificationState,
   companies: CompanyOption[],
+  industryRows: IndustryReferenceRowState[],
+  subIndustryRows: SubIndustryReferenceRowState[],
   richGrid: DownloadImportGrid | null,
   downloadsBannerRow: number,
   categoryColumns: CategoryColumnState[]
-): { mapping: VariableImportMapping } | { error: string; step: "defaults" | "columns" | "downloads" } {
+): { mapping: VariableImportMapping } | { error: string; step: "defaults" | "columns" | "industries" | "downloads" } {
   function findColumn(dest: ColumnDestination): number | undefined {
     for (const [col, d] of Object.entries(columnDestinations)) {
       if (d === dest) return Number(col);
@@ -93,7 +108,7 @@ function buildMapping(
   }
 
   function optionalField(
-    field: "subCategory" | "industry" | "subIndustry",
+    field: "subCategory",
     label: string
   ): FieldOutcome<{ mode: "none" } | { mode: "fixed"; value: string | null } | { mode: "mapped"; column: number }> {
     const c = classification[field];
@@ -113,10 +128,6 @@ function buildMapping(
   if (!productFamily.ok) return { error: productFamily.error, step: "defaults" };
   const subCategory = optionalField("subCategory", "Sub-Category");
   if (!subCategory.ok) return { error: subCategory.error, step: "defaults" };
-  const industry = optionalField("industry", "Industry");
-  if (!industry.ok) return { error: industry.error, step: "defaults" };
-  const subIndustry = optionalField("subIndustry", "Sub-Industry");
-  if (!subIndustry.ok) return { error: subIndustry.error, step: "defaults" };
 
   if (category.config.mode === "fixed" && subCategory.config.mode === "fixed" && subCategory.config.value) {
     const categoryId = category.config.value;
@@ -127,6 +138,46 @@ function buildMapping(
       return { error: "The selected Sub-Category does not belong to the selected Category.", step: "defaults" };
     }
   }
+
+  // Industry/Sub-Industry mode is derived purely from whether a column is mapped to them —
+  // there's no separate "fixed" toggle, since a cell can hold several comma-separated references.
+  const industryCol = findColumn("industry");
+  const subIndustryCol = findColumn("subIndustry");
+
+  for (const row of industryRows) {
+    if (row.mode === "existing" && !row.industryId) {
+      return { error: `Choose an industry for "${row.reference}", or switch it to create new.`, step: "industries" };
+    }
+    if (row.mode === "create" && !row.name.trim()) {
+      return { error: `Enter a name for the new industry "${row.reference}".`, step: "industries" };
+    }
+  }
+  for (const row of subIndustryRows) {
+    if (row.mode === "existing" && !row.subIndustryId) {
+      return { error: `Choose a sub-industry for "${row.reference}", or switch it to create new.`, step: "industries" };
+    }
+    if (row.mode === "create") {
+      if (!row.name.trim()) return { error: `Enter a name for the new sub-industry "${row.reference}".`, step: "industries" };
+      if (!row.parentIndustryReference) {
+        return { error: `Choose a parent industry for "${row.reference}".`, step: "industries" };
+      }
+    }
+  }
+
+  const industryReferences: IndustryReferenceMapping[] = industryRows.map((row) => ({
+    reference: row.reference,
+    target:
+      row.mode === "existing"
+        ? { kind: "existing" as const, industryId: row.industryId! }
+        : { kind: "create" as const, name: row.name.trim() },
+  }));
+  const subIndustryReferences: SubIndustryReferenceMapping[] = subIndustryRows.map((row) => ({
+    reference: row.reference,
+    target:
+      row.mode === "existing"
+        ? { kind: "existing" as const, subIndustryId: row.subIndustryId! }
+        : { kind: "create" as const, name: row.name.trim(), parentIndustryReference: row.parentIndustryReference },
+  }));
 
   let downloads: VariableImportMapping["downloads"];
   if (downloadsBannerRow > 0) {
@@ -164,11 +215,13 @@ function buildMapping(
         category: category.config,
         subCategory: subCategory.config,
         productFamily: productFamily.config,
-        industry: industry.config,
-        subIndustry: subIndustry.config,
+        industry: industryCol != null ? { mode: "mapped", column: industryCol } : { mode: "none" },
+        subIndustry: subIndustryCol != null ? { mode: "mapped", column: subIndustryCol } : { mode: "none" },
       },
       categoryMatchBy: classification.categoryMatchBy,
       subCategoryMatchBy: classification.subCategoryMatchBy,
+      industryReferences,
+      subIndustryReferences,
       downloads,
     },
   };
@@ -177,10 +230,12 @@ function buildMapping(
 export function VariableImportWizard({
   companies,
   industries,
+  subIndustries,
   downloadCategories,
 }: {
   companies: CompanyOption[];
   industries: IndustryOption[];
+  subIndustries: SubIndustryOption[];
   downloadCategories: DownloadCategoryOption[];
 }) {
   const [step, setStep] = useState<Step>("upload");
@@ -189,14 +244,14 @@ export function VariableImportWizard({
   const [headerRow, setHeaderRow] = useState(1);
   const [columnDestinations, setColumnDestinations] = useState<Record<number, ColumnDestination>>({});
   const [specificationColumns, setSpecificationColumns] = useState<number[]>([]);
+  const [industryRows, setIndustryRows] = useState<IndustryReferenceRowState[]>([]);
+  const [subIndustryRows, setSubIndustryRows] = useState<SubIndustryReferenceRowState[]>([]);
   const [downloadsBannerRow, setDownloadsBannerRow] = useState(0);
   const [categoryColumns, setCategoryColumns] = useState<CategoryColumnState[]>([]);
   const [classification, setClassification] = useState<ClassificationState>({
     category: { mode: "fixed", fixedValue: null },
     subCategory: { mode: "none", fixedValue: null },
     productFamily: { mode: "fixed", fixedValue: PRODUCT_FAMILIES[0] },
-    industry: { mode: "none", fixedValue: null },
-    subIndustry: { mode: "none", fixedValue: null },
     categoryMatchBy: "name",
     subCategoryMatchBy: "name",
   });
@@ -206,12 +261,23 @@ export function VariableImportWizard({
   const [previewing, setPreviewing] = useState(false);
   const [committing, setCommitting] = useState(false);
 
+  const industryColumn = (() => {
+    for (const [col, d] of Object.entries(columnDestinations)) if (d === "industry") return Number(col);
+    return null;
+  })();
+  const subIndustryColumn = (() => {
+    for (const [col, d] of Object.entries(columnDestinations)) if (d === "subIndustry") return Number(col);
+    return null;
+  })();
+
   function handleParsed(newGrid: string[][], newRichGrid: DownloadImportGrid) {
     setGrid(newGrid);
     setRichGrid(newRichGrid);
     setHeaderRow(1);
     setColumnDestinations({});
     setSpecificationColumns([]);
+    setIndustryRows([]);
+    setSubIndustryRows([]);
     setDownloadsBannerRow(0);
     setCategoryColumns([]);
   }
@@ -223,6 +289,8 @@ export function VariableImportWizard({
       specificationColumns,
       classification,
       companies,
+      industryRows,
+      subIndustryRows,
       richGrid,
       downloadsBannerRow,
       categoryColumns
@@ -255,6 +323,8 @@ export function VariableImportWizard({
       specificationColumns,
       classification,
       companies,
+      industryRows,
+      subIndustryRows,
       richGrid,
       downloadsBannerRow,
       categoryColumns
@@ -304,7 +374,6 @@ export function VariableImportWizard({
           classification={classification}
           onClassificationChange={setClassification}
           companies={companies}
-          industries={industries}
           error={mappingError}
           onBack={() => setStep("upload")}
           onNext={() => setStep("columns")}
@@ -320,6 +389,24 @@ export function VariableImportWizard({
           classification={classification}
           error={mappingError}
           onBack={() => setStep("defaults")}
+          onNext={() => setStep("industries")}
+        />
+      )}
+
+      {step === "industries" && grid && (
+        <ImportIndustriesStep
+          grid={grid}
+          headerRow={headerRow}
+          industryColumn={industryColumn}
+          subIndustryColumn={subIndustryColumn}
+          industries={industries}
+          subIndustries={subIndustries}
+          industryRows={industryRows}
+          onIndustryRowsChange={setIndustryRows}
+          subIndustryRows={subIndustryRows}
+          onSubIndustryRowsChange={setSubIndustryRows}
+          error={mappingError}
+          onBack={() => setStep("columns")}
           onNext={() => setStep("downloads")}
         />
       )}
@@ -333,7 +420,7 @@ export function VariableImportWizard({
           categoryColumns={categoryColumns}
           onCategoryColumnsChange={setCategoryColumns}
           error={mappingError}
-          onBack={() => setStep("columns")}
+          onBack={() => setStep("industries")}
           onNext={() => setStep("specifications")}
         />
       )}

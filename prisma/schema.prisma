@@ -43,13 +43,8 @@ model Product {
   subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id], onDelete: SetNull)
   subCategoryId String?
 
-  industry   Industry? @relation(fields: [industryId], references: [id], onDelete: SetNull)
-  industryId String?
-
-  subIndustry   SubIndustry? @relation(fields: [subIndustryId], references: [id], onDelete: SetNull)
-  subIndustryId String?
-
-  industriesServed String?
+  industries    Industry[]
+  subIndustries SubIndustry[]
 
   // Simple-product content (used when productType === "simple")
   /// [StringList]
@@ -78,6 +73,9 @@ model ProductVariant {
   minOperatingTemp String?
   maxOperatingTemp String?
   flowFactor       String?
+
+  industries    Industry[]
+  subIndustries SubIndustry[]
 
   // Same content shape as Product's simple-product fields, but per-variant
   // (used when productType === "variable")
@@ -160,15 +158,16 @@ model SubCategory {
 }
 
 model Industry {
-  id            String   @id @default(cuid())
-  slug          String   @unique
-  name          String
-  bgKey         String?
-  image         String?
-  mobileImage   String?
-  description   String
-  sectionTitle  String
-  overview      String
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  bgKey           String?
+  image           String?
+  mobileImage     String?
+  description     String
+  sectionTitle    String
+  overview        String
+  importReference String?  @unique
   /// [IndustryStats]
   stats         Json
   /// [IndustryWhyChoose]
@@ -176,6 +175,7 @@ model Industry {
 
   subIndustries SubIndustry[]
   products      Product[]
+  variants      ProductVariant[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -188,6 +188,7 @@ model SubIndustry {
   description         String
   image               String?
   mobileImage         String?
+  importReference     String?  @unique
   /// [StringList]
   partnerIds          Json     @default("[]")
   /// [StringList]
@@ -206,6 +207,7 @@ model SubIndustry {
   industryId String
 
   products Product[]
+  variants ProductVariant[]
 
   createdAt DateTime @default(now())
 

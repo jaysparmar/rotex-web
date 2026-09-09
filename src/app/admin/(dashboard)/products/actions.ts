@@ -12,6 +12,8 @@ function isDuplicateProductError(err: unknown): boolean {
 
 type ContentFields = {
   certificates: string[];
+  industryIds: string[];
+  subIndustryIds: string[];
   features: string | null;
   description: string | null;
   specifications: { key: string; value: string }[];
@@ -34,9 +36,6 @@ export type ProductInput = ContentFields & {
   companyId: string;
   categoryId: string;
   subCategoryId: string | null;
-  industryId: string | null;
-  subIndustryId: string | null;
-  industriesServed: string | null;
 };
 
 export type VariantInput = ContentFields & {
@@ -48,6 +47,20 @@ export type VariantInput = ContentFields & {
   flowFactor: string | null;
 };
 
+function connectIndustries(industryIds: string[], subIndustryIds: string[]) {
+  return {
+    industries: { connect: industryIds.map((id) => ({ id })) },
+    subIndustries: { connect: subIndustryIds.map((id) => ({ id })) },
+  };
+}
+
+function setIndustries(industryIds: string[], subIndustryIds: string[]) {
+  return {
+    industries: { set: industryIds.map((id) => ({ id })) },
+    subIndustries: { set: subIndustryIds.map((id) => ({ id })) },
+  };
+}
+
 function revalidateProducts(id?: string) {
   revalidatePath("/admin/products");
   if (id) revalidatePath(`/admin/products/${id}`);
@@ -55,9 +68,14 @@ function revalidateProducts(id?: string) {
 }
 
 export async function createProduct(data: ProductInput) {
+  const { industryIds, subIndustryIds, ...rest } = data;
   try {
     const product = await prisma.product.create({
-      data: { ...data, slug: slugify(`${data.name}-${data.modelNumber}`) },
+      data: {
+        ...rest,
+        slug: slugify(`${data.name}-${data.modelNumber}`),
+        ...connectIndustries(industryIds, subIndustryIds),
+      },
     });
     revalidateProducts();
     return { id: product.id };
@@ -70,8 +88,12 @@ export async function createProduct(data: ProductInput) {
 }
 
 export async function updateProduct(id: string, data: ProductInput) {
+  const { industryIds, subIndustryIds, ...rest } = data;
   try {
-    await prisma.product.update({ where: { id }, data });
+    await prisma.product.update({
+      where: { id },
+      data: { ...rest, ...setIndustries(industryIds, subIndustryIds) },
+    });
     revalidateProducts(id);
   } catch (err) {
     if (isDuplicateProductError(err)) {
@@ -104,13 +126,20 @@ export async function deleteProductsByFilter(filter: ProductFilterParams) {
 
 export async function createVariant(productId: string, data: VariantInput) {
   await prisma.product.findUniqueOrThrow({ where: { id: productId } });
-  const variant = await prisma.productVariant.create({ data: { ...data, productId } });
+  const { industryIds, subIndustryIds, ...rest } = data;
+  const variant = await prisma.productVariant.create({
+    data: { ...rest, productId, ...connectIndustries(industryIds, subIndustryIds) },
+  });
   revalidateProducts(productId);
   return { id: variant.id };
 }
 
 export async function updateVariant(id: string, data: VariantInput) {
-  const variant = await prisma.productVariant.update({ where: { id }, data });
+  const { industryIds, subIndustryIds, ...rest } = data;
+  const variant = await prisma.productVariant.update({
+    where: { id },
+    data: { ...rest, ...setIndustries(industryIds, subIndustryIds) },
+  });
   revalidateProducts(variant.productId);
 }
 

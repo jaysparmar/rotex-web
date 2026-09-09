@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
-import { TextField, TextAreaField, FieldGrid, RepeaterItem, AddButton } from "@/components/admin/form-fields";
+import { TextField, TextAreaField, FieldGrid, RepeaterItem, AddButton, Field } from "@/components/admin/form-fields";
+import { Input } from "@/components/ui/input";
 import { ImageUrlField } from "@/components/admin/image-url-field";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { SaveBar } from "@/components/admin/section-form-shell";
@@ -22,6 +23,7 @@ type FormValues = {
   description: string;
   image: string;
   mobileImage: string;
+  importReference: string;
   partnerIds: string[];
   storyIds: string[];
   challengesTitle: string;
@@ -38,6 +40,7 @@ type SubIndustryInput = {
   description: string;
   image: string | null;
   mobileImage: string | null;
+  importReference: string | null;
   partnerIds: unknown;
   storyIds: unknown;
   challengesTitle: string;
@@ -71,6 +74,7 @@ export function SubIndustryEditForm({
       description: subIndustry?.description ?? "",
       image: subIndustry?.image ?? "",
       mobileImage: subIndustry?.mobileImage ?? "",
+      importReference: subIndustry?.importReference ?? "",
       partnerIds: (subIndustry?.partnerIds as string[] | null) ?? [],
       storyIds: (subIndustry?.storyIds as string[] | null) ?? [],
       challengesTitle: subIndustry?.challengesTitle ?? "",
@@ -110,6 +114,7 @@ export function SubIndustryEditForm({
       description: values.description,
       image: values.image,
       mobileImage: values.mobileImage,
+      importReference: values.importReference.trim() || null,
       partnerIds: values.partnerIds,
       storyIds: values.storyIds,
       challengesTitle: values.challengesTitle,
@@ -145,6 +150,12 @@ export function SubIndustryEditForm({
             <TextAreaField label="Description" {...form.register("description")} />
             <ImageUrlField name="image" label="Banner Image" />
             <ImageUrlField name="mobileImage" label="Banner Image (Mobile)" />
+            <Field label="Import Reference">
+              <Input {...form.register("importReference")} className="h-9" />
+              <p className="text-xs text-muted-foreground">
+                Optional code used to match this sub-industry to a spreadsheet column during bulk product import.
+              </p>
+            </Field>
           </CardContent>
         </Card>
 

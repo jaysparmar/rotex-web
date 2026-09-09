@@ -25,6 +25,16 @@ export type ColumnDestination =
 
 export type ClassificationFieldConfig = { mode: "fixed"; value: string | null } | { mode: "mapped"; column: number };
 export type OptionalClassificationFieldConfig = ClassificationFieldConfig | { mode: "none" };
+/** Industry/Sub-Industry cells hold a comma-separated list, so there's no single "fixed value" mode. */
+export type MultiClassificationFieldConfig = { mode: "none" } | { mode: "mapped"; column: number };
+
+export type IndustryReferenceTarget = { kind: "existing"; industryId: string } | { kind: "create"; name: string };
+export type SubIndustryReferenceTarget =
+  | { kind: "existing"; subIndustryId: string }
+  | { kind: "create"; name: string; parentIndustryReference: string };
+
+export type IndustryReferenceMapping = { reference: string; target: IndustryReferenceTarget };
+export type SubIndustryReferenceMapping = { reference: string; target: SubIndustryReferenceTarget };
 
 export type VariableImportMapping = {
   headerRow: number; // 1-indexed row number containing column labels
@@ -34,11 +44,16 @@ export type VariableImportMapping = {
     category: ClassificationFieldConfig;
     subCategory: OptionalClassificationFieldConfig;
     productFamily: ClassificationFieldConfig;
-    industry: OptionalClassificationFieldConfig;
-    subIndustry: OptionalClassificationFieldConfig;
+    industry: MultiClassificationFieldConfig;
+    subIndustry: MultiClassificationFieldConfig;
   };
   categoryMatchBy: "name" | "importReference";
   subCategoryMatchBy: "name" | "importReference";
+  /** Every distinct industry/sub-industry reference token found in the mapped column(s), each
+   * resolved (by the "Map Industries" wizard step) to either an existing record or a new one to
+   * create. Absent/empty when no column is mapped to industry/sub-industry. */
+  industryReferences?: IndustryReferenceMapping[];
+  subIndustryReferences?: SubIndustryReferenceMapping[];
   downloads?: { bannerRow: number; categories: DownloadCategoryMapping[] };
 };
 
@@ -59,20 +74,40 @@ export type VariableImportSummary = {
   variantsToCreate: number;
   variantsToUpdate: number;
   newAttributeValues: { attribute: string; value: string }[];
+  newIndustries: { reference: string; name: string }[];
+  newSubIndustries: { reference: string; name: string; parentIndustryReference: string }[];
   errors: VariableImportRowError[];
   duplicates: VariableImportDuplicateDetail[];
 };
 
 type StagedProduct = ProductInput & { modelNumber: string };
-type StagedVariantUpdate = { variantId: string; data: VariantInput };
+
+/**
+ * A variant's data before industry/sub-industry references are fully resolved to real ids —
+ * `industryIds`/`subIndustryIds` are already-resolved (matched an existing record), while
+ * `pendingIndustryReferences`/`pendingSubIndustryReferences` are "create new" tokens that only
+ * become real ids once `applyVariableProductImportPlan` creates those records. `downloads` is
+ * deliberately omitted: new variants always get `[]`, and existing ones must never have this
+ * field touched by this importer (see the update loop below).
+ */
+type StagedVariantData = Omit<VariantInput, "downloads" | "industryIds" | "subIndustryIds"> & {
+  industryIds: string[];
+  pendingIndustryReferences: string[];
+  subIndustryIds: string[];
+  pendingSubIndustryReferences: string[];
+};
+
+type StagedVariantUpdate = { variantId: string; data: StagedVariantData };
 
 export type VariableImportPlan = {
   summary: VariableImportSummary;
   newProducts: StagedProduct[];
-  variantsToCreate: Map<string, VariantInput[]>;
+  variantsToCreate: Map<string, StagedVariantData[]>;
   variantsToUpdate: StagedVariantUpdate[];
   existingProductIdByModelNumber: Map<string, string>;
   newAttributeValueRows: { attribute: string; value: string; order: number }[];
+  industryReferences: IndustryReferenceMapping[];
+  subIndustryReferences: SubIndustryReferenceMapping[];
 };
 
 function emptyPlan(reason: string): VariableImportPlan {
@@ -85,6 +120,8 @@ function emptyPlan(reason: string): VariableImportPlan {
       variantsToCreate: 0,
       variantsToUpdate: 0,
       newAttributeValues: [],
+      newIndustries: [],
+      newSubIndustries: [],
       errors: [{ rowNumber: 0, modelNumber: null, reason }],
       duplicates: [],
     },
@@ -93,6 +130,8 @@ function emptyPlan(reason: string): VariableImportPlan {
     variantsToUpdate: [],
     existingProductIdByModelNumber: new Map(),
     newAttributeValueRows: [],
+    industryReferences: [],
+    subIndustryReferences: [],
   };
 }
 
@@ -169,6 +208,44 @@ export function estimatePendingDownloadLinks(
   return { rowsWithLinks, totalLinks };
 }
 
+/** Splits an Industry/Sub-Industry cell's comma-separated reference codes into clean tokens. */
+export function splitReferences(raw: string): string[] {
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+type TokenResolution = { kind: "id"; id: string } | { kind: "pending"; reference: string } | { kind: "unresolved" };
+
+function resolveIndustryToken(
+  token: string,
+  existingByReference: Map<string, string>,
+  configured: IndustryReferenceMapping[]
+): TokenResolution {
+  const key = token.toLowerCase();
+  const existingId = existingByReference.get(key);
+  if (existingId) return { kind: "id", id: existingId };
+  const entry = configured.find((r) => r.reference.toLowerCase() === key);
+  if (!entry) return { kind: "unresolved" };
+  return entry.target.kind === "existing" ? { kind: "id", id: entry.target.industryId } : { kind: "pending", reference: entry.reference };
+}
+
+function resolveSubIndustryToken(
+  token: string,
+  existingByReference: Map<string, string>,
+  configured: SubIndustryReferenceMapping[]
+): TokenResolution {
+  const key = token.toLowerCase();
+  const existingId = existingByReference.get(key);
+  if (existingId) return { kind: "id", id: existingId };
+  const entry = configured.find((r) => r.reference.toLowerCase() === key);
+  if (!entry) return { kind: "unresolved" };
+  return entry.target.kind === "existing"
+    ? { kind: "id", id: entry.target.subIndustryId }
+    : { kind: "pending", reference: entry.reference };
+}
+
 function variantKey(v: {
   size: string | null;
   variantType: string | null;
@@ -179,7 +256,7 @@ function variantKey(v: {
 }) {
   return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor]
     .map((x) => x ?? "")
-    .join("");
+    .join("");
 }
 
 type Resolved = { ok: true; id: string | null } | { ok: false; reason: string };
@@ -236,6 +313,11 @@ export async function analyzeVariableProductImport(
     const col = findSingleColumn(mapping, key);
     if (col != null) attributeCols[key] = col;
   }
+  const industryCol = mapping.classification.industry.mode === "mapped" ? mapping.classification.industry.column : null;
+  const subIndustryCol =
+    mapping.classification.subIndustry.mode === "mapped" ? mapping.classification.subIndustry.column : null;
+  const industryReferences = mapping.industryReferences ?? [];
+  const subIndustryReferences = mapping.subIndustryReferences ?? [];
 
   const dataRows = grid
     .slice(mapping.headerRow)
@@ -303,12 +385,18 @@ export async function analyzeVariableProductImport(
     }
   }
 
-  const industries = await prisma.industry.findMany({ include: { subIndustries: true } });
-  const industryByName = new Map(industries.map((i) => [i.name.toLowerCase(), i.id]));
-  const subIndustriesByIndustry = new Map<string, Map<string, string>>();
-  for (const ind of industries) {
-    subIndustriesByIndustry.set(ind.id, new Map(ind.subIndustries.map((s) => [s.name.toLowerCase(), s.id])));
-  }
+  const existingIndustries = await prisma.industry.findMany({ select: { id: true, importReference: true } });
+  const industryIdByReference = new Map(
+    existingIndustries
+      .filter((i) => i.importReference?.trim())
+      .map((i) => [i.importReference!.trim().toLowerCase(), i.id] as const)
+  );
+  const existingSubIndustries = await prisma.subIndustry.findMany({ select: { id: true, importReference: true } });
+  const subIndustryIdByReference = new Map(
+    existingSubIndustries
+      .filter((s) => s.importReference?.trim())
+      .map((s) => [s.importReference!.trim().toLowerCase(), s.id] as const)
+  );
 
   // Attribute value lookups (case-sensitive exact match) + next `order` per key
   const attributeRows = await prisma.attributeValue.findMany({ select: { attribute: true, value: true, order: true } });
@@ -356,7 +444,7 @@ export async function analyzeVariableProductImport(
   }
 
   const newProducts: StagedProduct[] = [];
-  const variantsToCreate = new Map<string, VariantInput[]>();
+  const variantsToCreate = new Map<string, StagedVariantData[]>();
   const variantsToUpdate: StagedVariantUpdate[] = [];
   const duplicates: VariableImportDuplicateDetail[] = [];
   const newAttributeValueRows: { attribute: string; value: string; order: number }[] = [];
@@ -413,32 +501,6 @@ export async function analyzeVariableProductImport(
       continue;
     }
 
-    const industry = resolveClassificationValue(
-      "Industry",
-      mapping.classification.industry,
-      firstRow,
-      industryByName,
-      false
-    );
-    if (!industry.ok) {
-      errors.push({ rowNumber: firstRowNumber, modelNumber, reason: industry.reason });
-      continue;
-    }
-
-    const subIndustry = industry.id
-      ? resolveClassificationValue(
-          "Sub-Industry",
-          mapping.classification.subIndustry,
-          firstRow,
-          subIndustriesByIndustry.get(industry.id) ?? new Map(),
-          false
-        )
-      : ({ ok: true, id: null } as const);
-    if (!subIndustry.ok) {
-      errors.push({ rowNumber: firstRowNumber, modelNumber, reason: subIndustry.reason });
-      continue;
-    }
-
     const name = (nameCol != null ? (firstRow[nameCol] ?? "").trim() : "") || modelNumber;
     const image = imageCol != null ? (firstRow[imageCol] ?? "").trim() || null : null;
 
@@ -455,10 +517,11 @@ export async function analyzeVariableProductImport(
         companyId,
         categoryId: category.id!,
         subCategoryId: subCategory.id,
-        industryId: industry.id,
-        subIndustryId: subIndustry.id,
-        industriesServed: null,
         images: image ? [image] : [],
+        // Industries/sub-industries live per-variant for variable products (see below) — the
+        // product record itself never carries them.
+        industryIds: [],
+        subIndustryIds: [],
         certificates: [],
         features: null,
         description: null,
@@ -471,7 +534,7 @@ export async function analyzeVariableProductImport(
     const existingKeyIds = existingProductId ? existingVariantIdsByProduct.get(existingProductId) ?? new Map() : new Map();
     const working = new Map<
       string,
-      { status: "create" | "update"; variantId?: string; data: VariantInput; rowNumber: number }
+      { status: "create" | "update"; variantId?: string; data: StagedVariantData; rowNumber: number }
     >();
 
     for (const row of rows) {
@@ -504,7 +567,29 @@ export async function analyzeVariableProductImport(
         .map((col) => ({ key: columnLabel(col), value: (row.cells[col] ?? "").trim() }))
         .filter((s) => s.value);
 
-      const data: VariantInput = {
+      const industryIds: string[] = [];
+      const pendingIndustryReferences: string[] = [];
+      if (industryCol != null) {
+        for (const token of splitReferences(row.cells[industryCol] ?? "")) {
+          const resolved = resolveIndustryToken(token, industryIdByReference, industryReferences);
+          if (resolved.kind === "id") industryIds.push(resolved.id);
+          else if (resolved.kind === "pending") pendingIndustryReferences.push(resolved.reference);
+          // "unresolved" tokens are skipped — the Map Industries step requires every distinct
+          // token in the sheet to be mapped before the import can be committed.
+        }
+      }
+
+      const subIndustryIds: string[] = [];
+      const pendingSubIndustryReferences: string[] = [];
+      if (subIndustryCol != null) {
+        for (const token of splitReferences(row.cells[subIndustryCol] ?? "")) {
+          const resolved = resolveSubIndustryToken(token, subIndustryIdByReference, subIndustryReferences);
+          if (resolved.kind === "id") subIndustryIds.push(resolved.id);
+          else if (resolved.kind === "pending") pendingSubIndustryReferences.push(resolved.reference);
+        }
+      }
+
+      const data: StagedVariantData = {
         size: attrs.size,
         variantType: attrs.variantType,
         orifice: attrs.orifice,
@@ -515,7 +600,10 @@ export async function analyzeVariableProductImport(
         features,
         description,
         specifications,
-        downloads: [],
+        industryIds,
+        pendingIndustryReferences,
+        subIndustryIds,
+        pendingSubIndustryReferences,
       };
 
       const existing = working.get(key);
@@ -538,7 +626,7 @@ export async function analyzeVariableProductImport(
       });
     }
 
-    const stagedCreates: VariantInput[] = [];
+    const stagedCreates: StagedVariantData[] = [];
     for (const entry of working.values()) {
       if (entry.status === "create") {
         stagedCreates.push(entry.data);
@@ -551,6 +639,16 @@ export async function analyzeVariableProductImport(
     if (stagedCreates.length) variantsToCreate.set(modelNumber, stagedCreates);
   }
 
+  const newIndustries = industryReferences
+    .filter((r): r is IndustryReferenceMapping & { target: { kind: "create"; name: string } } => r.target.kind === "create")
+    .map((r) => ({ reference: r.reference, name: r.target.name }));
+  const newSubIndustries = subIndustryReferences
+    .filter(
+      (r): r is SubIndustryReferenceMapping & { target: { kind: "create"; name: string; parentIndustryReference: string } } =>
+        r.target.kind === "create"
+    )
+    .map((r) => ({ reference: r.reference, name: r.target.name, parentIndustryReference: r.target.parentIndustryReference }));
+
   return {
     summary: {
       totalDataRows: dataRows.length,
@@ -560,6 +658,8 @@ export async function analyzeVariableProductImport(
       variantsToCreate: variantsToCreateCount,
       variantsToUpdate: variantsToUpdateCount,
       newAttributeValues: newAttributeValueRows.map(({ attribute, value }) => ({ attribute, value })),
+      newIndustries,
+      newSubIndustries,
       errors,
       duplicates,
     },
@@ -568,6 +668,8 @@ export async function analyzeVariableProductImport(
     variantsToUpdate,
     existingProductIdByModelNumber,
     newAttributeValueRows,
+    industryReferences,
+    subIndustryReferences,
   };
 }
 
@@ -578,30 +680,116 @@ export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
         await tx.attributeValue.createMany({ data: plan.newAttributeValueRows });
       }
 
+      // Resolve every "create new" industry/sub-industry reference first, so every product/variant
+      // built below can connect to a real id whether it references an existing or brand-new record.
+      // New records get bare-minimum stub content — they're expected to be fleshed out afterward in
+      // the Industries admin section.
+      const industryIdByReference = new Map<string, string>();
+      let createdIndustryCount = 0;
+      for (const ref of plan.industryReferences) {
+        if (ref.target.kind !== "create") continue;
+        const slugBase = slugify(ref.target.name) || slugify(ref.reference);
+        let slug = slugBase;
+        let suffix = 1;
+        while (await tx.industry.findUnique({ where: { slug } })) {
+          slug = `${slugBase}-${suffix++}`;
+        }
+        const created = await tx.industry.create({
+          data: {
+            name: ref.target.name,
+            slug,
+            importReference: ref.reference,
+            description: "",
+            sectionTitle: "",
+            overview: "",
+            stats: [],
+            whyChoose: { title: "", highlight: "", cards: [] },
+          },
+        });
+        industryIdByReference.set(ref.reference.toLowerCase(), created.id);
+        createdIndustryCount++;
+      }
+
+      const subIndustryIdByReference = new Map<string, string>();
+      let createdSubIndustryCount = 0;
+      for (const ref of plan.subIndustryReferences) {
+        if (ref.target.kind !== "create") continue;
+        const parentIndustryId = industryIdByReference.get(ref.target.parentIndustryReference.toLowerCase());
+        if (!parentIndustryId) continue; // the wizard requires this to resolve before commit
+        const slugBase = slugify(ref.target.name) || slugify(ref.reference);
+        let slug = slugBase;
+        let suffix = 1;
+        while (
+          await tx.subIndustry.findUnique({ where: { industryId_slug: { industryId: parentIndustryId, slug } } })
+        ) {
+          slug = `${slugBase}-${suffix++}`;
+        }
+        const created = await tx.subIndustry.create({
+          data: {
+            name: ref.target.name,
+            slug,
+            importReference: ref.reference,
+            industryId: parentIndustryId,
+            description: "",
+            challengesTitle: "",
+            solutionsTitle: "",
+            challenges: [],
+            solutions: [],
+            recommendedProducts: [],
+          },
+        });
+        subIndustryIdByReference.set(ref.reference.toLowerCase(), created.id);
+        createdSubIndustryCount++;
+      }
+
+      function finalIndustryIds(data: { industryIds: string[]; pendingIndustryReferences: string[] }): string[] {
+        const resolved = data.pendingIndustryReferences
+          .map((ref) => industryIdByReference.get(ref.toLowerCase()))
+          .filter((id): id is string => Boolean(id));
+        return [...data.industryIds, ...resolved];
+      }
+      function finalSubIndustryIds(data: { subIndustryIds: string[]; pendingSubIndustryReferences: string[] }): string[] {
+        const resolved = data.pendingSubIndustryReferences
+          .map((ref) => subIndustryIdByReference.get(ref.toLowerCase()))
+          .filter((id): id is string => Boolean(id));
+        return [...data.subIndustryIds, ...resolved];
+      }
+
       const productIdByModelNumber = new Map(plan.existingProductIdByModelNumber);
-      for (const { modelNumber, name, ...rest } of plan.newProducts) {
+      for (const product of plan.newProducts) {
+        const { modelNumber, name, industryIds, subIndustryIds, ...rest } = product;
+        void industryIds; // bulk-imported products never carry industries themselves — see StagedProduct
+        void subIndustryIds;
         const created = await tx.product.create({
           data: { ...rest, name, modelNumber, slug: slugify(`${name}-${modelNumber}`) },
         });
         productIdByModelNumber.set(modelNumber, created.id);
       }
 
-      const allVariants: (VariantInput & { productId: string })[] = [];
+      // Variants need per-row relation `connect`s, which `createMany` can't express — so these are
+      // created one at a time rather than in bulk chunks.
+      let createdVariantCount = 0;
       for (const [modelNumber, variants] of plan.variantsToCreate) {
         const productId = productIdByModelNumber.get(modelNumber);
         if (!productId) continue;
-        for (const v of variants) allVariants.push({ ...v, productId });
-      }
-
-      const CHUNK = 500;
-      for (let i = 0; i < allVariants.length; i += CHUNK) {
-        await tx.productVariant.createMany({ data: allVariants.slice(i, i + CHUNK) });
+        for (const v of variants) {
+          const { industryIds, pendingIndustryReferences, subIndustryIds, pendingSubIndustryReferences, ...scalars } = v;
+          await tx.productVariant.create({
+            data: {
+              ...scalars,
+              productId,
+              downloads: [],
+              industries: { connect: finalIndustryIds({ industryIds, pendingIndustryReferences }).map((id) => ({ id })) },
+              subIndustries: {
+                connect: finalSubIndustryIds({ subIndustryIds, pendingSubIndustryReferences }).map((id) => ({ id })),
+              },
+            },
+          });
+          createdVariantCount++;
+        }
       }
 
       for (const { variantId, data } of plan.variantsToUpdate) {
-        // Never touch `downloads` here — this importer always stages it as `[]`, and blindly
-        // writing that would wipe out downloads attached by a prior import or by hand. The
-        // downloads pass (if configured) reads-and-appends on top of whatever is already there.
         const {
           size,
           variantType,
@@ -627,15 +815,19 @@ export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
             features,
             description,
             specifications,
+            industries: { set: finalIndustryIds(data).map((id) => ({ id })) },
+            subIndustries: { set: finalSubIndustryIds(data).map((id) => ({ id })) },
           },
         });
       }
 
       return {
         createdProductCount: plan.newProducts.length,
-        createdVariantCount: allVariants.length,
+        createdVariantCount,
         updatedVariantCount: plan.variantsToUpdate.length,
         createdAttributeValueCount: plan.newAttributeValueRows.length,
+        createdIndustryCount,
+        createdSubIndustryCount,
       };
     },
     { timeout: 30_000 }

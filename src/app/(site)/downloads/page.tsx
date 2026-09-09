@@ -25,13 +25,14 @@ export default async function DownloadsPage() {
         modelNumber: true,
         category: { select: { name: true } },
         subCategory: { select: { name: true } },
-        industry: { select: { name: true } },
+        industries: { select: { name: true } },
       },
     }),
     prisma.productVariant.findMany({
       select: {
         id: true,
         downloads: true,
+        industries: { select: { name: true } },
         product: {
           select: {
             name: true,
@@ -39,7 +40,6 @@ export default async function DownloadsPage() {
             modelNumber: true,
             category: { select: { name: true } },
             subCategory: { select: { name: true } },
-            industry: { select: { name: true } },
           },
         },
       },
@@ -64,7 +64,7 @@ export default async function DownloadsPage() {
         image: p.image ?? PLACEHOLDER_IMAGE,
         product: p.category?.name ?? "",
         subCategory: p.subCategory?.name ?? "",
-        industry: p.industry?.name ?? "",
+        industries: p.industries.map((i) => i.name),
         categoryName: categoryNameById.get(d.categoryId) ?? "",
         modelNo: p.modelNumber ?? "",
       }))
@@ -84,7 +84,7 @@ export default async function DownloadsPage() {
         image: v.product.image ?? PLACEHOLDER_IMAGE,
         product: v.product.category?.name ?? "",
         subCategory: v.product.subCategory?.name ?? "",
-        industry: v.product.industry?.name ?? "",
+        industries: v.industries.map((i) => i.name),
         categoryName: categoryNameById.get(d.categoryId) ?? "",
         modelNo: v.product.modelNumber ?? "",
       }))

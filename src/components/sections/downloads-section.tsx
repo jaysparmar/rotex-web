@@ -49,7 +49,7 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
         (activeTab === ALL_TAB || item.tab === activeTab) &&
         (product === ALL || item.product === product) &&
         (subCategory === ALL || item.subCategory === subCategory) &&
-        (industry === ALL || item.industry === industry) &&
+        (industry === ALL || item.industries.includes(industry)) &&
         (!query || item.title.toLowerCase().includes(query) || item.modelNo.toLowerCase().includes(query))
     );
   }, [items, activeTab, product, subCategory, industry, search]);

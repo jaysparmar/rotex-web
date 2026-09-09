@@ -30,6 +30,8 @@ type VariantRecord = {
   minOperatingTemp: string | null;
   maxOperatingTemp: string | null;
   flowFactor: string | null;
+  industries: { id: string }[];
+  subIndustries: { id: string }[];
   certificates: unknown;
   features: string | null;
   description: string | null;
@@ -44,6 +46,8 @@ export function VariantEditForm({
   attributeValues,
   downloadCategories,
   certificationOptions,
+  industryOptions,
+  subIndustryOptions,
 }: {
   productId: string;
   productName: string;
@@ -51,6 +55,8 @@ export function VariantEditForm({
   attributeValues: Record<string, string[]>;
   downloadCategories: { id: string; name: string }[];
   certificationOptions: string[];
+  industryOptions: { id: string; name: string }[];
+  subIndustryOptions: { id: string; name: string }[];
 }) {
   const router = useRouter();
 
@@ -62,6 +68,8 @@ export function VariantEditForm({
       minOperatingTemp: variant?.minOperatingTemp ?? NONE,
       maxOperatingTemp: variant?.maxOperatingTemp ?? NONE,
       flowFactor: variant?.flowFactor ?? NONE,
+      industryIds: variant?.industries.map((i) => i.id) ?? [],
+      subIndustryIds: variant?.subIndustries.map((s) => s.id) ?? [],
       certificates: (variant?.certificates as string[] | null) ?? [],
       features: variant?.features ?? "",
       description: variant?.description ?? "",
@@ -95,6 +103,8 @@ export function VariantEditForm({
       minOperatingTemp: values.minOperatingTemp === NONE ? null : values.minOperatingTemp,
       maxOperatingTemp: values.maxOperatingTemp === NONE ? null : values.maxOperatingTemp,
       flowFactor: values.flowFactor === NONE ? null : values.flowFactor,
+      industryIds: values.industryIds,
+      subIndustryIds: values.subIndustryIds,
       certificates: values.certificates,
       features: values.features || null,
       description: values.description || null,
@@ -155,6 +165,8 @@ export function VariantEditForm({
         <ProductContentFields
           downloadCategories={downloadCategories}
           certificationOptions={certificationOptions}
+          industryOptions={industryOptions}
+          subIndustryOptions={subIndustryOptions}
           showDescription={false}
         />
 

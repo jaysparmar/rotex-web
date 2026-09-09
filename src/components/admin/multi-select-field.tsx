@@ -9,21 +9,24 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 
-export function CertificatesSelect({
+export function MultiSelectField({
   name,
   label,
   options,
+  placeholder,
 }: {
   name: string;
   label: string;
-  options: string[];
+  options: { value: string; label: string }[];
+  placeholder?: string;
 }) {
   const form = useFormContext();
   const [open, setOpen] = useState(false);
   const values = (useWatch({ control: form.control, name }) as string[] | undefined) ?? [];
+  const labelByValue = new Map(options.map((o) => [o.value, o.label]));
 
-  function toggle(option: string) {
-    const next = values.includes(option) ? values.filter((v) => v !== option) : [...values, option];
+  function toggle(value: string) {
+    const next = values.includes(value) ? values.filter((v) => v !== value) : [...values, value];
     form.setValue(name, next, { shouldDirty: true });
   }
 
@@ -42,7 +45,7 @@ export function CertificatesSelect({
           <div className="flex flex-wrap gap-2">
             {values.map((v, i) => (
               <Badge key={`${v}-${i}`} variant="secondary" className="gap-1 py-1 pr-1">
-                {v}
+                {labelByValue.get(v) ?? v}
                 <button
                   type="button"
                   onClick={() => removeAt(i)}
@@ -63,21 +66,26 @@ export function CertificatesSelect({
             )}
           >
             <span className="text-muted-foreground">
-              {values.length ? `${values.length} selected` : "Select certificates..."}
+              {values.length ? `${values.length} selected` : placeholder ?? "Select..."}
             </span>
             <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
           </PopoverTrigger>
           <PopoverContent className="w-72 p-0" align="start">
             <Command>
-              <CommandInput placeholder="Search certificates..." />
+              <CommandInput placeholder="Search..." />
               <CommandList>
-                <CommandEmpty>No certificates found.</CommandEmpty>
+                <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup>
                   {options.map((opt) => {
-                    const checked = values.includes(opt);
+                    const checked = values.includes(opt.value);
                     return (
-                      <CommandItem key={opt} value={opt} data-checked={checked} onSelect={() => toggle(opt)}>
-                        {opt}
+                      <CommandItem
+                        key={opt.value}
+                        value={opt.label}
+                        data-checked={checked}
+                        onSelect={() => toggle(opt.value)}
+                      >
+                        {opt.label}
                       </CommandItem>
                     );
                   })}

@@ -13,7 +13,6 @@ import type {
   ClassificationState,
   ClassificationFieldKey,
   CompanyOption,
-  IndustryOption,
 } from "./types";
 
 const MATCH_BY_OPTIONS: { value: MatchBy; label: string }[] = [
@@ -116,7 +115,6 @@ export function ImportBatchDefaultsStep({
   classification,
   onClassificationChange,
   companies,
-  industries,
   error,
   onBack,
   onNext,
@@ -125,7 +123,6 @@ export function ImportBatchDefaultsStep({
   classification: ClassificationState;
   onClassificationChange: (next: ClassificationState) => void;
   companies: CompanyOption[];
-  industries: IndustryOption[];
   error?: string;
   onBack: () => void;
   onNext: () => void;
@@ -151,9 +148,6 @@ export function ImportBatchDefaultsStep({
   function findCategoryOwner(categoryId: string) {
     return companies.find((c) => c.categories.some((cat) => cat.id === categoryId));
   }
-  function findIndustryById(industryId: string) {
-    return industries.find((i) => i.id === industryId);
-  }
 
   const categoryOptions = companies.flatMap((c) =>
     c.categories.map((cat) => ({ value: cat.id, label: `${c.name} — ${cat.name}` }))
@@ -173,15 +167,6 @@ export function ImportBatchDefaultsStep({
   })();
 
   const productFamilyOptions = PRODUCT_FAMILIES.map((f) => ({ value: f, label: f }));
-  const industryOptions = industries.map((i) => ({ value: i.id, label: i.name }));
-
-  const subIndustryOptions = (() => {
-    if (classification.industry.mode === "fixed" && classification.industry.fixedValue) {
-      const industry = findIndustryById(classification.industry.fixedValue);
-      return (industry?.subIndustries ?? []).map((s) => ({ value: s.id, label: s.name }));
-    }
-    return industries.flatMap((i) => i.subIndustries.map((s) => ({ value: s.id, label: `${i.name} — ${s.name}` })));
-  })();
 
   return (
     <Card>
@@ -236,24 +221,6 @@ export function ImportBatchDefaultsStep({
             fixedOptions={productFamilyOptions}
             required
             incomplete={isFieldIncomplete("productFamily", true)}
-          />
-          <ClassificationFieldControl
-            label="Industry"
-            state={classification.industry}
-            onChange={(next) => setField("industry", next)}
-            allowNone
-            fixedOptions={industryOptions}
-            required={false}
-            incomplete={isFieldIncomplete("industry", false)}
-          />
-          <ClassificationFieldControl
-            label="Sub-Industry"
-            state={classification.subIndustry}
-            onChange={(next) => setField("subIndustry", next)}
-            allowNone
-            fixedOptions={subIndustryOptions}
-            required={false}
-            incomplete={isFieldIncomplete("subIndustry", false)}
           />
         </div>
 

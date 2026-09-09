@@ -20,7 +20,6 @@ type CompanyOption = {
   name: string;
   categories: { id: string; name: string; subCategories: { id: string; name: string }[] }[];
 };
-type IndustryOption = { id: string; name: string; subIndustries: { id: string; name: string }[] };
 
 type ProductFormValues = ProductContentFormValues & {
   modelNumber: string;
@@ -31,9 +30,6 @@ type ProductFormValues = ProductContentFormValues & {
   companyId: string;
   categoryId: string;
   subCategoryId: string;
-  industryId: string;
-  subIndustryId: string;
-  industriesServed: string;
 };
 
 type ProductRecord = {
@@ -47,9 +43,8 @@ type ProductRecord = {
   companyId: string;
   categoryId: string;
   subCategoryId: string | null;
-  industryId: string | null;
-  subIndustryId: string | null;
-  industriesServed: string | null;
+  industries: { id: string }[];
+  subIndustries: { id: string }[];
   certificates: unknown;
   features: string | null;
   description: string | null;
@@ -60,15 +55,17 @@ type ProductRecord = {
 export function ProductEditForm({
   product,
   companies,
-  industries,
   downloadCategories,
   certificationOptions,
+  industryOptions,
+  subIndustryOptions,
 }: {
   product?: ProductRecord;
   companies: CompanyOption[];
-  industries: IndustryOption[];
   downloadCategories: { id: string; name: string }[];
   certificationOptions: string[];
+  industryOptions: { id: string; name: string }[];
+  subIndustryOptions: { id: string; name: string }[];
 }) {
   const router = useRouter();
 
@@ -86,9 +83,8 @@ export function ProductEditForm({
       companyId: product?.companyId ?? companies[0]?.id ?? "",
       categoryId: product?.categoryId ?? "",
       subCategoryId: product?.subCategoryId ?? NONE,
-      industryId: product?.industryId ?? NONE,
-      subIndustryId: product?.subIndustryId ?? NONE,
-      industriesServed: product?.industriesServed ?? "",
+      industryIds: product?.industries.map((i) => i.id) ?? [],
+      subIndustryIds: product?.subIndustries.map((s) => s.id) ?? [],
       certificates: (product?.certificates as string[] | null) ?? [],
       features: product?.features ?? "",
       description: product?.description ?? "",
@@ -116,7 +112,6 @@ export function ProductEditForm({
 
   const companyId = form.watch("companyId");
   const categoryId = form.watch("categoryId");
-  const industryId = form.watch("industryId");
   const productType = form.watch("productType");
 
   const selectedCompany = companies.find((c) => c.id === companyId);
@@ -125,12 +120,6 @@ export function ProductEditForm({
   const subCategoryOptions = [
     { value: NONE, label: "— None —" },
     ...(selectedCategory?.subCategories ?? []).map((s) => ({ value: s.id, label: s.name })),
-  ];
-
-  const selectedIndustry = industries.find((i) => i.id === industryId);
-  const subIndustryOptions = [
-    { value: NONE, label: "— None —" },
-    ...(selectedIndustry?.subIndustries ?? []).map((s) => ({ value: s.id, label: s.name })),
   ];
 
   function onSubmit(values: ProductFormValues) {
@@ -149,9 +138,8 @@ export function ProductEditForm({
       companyId: values.companyId,
       categoryId: values.categoryId,
       subCategoryId: values.subCategoryId === NONE ? null : values.subCategoryId,
-      industryId: values.industryId === NONE ? null : values.industryId,
-      subIndustryId: values.subIndustryId === NONE ? null : values.subIndustryId,
-      industriesServed: values.industriesServed || null,
+      industryIds: values.industryIds,
+      subIndustryIds: values.subIndustryIds,
       certificates: values.certificates,
       features: values.features || null,
       description: values.description || null,
@@ -260,34 +248,13 @@ export function ProductEditForm({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Industry</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FieldGrid>
-              <SelectField
-                label="Industry"
-                options={[{ value: NONE, label: "— None —" }, ...industries.map((i) => ({ value: i.id, label: i.name }))]}
-                value={industryId}
-                onChange={(e) => {
-                  form.setValue("industryId", e.target.value);
-                  form.setValue("subIndustryId", NONE);
-                }}
-              />
-              <SelectField
-                label="Sub-Industry"
-                options={subIndustryOptions}
-                value={form.watch("subIndustryId")}
-                onChange={(e) => form.setValue("subIndustryId", e.target.value)}
-              />
-            </FieldGrid>
-            <TextField label="Industries Served" {...form.register("industriesServed")} />
-          </CardContent>
-        </Card>
-
         {productType === "simple" && (
-          <ProductContentFields downloadCategories={downloadCategories} certificationOptions={certificationOptions} />
+          <ProductContentFields
+            downloadCategories={downloadCategories}
+            certificationOptions={certificationOptions}
+            industryOptions={industryOptions}
+            subIndustryOptions={subIndustryOptions}
+          />
         )}
 
         <SaveBar pending={pending} error={error} success={success} />

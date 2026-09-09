@@ -11,12 +11,15 @@ export default async function AdminNewVariantPage({
 }) {
   const { id } = await params;
 
-  const [product, attributeValues, downloadCategories, certifications] = await Promise.all([
-    prisma.product.findUnique({ where: { id }, select: { id: true, name: true } }),
-    getAttributeValuesByKey(),
-    prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
-    prisma.certification.findMany({ orderBy: { name: "asc" } }),
-  ]);
+  const [product, attributeValues, downloadCategories, certifications, industryOptions, subIndustryOptions] =
+    await Promise.all([
+      prisma.product.findUnique({ where: { id }, select: { id: true, name: true } }),
+      getAttributeValuesByKey(),
+      prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
+      prisma.certification.findMany({ orderBy: { name: "asc" } }),
+      prisma.industry.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+      prisma.subIndustry.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    ]);
   if (!product) notFound();
 
   return (
@@ -42,6 +45,8 @@ export default async function AdminNewVariantPage({
         attributeValues={attributeValues}
         downloadCategories={downloadCategories}
         certificationOptions={certifications.map((c) => c.name)}
+        industryOptions={industryOptions}
+        subIndustryOptions={subIndustryOptions}
       />
     </div>
   );

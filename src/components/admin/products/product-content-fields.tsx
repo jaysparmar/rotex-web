@@ -2,7 +2,7 @@
 
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { TextField, TextAreaField, RepeaterItem, AddButton, SelectField } from "@/components/admin/form-fields";
-import { CertificatesSelect } from "@/components/admin/certificates-select";
+import { MultiSelectField } from "@/components/admin/multi-select-field";
 import { DocumentField } from "@/components/admin/document-field";
 import { RichTextField } from "@/components/admin/rich-text-field";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -10,6 +10,8 @@ import { DOWNLOAD_TABS } from "@/lib/downloads-data";
 
 export type ProductContentFormValues = {
   certificates: string[];
+  industryIds: string[];
+  subIndustryIds: string[];
   features: string;
   description: string;
   specifications: { key: string; value: string }[];
@@ -25,10 +27,14 @@ export type ProductContentFormValues = {
 export function ProductContentFields({
   downloadCategories,
   certificationOptions,
+  industryOptions,
+  subIndustryOptions,
   showDescription = true,
 }: {
   downloadCategories: { id: string; name: string }[];
   certificationOptions: string[];
+  industryOptions: { id: string; name: string }[];
+  subIndustryOptions: { id: string; name: string }[];
   showDescription?: boolean;
 }) {
   const form = useFormContext<ProductContentFormValues>();
@@ -43,7 +49,32 @@ export function ProductContentFields({
           <CardTitle>Certificates</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <CertificatesSelect name="certificates" label="Certificates" options={certificationOptions} />
+          <MultiSelectField
+            name="certificates"
+            label="Certificates"
+            placeholder="Select certificates..."
+            options={certificationOptions.map((o) => ({ value: o, label: o }))}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Industries</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <MultiSelectField
+            name="industryIds"
+            label="Industry"
+            placeholder="Select industries..."
+            options={industryOptions.map((i) => ({ value: i.id, label: i.name }))}
+          />
+          <MultiSelectField
+            name="subIndustryIds"
+            label="Sub-Industry"
+            placeholder="Select sub-industries..."
+            options={subIndustryOptions.map((s) => ({ value: s.id, label: s.name }))}
+          />
         </CardContent>
       </Card>
 

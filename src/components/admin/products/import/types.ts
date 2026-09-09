@@ -12,7 +12,25 @@ export type CompanyOption = {
   }[];
 };
 
-export type IndustryOption = { id: string; name: string; subIndustries: { id: string; name: string }[] };
+export type IndustryOption = { id: string; name: string; importReference: string | null };
+export type SubIndustryOption = { id: string; name: string; importReference: string | null };
+
+/** UI state for one distinct industry reference token found in the mapped column. */
+export type IndustryReferenceRowState = {
+  reference: string;
+  mode: "existing" | "create";
+  industryId: string | null;
+  name: string;
+};
+
+/** Same as above for sub-industries — "create" additionally needs a parent industry. */
+export type SubIndustryReferenceRowState = {
+  reference: string;
+  mode: "existing" | "create";
+  subIndustryId: string | null;
+  name: string;
+  parentIndustryReference: string;
+};
 
 export type ClassificationFieldState = { mode: "fixed" | "mapped" | "none"; fixedValue: string | null };
 
@@ -22,8 +40,6 @@ export type ClassificationState = {
   category: ClassificationFieldState;
   subCategory: ClassificationFieldState;
   productFamily: ClassificationFieldState;
-  industry: ClassificationFieldState;
-  subIndustry: ClassificationFieldState;
   categoryMatchBy: MatchBy;
   subCategoryMatchBy: MatchBy;
 };
@@ -34,8 +50,6 @@ export const CLASSIFICATION_DESTINATIONS: { value: ColumnDestination; label: str
   { value: "category", label: "Category", field: "category" },
   { value: "subCategory", label: "Sub-Category", field: "subCategory" },
   { value: "productFamily", label: "Product Family", field: "productFamily" },
-  { value: "industry", label: "Industry", field: "industry" },
-  { value: "subIndustry", label: "Sub-Industry", field: "subIndustry" },
 ];
 
 export const BASE_DESTINATIONS: { value: ColumnDestination; label: string }[] = [
@@ -46,6 +60,8 @@ export const BASE_DESTINATIONS: { value: ColumnDestination; label: string }[] = 
   { value: "certificates", label: "Certificates" },
   { value: "features", label: "Features" },
   { value: "description", label: "Description" },
+  { value: "industry", label: "Industry (comma-separated references)" },
+  { value: "subIndustry", label: "Sub-Industry (comma-separated references)" },
   ...PRODUCT_ATTRIBUTES.map((a) => ({ value: a.key as ColumnDestination, label: a.label })),
 ];
 

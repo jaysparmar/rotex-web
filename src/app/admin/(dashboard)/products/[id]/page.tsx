@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProductEditForm } from "@/components/admin/products/product-edit-form";
 import { ProductDetailHeader } from "@/components/admin/products/product-detail-header";
 import { VariantList } from "@/components/admin/products/variant-list";
-import { getCompanyCategoryTree, getIndustryTree } from "@/lib/products";
+import { getCompanyCategoryTree } from "@/lib/products";
 
 export default async function AdminProductDetailPage({
   params,
@@ -14,20 +14,24 @@ export default async function AdminProductDetailPage({
 }) {
   const { id } = await params;
 
-  const [product, companies, industries, downloadCategories, certifications] = await Promise.all([
-    prisma.product.findUnique({
-      where: { id },
-      include: {
-        company: { select: { name: true } },
-        category: { select: { name: true } },
-        variants: { orderBy: { createdAt: "asc" } },
-      },
-    }),
-    getCompanyCategoryTree(),
-    getIndustryTree(),
-    prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
-    prisma.certification.findMany({ orderBy: { name: "asc" } }),
-  ]);
+  const [product, companies, downloadCategories, certifications, industryOptions, subIndustryOptions] =
+    await Promise.all([
+      prisma.product.findUnique({
+        where: { id },
+        include: {
+          company: { select: { name: true } },
+          category: { select: { name: true } },
+          variants: { orderBy: { createdAt: "asc" } },
+          industries: { select: { id: true } },
+          subIndustries: { select: { id: true } },
+        },
+      }),
+      getCompanyCategoryTree(),
+      prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
+      prisma.certification.findMany({ orderBy: { name: "asc" } }),
+      prisma.industry.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+      prisma.subIndustry.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    ]);
 
   if (!product) notFound();
 
@@ -59,9 +63,10 @@ export default async function AdminProductDetailPage({
       <ProductEditForm
         product={product}
         companies={companies}
-        industries={industries}
         downloadCategories={downloadCategories}
         certificationOptions={certifications.map((c) => c.name)}
+        industryOptions={industryOptions}
+        subIndustryOptions={subIndustryOptions}
       />
 
       {product.productType === "variable" && <VariantList productId={product.id} variants={product.variants} />}

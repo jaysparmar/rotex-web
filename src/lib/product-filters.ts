@@ -38,15 +38,32 @@ export const FILTER_KEYS = [
 
 export function buildProductWhere(f: ProductFilterParams): Prisma.ProductWhereInput {
   const where: Prisma.ProductWhereInput = {};
+  const and: Prisma.ProductWhereInput[] = [];
 
-  if (f.q) where.OR = [{ name: { contains: f.q } }, { modelNumber: { contains: f.q } }];
+  if (f.q) and.push({ OR: [{ name: { contains: f.q } }, { modelNumber: { contains: f.q } }] });
   if (f.productType) where.productType = f.productType;
   if (f.productFamily) where.productFamily = f.productFamily;
   if (f.companyId) where.companyId = f.companyId;
   if (f.categoryId) where.categoryId = f.categoryId;
   if (f.subCategoryId) where.subCategoryId = f.subCategoryId;
-  if (f.industryId) where.industryId = f.industryId;
-  if (f.subIndustryId) where.subIndustryId = f.subIndustryId;
+  // Industries/sub-industries now live on Product (simple) or its variants (variable) —
+  // match either level, since a filter shouldn't care which type of product it is.
+  if (f.industryId) {
+    and.push({
+      OR: [
+        { industries: { some: { id: f.industryId } } },
+        { variants: { some: { industries: { some: { id: f.industryId } } } } },
+      ],
+    });
+  }
+  if (f.subIndustryId) {
+    and.push({
+      OR: [
+        { subIndustries: { some: { id: f.subIndustryId } } },
+        { variants: { some: { subIndustries: { some: { id: f.subIndustryId } } } } },
+      ],
+    });
+  }
 
   const attrFilter: Record<string, string> = {};
   for (const key of ATTRIBUTE_KEYS) {
@@ -54,6 +71,8 @@ export function buildProductWhere(f: ProductFilterParams): Prisma.ProductWhereIn
     if (value) attrFilter[key] = value;
   }
   if (Object.keys(attrFilter).length) where.variants = { some: attrFilter };
+
+  if (and.length) where.AND = and;
 
   return where;
 }

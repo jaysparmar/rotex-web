@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
-import { TextField, TextAreaField, FieldGrid, RepeaterItem, AddButton } from "@/components/admin/form-fields";
+import { TextField, TextAreaField, FieldGrid, RepeaterItem, AddButton, Field } from "@/components/admin/form-fields";
+import { Input } from "@/components/ui/input";
 import { ImageUrlField } from "@/components/admin/image-url-field";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { SaveBar } from "@/components/admin/section-form-shell";
@@ -21,6 +22,7 @@ type FormValues = {
   description: string;
   sectionTitle: string;
   overview: string;
+  importReference: string;
   stats: Stat[];
   whyChoose: { title: string; highlight: string; cards: WhyChooseCard[] };
 };
@@ -35,6 +37,7 @@ type IndustryInput = {
   description: string;
   sectionTitle: string;
   overview: string;
+  importReference: string | null;
   stats: unknown;
   whyChoose: unknown;
 };
@@ -58,6 +61,7 @@ export function IndustryEditForm({ industry }: { industry?: IndustryInput }) {
       description: industry?.description ?? "",
       sectionTitle: industry?.sectionTitle ?? "",
       overview: industry?.overview ?? "",
+      importReference: industry?.importReference ?? "",
       stats,
       whyChoose,
     },
@@ -68,11 +72,12 @@ export function IndustryEditForm({ industry }: { industry?: IndustryInput }) {
   const cardsArray = useFieldArray({ control: form.control, name: "whyChoose.cards" });
 
   function onSubmit(values: FormValues) {
+    const data = { ...values, importReference: values.importReference.trim() || null };
     run(async () => {
       if (industry) {
-        await updateIndustry(industry.id, values);
+        await updateIndustry(industry.id, data);
       } else {
-        const created = await createIndustry(values);
+        const created = await createIndustry(data);
         router.push(`/admin/industries/${created.id}`);
       }
     });
@@ -117,6 +122,12 @@ export function IndustryEditForm({ industry }: { industry?: IndustryInput }) {
           <CardContent className="space-y-4">
             <TextField label="Section Title" {...form.register("sectionTitle")} />
             <TextAreaField label="Overview" rows={6} {...form.register("overview")} />
+            <Field label="Import Reference">
+              <Input {...form.register("importReference")} className="h-9" />
+              <p className="text-xs text-muted-foreground">
+                Optional code used to match this industry to a spreadsheet column during bulk product import.
+              </p>
+            </Field>
           </CardContent>
         </Card>
 

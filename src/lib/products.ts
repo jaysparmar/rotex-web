@@ -29,9 +29,10 @@ export async function getIndustryTree() {
     select: {
       id: true,
       name: true,
+      importReference: true,
       subIndustries: {
         orderBy: { name: "asc" },
-        select: { id: true, name: true },
+        select: { id: true, name: true, importReference: true },
       },
     },
   });

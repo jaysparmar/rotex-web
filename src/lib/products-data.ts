@@ -143,7 +143,12 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
   const [product, downloadCategories] = await Promise.all([
     prisma.product.findUnique({
       where: { slug },
-      include: { category: true, subCategory: true, variants: true },
+      include: {
+        category: true,
+        subCategory: true,
+        industries: { select: { name: true } },
+        variants: { include: { industries: { select: { name: true } } } },
+      },
     }),
     prisma.downloadCategory.findMany(),
   ]);
@@ -166,6 +171,11 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
 
   const imageList = (product.images as string[] | null) ?? [];
 
+  const industriesServed =
+    product.productType === "variable"
+      ? Array.from(new Set(product.variants.flatMap((v) => v.industries.map((i) => i.name))))
+      : product.industries.map((i) => i.name);
+
   const base = {
     slug: product.slug,
     code: product.modelNumber,
@@ -173,7 +183,7 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
     category: product.category.name,
     tags: product.subCategory ? [product.subCategory.name] : [],
     description,
-    industriesServed: product.industriesServed ? product.industriesServed.split(",").map((s) => s.trim()).filter(Boolean) : [],
+    industriesServed,
     certificates: product.certificates as string[],
     images: imageList.length > 0 ? imageList : [product.image ?? PLACEHOLDER_PRODUCT_IMAGE],
     breadcrumb,

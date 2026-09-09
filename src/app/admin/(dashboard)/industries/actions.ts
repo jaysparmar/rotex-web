@@ -12,6 +12,7 @@ type IndustryData = {
   description: string;
   sectionTitle: string;
   overview: string;
+  importReference?: string | null;
   stats: { value: string; suffix?: string; label: string }[];
   whyChoose: { title: string; highlight: string; cards: { title: string; description: string }[] };
 };
@@ -22,6 +23,7 @@ type SubIndustryData = {
   description: string;
   image?: string;
   mobileImage?: string;
+  importReference?: string | null;
   partnerIds: string[];
   storyIds: string[];
   challengesTitle: string;

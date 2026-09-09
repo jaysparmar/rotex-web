@@ -35,6 +35,8 @@ export function ImportPreviewStep({
     createdVariantCount: number;
     updatedVariantCount: number;
     createdAttributeValueCount: number;
+    createdIndustryCount?: number;
+    createdSubIndustryCount?: number;
     createdCategoryCount?: number;
     updatedTargetCount?: number;
     addedEntryCount?: number;
@@ -70,6 +72,12 @@ export function ImportPreviewStep({
             <StatTile label="Variants created" value={committedResult.createdVariantCount} />
             <StatTile label="Variants updated" value={committedResult.updatedVariantCount} />
             <StatTile label="Attribute values added" value={committedResult.createdAttributeValueCount} />
+            {committedResult.createdIndustryCount != null && (
+              <StatTile label="Industries created" value={committedResult.createdIndustryCount} />
+            )}
+            {committedResult.createdSubIndustryCount != null && (
+              <StatTile label="Sub-industries created" value={committedResult.createdSubIndustryCount} />
+            )}
             {committedResult.createdCategoryCount != null && (
               <StatTile label="Download categories created" value={committedResult.createdCategoryCount} />
             )}
@@ -119,6 +127,27 @@ export function ImportPreviewStep({
               </div>
               <p className="text-xs text-muted-foreground">
                 Exact attach/dedup results (including any newly created categories) are shown after Import.
+              </p>
+            </div>
+          )}
+
+          {(summary.newIndustries.length > 0 || summary.newSubIndustries.length > 0) && (
+            <div className="space-y-1.5">
+              <div className="text-sm font-medium">New industries/sub-industries that will be created</div>
+              <div className="flex flex-wrap gap-1.5">
+                {summary.newIndustries.map((i, idx) => (
+                  <Badge key={`industry-${idx}`} variant="outline">
+                    Industry: {i.name} ({i.reference})
+                  </Badge>
+                ))}
+                {summary.newSubIndustries.map((s, idx) => (
+                  <Badge key={`subindustry-${idx}`} variant="outline">
+                    Sub-Industry: {s.name} ({s.reference})
+                  </Badge>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Created with bare-minimum content — flesh them out afterward in the Industries admin section.
               </p>
             </div>
           )}
