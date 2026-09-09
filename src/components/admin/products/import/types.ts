@@ -1,8 +1,6 @@
 import { PRODUCT_ATTRIBUTES } from "@/lib/product-constants";
 import type { ColumnDestination } from "@/lib/variable-product-import";
 
-export type SheetData = { name: string; grid: string[][] };
-
 export type CompanyOption = {
   id: string;
   name: string;

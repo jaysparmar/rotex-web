@@ -33,7 +33,7 @@ export function DownloadCategoryList({ categories }: { categories: DownloadCateg
   return (
     <div className="space-y-4">
       <div className="flex justify-end gap-2">
-        <Link href="/admin/download-categories/import">
+        <Link href="/admin/products/import">
           <Button size="sm" variant="outline" className="gap-1.5">
             <Upload className="size-3.5" />
             Import Downloads

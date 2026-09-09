@@ -5,25 +5,21 @@ import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Field, SelectField } from "@/components/admin/form-fields";
+import { Field } from "@/components/admin/form-fields";
 import { excelColumnLabel } from "@/lib/excel-columns";
 import { adminFetch } from "@/lib/admin-fetch";
-import type { SheetData } from "./types";
+import type { DownloadImportGrid } from "@/lib/download-grid";
 
 export function ImportUploadStep({
-  sheets,
-  selectedSheetIndex,
+  grid,
   headerRow,
   onParsed,
-  onSelectSheet,
   onHeaderRowChange,
   onNext,
 }: {
-  sheets: SheetData[] | null;
-  selectedSheetIndex: number;
+  grid: string[][] | null;
   headerRow: number;
-  onParsed: (sheets: SheetData[]) => void;
-  onSelectSheet: (index: number) => void;
+  onParsed: (grid: string[][], richGrid: DownloadImportGrid) => void;
   onHeaderRowChange: (row: number) => void;
   onNext: () => void;
 }) {
@@ -40,7 +36,7 @@ export function ImportUploadStep({
       const res = await adminFetch("/api/admin/products/import/parse", { method: "POST", body: formData });
       const json = await res.json();
       if (!json.success) throw new Error(json.error?.message ?? "Failed to parse file");
-      onParsed(json.data.sheets as SheetData[]);
+      onParsed(json.data.grid as string[][], json.data.richGrid as DownloadImportGrid);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to parse file");
     } finally {
@@ -48,22 +44,21 @@ export function ImportUploadStep({
     }
   }
 
-  const grid = sheets?.[selectedSheetIndex]?.grid ?? [];
-  const previewRows = grid.slice(0, headerRow + 5);
-  const columnCount = grid.reduce((max, row) => Math.max(max, row.length), 0);
+  const previewRows = grid ? grid.slice(0, headerRow + 5) : [];
+  const columnCount = grid ? grid.reduce((max, row) => Math.max(max, row.length), 0) : 0;
 
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle>Upload spreadsheet</CardTitle>
-          <CardDescription>.xlsx or .xls, one row per variant.</CardDescription>
+          <CardDescription>A Google Sheets HTML export (.html/.htm), one row per variant.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <input
             ref={inputRef}
             type="file"
-            accept=".xlsx,.xls"
+            accept=".html,.htm"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -79,36 +74,28 @@ export function ImportUploadStep({
             onClick={() => inputRef.current?.click()}
           >
             <Upload className="size-3.5" />
-            {loading ? "Parsing..." : sheets ? "Replace file" : "Choose file"}
+            {loading ? "Parsing..." : grid ? "Replace file" : "Choose file"}
           </Button>
           {error && <p className="text-sm text-destructive">{error}</p>}
         </CardContent>
       </Card>
 
-      {sheets && (
+      {grid && (
         <Card>
           <CardHeader>
-            <CardTitle>Sheet &amp; header row</CardTitle>
-            <CardDescription>Pick the sheet, then the row number that holds the column labels.</CardDescription>
+            <CardTitle>Header row</CardTitle>
+            <CardDescription>Pick the row number that holds the column labels.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <SelectField
-                label="Sheet"
-                options={sheets.map((s, i) => ({ value: String(i), label: s.name }))}
-                value={String(selectedSheetIndex)}
-                onChange={(e) => onSelectSheet(Number(e.target.value))}
+            <Field label="Header row number">
+              <Input
+                type="number"
+                min={1}
+                className="h-9 w-40"
+                value={headerRow}
+                onChange={(e) => onHeaderRowChange(Math.max(1, Number(e.target.value) || 1))}
               />
-              <Field label="Header row number">
-                <Input
-                  type="number"
-                  min={1}
-                  className="h-9"
-                  value={headerRow}
-                  onChange={(e) => onHeaderRowChange(Math.max(1, Number(e.target.value) || 1))}
-                />
-              </Field>
-            </div>
+            </Field>
 
             <div className="max-h-96 overflow-auto rounded-lg border border-border">
               <table className="w-full text-left text-xs">

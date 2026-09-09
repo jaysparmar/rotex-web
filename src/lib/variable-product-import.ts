@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { excelColumnLabel } from "@/lib/excel-columns";
 import { PRODUCT_ATTRIBUTES, PRODUCT_FAMILIES, type ProductAttributeKey } from "@/lib/product-constants";
+import { cleanDownloadName, resolveDownloadColumns, type DownloadImportGrid } from "@/lib/download-grid";
+import type { DownloadCategoryMapping } from "@/lib/download-import";
 import type { ProductInput, VariantInput } from "@/app/admin/(dashboard)/products/actions";
 
 const ATTRIBUTE_KEYS = PRODUCT_ATTRIBUTES.map((a) => a.key);
@@ -37,6 +39,7 @@ export type VariableImportMapping = {
   };
   categoryMatchBy: "name" | "importReference";
   subCategoryMatchBy: "name" | "importReference";
+  downloads?: { bannerRow: number; categories: DownloadCategoryMapping[] };
 };
 
 export type VariableImportRowError = { rowNumber: number; modelNumber: string | null; reason: string };
@@ -111,6 +114,59 @@ function findSingleColumn(mapping: VariableImportMapping, dest: ColumnDestinatio
     if (d === dest) return Number(col);
   }
   return undefined;
+}
+
+/**
+ * The Model Number and variant-attribute columns are already chosen in the "Map Columns" step —
+ * reuse them for target-resolution when attaching downloads, instead of asking the user to pick
+ * them again.
+ */
+export function deriveDownloadTargetColumns(
+  mapping: VariableImportMapping
+): { modelNumberColumn: number; attributeColumns: Partial<Record<ProductAttributeKey, number>> } | null {
+  const modelNumberColumn = findSingleColumn(mapping, "modelNumber");
+  if (modelNumberColumn == null) return null;
+  const attributeColumns: Partial<Record<ProductAttributeKey, number>> = {};
+  for (const key of ATTRIBUTE_KEYS) {
+    const col = findSingleColumn(mapping, key);
+    if (col != null) attributeColumns[key] = col;
+  }
+  return { modelNumberColumn, attributeColumns };
+}
+
+/**
+ * A lightweight, DB-free count of the links sitting in the mapped Downloads columns, for the
+ * preview screen. It intentionally does not resolve real product/variant targets — rows for
+ * brand-new products can't be resolved until those rows are created by this same import, so full
+ * resolution happens once, at commit time, via `analyzeDownloadImport`.
+ */
+export function estimatePendingDownloadLinks(
+  richGrid: DownloadImportGrid,
+  downloads: { bannerRow: number; categories: DownloadCategoryMapping[] }
+): { rowsWithLinks: number; totalLinks: number } {
+  const resolved = resolveDownloadColumns(richGrid, downloads.bannerRow);
+  if (!resolved.ok) return { rowsWithLinks: 0, totalLinks: 0 };
+
+  const dataRows = richGrid.slice(downloads.bannerRow + 1);
+  let rowsWithLinks = 0;
+  let totalLinks = 0;
+  for (const row of dataRows) {
+    let rowHasLink = false;
+    for (const col of resolved.result.columns) {
+      const cell = row[col];
+      if (!cell) continue;
+      for (const link of cell.links) {
+        const title = cleanDownloadName(link.text);
+        const url = link.href.trim();
+        if (title && url) {
+          totalLinks++;
+          rowHasLink = true;
+        }
+      }
+    }
+    if (rowHasLink) rowsWithLinks++;
+  }
+  return { rowsWithLinks, totalLinks };
 }
 
 function variantKey(v: {
@@ -542,7 +598,36 @@ export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
       }
 
       for (const { variantId, data } of plan.variantsToUpdate) {
-        await tx.productVariant.update({ where: { id: variantId }, data });
+        // Never touch `downloads` here — this importer always stages it as `[]`, and blindly
+        // writing that would wipe out downloads attached by a prior import or by hand. The
+        // downloads pass (if configured) reads-and-appends on top of whatever is already there.
+        const {
+          size,
+          variantType,
+          orifice,
+          minOperatingTemp,
+          maxOperatingTemp,
+          flowFactor,
+          certificates,
+          features,
+          description,
+          specifications,
+        } = data;
+        await tx.productVariant.update({
+          where: { id: variantId },
+          data: {
+            size,
+            variantType,
+            orifice,
+            minOperatingTemp,
+            maxOperatingTemp,
+            flowFactor,
+            certificates,
+            features,
+            description,
+            specifications,
+          },
+        });
       }
 
       return {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import * as XLSX from "xlsx";
 import { auth } from "@/lib/auth";
+import { parseDownloadsHtml } from "@/lib/download-html-parser";
 
 const MAX_SIZE_MB = 20;
 const MAX_SIZE = MAX_SIZE_MB * 1024 * 1024;
@@ -24,9 +24,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!/\.xlsx?$/i.test(file.name)) {
+  if (!/\.html?$/i.test(file.name)) {
     return NextResponse.json(
-      { success: false, error: { code: "BAD_REQUEST", message: "File must be .xlsx or .xls" } },
+      { success: false, error: { code: "BAD_REQUEST", message: "File must be .html or .htm" } },
       { status: 400 }
     );
   }
@@ -38,12 +38,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const workbook = XLSX.read(buffer, { type: "buffer" });
-  const sheets = workbook.SheetNames.map((name) => ({
-    name,
-    grid: XLSX.utils.sheet_to_json<string[]>(workbook.Sheets[name], { header: 1, raw: false, defval: "" }),
-  }));
+  const html = await file.text();
+  const richGrid = parseDownloadsHtml(html);
+  const grid = richGrid.map((row) => row.map((cell) => cell?.text ?? ""));
 
-  return NextResponse.json({ success: true, data: { sheets } });
+  return NextResponse.json({ success: true, data: { grid, richGrid } });
 }

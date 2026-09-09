@@ -1,4 +1,5 @@
 import { excelColumnLabel } from "@/lib/excel-columns";
+import type { DownloadCategoryMatchBy } from "@/lib/download-import";
 
 export type DownloadImportLink = { text: string; href: string };
 export type DownloadImportCell = { text: string; links: DownloadImportLink[]; colSpan?: number };
@@ -45,4 +46,34 @@ export function resolveDownloadColumns(
   const columns = Array.from({ length: span }, (_, i) => anchorCol + i);
   const names = columns.map((c) => (subHeaderRow[c]?.text ?? "").trim() || `Column ${excelColumnLabel(c)}`);
   return { ok: true, result: { columns, names } };
+}
+
+export type DownloadCategoryOption = { id: string; name: string; importReference: string | null };
+
+/** UI state for one detected "Downloads" sub-column, before it's turned into a DownloadCategoryMapping. */
+export type CategoryColumnState = {
+  sheetColumn: number;
+  headerText: string;
+  matchBy: DownloadCategoryMatchBy;
+  mode: "existing" | "create";
+  categoryId: string | null;
+};
+
+export function computeDefaultCategoryColumns(
+  columns: number[],
+  names: string[],
+  categories: DownloadCategoryOption[]
+): CategoryColumnState[] {
+  return columns.map((col, i) => {
+    const headerText = names[i];
+    const needle = headerText.trim().toLowerCase();
+    const match = categories.find((c) => c.name.toLowerCase() === needle);
+    return {
+      sheetColumn: col,
+      headerText,
+      matchBy: "name",
+      mode: match ? "existing" : "create",
+      categoryId: match?.id ?? null,
+    };
+  });
 }

@@ -27,7 +27,7 @@ export function ImportPreviewStep({
   onRefreshPreview,
   onCommit,
 }: {
-  summary: VariableImportSummary | null;
+  summary: (VariableImportSummary & { downloads?: { rowsWithLinks: number; totalLinks: number } | null }) | null;
   loading: boolean;
   committing: boolean;
   committedResult: {
@@ -35,6 +35,9 @@ export function ImportPreviewStep({
     createdVariantCount: number;
     updatedVariantCount: number;
     createdAttributeValueCount: number;
+    createdCategoryCount?: number;
+    updatedTargetCount?: number;
+    addedEntryCount?: number;
   } | null;
   onBack: () => void;
   onRefreshPreview: () => void;
@@ -67,6 +70,15 @@ export function ImportPreviewStep({
             <StatTile label="Variants created" value={committedResult.createdVariantCount} />
             <StatTile label="Variants updated" value={committedResult.updatedVariantCount} />
             <StatTile label="Attribute values added" value={committedResult.createdAttributeValueCount} />
+            {committedResult.createdCategoryCount != null && (
+              <StatTile label="Download categories created" value={committedResult.createdCategoryCount} />
+            )}
+            {committedResult.updatedTargetCount != null && (
+              <StatTile label="Products/variants with downloads" value={committedResult.updatedTargetCount} />
+            )}
+            {committedResult.addedEntryCount != null && (
+              <StatTile label="Downloads attached" value={committedResult.addedEntryCount} />
+            )}
           </div>
           <Link href="/admin/products">
             <Button type="button" size="sm">
@@ -97,6 +109,19 @@ export function ImportPreviewStep({
             <StatTile label="Variants to create" value={summary.variantsToCreate} />
             <StatTile label="Variants to update" value={summary.variantsToUpdate} />
           </div>
+
+          {summary.downloads && (
+            <div className="space-y-1.5">
+              <div className="text-sm font-medium">Downloads</div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <StatTile label="Rows with links" value={summary.downloads.rowsWithLinks} />
+                <StatTile label="Links detected" value={summary.downloads.totalLinks} />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Exact attach/dedup results (including any newly created categories) are shown after Import.
+              </p>
+            </div>
+          )}
 
           {summary.newAttributeValues.length > 0 && (
             <div className="space-y-1.5">

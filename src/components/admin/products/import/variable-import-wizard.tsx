@@ -4,21 +4,29 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { adminFetch } from "@/lib/admin-fetch";
 import { PRODUCT_FAMILIES } from "@/lib/product-constants";
-import type { ColumnDestination, ImportGrid, VariableImportMapping, VariableImportSummary } from "@/lib/variable-product-import";
+import {
+  type ColumnDestination,
+  type ImportGrid,
+  type VariableImportMapping,
+  type VariableImportSummary,
+} from "@/lib/variable-product-import";
+import { resolveDownloadColumns, type CategoryColumnState, type DownloadCategoryOption, type DownloadImportGrid } from "@/lib/download-grid";
 import { Stepper, type StepperStep } from "@/components/ui/stepper";
 import { ImportUploadStep } from "./import-upload-step";
 import { ImportBatchDefaultsStep } from "./import-batch-defaults-step";
 import { ImportColumnMappingStep } from "./import-column-mapping-step";
+import { ImportDownloadsStep } from "./import-downloads-step";
 import { ImportSpecificationsStep } from "./import-specifications-step";
 import { ImportPreviewStep } from "./import-preview-step";
-import type { ClassificationState, CompanyOption, IndustryOption, SheetData } from "./types";
+import type { ClassificationState, CompanyOption, IndustryOption } from "./types";
 
-type Step = "upload" | "defaults" | "columns" | "specifications" | "preview";
+type Step = "upload" | "defaults" | "columns" | "downloads" | "specifications" | "preview";
 
 const STEPS: StepperStep[] = [
   { id: "upload", label: "Upload" },
   { id: "defaults", label: "Batch Defaults" },
   { id: "columns", label: "Map Columns" },
+  { id: "downloads", label: "Map Downloads" },
   { id: "specifications", label: "Specifications" },
   { id: "preview", label: "Preview & Import" },
 ];
@@ -27,15 +35,26 @@ type CommitResult = {
   createdVariantCount: number;
   updatedVariantCount: number;
   createdAttributeValueCount: number;
+  createdCategoryCount?: number;
+  updatedTargetCount?: number;
+  addedEntryCount?: number;
+};
+type PreviewSummary = VariableImportSummary & {
+  downloads: { rowsWithLinks: number; totalLinks: number } | null;
 };
 
 type FieldOutcome<T> = { ok: true; config: T } | { ok: false; error: string };
 
-async function postImport<T>(path: "preview" | "commit", grid: ImportGrid, mapping: VariableImportMapping): Promise<T> {
+async function postImport<T>(
+  path: "preview" | "commit",
+  grid: ImportGrid,
+  richGrid: DownloadImportGrid | null,
+  mapping: VariableImportMapping
+): Promise<T> {
   const res = await adminFetch(`/api/admin/products/import/${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ grid, mapping }),
+    body: JSON.stringify({ grid, richGrid, mapping }),
   });
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message ?? `Failed to ${path} import`);
@@ -47,8 +66,11 @@ function buildMapping(
   columnDestinations: Record<number, ColumnDestination>,
   specificationColumns: number[],
   classification: ClassificationState,
-  companies: CompanyOption[]
-): { mapping: VariableImportMapping } | { error: string; step: "defaults" | "columns" } {
+  companies: CompanyOption[],
+  richGrid: DownloadImportGrid | null,
+  downloadsBannerRow: number,
+  categoryColumns: CategoryColumnState[]
+): { mapping: VariableImportMapping } | { error: string; step: "defaults" | "columns" | "downloads" } {
   function findColumn(dest: ColumnDestination): number | undefined {
     for (const [col, d] of Object.entries(columnDestinations)) {
       if (d === dest) return Number(col);
@@ -106,6 +128,33 @@ function buildMapping(
     }
   }
 
+  let downloads: VariableImportMapping["downloads"];
+  if (downloadsBannerRow > 0) {
+    if (!richGrid) return { error: "Upload the sheet again before mapping downloads.", step: "downloads" };
+    const resolved = resolveDownloadColumns(richGrid, downloadsBannerRow);
+    if (!resolved.ok) return { error: resolved.error, step: "downloads" };
+    if (categoryColumns.length !== resolved.result.columns.length) {
+      return { error: "Re-open the Map Downloads step to finish mapping categories.", step: "downloads" };
+    }
+    for (const c of categoryColumns) {
+      if (c.mode === "existing" && !c.categoryId) {
+        return { error: `Choose a category for "${c.headerText}", or switch it to create new.`, step: "downloads" };
+      }
+    }
+    downloads = {
+      bannerRow: downloadsBannerRow,
+      categories: categoryColumns.map((c) => ({
+        sheetColumn: c.sheetColumn,
+        headerText: c.headerText,
+        matchBy: c.matchBy,
+        target:
+          c.mode === "existing"
+            ? { kind: "existing" as const, categoryId: c.categoryId! }
+            : { kind: "create" as const, importReference: c.matchBy === "importReference" ? c.headerText : undefined },
+      })),
+    };
+  }
+
   return {
     mapping: {
       headerRow,
@@ -120,6 +169,7 @@ function buildMapping(
       },
       categoryMatchBy: classification.categoryMatchBy,
       subCategoryMatchBy: classification.subCategoryMatchBy,
+      downloads,
     },
   };
 }
@@ -127,16 +177,20 @@ function buildMapping(
 export function VariableImportWizard({
   companies,
   industries,
+  downloadCategories,
 }: {
   companies: CompanyOption[];
   industries: IndustryOption[];
+  downloadCategories: DownloadCategoryOption[];
 }) {
   const [step, setStep] = useState<Step>("upload");
-  const [sheets, setSheets] = useState<SheetData[] | null>(null);
-  const [selectedSheetIndex, setSelectedSheetIndex] = useState(0);
+  const [grid, setGrid] = useState<string[][] | null>(null);
+  const [richGrid, setRichGrid] = useState<DownloadImportGrid | null>(null);
   const [headerRow, setHeaderRow] = useState(1);
   const [columnDestinations, setColumnDestinations] = useState<Record<number, ColumnDestination>>({});
   const [specificationColumns, setSpecificationColumns] = useState<number[]>([]);
+  const [downloadsBannerRow, setDownloadsBannerRow] = useState(0);
+  const [categoryColumns, setCategoryColumns] = useState<CategoryColumnState[]>([]);
   const [classification, setClassification] = useState<ClassificationState>({
     category: { mode: "fixed", fixedValue: null },
     subCategory: { mode: "none", fixedValue: null },
@@ -147,23 +201,32 @@ export function VariableImportWizard({
     subCategoryMatchBy: "name",
   });
   const [mappingError, setMappingError] = useState<string>();
-  const [summary, setSummary] = useState<VariableImportSummary | null>(null);
+  const [summary, setSummary] = useState<PreviewSummary | null>(null);
   const [committedResult, setCommittedResult] = useState<CommitResult | null>(null);
   const [previewing, setPreviewing] = useState(false);
   const [committing, setCommitting] = useState(false);
 
-  const grid = sheets?.[selectedSheetIndex]?.grid ?? [];
-
-  function handleParsed(newSheets: SheetData[]) {
-    setSheets(newSheets);
-    setSelectedSheetIndex(0);
+  function handleParsed(newGrid: string[][], newRichGrid: DownloadImportGrid) {
+    setGrid(newGrid);
+    setRichGrid(newRichGrid);
     setHeaderRow(1);
     setColumnDestinations({});
     setSpecificationColumns([]);
+    setDownloadsBannerRow(0);
+    setCategoryColumns([]);
   }
 
   async function handleRunPreview() {
-    const result = buildMapping(headerRow, columnDestinations, specificationColumns, classification, companies);
+    const result = buildMapping(
+      headerRow,
+      columnDestinations,
+      specificationColumns,
+      classification,
+      companies,
+      richGrid,
+      downloadsBannerRow,
+      categoryColumns
+    );
     if ("error" in result) {
       setMappingError(result.error);
       setStep(result.step);
@@ -175,7 +238,7 @@ export function VariableImportWizard({
     setSummary(null);
     setCommittedResult(null);
     try {
-      const preview = await postImport<VariableImportSummary>("preview", grid, result.mapping);
+      const preview = await postImport<PreviewSummary>("preview", grid ?? [], richGrid, result.mapping);
       setSummary(preview);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to analyze the spreadsheet");
@@ -186,14 +249,23 @@ export function VariableImportWizard({
   }
 
   async function handleCommit() {
-    const result = buildMapping(headerRow, columnDestinations, specificationColumns, classification, companies);
+    const result = buildMapping(
+      headerRow,
+      columnDestinations,
+      specificationColumns,
+      classification,
+      companies,
+      richGrid,
+      downloadsBannerRow,
+      categoryColumns
+    );
     if ("error" in result) {
       toast.error(result.error);
       return;
     }
     setCommitting(true);
     try {
-      const outcome = await postImport<VariableImportSummary & CommitResult>("commit", grid, result.mapping);
+      const outcome = await postImport<PreviewSummary & CommitResult>("commit", grid ?? [], richGrid, result.mapping);
       setSummary(outcome);
       setCommittedResult(outcome);
       toast.success("Import complete");
@@ -218,21 +290,15 @@ export function VariableImportWizard({
 
       {step === "upload" && (
         <ImportUploadStep
-          sheets={sheets}
-          selectedSheetIndex={selectedSheetIndex}
+          grid={grid}
           headerRow={headerRow}
           onParsed={handleParsed}
-          onSelectSheet={(i) => {
-            setSelectedSheetIndex(i);
-            setColumnDestinations({});
-            setSpecificationColumns([]);
-          }}
           onHeaderRowChange={setHeaderRow}
           onNext={() => setStep("defaults")}
         />
       )}
 
-      {step === "defaults" && sheets && (
+      {step === "defaults" && grid && (
         <ImportBatchDefaultsStep
           columnDestinations={columnDestinations}
           classification={classification}
@@ -245,7 +311,7 @@ export function VariableImportWizard({
         />
       )}
 
-      {step === "columns" && sheets && (
+      {step === "columns" && grid && (
         <ImportColumnMappingStep
           grid={grid}
           headerRow={headerRow}
@@ -254,18 +320,32 @@ export function VariableImportWizard({
           classification={classification}
           error={mappingError}
           onBack={() => setStep("defaults")}
+          onNext={() => setStep("downloads")}
+        />
+      )}
+
+      {step === "downloads" && richGrid && (
+        <ImportDownloadsStep
+          richGrid={richGrid}
+          categories={downloadCategories}
+          bannerRow={downloadsBannerRow}
+          onBannerRowChange={setDownloadsBannerRow}
+          categoryColumns={categoryColumns}
+          onCategoryColumnsChange={setCategoryColumns}
+          error={mappingError}
+          onBack={() => setStep("columns")}
           onNext={() => setStep("specifications")}
         />
       )}
 
-      {step === "specifications" && sheets && (
+      {step === "specifications" && grid && (
         <ImportSpecificationsStep
           grid={grid}
           headerRow={headerRow}
           columnDestinations={columnDestinations}
           specificationColumns={specificationColumns}
           onChange={setSpecificationColumns}
-          onBack={() => setStep("columns")}
+          onBack={() => setStep("downloads")}
           onNext={handleRunPreview}
         />
       )}
