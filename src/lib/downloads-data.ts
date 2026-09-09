@@ -20,4 +20,6 @@ export type DownloadItem = {
   product: string;
   subCategory: string;
   industry: string;
+  categoryName: string;
+  modelNo: string;
 };

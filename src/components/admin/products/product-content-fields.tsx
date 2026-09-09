@@ -24,8 +24,10 @@ export type ProductContentFormValues = {
 
 export function ProductContentFields({
   downloadCategories,
+  showDescription = true,
 }: {
   downloadCategories: { id: string; name: string }[];
+  showDescription?: boolean;
 }) {
   const form = useFormContext<ProductContentFormValues>();
   const specs = useFieldArray({ control: form.control, name: "specifications" });
@@ -43,14 +45,16 @@ export function ProductContentFields({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Short Description</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <RichTextField name="description" label="Short Description" />
-        </CardContent>
-      </Card>
+      {showDescription && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Short Description</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <RichTextField name="description" label="Short Description" />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

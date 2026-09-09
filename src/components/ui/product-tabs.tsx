@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import DOMPurify from "isomorphic-dompurify";
+import { IoEyeOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import { toRichHtml } from "@/lib/rich-text";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -142,13 +143,26 @@ export function ProductTabs({
                   </span>
                   <span className="text-zinc-800 text-base font-medium font-montserrat">{d.title}</span>
                 </div>
-                <a
-                  href={d.url}
-                  className="self-start px-5 py-2 bg-stone-100 rounded-full flex items-center gap-2.5 shrink-0 hover:bg-stone-200 transition-colors"
-                >
-                  <DownloadIcon className="text-[#EF3E23]" size={20} />
-                  <span className="text-[#EF3E23] text-sm font-semibold font-montserrat">Download</span>
-                </a>
+                <div className="self-start flex items-center gap-2 shrink-0">
+                  <a
+                    href={d.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="View document"
+                    title="View"
+                    className="p-2 bg-stone-100 rounded-full flex items-center justify-center hover:bg-stone-200 transition-colors"
+                  >
+                    <IoEyeOutline className="text-stone-600" size={20} />
+                  </a>
+                  <a
+                    href={d.url}
+                    download
+                    className="px-5 py-2 bg-stone-100 rounded-full flex items-center gap-2.5 hover:bg-stone-200 transition-colors"
+                  >
+                    <DownloadIcon className="text-[#EF3E23]" size={20} />
+                    <span className="text-[#EF3E23] text-sm font-semibold font-montserrat">Download</span>
+                  </a>
+                </div>
               </div>
             ))}
           </div>

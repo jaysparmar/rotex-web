@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useForm, FormProvider, type FieldErrors } from "react-hook-form";
 import { toast } from "sonner";
 import { TextField, SelectField, FieldGrid } from "@/components/admin/form-fields";
-import { ImageUrlField } from "@/components/admin/image-url-field";
+import { ImageListField } from "@/components/admin/image-list-field";
+import { RichTextField } from "@/components/admin/rich-text-field";
 import { ProductContentFields, type ProductContentFormValues } from "@/components/admin/products/product-content-fields";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { SaveBar } from "@/components/admin/section-form-shell";
@@ -24,7 +25,7 @@ type IndustryOption = { id: string; name: string; subIndustries: { id: string; n
 type ProductFormValues = ProductContentFormValues & {
   modelNumber: string;
   name: string;
-  image: string;
+  images: string[];
   productFamily: string;
   productType: string;
   companyId: string;
@@ -40,6 +41,7 @@ type ProductRecord = {
   modelNumber: string;
   name: string;
   image: string | null;
+  images: unknown;
   productFamily: string;
   productType: string;
   companyId: string;
@@ -72,7 +74,11 @@ export function ProductEditForm({
     defaultValues: {
       modelNumber: product?.modelNumber ?? "",
       name: product?.name ?? "",
-      image: product?.image ?? "",
+      images: (() => {
+        const list = (product?.images as string[] | null) ?? [];
+        if (list.length > 0) return list;
+        return product?.image ? [product.image] : [];
+      })(),
       productFamily: product?.productFamily ?? PRODUCT_FAMILIES[0],
       productType: product?.productType ?? "simple",
       companyId: product?.companyId ?? companies[0]?.id ?? "",
@@ -134,7 +140,8 @@ export function ProductEditForm({
     const data: ProductInput = {
       modelNumber: values.modelNumber,
       name: values.name,
-      image: values.image || null,
+      image: values.images[0] || null,
+      images: values.images.filter((url) => url.trim()),
       productFamily: values.productFamily,
       productType: values.productType,
       companyId: values.companyId,
@@ -187,7 +194,10 @@ export function ProductEditForm({
               <TextField label="Model Number" {...form.register("modelNumber", { required: true })} />
               <TextField label="Name" {...form.register("name", { required: true })} />
             </FieldGrid>
-            <ImageUrlField name="image" label="Image" />
+            <ImageListField name="images" label="Images" />
+            {productType !== "simple" && (
+              <RichTextField name="description" label="Short Description" />
+            )}
           </CardContent>
         </Card>
 

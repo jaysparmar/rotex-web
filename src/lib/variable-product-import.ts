@@ -458,6 +458,7 @@ export async function analyzeVariableProductImport(
         industryId: industry.id,
         subIndustryId: subIndustry.id,
         industriesServed: null,
+        images: image ? [image] : [],
         certificates: [],
         features: null,
         description: null,

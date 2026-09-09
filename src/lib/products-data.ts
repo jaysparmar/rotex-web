@@ -158,9 +158,13 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
     { label: product.name },
   ];
 
-  const description = product.features
-    ? firstSentence(product.features)
-    : `${product.category.name} model ${product.modelNumber}.`;
+  const description = product.description
+    ? firstSentence(product.description)
+    : product.features
+      ? firstSentence(product.features)
+      : `${product.category.name} model ${product.modelNumber}.`;
+
+  const imageList = (product.images as string[] | null) ?? [];
 
   const base = {
     slug: product.slug,
@@ -171,7 +175,7 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
     description,
     industriesServed: product.industriesServed ? product.industriesServed.split(",").map((s) => s.trim()).filter(Boolean) : [],
     certificates: product.certificates as string[],
-    images: [product.image ?? PLACEHOLDER_PRODUCT_IMAGE],
+    images: imageList.length > 0 ? imageList : [product.image ?? PLACEHOLDER_PRODUCT_IMAGE],
     breadcrumb,
     productType: product.productType as "simple" | "variable",
   };

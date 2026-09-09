@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { IoSearchOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import { DownloadCard } from "@/components/ui/download-card";
 import { DownloadsFilterField } from "@/components/ui/downloads-filter-field";
@@ -25,6 +26,7 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
   const [product, setProduct] = useState(ALL);
   const [subCategory, setSubCategory] = useState(ALL);
   const [industry, setIndustry] = useState(ALL);
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const resultsTopRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
@@ -40,17 +42,17 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
   const productOptions = useMemo(() => uniqueOptions(items, "product"), [items]);
   const subCategoryOptions = useMemo(() => uniqueOptions(items, "subCategory"), [items]);
 
-  const filteredItems = useMemo(
-    () =>
-      items.filter(
-        (item) =>
-          (activeTab === ALL_TAB || item.tab === activeTab) &&
-          (product === ALL || item.product === product) &&
-          (subCategory === ALL || item.subCategory === subCategory) &&
-          (industry === ALL || item.industry === industry)
-      ),
-    [items, activeTab, product, subCategory, industry]
-  );
+  const filteredItems = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return items.filter(
+      (item) =>
+        (activeTab === ALL_TAB || item.tab === activeTab) &&
+        (product === ALL || item.product === product) &&
+        (subCategory === ALL || item.subCategory === subCategory) &&
+        (industry === ALL || item.industry === industry) &&
+        (!query || item.title.toLowerCase().includes(query) || item.modelNo.toLowerCase().includes(query))
+    );
+  }, [items, activeTab, product, subCategory, industry, search]);
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
   const visibleItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -60,12 +62,18 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
     setPage(1);
   };
 
-  const hasActiveFilters = product !== ALL || subCategory !== ALL || industry !== ALL;
+  const changeSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const hasActiveFilters = product !== ALL || subCategory !== ALL || industry !== ALL || search !== "";
 
   const clearFilters = () => {
     setProduct(ALL);
     setSubCategory(ALL);
     setIndustry(ALL);
+    setSearch("");
     setPage(1);
   };
 
@@ -73,6 +81,16 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
     <section className="py-16 lg:py-20">
       <div className="container flex flex-col lg:flex-row gap-10">
         {/* Mobile filters */}
+        <div className="lg:hidden relative">
+          <IoSearchOutline size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => changeSearch(e.target.value)}
+            placeholder="Search downloads by title or model no."
+            className="w-full pl-9 pr-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 outline-gray-200 focus:outline-stone-400 text-sm font-medium font-montserrat leading-5 text-stone-900 placeholder:text-neutral-400"
+          />
+        </div>
         <MobileDownloadsFilters
           productOptions={productOptions}
           subCategoryOptions={subCategoryOptions}
@@ -100,6 +118,16 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
                 Clear Filters
               </button>
             )}
+          </div>
+          <div className="relative">
+            <IoSearchOutline size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => changeSearch(e.target.value)}
+              placeholder="Search downloads by title or model no."
+              className="w-full pl-9 pr-3 py-2.5 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 outline-gray-200 focus:outline-stone-400 text-sm font-medium font-montserrat leading-5 text-stone-900 placeholder:text-neutral-400"
+            />
           </div>
           <DownloadsFilterField label="Product" placeholder="Select Product" options={productOptions} value={product} onChange={setProduct} />
           <DownloadsFilterField
@@ -141,11 +169,13 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
               {visibleItems.length > 0 ? (
                 <div className="py-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {visibleItems.map((item) => (
-                    <DownloadCard key={item.id} item={item} />
+                    <DownloadCard key={item.id} item={item} showCategoryTag={activeTab === ALL_TAB} />
                   ))}
                 </div>
               ) : (
-                <p className="text-stone-400 text-center py-20">No downloads in this category.</p>
+                <p className="text-stone-400 text-center py-20">
+                  {search ? "No downloads match your search." : "No downloads in this category."}
+                </p>
               )}
             </motion.div>
           </AnimatePresence>

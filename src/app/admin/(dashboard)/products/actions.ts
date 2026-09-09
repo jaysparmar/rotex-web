@@ -28,6 +28,7 @@ export type ProductInput = ContentFields & {
   modelNumber: string;
   name: string;
   image: string | null;
+  images: string[];
   productFamily: string;
   productType: string;
   companyId: string;

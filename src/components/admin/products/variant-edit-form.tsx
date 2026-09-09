@@ -150,7 +150,7 @@ export function VariantEditForm({
           </CardContent>
         </Card>
 
-        <ProductContentFields downloadCategories={downloadCategories} />
+        <ProductContentFields downloadCategories={downloadCategories} showDescription={false} />
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>

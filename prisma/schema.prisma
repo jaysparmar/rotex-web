@@ -28,6 +28,8 @@ model Product {
   slug        String  @unique
   name        String
   image       String?
+  /// [StringList]
+  images      Json    @default("[]")
 
   productFamily String // "Solenoid Valves" | "Angle Seat Valves" | "Automotive Solutions" | "CTIS Actuators" | "Positioners"
   productType   String // "simple" | "variable"

@@ -87,35 +87,39 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
               <p className="text-black text-base font-medium font-montserrat leading-6">{product.description}</p>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase tracking-wide">
-                Industries served
-              </p>
-              <div className="flex flex-wrap items-start gap-2">
-                {product.industriesServed.map((industry, i) => (
-                  <span key={industry} className="text-stone-900 text-sm font-semibold font-montserrat leading-6">
-                    {industry}
-                    {i < product.industriesServed.length - 1 && ","}
-                  </span>
-                ))}
+            {product.industriesServed.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase tracking-wide">
+                  Industries served
+                </p>
+                <div className="flex flex-wrap items-start gap-2">
+                  {product.industriesServed.map((industry, i) => (
+                    <span key={industry} className="text-stone-900 text-sm font-semibold font-montserrat leading-6">
+                      {industry}
+                      {i < product.industriesServed.length - 1 && ","}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="flex flex-col gap-3">
-              <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase tracking-wide">
-                Certificates
-              </p>
-              <div className="flex flex-wrap items-center gap-2.5">
-                {heroCertificates.map((cert) => (
-                  <span
-                    key={cert}
-                    className="px-4 py-0.5 bg-zinc-100 rounded-full text-stone-900 text-xs font-medium font-montserrat uppercase"
-                  >
-                    {cert}
-                  </span>
-                ))}
+            {heroCertificates.length > 0 && (
+              <div className="flex flex-col gap-3">
+                <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase tracking-wide">
+                  Certificates
+                </p>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  {heroCertificates.map((cert) => (
+                    <span
+                      key={cert}
+                      className="px-4 py-0.5 bg-zinc-100 rounded-full text-stone-900 text-xs font-medium font-montserrat uppercase"
+                    >
+                      {cert}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <button
