@@ -43,12 +43,14 @@ export function VariantEditForm({
   variant,
   attributeValues,
   downloadCategories,
+  certificationOptions,
 }: {
   productId: string;
   productName: string;
   variant?: VariantRecord;
   attributeValues: Record<string, string[]>;
   downloadCategories: { id: string; name: string }[];
+  certificationOptions: string[];
 }) {
   const router = useRouter();
 
@@ -150,7 +152,11 @@ export function VariantEditForm({
           </CardContent>
         </Card>
 
-        <ProductContentFields downloadCategories={downloadCategories} showDescription={false} />
+        <ProductContentFields
+          downloadCategories={downloadCategories}
+          certificationOptions={certificationOptions}
+          showDescription={false}
+        />
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>

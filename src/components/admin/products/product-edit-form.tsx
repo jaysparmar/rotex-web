@@ -62,11 +62,13 @@ export function ProductEditForm({
   companies,
   industries,
   downloadCategories,
+  certificationOptions,
 }: {
   product?: ProductRecord;
   companies: CompanyOption[];
   industries: IndustryOption[];
   downloadCategories: { id: string; name: string }[];
+  certificationOptions: string[];
 }) {
   const router = useRouter();
 
@@ -284,7 +286,9 @@ export function ProductEditForm({
           </CardContent>
         </Card>
 
-        {productType === "simple" && <ProductContentFields downloadCategories={downloadCategories} />}
+        {productType === "simple" && (
+          <ProductContentFields downloadCategories={downloadCategories} certificationOptions={certificationOptions} />
+        )}
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>

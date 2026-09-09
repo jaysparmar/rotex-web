@@ -14,7 +14,7 @@ export default async function AdminProductDetailPage({
 }) {
   const { id } = await params;
 
-  const [product, companies, industries, downloadCategories] = await Promise.all([
+  const [product, companies, industries, downloadCategories, certifications] = await Promise.all([
     prisma.product.findUnique({
       where: { id },
       include: {
@@ -26,6 +26,7 @@ export default async function AdminProductDetailPage({
     getCompanyCategoryTree(),
     getIndustryTree(),
     prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
+    prisma.certification.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   if (!product) notFound();
@@ -60,6 +61,7 @@ export default async function AdminProductDetailPage({
         companies={companies}
         industries={industries}
         downloadCategories={downloadCategories}
+        certificationOptions={certifications.map((c) => c.name)}
       />
 
       {product.productType === "variable" && <VariantList productId={product.id} variants={product.variants} />}

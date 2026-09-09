@@ -2,7 +2,7 @@
 
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { TextField, TextAreaField, RepeaterItem, AddButton, SelectField } from "@/components/admin/form-fields";
-import { PillsInput } from "@/components/admin/pills-input";
+import { CertificatesSelect } from "@/components/admin/certificates-select";
 import { DocumentField } from "@/components/admin/document-field";
 import { RichTextField } from "@/components/admin/rich-text-field";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -24,9 +24,11 @@ export type ProductContentFormValues = {
 
 export function ProductContentFields({
   downloadCategories,
+  certificationOptions,
   showDescription = true,
 }: {
   downloadCategories: { id: string; name: string }[];
+  certificationOptions: string[];
   showDescription?: boolean;
 }) {
   const form = useFormContext<ProductContentFormValues>();
@@ -41,7 +43,7 @@ export function ProductContentFields({
           <CardTitle>Certificates</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <PillsInput name="certificates" label="Certificates" />
+          <CertificatesSelect name="certificates" label="Certificates" options={certificationOptions} />
         </CardContent>
       </Card>
 

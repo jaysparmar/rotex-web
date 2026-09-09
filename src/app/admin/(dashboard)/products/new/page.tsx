@@ -4,10 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { getCompanyCategoryTree, getIndustryTree } from "@/lib/products";
 
 export default async function AdminNewProductPage() {
-  const [companies, industries, downloadCategories] = await Promise.all([
+  const [companies, industries, downloadCategories, certifications] = await Promise.all([
     getCompanyCategoryTree(),
     getIndustryTree(),
     prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
+    prisma.certification.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   return (
@@ -26,7 +27,12 @@ export default async function AdminNewProductPage() {
         />
       </div>
 
-      <ProductEditForm companies={companies} industries={industries} downloadCategories={downloadCategories} />
+      <ProductEditForm
+        companies={companies}
+        industries={industries}
+        downloadCategories={downloadCategories}
+        certificationOptions={certifications.map((c) => c.name)}
+      />
     </div>
   );
 }
