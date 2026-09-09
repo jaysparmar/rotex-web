@@ -1,10 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import { cn } from "@/lib/utils";
+import { toRichHtml } from "@/lib/rich-text";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DownloadIcon } from "@/components/ui/download-icon";
 import type { SpecItem, DownloadItem } from "@/lib/product-detail-data";
+import richContentStyles from "@/components/sections/rich-content.module.css";
 
 const TABS = ["Features", "Specifications", "Certificates", "Downloads"] as const;
 type Tab = (typeof TABS)[number];
@@ -42,6 +45,11 @@ export function ProductTabs({
   const visibleDownloads =
     category === "All Documents" ? downloads : downloads.filter((d) => d.category === category);
 
+  const featuresHtml = useMemo(
+    () => (features.trim() ? DOMPurify.sanitize(toRichHtml(features)) : ""),
+    [features]
+  );
+
   if (visibleTabs.length === 0) return null;
 
   return (
@@ -63,7 +71,13 @@ export function ProductTabs({
       </div>
 
       {activeTab === "Features" && (
-        <p className="max-w-170 text-stone-900 text-sm font-medium font-montserrat leading-5">{features}</p>
+        <div
+          className={cn(
+            "max-w-170 text-stone-900 text-sm font-medium font-montserrat leading-5",
+            richContentStyles.content
+          )}
+          dangerouslySetInnerHTML={{ __html: featuresHtml }}
+        />
       )}
 
       {activeTab === "Specifications" && (

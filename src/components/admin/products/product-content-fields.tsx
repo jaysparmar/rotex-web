@@ -4,6 +4,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { TextField, TextAreaField, RepeaterItem, AddButton, SelectField } from "@/components/admin/form-fields";
 import { PillsInput } from "@/components/admin/pills-input";
 import { DocumentField } from "@/components/admin/document-field";
+import { RichTextField } from "@/components/admin/rich-text-field";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { DOWNLOAD_TABS } from "@/lib/downloads-data";
 
@@ -35,12 +36,28 @@ export function ProductContentFields({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Certificates & Features</CardTitle>
+          <CardTitle>Certificates</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <PillsInput name="certificates" label="Certificates" />
-          <TextAreaField label="Description" rows={4} {...form.register("description")} />
-          <TextAreaField label="Features" rows={4} {...form.register("features")} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Short Description</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <RichTextField name="description" label="Short Description" />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Features</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <RichTextField name="features" label="Features" />
         </CardContent>
       </Card>
 

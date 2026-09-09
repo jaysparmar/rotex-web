@@ -22,8 +22,8 @@ export type CategoryWithCount = {
 };
 
 function firstSentence(text: string, maxLen = 160): string {
-  const trimmed = text.trim().split("\n")[0];
-  return trimmed.length > maxLen ? `${trimmed.slice(0, maxLen).trimEnd()}…` : trimmed;
+  const plain = text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return plain.length > maxLen ? `${plain.slice(0, maxLen).trimEnd()}…` : plain;
 }
 
 function toSummary(product: {

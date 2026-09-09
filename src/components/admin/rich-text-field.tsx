@@ -4,19 +4,15 @@ import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTheme } from "next-themes";
 import { Editor } from "@tinymce/tinymce-react";
-import { marked } from "marked";
 import "@/components/admin/resources/tinymce-theme.css";
 import { Field } from "@/components/admin/form-fields";
 import { adminFetch } from "@/lib/admin-fetch";
-
-function looksLikeHtml(value: string): boolean {
-  return /<[a-z][\s\S]*>/i.test(value);
-}
+import { toRichHtml } from "@/lib/rich-text";
 
 export function RichTextField({ name, label }: { name: string; label: string }) {
   const form = useFormContext();
   const raw = form.getValues(name) as string;
-  const initialValue = raw && !looksLikeHtml(raw) ? (marked.parse(raw, { async: false }) as string) : raw;
+  const initialValue = toRichHtml(raw);
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
