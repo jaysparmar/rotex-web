@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/admin/form-fields";
 import { Input } from "@/components/ui/input";
-import { splitReferences } from "@/lib/variable-product-import";
+import { splitReferences } from "@/lib/import-references";
 import { PlainSelect } from "./plain-select";
 import type { IndustryOption, SubIndustryOption, IndustryReferenceRowState, SubIndustryReferenceRowState } from "./types";
 

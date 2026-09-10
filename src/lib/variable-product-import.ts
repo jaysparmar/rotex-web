@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { excelColumnLabel } from "@/lib/excel-columns";
+import { splitReferences } from "@/lib/import-references";
 import { PRODUCT_ATTRIBUTES, PRODUCT_FAMILIES, type ProductAttributeKey } from "@/lib/product-constants";
 import { cleanDownloadName, resolveDownloadColumns, type DownloadImportGrid } from "@/lib/download-grid";
 import type { DownloadCategoryMapping } from "@/lib/download-import";
@@ -206,14 +207,6 @@ export function estimatePendingDownloadLinks(
     if (rowHasLink) rowsWithLinks++;
   }
   return { rowsWithLinks, totalLinks };
-}
-
-/** Splits an Industry/Sub-Industry cell's comma-separated reference codes into clean tokens. */
-export function splitReferences(raw: string): string[] {
-  return raw
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
 }
 
 type TokenResolution = { kind: "id"; id: string } | { kind: "pending"; reference: string } | { kind: "unresolved" };

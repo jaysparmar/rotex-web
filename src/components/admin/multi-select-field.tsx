@@ -44,7 +44,7 @@ export function MultiSelectField({
         {values.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {values.map((v, i) => (
-              <Badge key={`${v}-${i}`} variant="secondary" className="gap-1 py-1 pr-1">
+              <Badge key={`${v}-${i}`} variant="outline" className="gap-1 py-1 pr-1">
                 {labelByValue.get(v) ?? v}
                 <button
                   type="button"
