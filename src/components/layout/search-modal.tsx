@@ -51,7 +51,7 @@ export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChang
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl sm:max-w-2xl p-6 gap-6" showCloseButton>
+      <DialogContent className="max-w-xl sm:max-w-2xl max-h-[85vh] overflow-y-auto p-4 gap-5 sm:p-6 sm:gap-6" showCloseButton>
         <div className="flex items-center gap-2 border-b border-neutral-200 pb-4">
           <IoSearchOutline size={18} className="text-neutral-400 shrink-0" />
           <input
