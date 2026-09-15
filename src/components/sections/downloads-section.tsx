@@ -5,7 +5,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import { DownloadCard } from "@/components/ui/download-card";
 import { DownloadsFilterField } from "@/components/ui/downloads-filter-field";
-import { MobileDownloadsFilters } from "@/components/ui/mobile-downloads-filters";
+import { MobileDownloadsFilters, type FilterCategoryConfig } from "@/components/ui/mobile-downloads-filters";
 import { Pagination } from "@/components/ui/pagination";
 import { DOWNLOAD_TABS, type DownloadTab, type DownloadItem } from "@/lib/downloads-data";
 
@@ -92,15 +92,40 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
           />
         </div>
         <MobileDownloadsFilters
-          productOptions={productOptions}
-          subCategoryOptions={subCategoryOptions}
-          industryOptions={industryOptions}
-          product={product}
-          setProduct={setProduct}
-          subCategory={subCategory}
-          setSubCategory={setSubCategory}
-          industry={industry}
-          setIndustry={setIndustry}
+          categories={
+            [
+              {
+                id: "product",
+                rowLabel: "Product",
+                panelTitle: "Select Product",
+                allLabel: "All Products",
+                placeholder: "Select Product",
+                options: productOptions,
+                value: product,
+                onChange: setProduct,
+              },
+              {
+                id: "subCategory",
+                rowLabel: "Sub Category Product",
+                panelTitle: "Select Sub Category Product",
+                allLabel: "All Sub Categories",
+                placeholder: "Select Sub Category Product",
+                options: subCategoryOptions,
+                value: subCategory,
+                onChange: setSubCategory,
+              },
+              {
+                id: "industry",
+                rowLabel: "Industry Type",
+                panelTitle: "Select Industry",
+                allLabel: "All Industries",
+                placeholder: "Select Industry",
+                options: industryOptions,
+                value: industry,
+                onChange: setIndustry,
+              },
+            ] satisfies FilterCategoryConfig[]
+          }
           hasActiveFilters={hasActiveFilters}
           clearFilters={clearFilters}
         />
