@@ -1,0 +1,229 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ProductListCard, type ProductListCardProps } from "@/components/ui/product-list-card";
+import { ResourceCard } from "@/components/ui/resource-card";
+import { JobCard } from "@/components/ui/job-card";
+import { SearchDocumentsPanel } from "@/components/ui/search-documents-panel";
+import { cn } from "@/lib/utils";
+import type { DownloadItem } from "@/lib/downloads-data";
+import type { SearchCounts, DocumentFilterOptions, JobSummary } from "@/lib/search-data";
+import type { ResourceItem } from "@/lib/resource-types";
+
+type Tab = "all" | "products" | "documents" | "case-studies" | "blogs" | "jobs";
+
+const PAGE_SIZE = 12;
+const DOC_PAGE_SIZE = 12;
+
+type DocFilters = { product: string; productCertificateType: string; qualityCertificateType: string; industry: string };
+const EMPTY_DOC_FILTERS: DocFilters = { product: "", productCertificateType: "", qualityCertificateType: "", industry: "" };
+
+export function SearchResultsClient({ q }: { q: string }) {
+  const [tab, setTab] = useState<Tab>("all");
+  const [page, setPage] = useState(1);
+  const [docFilters, setDocFilters] = useState<DocFilters>(EMPTY_DOC_FILTERS);
+  const [counts, setCounts] = useState<SearchCounts>({ products: 0, documents: 0, caseStudies: 0, blogs: 0, jobs: 0, total: 0 });
+
+  const [allProductsPreview, setAllProductsPreview] = useState<ProductListCardProps[]>([]);
+  const [allIndustries, setAllIndustries] = useState<string[]>([]);
+  const [products, setProducts] = useState<ProductListCardProps[]>([]);
+  const [productsTotal, setProductsTotal] = useState(0);
+  const [documents, setDocuments] = useState<DownloadItem[]>([]);
+  const [documentsTotal, setDocumentsTotal] = useState(0);
+  const [documentFilterOptions, setDocumentFilterOptions] = useState<DocumentFilterOptions>({
+    products: [],
+    productCertificateTypes: [],
+    qualityCertificateTypes: [],
+    industries: [],
+  });
+  const [caseStudies, setCaseStudies] = useState<ResourceItem[]>([]);
+  const [caseStudiesTotal, setCaseStudiesTotal] = useState(0);
+  const [blogs, setBlogs] = useState<ResourceItem[]>([]);
+  const [blogsTotal, setBlogsTotal] = useState(0);
+  const [jobs, setJobs] = useState<JobSummary[]>([]);
+  const [jobsTotal, setJobsTotal] = useState(0);
+
+  useEffect(() => {
+    setPage(1);
+  }, [tab, q]);
+
+  useEffect(() => {
+    const params = new URLSearchParams({ q, tab, page: String(page) });
+    if (tab === "documents") {
+      if (docFilters.product) params.set("product", docFilters.product);
+      if (docFilters.productCertificateType) params.set("productCertificateType", docFilters.productCertificateType);
+      if (docFilters.qualityCertificateType) params.set("qualityCertificateType", docFilters.qualityCertificateType);
+      if (docFilters.industry) params.set("industry", docFilters.industry);
+    }
+
+    fetch(`/api/v1/search?${params.toString()}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (!json.success) return;
+        const data = json.data;
+        setCounts(data.counts);
+
+        if (tab === "all") {
+          setAllProductsPreview(data.productsPreview);
+          setAllIndustries(data.industries);
+        } else if (tab === "products") {
+          setProducts(data.items);
+          setProductsTotal(data.total);
+        } else if (tab === "documents") {
+          setDocuments(data.items);
+          setDocumentsTotal(data.total);
+          setDocumentFilterOptions(data.filterOptions);
+        } else if (tab === "case-studies") {
+          setCaseStudies(data.items);
+          setCaseStudiesTotal(data.total);
+        } else if (tab === "blogs") {
+          setBlogs(data.items);
+          setBlogsTotal(data.total);
+        } else if (tab === "jobs") {
+          setJobs(data.items);
+          setJobsTotal(data.total);
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, q, page, docFilters]);
+
+  const tabs: { id: Tab; label: string; count: number }[] = [
+    { id: "all", label: "All Results", count: counts.total },
+    { id: "products", label: "Products", count: counts.products },
+    { id: "documents", label: "Documents", count: counts.documents },
+    { id: "case-studies", label: "Case Studies", count: counts.caseStudies },
+    { id: "blogs", label: "Blogs", count: counts.blogs },
+    { id: "jobs", label: "Jobs", count: counts.jobs },
+  ];
+
+  return (
+    <div className="container py-10 flex flex-col gap-8">
+      <h1 className="text-stone-900 font-montserrat font-medium text-3xl lg:text-5xl leading-tight">
+        Search results for &apos;{q}&apos;
+      </h1>
+
+      <div className="border-b border-stone-300 flex items-center gap-5 overflow-x-auto">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={cn(
+              "px-2.5 py-5 border-b-2 whitespace-nowrap text-sm font-medium font-montserrat leading-5 transition-colors uppercase",
+              t.id === tab ? "border-[#EF3E23] text-[#EF3E23]" : "border-transparent text-stone-900 hover:text-[#EF3E23]"
+            )}
+          >
+            {t.label} ({t.count})
+          </button>
+        ))}
+      </div>
+
+      {tab === "all" && (
+        <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-stone-900 font-montserrat font-medium text-xl">Products ({counts.products})</h2>
+              <button onClick={() => setTab("products")} className="text-[#EF3E23] text-sm font-semibold font-montserrat hover:underline">
+                View All Products
+              </button>
+            </div>
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
+              {allProductsPreview.map((p) => (
+                <ProductListCard key={p.slug} {...p} />
+              ))}
+            </div>
+          </div>
+
+          {allIndustries.length > 0 && (
+            <div className="flex flex-col gap-4">
+              <h2 className="text-stone-900 font-montserrat font-medium text-xl">Industries ({allIndustries.length})</h2>
+              <div className="flex flex-wrap gap-3">
+                {allIndustries.map((name) => (
+                  <span key={name} className="px-4 py-2 rounded-full border border-neutral-200 text-stone-900 text-xs font-semibold font-montserrat uppercase">
+                    {name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === "products" && (
+        <div className="flex flex-col gap-5">
+          {products.length > 0 ? (
+            <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
+              {products.map((p) => (
+                <ProductListCard key={p.slug} {...p} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-stone-400 text-center py-20">No products match your search.</p>
+          )}
+          <PaginationRow page={page} total={productsTotal} pageSize={PAGE_SIZE} onChange={setPage} />
+        </div>
+      )}
+
+      {tab === "documents" && (
+        <SearchDocumentsPanel
+          items={documents}
+          total={documentsTotal}
+          filterOptions={documentFilterOptions}
+          page={page}
+          pageSize={DOC_PAGE_SIZE}
+          onPageChange={setPage}
+          filters={docFilters}
+          onFiltersChange={setDocFilters}
+        />
+      )}
+
+      {(tab === "case-studies" || tab === "blogs") && (
+        <div className="flex flex-col gap-5">
+          {(tab === "case-studies" ? caseStudies : blogs).length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {(tab === "case-studies" ? caseStudies : blogs).map((post) => (
+                <ResourceCard key={post.id} post={post} basePath={`/${tab}`} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-stone-400 text-center py-20">No results match your search.</p>
+          )}
+          <PaginationRow page={page} total={tab === "case-studies" ? caseStudiesTotal : blogsTotal} pageSize={PAGE_SIZE} onChange={setPage} />
+        </div>
+      )}
+
+      {tab === "jobs" && (
+        <div className="flex flex-col gap-5">
+          {jobs.length > 0 ? (
+            jobs.map((job) => <JobCard key={job.id} job={job} />)
+          ) : (
+            <p className="text-stone-400 text-center py-20">No jobs match your search.</p>
+          )}
+          <PaginationRow page={page} total={jobsTotal} pageSize={PAGE_SIZE} onChange={setPage} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PaginationRow({ page, total, pageSize, onChange }: { page: number; total: number; pageSize: number; onChange: (p: number) => void }) {
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  if (totalPages <= 1) return null;
+  return (
+    <div className="flex justify-center gap-2 pt-4">
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+        <button
+          key={p}
+          onClick={() => onChange(p)}
+          className={cn(
+            "size-10 rounded-full flex items-center justify-center text-sm font-medium font-montserrat transition-colors",
+            p === page ? "bg-[#EF3E23] text-white" : "outline outline-1 -outline-offset-1 outline-neutral-200 text-stone-500 hover:bg-stone-50"
+          )}
+        >
+          {p}
+        </button>
+      ))}
+    </div>
+  );
+}
