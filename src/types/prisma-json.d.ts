@@ -84,6 +84,7 @@ declare global {
 
     type GlobalConfigData = {
       logo: { src: string; alt: string; href: string };
+      favicon?: { src: string };
       header: { nav: NavItem[]; cta: { label: string; href: string } };
       footer: {
         tagline: string;
@@ -101,11 +102,14 @@ declare global {
       sidebarLogoDark: string;
     };
 
-    type HomeSeoData = {
+    type SeoMetaData = {
       title: string;
       description: string;
-      og_image: { src: string; alt: string };
+      keywords: string[];
+      ogImage: { src: string; alt: string };
       canonical: string;
+      noindex: boolean;
+      schema: string;
     };
 
     type SpecList = { key: string; value: string }[];
