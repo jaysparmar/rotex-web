@@ -280,9 +280,9 @@ model GlobalConfig {
   updatedAt DateTime @updatedAt
 }
 
-model HomeSeo {
-  id        String   @id @default("home")
-  /// [HomeSeoData]
+model SeoPage {
+  key       String   @id
+  /// [SeoMetaData]
   data      Json
   updatedAt DateTime @updatedAt
 }
