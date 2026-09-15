@@ -18,18 +18,24 @@ export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChang
   useEffect(() => {
     if (!open) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    const controller = new AbortController();
     debounceRef.current = setTimeout(() => {
-      fetch(`/api/v1/search?q=${encodeURIComponent(term)}&mode=quick`)
+      fetch(`/api/v1/search?q=${encodeURIComponent(term)}&mode=quick`, { signal: controller.signal })
         .then((res) => res.json())
         .then((json) => {
           if (!json.success) return;
           setProducts(json.data.products ?? []);
           setIndustries(json.data.industries ?? []);
         })
-        .catch(() => {});
+        .catch((err) => {
+          if (err?.name !== "AbortError") {
+            // swallow other errors as before
+          }
+        });
     }, 300);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      controller.abort();
     };
   }, [term, open]);
 
