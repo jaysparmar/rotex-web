@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ProductListCard, type ProductListCardProps } from "@/components/ui/product-list-card";
 import { ResourceCard } from "@/components/ui/resource-card";
 import { JobCard } from "@/components/ui/job-card";
+import { DownloadCard } from "@/components/ui/download-card";
 import { SearchDocumentsPanel } from "@/components/ui/search-documents-panel";
 import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,10 @@ export function SearchResultsClient({ q }: { q: string }) {
 
   const [allProductsPreview, setAllProductsPreview] = useState<ProductListCardProps[]>([]);
   const [allIndustries, setAllIndustries] = useState<string[]>([]);
+  const [allDocumentsPreview, setAllDocumentsPreview] = useState<DownloadItem[]>([]);
+  const [allCaseStudiesPreview, setAllCaseStudiesPreview] = useState<ResourceItem[]>([]);
+  const [allBlogsPreview, setAllBlogsPreview] = useState<ResourceItem[]>([]);
+  const [allJobsPreview, setAllJobsPreview] = useState<JobSummary[]>([]);
   const [products, setProducts] = useState<ProductListCardProps[]>([]);
   const [productsTotal, setProductsTotal] = useState(0);
   const [documents, setDocuments] = useState<DownloadItem[]>([]);
@@ -69,6 +74,10 @@ export function SearchResultsClient({ q }: { q: string }) {
         if (tab === "all") {
           setAllProductsPreview(data.productsPreview);
           setAllIndustries(data.industries);
+          setAllDocumentsPreview(data.documentsPreview);
+          setAllCaseStudiesPreview(data.caseStudiesPreview);
+          setAllBlogsPreview(data.blogsPreview);
+          setAllJobsPreview(data.jobsPreview);
         } else if (tab === "products") {
           setProducts(data.items);
           setProductsTotal(data.total);
@@ -99,7 +108,7 @@ export function SearchResultsClient({ q }: { q: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, q, page, docFilters]);
 
-  const tabs: { id: Tab; label: string; count: number }[] = [
+  const allTabs: { id: Tab; label: string; count: number }[] = [
     { id: "all", label: "All Results", count: counts.total },
     { id: "products", label: "Products", count: counts.products },
     { id: "documents", label: "Documents", count: counts.documents },
@@ -107,11 +116,12 @@ export function SearchResultsClient({ q }: { q: string }) {
     { id: "blogs", label: "Blogs", count: counts.blogs },
     { id: "jobs", label: "Jobs", count: counts.jobs },
   ];
+  const tabs = allTabs.filter((t) => t.id === "all" || t.id === tab || t.count > 0);
 
   return (
-    <div className="container py-10 flex flex-col gap-8">
-      <h1 className="text-stone-900 font-montserrat font-medium text-3xl lg:text-5xl leading-tight">
-        Search results for &apos;{q}&apos;
+    <div className="container pt-28 pb-10 lg:pt-32 flex flex-col gap-8">
+      <h1 className="text-stone-900 font-montserrat font-normal text-5xl leading-[58px]">
+        Search results for &lsquo;{q}&rsquo;
       </h1>
 
       <div className="border-b border-stone-300 flex items-center gap-5 overflow-x-auto">
@@ -131,19 +141,15 @@ export function SearchResultsClient({ q }: { q: string }) {
 
       {tab === "all" && (
         <div className="flex flex-col gap-10">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-stone-900 font-montserrat font-medium text-xl">Products ({counts.products})</h2>
-              <button onClick={() => setTab("products")} className="text-[#EF3E23] text-sm font-semibold font-montserrat hover:underline">
-                View All Products
-              </button>
-            </div>
-            <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
-              {allProductsPreview.map((p) => (
-                <ProductListCard key={p.slug} {...p} />
-              ))}
-            </div>
-          </div>
+          {counts.products > 0 && (
+            <PreviewSection title={`Products (${counts.products})`} viewAllLabel="View All Products" onViewAll={() => setTab("products")}>
+              <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
+                {allProductsPreview.map((p) => (
+                  <ProductListCard key={p.slug} {...p} />
+                ))}
+              </div>
+            </PreviewSection>
+          )}
 
           {allIndustries.length > 0 && (
             <div className="flex flex-col gap-4">
@@ -156,6 +162,46 @@ export function SearchResultsClient({ q }: { q: string }) {
                 ))}
               </div>
             </div>
+          )}
+
+          {counts.documents > 0 && (
+            <PreviewSection title={`Downloads (${counts.documents})`} viewAllLabel="View All Downloads" onViewAll={() => setTab("documents")}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {allDocumentsPreview.map((item) => (
+                  <DownloadCard key={item.id} item={item} showCategoryTag />
+                ))}
+              </div>
+            </PreviewSection>
+          )}
+
+          {counts.caseStudies > 0 && (
+            <PreviewSection title={`Case Studies (${counts.caseStudies})`} viewAllLabel="View All Case Studies" onViewAll={() => setTab("case-studies")}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {allCaseStudiesPreview.map((post) => (
+                  <ResourceCard key={post.id} post={post} basePath="/case-studies" />
+                ))}
+              </div>
+            </PreviewSection>
+          )}
+
+          {counts.blogs > 0 && (
+            <PreviewSection title={`Blogs (${counts.blogs})`} viewAllLabel="View All Blogs" onViewAll={() => setTab("blogs")}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {allBlogsPreview.map((post) => (
+                  <ResourceCard key={post.id} post={post} basePath="/blogs" />
+                ))}
+              </div>
+            </PreviewSection>
+          )}
+
+          {counts.jobs > 0 && (
+            <PreviewSection title={`Jobs (${counts.jobs})`} viewAllLabel="View All Jobs" onViewAll={() => setTab("jobs")}>
+              <div className="flex flex-col gap-5">
+                {allJobsPreview.map((job) => (
+                  <JobCard key={job.id} job={job} />
+                ))}
+              </div>
+            </PreviewSection>
           )}
         </div>
       )}
@@ -217,6 +263,30 @@ export function SearchResultsClient({ q }: { q: string }) {
           <Pagination page={page} totalPages={Math.max(1, Math.ceil(jobsTotal / PAGE_SIZE))} onChange={setPage} />
         </div>
       )}
+    </div>
+  );
+}
+
+function PreviewSection({
+  title,
+  viewAllLabel,
+  onViewAll,
+  children,
+}: {
+  title: string;
+  viewAllLabel: string;
+  onViewAll: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-stone-900 font-montserrat font-medium text-xl">{title}</h2>
+        <button onClick={onViewAll} className="text-[#EF3E23] text-sm font-semibold font-montserrat hover:underline">
+          {viewAllLabel}
+        </button>
+      </div>
+      {children}
     </div>
   );
 }
