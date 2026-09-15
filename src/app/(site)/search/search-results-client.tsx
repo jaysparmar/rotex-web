@@ -119,12 +119,15 @@ export function SearchResultsClient({ q }: { q: string }) {
   const tabs = allTabs.filter((t) => t.id === "all" || t.id === tab || t.count > 0);
 
   return (
-    <div className="container pt-28 pb-10 lg:pt-32 flex flex-col gap-8">
-      <h1 className="text-stone-900 font-montserrat font-normal text-5xl leading-[58px]">
+    <div className="container pt-24 pb-10 sm:pt-28 lg:pt-32 flex flex-col gap-6 sm:gap-8">
+      <h1 className="text-stone-900 font-montserrat font-normal text-3xl leading-9 sm:text-4xl sm:leading-tight lg:text-5xl lg:leading-[58px]">
         Search results for &lsquo;{q}&rsquo;
       </h1>
 
-      <div className="border-b border-stone-300 flex items-center gap-5 overflow-x-auto">
+      <div
+        className="sticky top-20 lg:top-24 z-40 bg-white border-b border-stone-300 flex items-center gap-5 overflow-x-auto no-scrollbar"
+        style={{ scrollbarWidth: "none" }}
+      >
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -143,7 +146,7 @@ export function SearchResultsClient({ q }: { q: string }) {
         <div className="flex flex-col gap-10">
           {counts.products > 0 && (
             <PreviewSection title={`Products (${counts.products})`} viewAllLabel="View All Products" onViewAll={() => setTab("products")}>
-              <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
                 {allProductsPreview.map((p) => (
                   <ProductListCard key={p.slug} {...p} />
                 ))}
@@ -153,7 +156,7 @@ export function SearchResultsClient({ q }: { q: string }) {
 
           {allIndustries.length > 0 && (
             <div className="flex flex-col gap-4">
-              <h2 className="text-stone-900 font-montserrat font-medium text-xl">Industries ({allIndustries.length})</h2>
+              <h2 className="text-stone-900 font-montserrat font-medium text-lg sm:text-xl">Industries ({allIndustries.length})</h2>
               <div className="flex flex-wrap gap-3">
                 {allIndustries.map((name) => (
                   <span key={name} className="px-4 py-2 rounded-full border border-neutral-200 text-stone-900 text-xs font-semibold font-montserrat uppercase">
@@ -209,7 +212,7 @@ export function SearchResultsClient({ q }: { q: string }) {
       {tab === "products" && (
         <div className="flex flex-col gap-5">
           {products.length > 0 ? (
-            <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {products.map((p) => (
                 <ProductListCard key={p.slug} {...p} />
               ))}
@@ -280,9 +283,9 @@ function PreviewSection({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-stone-900 font-montserrat font-medium text-xl">{title}</h2>
-        <button onClick={onViewAll} className="text-[#EF3E23] text-sm font-semibold font-montserrat hover:underline">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-stone-900 font-montserrat font-medium text-lg sm:text-xl">{title}</h2>
+        <button onClick={onViewAll} className="shrink-0 text-[#EF3E23] text-sm font-semibold font-montserrat hover:underline">
           {viewAllLabel}
         </button>
       </div>
