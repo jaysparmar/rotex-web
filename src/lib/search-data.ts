@@ -7,6 +7,19 @@ import type { ResourceItem, ResourceType } from "@/lib/resource-types";
 
 export type SuggestedCategory = { id: string; slug: string; name: string; image: string | null };
 
+function dedupeByName<T extends { name: string }>(items: T[], limit: number): T[] {
+  const seen = new Set<string>();
+  const result: T[] = [];
+  for (const item of items) {
+    const key = item.name.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(item);
+    if (result.length >= limit) break;
+  }
+  return result;
+}
+
 async function curatedCategories(limit: number): Promise<SuggestedCategory[]> {
   const section = await prisma.homeSection.findUnique({ where: { key: "products" } });
   const categoryIds = ((section?.data as Record<string, unknown> | undefined)?.categoryIds as string[]) ?? [];
@@ -16,10 +29,10 @@ async function curatedCategories(limit: number): Promise<SuggestedCategory[]> {
     select: { id: true, slug: true, name: true, image: true },
   });
   const byId = new Map(categories.map((c) => [c.id, c]));
-  return categoryIds
+  const ordered = categoryIds
     .map((id) => byId.get(id))
-    .filter((c): c is NonNullable<typeof c> => Boolean(c))
-    .slice(0, limit);
+    .filter((c): c is NonNullable<typeof c> => Boolean(c));
+  return dedupeByName(ordered, limit);
 }
 
 /**
@@ -60,11 +73,14 @@ export async function getModalSuggestions(q: string): Promise<{ products: Sugges
   const query = q.trim();
 
   const products = query
-    ? await prisma.category.findMany({
-        where: { OR: [{ name: { contains: query } }, { description: { contains: query } }] },
-        select: { id: true, slug: true, name: true, image: true },
-        take: 4,
-      })
+    ? dedupeByName(
+        await prisma.category.findMany({
+          where: { OR: [{ name: { contains: query } }, { description: { contains: query } }] },
+          select: { id: true, slug: true, name: true, image: true },
+          take: 16,
+        }),
+        4
+      )
     : await curatedCategories(4);
 
   const industries = query ? await matchingIndustryNames(query, 6) : [];

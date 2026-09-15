@@ -35,11 +35,27 @@ export async function GET(request: NextRequest) {
   const counts = await getSearchCounts(q, documentFilters);
 
   if (tab === "all") {
-    const [{ products: productsPreview }, industryNames] = await Promise.all([
-      getProductsList({ search: q, page: 1, pageSize: 4 }),
-      matchingIndustryNames(q, 6),
-    ]);
-    return apiSuccess({ counts, productsPreview, industries: industryNames }, new Date());
+    const [{ products: productsPreview }, industryNames, documentsPreview, caseStudiesPreview, blogsPreview, jobsPreview] =
+      await Promise.all([
+        getProductsList({ search: q, page: 1, pageSize: 4 }),
+        matchingIndustryNames(q, 6),
+        searchDocuments(q, documentFilters, 1, 4),
+        searchResources(q, "case-studies", 1, 4),
+        searchResources(q, "blogs", 1, 4),
+        searchJobs(q, 1, 4),
+      ]);
+    return apiSuccess(
+      {
+        counts,
+        productsPreview,
+        industries: industryNames,
+        documentsPreview: documentsPreview.items,
+        caseStudiesPreview: caseStudiesPreview.items,
+        blogsPreview: blogsPreview.items,
+        jobsPreview: jobsPreview.items,
+      },
+      new Date()
+    );
   }
 
   if (tab === "products") {
