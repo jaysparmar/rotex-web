@@ -9,6 +9,7 @@ import { GradientButton } from "@/components/ui/gradient-button";
 import { Menu } from "lucide-react";
 import { IoChevronDownOutline } from "react-icons/io5";
 import { SearchIcon } from "@/components/ui/icons";
+import { SearchModal } from "@/components/layout/search-modal";
 import { useScrolled } from "@/hooks/use-scrolled";
 
 type CategorySwitcherMenu = PrismaJson.CategorySwitcherMenu;
@@ -692,20 +693,9 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
           </div>
         </div>
 
-        {searchOpen && (
-          <div
-            className="container border-t border-white/10 py-3"
-            style={{ background: "#161412" }}
-          >
-            <input
-              autoFocus
-              type="text"
-              placeholder="Search products, industries, resources..."
-              className="w-full bg-transparent text-white placeholder-stone-500 text-sm font-montserrat outline-none"
-            />
-          </div>
-        )}
       </motion.header>
+
+      <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
 
       {/* Mega Menu */}
       <AnimatePresence>
