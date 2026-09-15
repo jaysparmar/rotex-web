@@ -1,4 +1,4 @@
-import { IoDocumentTextOutline } from "react-icons/io5";
+import { IoDocumentTextOutline, IoEyeOutline } from "react-icons/io5";
 import { DownloadIcon } from "@/components/ui/download-icon";
 import type { DownloadItem } from "@/lib/downloads-data";
 
@@ -37,18 +37,30 @@ export function DownloadCard({ item, showCategoryTag = false }: { item: Download
           {meta && <span className="text-neutral-400 text-xs font-medium font-montserrat leading-4 truncate">{meta}</span>}
         </div>
       </div>
-      <a
-        href={item.fileUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        download
-        className="w-full px-4 py-2.5 bg-stone-100 rounded-[47px] flex justify-center items-center gap-2 transition-colors duration-200 group-hover:bg-[#EF3E23]"
-      >
-        <DownloadIcon className="size-4 text-[#EF3E23] transition-colors duration-200 group-hover:text-white" />
-        <span className="text-[#EF3E23] text-xs font-semibold font-montserrat leading-5 transition-colors duration-200 group-hover:text-white">
-          Download
-        </span>
-      </a>
+      <div className="flex items-center gap-2">
+        <a
+          href={item.fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View document"
+          title="View"
+          className="shrink-0 p-2.5 bg-stone-100 rounded-full flex items-center justify-center hover:bg-stone-200 transition-colors"
+        >
+          <IoEyeOutline className="size-4 text-stone-600" />
+        </a>
+        <a
+          href={item.fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          download
+          className="flex-1 px-4 py-2.5 bg-stone-100 rounded-[47px] flex justify-center items-center gap-2 transition-colors duration-200 group-hover:bg-[#EF3E23]"
+        >
+          <DownloadIcon className="size-4 text-[#EF3E23] transition-colors duration-200 group-hover:text-white" />
+          <span className="text-[#EF3E23] text-xs font-semibold font-montserrat leading-5 transition-colors duration-200 group-hover:text-white">
+            Download
+          </span>
+        </a>
+      </div>
     </div>
   );
 }
