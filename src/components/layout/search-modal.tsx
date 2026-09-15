@@ -106,6 +106,12 @@ export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChang
           </div>
         )}
 
+        {term.trim() && products.length === 0 && industries.length === 0 && (
+          <p className="text-neutral-400 text-sm font-montserrat text-center py-4">
+            No matches yet — try &quot;View all results&quot; for the full search.
+          </p>
+        )}
+
         {term.trim() && (
           <button
             type="button"

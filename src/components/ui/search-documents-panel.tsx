@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { DownloadCard } from "@/components/ui/download-card";
 import { DownloadsFilterField } from "@/components/ui/downloads-filter-field";
 import { MobileDownloadsFilters, type FilterCategoryConfig } from "@/components/ui/mobile-downloads-filters";
@@ -29,7 +28,6 @@ export function SearchDocumentsPanel({
   filters: { product: string; productCertificateType: string; qualityCertificateType: string; industry: string };
   onFiltersChange: (next: typeof filters) => void;
 }) {
-  const [clearedFlash, setClearedFlash] = useState(false);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   const set = (key: keyof typeof filters) => (value: string) =>
@@ -39,8 +37,6 @@ export function SearchDocumentsPanel({
 
   const clearFilters = () => {
     onFiltersChange({ product: "", productCertificateType: "", qualityCertificateType: "", industry: "" });
-    setClearedFlash(true);
-    setTimeout(() => setClearedFlash(false), 300);
   };
 
   const categories: FilterCategoryConfig[] = [
@@ -104,7 +100,7 @@ export function SearchDocumentsPanel({
       <MobileDownloadsFilters categories={categories} hasActiveFilters={hasActiveFilters} clearFilters={clearFilters} />
 
       {items.length > 0 ? (
-        <div className={clearedFlash ? "" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {items.map((item) => (
             <DownloadCard key={item.id} item={item} showCategoryTag />
           ))}
