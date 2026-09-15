@@ -1,13 +1,13 @@
 import type { NextRequest } from "next/server";
 import { apiSuccess, apiError } from "@/lib/api-response";
 import { getProductsList } from "@/lib/products-data";
-import { prisma } from "@/lib/prisma";
 import {
   getModalSuggestions,
   searchDocuments,
   searchResources,
   searchJobs,
   getSearchCounts,
+  matchingIndustryNames,
   type DocumentFilters,
 } from "@/lib/search-data";
 
@@ -35,11 +35,10 @@ export async function GET(request: NextRequest) {
   const counts = await getSearchCounts(q, documentFilters);
 
   if (tab === "all") {
-    const [{ products: productsPreview }, industries] = await Promise.all([
+    const [{ products: productsPreview }, industryNames] = await Promise.all([
       getProductsList({ search: q, page: 1, pageSize: 4 }),
-      prisma.industry.findMany({ where: q.trim() ? { name: { contains: q.trim() } } : {}, select: { name: true }, take: 6 }),
+      matchingIndustryNames(q, 6),
     ]);
-    const industryNames = industries.length > 0 ? industries.map((i) => i.name) : (await prisma.industry.findMany({ select: { name: true }, take: 6 })).map((i) => i.name);
     return apiSuccess({ counts, productsPreview, industries: industryNames }, new Date());
   }
 
