@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { ProductListCard, type ProductListCardProps } from "@/components/ui/product-list-card";
 import { ResourceCard } from "@/components/ui/resource-card";
 import { JobCard } from "@/components/ui/job-card";
@@ -46,9 +45,11 @@ export function SearchResultsClient({ q }: { q: string }) {
 
   useEffect(() => {
     setPage(1);
+    setDocFilters(EMPTY_DOC_FILTERS);
   }, [tab, q]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const params = new URLSearchParams({ q, tab, page: String(page) });
     if (tab === "documents") {
       if (docFilters.product) params.set("product", docFilters.product);
@@ -57,7 +58,7 @@ export function SearchResultsClient({ q }: { q: string }) {
       if (docFilters.industry) params.set("industry", docFilters.industry);
     }
 
-    fetch(`/api/v1/search?${params.toString()}`)
+    fetch(`/api/v1/search?${params.toString()}`, { signal: controller.signal })
       .then((res) => res.json())
       .then((json) => {
         if (!json.success) return;
@@ -85,7 +86,15 @@ export function SearchResultsClient({ q }: { q: string }) {
           setJobsTotal(data.total);
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (err?.name !== "AbortError") {
+          // swallow other errors as before
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, q, page, docFilters]);
 
