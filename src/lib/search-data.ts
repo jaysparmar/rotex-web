@@ -22,6 +22,40 @@ async function curatedCategories(limit: number): Promise<SuggestedCategory[]> {
     .slice(0, limit);
 }
 
+/**
+ * Industries matching a search query, shared by the modal's quick suggestions and the
+ * results page's `tab=all` overview so the two never disagree about the same term.
+ *
+ * When `q` is empty, returns the first `limit` industry names (unfiltered "browse" list).
+ * When `q` is non-empty, matches industries by name or by their products' name/modelNumber,
+ * and projects to sub-industry names when an industry has sub-industries. A non-empty query
+ * that genuinely matches nothing returns an empty array (no fabricated fallback).
+ */
+export async function matchingIndustryNames(q: string, limit: number): Promise<string[]> {
+  const query = q.trim();
+
+  if (!query) {
+    const industries = await prisma.industry.findMany({ select: { name: true }, take: limit });
+    return industries.map((i) => i.name);
+  }
+
+  const industries = await prisma.industry.findMany({
+    where: {
+      OR: [
+        { name: { contains: query } },
+        { products: { some: { name: { contains: query } } } },
+        { products: { some: { modelNumber: { contains: query } } } },
+      ],
+    },
+    select: { name: true, subIndustries: { select: { name: true } } },
+    take: limit,
+  });
+
+  return Array.from(
+    new Set(industries.flatMap((ind) => (ind.subIndustries.length > 0 ? ind.subIndustries.map((s) => s.name) : [ind.name])))
+  ).slice(0, limit);
+}
+
 export async function getModalSuggestions(q: string): Promise<{ products: SuggestedCategory[]; industries: string[] }> {
   const query = q.trim();
 
@@ -33,27 +67,9 @@ export async function getModalSuggestions(q: string): Promise<{ products: Sugges
       })
     : await curatedCategories(4);
 
-  const industryWhere = query
-    ? {
-        OR: [
-          { name: { contains: query } },
-          { products: { some: { name: { contains: query } } } },
-          { products: { some: { modelNumber: { contains: query } } } },
-        ],
-      }
-    : {};
+  const industries = query ? await matchingIndustryNames(query, 6) : [];
 
-  const industries = await prisma.industry.findMany({
-    where: industryWhere,
-    select: { name: true, subIndustries: { select: { name: true } } },
-    take: 6,
-  });
-
-  const industryNames = Array.from(
-    new Set(industries.flatMap((ind) => (ind.subIndustries.length > 0 ? ind.subIndustries.map((s) => s.name) : [ind.name])))
-  ).slice(0, 6);
-
-  return { products, industries: query ? industryNames : [] };
+  return { products, industries };
 }
 
 // ─── Documents (flattened Product/ProductVariant downloads) ───────────────────

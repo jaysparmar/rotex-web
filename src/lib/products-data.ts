@@ -120,6 +120,11 @@ export async function getProductsList(params: ProductListFilterParams = {}): Pro
           OR: [
             { name: { contains: search.trim() } },
             { modelNumber: { contains: search.trim() } },
+            { description: { contains: search.trim() } },
+            { features: { contains: search.trim() } },
+            { category: { name: { contains: search.trim() } } },
+            { subCategory: { name: { contains: search.trim() } } },
+            { industries: { some: { name: { contains: search.trim() } } } },
           ],
         }
       : {}),
