@@ -7,10 +7,8 @@ import { Button } from "@/components/ui/button";
 
 const ALL = "All";
 
-type FilterCategory = "product" | "subCategory" | "industry";
-
-type CategoryConfig = {
-  id: FilterCategory;
+export type FilterCategoryConfig = {
+  id: string;
   rowLabel: string;
   panelTitle: string;
   allLabel: string;
@@ -21,69 +19,20 @@ type CategoryConfig = {
 };
 
 export function MobileDownloadsFilters({
-  productOptions,
-  subCategoryOptions,
-  industryOptions,
-  product,
-  setProduct,
-  subCategory,
-  setSubCategory,
-  industry,
-  setIndustry,
+  categories,
   hasActiveFilters,
   clearFilters,
 }: {
-  productOptions: string[];
-  subCategoryOptions: string[];
-  industryOptions: string[];
-  product: string;
-  setProduct: (v: string) => void;
-  subCategory: string;
-  setSubCategory: (v: string) => void;
-  industry: string;
-  setIndustry: (v: string) => void;
+  categories: FilterCategoryConfig[];
   hasActiveFilters: boolean;
   clearFilters: () => void;
 }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [panel, setPanel] = useState<FilterCategory | null>(null);
-
-  const categories: CategoryConfig[] = [
-    {
-      id: "product",
-      rowLabel: "Product",
-      panelTitle: "Select Product",
-      allLabel: "All Products",
-      placeholder: "Select Product",
-      options: productOptions,
-      value: product,
-      onChange: setProduct,
-    },
-    {
-      id: "subCategory",
-      rowLabel: "Sub Category Product",
-      panelTitle: "Select Sub Category Product",
-      allLabel: "All Sub Categories",
-      placeholder: "Select Sub Category Product",
-      options: subCategoryOptions,
-      value: subCategory,
-      onChange: setSubCategory,
-    },
-    {
-      id: "industry",
-      rowLabel: "Industry Type",
-      panelTitle: "Select Industry",
-      allLabel: "All Industries",
-      placeholder: "Select Industry",
-      options: industryOptions,
-      value: industry,
-      onChange: setIndustry,
-    },
-  ];
+  const [panel, setPanel] = useState<string | null>(null);
 
   const activePanel = categories.find((c) => c.id === panel) ?? null;
 
-  function selectValue(cat: CategoryConfig, v: string) {
+  function selectValue(cat: FilterCategoryConfig, v: string) {
     cat.onChange(v);
     setPanel(null);
   }
