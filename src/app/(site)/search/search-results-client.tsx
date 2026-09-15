@@ -5,6 +5,7 @@ import { ProductListCard, type ProductListCardProps } from "@/components/ui/prod
 import { ResourceCard } from "@/components/ui/resource-card";
 import { JobCard } from "@/components/ui/job-card";
 import { SearchDocumentsPanel } from "@/components/ui/search-documents-panel";
+import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 import type { DownloadItem } from "@/lib/downloads-data";
 import type { SearchCounts, DocumentFilterOptions, JobSummary } from "@/lib/search-data";
@@ -170,7 +171,7 @@ export function SearchResultsClient({ q }: { q: string }) {
           ) : (
             <p className="text-stone-400 text-center py-20">No products match your search.</p>
           )}
-          <PaginationRow page={page} total={productsTotal} pageSize={PAGE_SIZE} onChange={setPage} />
+          <Pagination page={page} totalPages={Math.max(1, Math.ceil(productsTotal / PAGE_SIZE))} onChange={setPage} />
         </div>
       )}
 
@@ -198,7 +199,11 @@ export function SearchResultsClient({ q }: { q: string }) {
           ) : (
             <p className="text-stone-400 text-center py-20">No results match your search.</p>
           )}
-          <PaginationRow page={page} total={tab === "case-studies" ? caseStudiesTotal : blogsTotal} pageSize={PAGE_SIZE} onChange={setPage} />
+          <Pagination
+            page={page}
+            totalPages={Math.max(1, Math.ceil((tab === "case-studies" ? caseStudiesTotal : blogsTotal) / PAGE_SIZE))}
+            onChange={setPage}
+          />
         </div>
       )}
 
@@ -209,30 +214,9 @@ export function SearchResultsClient({ q }: { q: string }) {
           ) : (
             <p className="text-stone-400 text-center py-20">No jobs match your search.</p>
           )}
-          <PaginationRow page={page} total={jobsTotal} pageSize={PAGE_SIZE} onChange={setPage} />
+          <Pagination page={page} totalPages={Math.max(1, Math.ceil(jobsTotal / PAGE_SIZE))} onChange={setPage} />
         </div>
       )}
-    </div>
-  );
-}
-
-function PaginationRow({ page, total, pageSize, onChange }: { page: number; total: number; pageSize: number; onChange: (p: number) => void }) {
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  if (totalPages <= 1) return null;
-  return (
-    <div className="flex justify-center gap-2 pt-4">
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-        <button
-          key={p}
-          onClick={() => onChange(p)}
-          className={cn(
-            "size-10 rounded-full flex items-center justify-center text-sm font-medium font-montserrat transition-colors",
-            p === page ? "bg-[#EF3E23] text-white" : "outline outline-1 -outline-offset-1 outline-neutral-200 text-stone-500 hover:bg-stone-50"
-          )}
-        >
-          {p}
-        </button>
-      ))}
     </div>
   );
 }
