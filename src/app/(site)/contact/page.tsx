@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { ContactHeroSection } from "@/components/sections/contact-hero-section";
 import { ContactFormSection } from "@/components/sections/contact-form-section";
 import { ContactOfficesSection } from "@/components/sections/contact-offices-section";
 import { fetchContactSection, fetchIndustries } from "@/lib/site-api";
 import { INDUSTRY_OPTIONS, type ContactOfficeTab } from "@/lib/contact-data";
+import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 
 type HeroData = { breadcrumbLabel: string; title: string; description: string; ctaLabel: string };
 type OfficesData = { heading: string; description: string; tabs: ContactOfficeTab[] };
@@ -22,7 +25,12 @@ type FormData = {
 };
 type IndustriesData = { industries: { id: string; slug: string; name: string }[] };
 
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata(await getPageSeo("contact"), SITE_METADATA_FALLBACK);
+}
+
 export default async function ContactPage() {
+  const seo = await getPageSeo("contact");
   const [hero, offices, form, industriesData] = await Promise.all([
     fetchContactSection<HeroData>("hero"),
     fetchContactSection<OfficesData>("offices"),
@@ -35,6 +43,8 @@ export default async function ContactPage() {
 
   return (
     <div>
+      <SeoJsonLd schema={seo.schema} />
+
       {hero?.enabled && (
         <ContactHeroSection
           breadcrumbLabel={hero.breadcrumbLabel}

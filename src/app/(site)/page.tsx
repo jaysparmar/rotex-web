@@ -1,5 +1,8 @@
 import type { ReactElement } from "react";
+import type { Metadata } from "next";
 import { fetchHomeSection, fetchIndustries } from "@/lib/site-api";
+import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 import { HeroSection } from "@/components/sections/hero-section";
 import { TrustedLeaders } from "@/components/sections/trusted-leaders";
 import { RedefiningSection } from "@/components/sections/redefining-section";
@@ -59,7 +62,12 @@ type IndustryCard = {
   mobileImage: string | null;
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata(await getPageSeo("home"), SITE_METADATA_FALLBACK);
+}
+
 export default async function Home() {
+  const seo = await getPageSeo("home");
   const hero = await fetchHomeSection<HeroData>("hero");
   const partners = await fetchHomeSection<PartnersData>("partners");
   const redefining = await fetchHomeSection<RedefiningData>("redefining");
@@ -161,6 +169,9 @@ export default async function Home() {
   const heroIsFirst = sections[0]?.id === "hero";
 
   return (
-    <div className={heroIsFirst ? undefined : "pt-20 lg:pt-24"}>{sections.map((s) => s.node)}</div>
+    <div className={heroIsFirst ? undefined : "pt-20 lg:pt-24"}>
+      <SeoJsonLd schema={seo.schema} />
+      {sections.map((s) => s.node)}
+    </div>
   );
 }

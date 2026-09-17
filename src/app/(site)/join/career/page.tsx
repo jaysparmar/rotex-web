@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { CareerHeroSection } from "@/components/sections/career-hero-section";
 import { CareerValuesSection } from "@/components/sections/career-values-section";
 import { CareerGallerySection } from "@/components/sections/career-gallery-section";
@@ -6,6 +7,8 @@ import { CareerOpenPositionsSection } from "@/components/sections/career-open-po
 import { CareerFormSection } from "@/components/sections/career-form-section";
 import { fetchCareerSection } from "@/lib/site-api";
 import { prisma } from "@/lib/prisma";
+import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 
 type CtaButton = { label: string; href: string };
 type HeroData = { title: string; description: string; cta: CtaButton };
@@ -15,7 +18,12 @@ type WhyData = { heading: string; description: string; cards: { title: string; d
 type PositionsData = { heading: string };
 type FormData = { heading: string; description: string; benefits: string[]; experienceOptions: string[] };
 
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata(await getPageSeo("join-career"), SITE_METADATA_FALLBACK);
+}
+
 export default async function CareerPage() {
+  const seo = await getPageSeo("join-career");
   const [hero, values, gallery, why, positions, form, jobRecords] = await Promise.all([
     fetchCareerSection<HeroData>("hero"),
     fetchCareerSection<ValuesData>("values"),
@@ -30,6 +38,8 @@ export default async function CareerPage() {
 
   return (
     <div>
+      <SeoJsonLd schema={seo.schema} />
+
       {hero?.enabled && (
         <CareerHeroSection
           title={hero.title}

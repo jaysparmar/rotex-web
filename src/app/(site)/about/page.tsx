@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { PillButton } from "@/components/ui/pill-button";
 import { fetchAboutSection } from "@/lib/site-api";
+import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 import { AboutHeroSection } from "@/components/sections/about-hero-section";
 import { AboutStorySection } from "@/components/sections/about-story-section";
 import { MissionVisionSection } from "@/components/sections/mission-vision-section";
@@ -43,7 +46,12 @@ type ResourcesData = {
   tabs: { id: string; label: string; cta: CtaButton; resources: { slug: string; title: string; image: string }[] }[];
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata(await getPageSeo("about"), SITE_METADATA_FALLBACK);
+}
+
 export default async function AboutPage() {
+  const seo = await getPageSeo("about");
   const hero = await fetchAboutSection<HeroData>("hero");
   const story = await fetchAboutSection<StoryData>("story");
   const missionVision = await fetchAboutSection<MissionVisionData>("mission-vision");
@@ -59,6 +67,8 @@ export default async function AboutPage() {
 
   return (
     <>
+      <SeoJsonLd schema={seo.schema} />
+
       {hero?.enabled && (
         <AboutHeroSection title={hero.title} description={hero.description} breadcrumbLabel={hero.breadcrumbLabel}>
           <PillButton

@@ -1,11 +1,19 @@
-"use client";
-import { useState } from "react";
-import { PartnerToolsLogin } from "@/components/sections/partner-tools-login";
-import { PartnerToolsGrid } from "@/components/sections/partner-tools-grid";
+import type { Metadata } from "next";
+import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { SeoJsonLd } from "@/components/seo/seo-json-ld";
+import { PartnerSalesToolsClient } from "./partner-sales-tools-client";
 
-export default function PartnerSalesToolsPage() {
-  const [unlocked, setUnlocked] = useState(false);
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata(await getPageSeo("join-partner-sales-tools"), SITE_METADATA_FALLBACK);
+}
 
-  if (!unlocked) return <PartnerToolsLogin onUnlock={() => setUnlocked(true)} />;
-  return <PartnerToolsGrid />;
+export default async function PartnerSalesToolsPage() {
+  const seo = await getPageSeo("join-partner-sales-tools");
+
+  return (
+    <>
+      <SeoJsonLd schema={seo.schema} />
+      <PartnerSalesToolsClient />
+    </>
+  );
 }

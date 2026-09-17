@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { SupplierHeroSection } from "@/components/sections/supplier-hero-section";
 import { SupplierBenefitsSection } from "@/components/sections/supplier-benefits-section";
 import { SupplierFormSection } from "@/components/sections/supplier-form-section";
 import { fetchSupplierSection, fetchIndustries } from "@/lib/site-api";
+import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 
 type IndustriesData = { industries: { id: string; name: string }[] };
 
@@ -25,7 +28,12 @@ type FormData = {
   defaultCountry: string;
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata(await getPageSeo("join-supplier"), SITE_METADATA_FALLBACK);
+}
+
 export default async function SupplierPage() {
+  const seo = await getPageSeo("join-supplier");
   const [hero, benefits, form, industriesData] = await Promise.all([
     fetchSupplierSection<HeroData>("hero"),
     fetchSupplierSection<BenefitsData>("benefits"),
@@ -38,6 +46,8 @@ export default async function SupplierPage() {
 
   return (
     <div>
+      <SeoJsonLd schema={seo.schema} />
+
       {hero?.enabled && (
         <SupplierHeroSection
           title={hero.title}
