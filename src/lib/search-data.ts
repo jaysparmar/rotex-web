@@ -42,9 +42,13 @@ async function curatedCategories(limit: number): Promise<SuggestedItem[]> {
  * results page's `tab=all` overview so the two never disagree about the same term.
  *
  * When `q` is empty, returns the first `limit` industry names (unfiltered "browse" list).
- * When `q` is non-empty, matches industries by name or by their products' name/modelNumber,
- * and projects to sub-industry names when an industry has sub-industries. A non-empty query
- * that genuinely matches nothing returns an empty array (no fabricated fallback).
+ * When `q` is non-empty, matches industries by name, by their sub-industries' names, or by
+ * their products' name/modelNumber. An industry whose own name matches the query is returned
+ * as-is. An industry matched via one or more of its sub-industry names returns just those
+ * matching sub-industries. An industry that only matched via its products projects to *all*
+ * of its sub-industry names (more specific), falling back to its own name when it has none.
+ * A non-empty query that genuinely matches nothing returns an empty array (no fabricated
+ * fallback).
  */
 export async function matchingIndustryNames(q: string, limit: number): Promise<string[]> {
   const query = q.trim();
@@ -58,6 +62,7 @@ export async function matchingIndustryNames(q: string, limit: number): Promise<s
     where: {
       OR: [
         { name: { contains: query } },
+        { subIndustries: { some: { name: { contains: query } } } },
         { products: { some: { name: { contains: query } } } },
         { products: { some: { modelNumber: { contains: query } } } },
       ],
@@ -66,8 +71,16 @@ export async function matchingIndustryNames(q: string, limit: number): Promise<s
     take: limit,
   });
 
+  const lowerQuery = query.toLowerCase();
   return Array.from(
-    new Set(industries.flatMap((ind) => (ind.subIndustries.length > 0 ? ind.subIndustries.map((s) => s.name) : [ind.name])))
+    new Set(
+      industries.flatMap((ind) => {
+        if (ind.name.toLowerCase().includes(lowerQuery)) return [ind.name];
+        const matchingSubIndustries = ind.subIndustries.filter((s) => s.name.toLowerCase().includes(lowerQuery));
+        if (matchingSubIndustries.length > 0) return matchingSubIndustries.map((s) => s.name);
+        return ind.subIndustries.length === 0 ? [ind.name] : ind.subIndustries.map((s) => s.name);
+      })
+    )
   ).slice(0, limit);
 }
 
