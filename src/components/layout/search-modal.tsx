@@ -6,12 +6,12 @@ import Link from "next/link";
 import { IoSearchOutline } from "react-icons/io5";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ImageView } from "@/components/ui/image-view";
-import type { SuggestedCategory } from "@/lib/search-data";
+import type { SuggestedItem } from "@/lib/search-data";
 
 export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const router = useRouter();
   const [term, setTerm] = useState("");
-  const [products, setProducts] = useState<SuggestedCategory[]>([]);
+  const [products, setProducts] = useState<SuggestedItem[]>([]);
   const [industries, setIndustries] = useState<string[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -73,8 +73,8 @@ export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChang
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {products.map((p) => (
                 <Link
-                  key={p.id}
-                  href={`/products?category=${p.slug}`}
+                  key={p.slug}
+                  href={term.trim() ? `/products/${p.slug}` : `/products?category=${p.slug}`}
                   onClick={() => onOpenChange(false)}
                   className="flex flex-col items-center gap-2 p-4 rounded-xl border border-neutral-200 hover:border-[#EF3E23] transition-colors"
                 >

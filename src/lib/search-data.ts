@@ -1,11 +1,13 @@
+import type { StaticImageData } from "next/image";
 import { prisma } from "@/lib/prisma";
 import { getProductsList } from "@/lib/products-data";
 import { flattenDownloadItems, type DownloadItem } from "@/lib/downloads-data";
 import type { ResourceItem, ResourceType } from "@/lib/resource-types";
 
-// ─── Modal quick-suggestions (Products = Categories, Industries) ──────────────
+// ─── Modal quick-suggestions (Products, Industries) ────────────────────────────
 
-export type SuggestedCategory = { id: string; slug: string; name: string; image: string | null };
+/** Empty query: curated Category suggestions. Typed query: matched Product suggestions. */
+export type SuggestedItem = { slug: string; name: string; image: string | StaticImageData | null };
 
 function dedupeByName<T extends { name: string }>(items: T[], limit: number): T[] {
   const seen = new Set<string>();
@@ -20,7 +22,7 @@ function dedupeByName<T extends { name: string }>(items: T[], limit: number): T[
   return result;
 }
 
-async function curatedCategories(limit: number): Promise<SuggestedCategory[]> {
+async function curatedCategories(limit: number): Promise<SuggestedItem[]> {
   const section = await prisma.homeSection.findUnique({ where: { key: "products" } });
   const categoryIds = ((section?.data as Record<string, unknown> | undefined)?.categoryIds as string[]) ?? [];
   if (categoryIds.length === 0) return [];
@@ -69,18 +71,15 @@ export async function matchingIndustryNames(q: string, limit: number): Promise<s
   ).slice(0, limit);
 }
 
-export async function getModalSuggestions(q: string): Promise<{ products: SuggestedCategory[]; industries: string[] }> {
+export async function getModalSuggestions(q: string): Promise<{ products: SuggestedItem[]; industries: string[] }> {
   const query = q.trim();
 
   const products = query
-    ? dedupeByName(
-        await prisma.category.findMany({
-          where: { OR: [{ name: { contains: query } }, { description: { contains: query } }] },
-          select: { id: true, slug: true, name: true, image: true },
-          take: 16,
-        }),
-        4
-      )
+    ? (await getProductsList({ search: query, pageSize: 4 })).products.map(({ slug, name, image }) => ({
+        slug,
+        name,
+        image,
+      }))
     : await curatedCategories(4);
 
   const industries = query ? await matchingIndustryNames(query, 6) : [];
