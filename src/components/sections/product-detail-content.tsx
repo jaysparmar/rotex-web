@@ -8,10 +8,12 @@ import { VariantConfigurator } from "@/components/ui/variant-configurator";
 import { ProductTabs } from "@/components/ui/product-tabs";
 import { ProductQuoteFormInline, ProductQuoteFormSheet } from "@/components/sections/product-quote-form";
 import { crumbsFromCategory } from "@/lib/breadcrumb";
+import { cn } from "@/lib/utils";
 import type { ProductDetail, ProductVariant } from "@/lib/product-detail-data";
 
 export function ProductDetailContent({ product }: { product: ProductDetail }) {
   const isVariable = product.productType === "variable" && !!product.variants;
+  const hasImages = product.images.length > 0;
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
     isVariable ? product.variants?.[0] : undefined
@@ -67,7 +69,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
 
       {/* Hero: info + gallery */}
       <div className="flex justify-between items-start gap-10 flex-wrap lg:flex-nowrap">
-        <div className="w-full lg:max-w-144 flex flex-col gap-10">
+        <div className={cn("order-2 lg:order-1 w-full flex flex-col gap-10", hasImages && "lg:max-w-144")}>
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <p className="text-orange-600 text-xl font-bold font-montserrat uppercase tracking-[4px]">
@@ -82,7 +84,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
                     </span>
                   ))}
                 </div>
-                <h1 className="text-black text-4xl font-normal font-montserrat leading-10">{product.name}</h1>
+                <h1 className="text-black text-2xl lg:text-4xl font-normal font-montserrat leading-8 lg:leading-10">{product.name}</h1>
               </div>
               <p className="text-black text-base font-medium font-montserrat leading-6">{product.description}</p>
             </div>
@@ -125,7 +127,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
           <button
             type="button"
             onClick={handleHeroQuoteClick}
-            className="w-60 px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
+            className="w-full lg:w-60 px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
           >
             <span className="text-center text-white text-sm font-semibold font-montserrat uppercase">
               Request a Quote
@@ -133,13 +135,17 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
           </button>
         </div>
 
-        <ProductGallery images={product.images} alt={product.name} />
+        {hasImages && (
+          <div className="order-1 lg:order-2 w-full">
+            <ProductGallery images={product.images} alt={product.name} />
+          </div>
+        )}
       </div>
 
       {/* Variant configurator + tabs */}
       {isVariable && product.variants ? (
         <div className="flex flex-col gap-7">
-          <h2 className="text-stone-900 text-4xl font-normal font-montserrat leading-10">Configure Product Variant</h2>
+          <h2 className="text-stone-900 text-2xl lg:text-4xl font-normal font-montserrat leading-8 lg:leading-10">Configure Product Variant</h2>
           <div className="flex justify-between items-start gap-10 flex-wrap lg:flex-nowrap">
             <div className="w-full lg:max-w-120">
               <VariantConfigurator
@@ -157,6 +163,16 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
               />
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setQuoteOpen(true)}
+            className="lg:hidden w-full px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
+          >
+            <span className="text-center text-white text-sm font-semibold font-montserrat uppercase">
+              Request Quote for This Variant
+            </span>
+          </button>
         </div>
       ) : (
         <ProductTabs features={features} specifications={specifications} downloads={downloads} />

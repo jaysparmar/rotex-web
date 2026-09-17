@@ -16,8 +16,8 @@ export function ProductGallery({ images, alt }: { images: (StaticImageData | str
   };
 
   return (
-    <div className="w-full aspect-[630/530] max-w-158 bg-neutral-100 rounded-3xl relative">
-      <div className="absolute inset-0 flex items-center justify-center p-14">
+    <div className="w-full aspect-[630/530] max-w-158 bg-neutral-100 rounded-2xl lg:rounded-3xl relative">
+      <div className="absolute inset-0 flex items-center justify-center p-6 lg:p-14">
         <div className={cn("relative w-full h-full transition-transform duration-200", zoomed && "scale-125")}>
           <Image src={images[activeIndex]} alt={alt} fill className="object-contain" sizes="630px" />
         </div>
@@ -45,24 +45,25 @@ export function ProductGallery({ images, alt }: { images: (StaticImageData | str
 
       {/* Thumbnails */}
       {showArrows && (
-        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
+        <div className="absolute -bottom-6 lg:-bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 lg:gap-3">
           <button
             type="button"
             onClick={() => goTo(-1)}
             aria-label="Previous image"
-            className="size-8 flex items-center justify-center text-neutral-400 hover:text-stone-900 border rounded-full bg-white border-neutral-500 hover:border-stone-900 transition-colors"
+            className="size-6 lg:size-8 shrink-0 flex items-center justify-center text-neutral-400 hover:text-stone-900 border rounded-full bg-white border-neutral-500 hover:border-stone-900 transition-colors"
           >
-            <IoChevronBackOutline size={16} />
+            <IoChevronBackOutline size={14} className="lg:hidden" />
+            <IoChevronBackOutline size={16} className="hidden lg:block" />
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 lg:gap-2">
             {images.map((img, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => setActiveIndex(i)}
                 className={cn(
-                  "size-16 relative rounded-lg overflow-hidden border bg-white",
+                  "size-11 lg:size-16 relative rounded-lg overflow-hidden border bg-white",
                   i === activeIndex ? "border-stone-900" : "border-transparent"
                 )}
               >
@@ -75,9 +76,10 @@ export function ProductGallery({ images, alt }: { images: (StaticImageData | str
             type="button"
             onClick={() => goTo(1)}
             aria-label="Next image"
-            className="size-8 flex items-center justify-center text-neutral-400 hover:text-stone-900 border rounded-full bg-white border-neutral-500 hover:border-stone-900 transition-colors"
+            className="size-6 lg:size-8 shrink-0 flex items-center justify-center text-neutral-400 hover:text-stone-900 border rounded-full bg-white border-neutral-500 hover:border-stone-900 transition-colors"
           >
-            <IoChevronForwardOutline size={16} />
+            <IoChevronForwardOutline size={14} className="lg:hidden" />
+            <IoChevronForwardOutline size={16} className="hidden lg:block" />
           </button>
         </div>
       )}

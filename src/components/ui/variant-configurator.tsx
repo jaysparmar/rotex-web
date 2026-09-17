@@ -118,7 +118,7 @@ export function VariantConfigurator({
       <button
         type="button"
         onClick={onRequestQuote}
-        className="w-fit px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
+        className="hidden lg:flex w-fit px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full justify-center items-center gap-3.5 transition-colors"
       >
         <span className="text-center text-white text-sm font-semibold font-montserrat uppercase leading-5">
           Request Quote for This Variant
