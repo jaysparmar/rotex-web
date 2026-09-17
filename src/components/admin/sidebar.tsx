@@ -31,6 +31,7 @@ import {
   Building2,
   SlidersHorizontal,
   Tag,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,7 @@ const PAGE_ITEMS = [
   { href: "/admin/supplier", label: "Supplier Page", icon: Truck },
   { href: "/admin/partner-sales-tools", label: "Partner Sales Tools", icon: Wrench },
   { href: "/admin/legal", label: "Legal Pages", icon: Shield },
+  { href: "/admin/seo", label: "SEO Settings", icon: Search },
 ];
 
 const NAV_ITEMS = [
