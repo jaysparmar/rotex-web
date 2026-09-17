@@ -13,10 +13,14 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
-export const metadata: Metadata = {
-  title: "Rotex | Industrial Solutions",
-  description: "Leading provider of industrial rotary solutions and equipment",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getResolvedGlobalConfig();
+  return {
+    title: "Rotex | Industrial Solutions",
+    description: "Leading provider of industrial rotary solutions and equipment",
+    icons: config.favicon?.src ? { icon: config.favicon.src } : undefined,
+  };
+}
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const config = await getResolvedGlobalConfig();

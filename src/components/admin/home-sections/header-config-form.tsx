@@ -16,6 +16,7 @@ type BlogOption = { slug: string; title: string };
 
 type FormValues = {
   logo: { src: string; alt: string; href: string };
+  favicon: { src: string };
   header: { nav: PrismaJson.NavItem[]; cta: { label: string; href: string } };
 };
 
@@ -37,7 +38,7 @@ export function HeaderConfigForm({
   const nav = useFieldArray({ control: form.control, name: "header.nav" });
 
   function onSubmit(values: FormValues) {
-    run(() => saveGlobalConfig({ logo: values.logo, header: values.header, footer } as never));
+    run(() => saveGlobalConfig({ logo: values.logo, favicon: values.favicon, header: values.header, footer } as never));
   }
 
   return (
@@ -47,6 +48,11 @@ export function HeaderConfigForm({
           <h2 className="text-sm font-semibold">Logo</h2>
           <MediaField name="logo" mediaType="image" />
           <TextField label="Href" {...form.register("logo.href")} />
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-sm font-semibold">Favicon</h2>
+          <MediaField name="favicon" mediaType="image" showAlt={false} previewFit="contain" />
         </section>
 
         <section className="space-y-4">
