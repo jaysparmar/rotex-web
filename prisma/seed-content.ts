@@ -24,7 +24,7 @@ function load<T>(name: string): T[] {
 async function main() {
   const globalConfig = load<any>("globalConfig");
   const adminConfig = load<any>("adminConfig");
-  const homeSeo = load<any>("homeSeo");
+  const seoPages = load<any>("seoPages");
   const homeSections = load<any>("homeSections");
   const partners = load<any>("partners");
   const customerStories = load<any>("customerStories");
@@ -53,8 +53,8 @@ async function main() {
   for (const row of homeSections) {
     await prisma.homeSection.upsert({ where: { key: row.key }, update: row, create: row });
   }
-  for (const row of homeSeo) {
-    await prisma.homeSeo.upsert({ where: { id: row.id }, update: row, create: row });
+  for (const row of seoPages) {
+    await prisma.seoPage.upsert({ where: { key: row.key }, update: row, create: row });
   }
   for (const row of globalConfig) {
     await prisma.globalConfig.upsert({ where: { id: row.id }, update: row, create: row });

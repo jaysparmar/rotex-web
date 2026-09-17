@@ -271,12 +271,15 @@ const RESOURCES: { type: string; slug: string; title: string; image: string }[] 
   { type: "blogs", slug: "flow-control-oil-gas", title: "Flow Control in the Oil & Gas Industry: Challenges and Solutions", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80" },
 ];
 
-const HOME_SEO = {
+const HOME_SEO: PrismaJson.SeoMetaData = {
   title: "Rotex | Flow Control. Where It Matters Most.",
   description:
     "Engineered flow control solutions that reduce downtime, enhance safety, and ensure uninterrupted operations across critical industries.",
-  og_image: { src: "https://cdn.rotex.com/og/home.jpg", alt: "Rotex — Flow Control Solutions" },
+  keywords: [],
+  ogImage: { src: "https://cdn.rotex.com/og/home.jpg", alt: "Rotex — Flow Control Solutions" },
   canonical: "https://www.rotex.com",
+  noindex: false,
+  schema: "",
 };
 
 const SECTIONS: { key: string; order: number; data: unknown }[] = [
@@ -430,10 +433,10 @@ async function main() {
     create: { id: "global", data: GLOBAL_CONFIG },
   });
 
-  await prisma.homeSeo.upsert({
-    where: { id: "home" },
-    update: { data: HOME_SEO },
-    create: { id: "home", data: HOME_SEO },
+  await prisma.seoPage.upsert({
+    where: { key: "home" },
+    update: { data: HOME_SEO as never },
+    create: { key: "home", data: HOME_SEO as never },
   });
 
   for (const partner of PARTNERS) {

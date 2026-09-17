@@ -19,7 +19,7 @@ async function main() {
   const [
     globalConfig,
     adminConfig,
-    homeSeo,
+    seoPages,
     homeSections,
     partners,
     customerStories,
@@ -29,7 +29,7 @@ async function main() {
   ] = await Promise.all([
     prisma.globalConfig.findMany(),
     prisma.adminConfig.findMany(),
-    prisma.homeSeo.findMany(),
+    prisma.seoPage.findMany(),
     prisma.homeSection.findMany(),
     prisma.partner.findMany(),
     prisma.customerStory.findMany(),
@@ -41,7 +41,7 @@ async function main() {
   const dump: Record<string, unknown> = {
     globalConfig,
     adminConfig,
-    homeSeo,
+    seoPages,
     homeSections,
     partners,
     customerStories,
