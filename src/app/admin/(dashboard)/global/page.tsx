@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PanelTop, PanelBottom, LayoutPanelLeft, MessageCircle } from "lucide-react";
+import { PanelTop, PanelBottom, LayoutPanelLeft, MessageCircle, Bot } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 
@@ -27,6 +27,12 @@ const SECTIONS = [
     label: "WhatsApp Button",
     description: "Floating WhatsApp button shown in the bottom-right corner of every public page.",
     icon: MessageCircle,
+  },
+  {
+    key: "ask-ai",
+    label: "Ask AI Button",
+    description: "Floating Ask AI button that opens an iframe panel on every public page.",
+    icon: Bot,
   },
 ];
 

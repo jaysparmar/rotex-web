@@ -97,6 +97,8 @@ declare global {
       partnerTools?: { password: string };
       /* Floating WhatsApp button, bottom-right on every public page. */
       whatsapp?: { enabled: boolean; link: string };
+      /* Floating "Ask AI" button that opens an iframe panel, bottom-right on every public page. */
+      askAi?: { enabled: boolean; iframeUrl: string; label?: string };
     };
 
     type AdminConfigData = {

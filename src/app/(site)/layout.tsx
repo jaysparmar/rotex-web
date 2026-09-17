@@ -4,6 +4,7 @@ import "../globals.css";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
+import { AskAiButton } from "@/components/layout/ask-ai-button";
 import { PageLoader } from "@/components/ui/page-loader";
 import { HashScroll } from "@/components/ui/hash-scroll";
 import { getResolvedGlobalConfig } from "@/lib/global-config";
@@ -31,6 +32,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <main>{children}</main>
         <Footer config={config} />
         <WhatsAppButton config={config.whatsapp} />
+        <AskAiButton config={config.askAi} />
       </body>
     </html>
   );
