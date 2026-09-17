@@ -1,14 +1,34 @@
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { CompanyList } from "@/components/admin/companies/company-list";
 
-export default async function AdminCompaniesPage() {
-  const companies = await prisma.company.findMany({
-    orderBy: { createdAt: "asc" },
-    include: {
-      categories: { select: { id: true } },
-    },
-  });
+const PAGE_SIZE = 20;
+
+export default async function AdminCompaniesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; q?: string }>;
+}) {
+  const { page: pageParam, q } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const where: Prisma.CompanyWhereInput = q
+    ? { OR: [{ name: { contains: q } }, { slug: { contains: q } }] }
+    : {};
+
+  const [companies, total] = await Promise.all([
+    prisma.company.findMany({
+      where,
+      orderBy: { createdAt: "asc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+      include: {
+        categories: { select: { id: true } },
+      },
+    }),
+    prisma.company.count({ where }),
+  ]);
 
   const rows = companies.map((company) => ({
     id: company.id,
@@ -29,7 +49,7 @@ export default async function AdminCompaniesPage() {
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Companies" }]} />
       </div>
 
-      <CompanyList companies={rows} />
+      <CompanyList companies={rows} total={total} page={page} pageSize={PAGE_SIZE} q={q ?? ""} />
     </div>
   );
 }

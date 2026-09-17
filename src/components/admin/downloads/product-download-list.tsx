@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, Download as DownloadIcon, FileText } from "lucide-react";
+import { ExternalLink, Download as DownloadIcon, FileText, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminPagination } from "@/components/ui/admin-pagination";
 import { EmptyState } from "@/components/admin/empty-state";
-import { Pagination } from "@/components/ui/pagination";
+import { useAdminListUrl } from "@/hooks/use-admin-list-url";
+import { useDebouncedUrlSearch } from "@/hooks/use-debounced-url-search";
 
 export type ProductSourcedDownload = {
   id: string;
@@ -23,36 +25,38 @@ export type ProductSourcedDownload = {
 };
 
 const ALL = "all";
-const PAGE_SIZE = 20;
 
 export function ProductDownloadList({
   items,
+  total,
+  page,
+  pageSize,
+  q,
+  categoryId,
   categories,
+  tabCounts,
+  totalAll,
 }: {
   items: ProductSourcedDownload[];
+  total: number;
+  page: number;
+  pageSize: number;
+  q: string;
+  categoryId: string;
   categories: { id: string; name: string }[];
+  tabCounts: Record<string, number>;
+  totalAll: number;
 }) {
-  const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
-  const [page, setPage] = useState(1);
+  const { pageHref, setParam } = useAdminListUrl();
+  const { search, onSearchChange } = useDebouncedUrlSearch(q);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  const filters = useMemo(
-    () => [
-      { id: ALL, label: "All", count: items.length },
-      ...categories.map((c) => ({ id: c.id, label: c.name, count: items.filter((i) => i.categoryId === c.id).length })),
-    ],
-    [items, categories]
-  );
+  const tabs = [
+    { id: ALL, label: "All", count: totalAll },
+    ...categories.map((c) => ({ id: c.id, label: c.name, count: tabCounts[c.id] ?? 0 })),
+  ];
 
-  const filteredItems = categoryFilter === ALL ? items : items.filter((i) => i.categoryId === categoryFilter);
-  const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
-  const visibleItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  function changeCategory(id: string) {
-    setCategoryFilter(id);
-    setPage(1);
-  }
-
-  if (items.length === 0) {
+  if (totalAll === 0) {
     return (
       <div className="rounded-lg border border-border">
         <EmptyState
@@ -66,24 +70,38 @@ export function ProductDownloadList({
 
   return (
     <div className="space-y-4">
-      <Tabs value={categoryFilter} onValueChange={(v) => changeCategory(v as string)}>
+      <Tabs value={categoryId} onValueChange={(v) => setParam("categoryId", v === ALL ? undefined : (v as string))}>
         <TabsList className="h-auto flex-wrap">
-          {filters.map((f) => (
-            <TabsTrigger key={f.id} value={f.id} className="gap-1.5">
-              {f.label}
-              <span className="text-[10px] opacity-70">{f.count}</span>
+          {tabs.map((t) => (
+            <TabsTrigger key={t.id} value={t.id} className="gap-1.5">
+              {t.label}
+              <span className="text-[10px] opacity-70">{t.count}</span>
             </TabsTrigger>
           ))}
         </TabsList>
       </Tabs>
 
-      {visibleItems.length === 0 ? (
+      <div className="relative w-full max-w-xs">
+        <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search by title or product..."
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-8"
+        />
+      </div>
+
+      {items.length === 0 ? (
         <div className="rounded-lg border border-border">
-          <EmptyState icon={DownloadIcon} title="No downloads in this category" description="Try a different category." />
+          <EmptyState
+            icon={DownloadIcon}
+            title="No downloads match your filters"
+            description="Try a different category or search."
+          />
         </div>
       ) : (
         <div className="divide-y divide-border rounded-lg border border-border">
-          {visibleItems.map((item) => (
+          {items.map((item) => (
             <div key={item.id} className="flex flex-wrap items-center gap-4 p-4">
               <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
                 {item.image ? (
@@ -113,9 +131,9 @@ export function ProductDownloadList({
         </div>
       )}
 
-      <div className="flex justify-end">
-        <Pagination page={page} totalPages={totalPages} onChange={setPage} />
-      </div>
+      {total > 0 && (
+        <AdminPagination page={page} totalPages={totalPages} total={total} itemLabel="download" pageHref={pageHref} />
+      )}
     </div>
   );
 }

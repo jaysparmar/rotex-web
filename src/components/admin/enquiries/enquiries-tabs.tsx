@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { Mail, Phone, MapPin, Building2, FileText, Calendar } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AdminPagination } from "@/components/ui/admin-pagination";
+import { useAdminListUrl } from "@/hooks/use-admin-list-url";
+import { OTHER_TAB, NO_PRODUCT_PLACEHOLDER } from "@/lib/enquiry-filters";
 
 const ALL_PRODUCTS = "__all__";
 
-type Industry = { id: string; name: string };
 type Enquiry = {
   id: string;
   source: string;
@@ -24,13 +25,6 @@ type Enquiry = {
   fileUrl: string | null;
   createdAt: Date;
 };
-
-const SUPPLIER_TAB = "Supplier Applications";
-const OTHER_TAB = "Other";
-
-// The Supplier form reuses this table but has no real "product" — it sends
-// this literal placeholder to satisfy the NOT NULL column. Hide it in the UI.
-const NO_PRODUCT_PLACEHOLDER = "Supplier Application";
 
 function DetailRow({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | null | undefined }) {
   if (!value) return null;
@@ -94,43 +88,37 @@ function EnquiryCard({ enquiry, tab }: { enquiry: Enquiry; tab: string }) {
   );
 }
 
-export function EnquiriesTabs({ industries, enquiries }: { industries: Industry[]; enquiries: Enquiry[] }) {
-  const industryNames = industries.map((i) => i.name);
+export function EnquiriesTabs({
+  tabs,
+  tabCounts,
+  active,
+  enquiries,
+  total,
+  page,
+  pageSize,
+  product,
+  productNames,
+}: {
+  tabs: string[];
+  tabCounts: Record<string, number>;
+  active: string;
+  enquiries: Enquiry[];
+  total: number;
+  page: number;
+  pageSize: number;
+  product: string;
+  productNames: string[];
+}) {
+  const { searchParams, pathname, router, pageHref, setParam } = useAdminListUrl();
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  // Supplier applications get their own tab — they were never "about" an
-  // industry, the form just repurposes the same table/columns.
-  const supplierEnquiries = enquiries.filter((e) => e.source === "supplier");
-  const nonSupplier = enquiries.filter((e) => e.source !== "supplier");
-  const otherEnquiries = nonSupplier.filter((e) => !industryNames.includes(e.industryName));
-
-  const tabs = [
-    ...industryNames,
-    ...(supplierEnquiries.length > 0 ? [SUPPLIER_TAB] : []),
-    ...(otherEnquiries.length > 0 ? [OTHER_TAB] : []),
-  ];
-
-  const [active, setActive] = useState(tabs[0] ?? "");
-
-  function enquiriesForTab(name: string) {
-    if (name === SUPPLIER_TAB) return supplierEnquiries;
-    if (name === OTHER_TAB) return otherEnquiries;
-    return nonSupplier.filter((e) => e.industryName === name);
+  function changeTab(name: string) {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", name);
+    params.delete("product");
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`);
   }
-
-  const tabEnquiries = enquiriesForTab(active);
-
-  const productNames = Array.from(
-    new Set(
-      tabEnquiries
-        .map((e) => e.product)
-        .filter((p) => p && p !== NO_PRODUCT_PLACEHOLDER)
-    )
-  ).sort();
-
-  const [productFilter, setProductFilter] = useState("");
-  const filtered = productFilter
-    ? tabEnquiries.filter((e) => e.product === productFilter)
-    : tabEnquiries;
 
   return (
     <div className="space-y-4">
@@ -138,10 +126,7 @@ export function EnquiriesTabs({ industries, enquiries }: { industries: Industry[
         {tabs.map((name) => (
           <button
             key={name}
-            onClick={() => {
-              setActive(name);
-              setProductFilter("");
-            }}
+            onClick={() => changeTab(name)}
             className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
               active === name
                 ? "border-primary text-primary"
@@ -149,15 +134,15 @@ export function EnquiriesTabs({ industries, enquiries }: { industries: Industry[
             }`}
           >
             {name}
-            <span className="rounded-full bg-muted px-1.5 py-0.5 text-xs">{enquiriesForTab(name).length}</span>
+            <span className="rounded-full bg-muted px-1.5 py-0.5 text-xs">{tabCounts[name] ?? 0}</span>
           </button>
         ))}
       </div>
 
       {productNames.length > 0 && (
         <Select
-          value={productFilter || ALL_PRODUCTS}
-          onValueChange={(v) => setProductFilter(v === ALL_PRODUCTS ? "" : (v as string))}
+          value={product || ALL_PRODUCTS}
+          onValueChange={(v) => setParam("product", v === ALL_PRODUCTS ? undefined : (v as string))}
         >
           <SelectTrigger className="w-56">
             <SelectValue />
@@ -173,16 +158,20 @@ export function EnquiriesTabs({ industries, enquiries }: { industries: Industry[
         </Select>
       )}
 
-      {filtered.length === 0 ? (
+      {enquiries.length === 0 ? (
         <p className="rounded-lg border border-border py-8 text-center text-sm text-muted-foreground">
           No enquiries here yet.
         </p>
       ) : (
         <div className="grid gap-3 lg:grid-cols-2">
-          {filtered.map((e) => (
+          {enquiries.map((e) => (
             <EnquiryCard key={e.id} enquiry={e} tab={active} />
           ))}
         </div>
+      )}
+
+      {total > 0 && (
+        <AdminPagination page={page} totalPages={totalPages} total={total} itemLabel="enquiry" itemLabelPlural="enquiries" pageHref={pageHref} />
       )}
     </div>
   );

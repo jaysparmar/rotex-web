@@ -1,3 +1,4 @@
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { CertificationList } from "@/components/admin/certifications/certification-list";
@@ -7,18 +8,25 @@ const PAGE_SIZE = 12;
 export default async function AdminCertificationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; published?: string }>;
 }) {
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, q, published } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
+
+  const where: Prisma.CertificationWhereInput = {
+    ...(q ? { name: { contains: q } } : {}),
+    ...(published === "true" ? { published: true } : {}),
+    ...(published === "false" ? { published: false } : {}),
+  };
 
   const [certifications, total] = await Promise.all([
     prisma.certification.findMany({
+      where,
       orderBy: { createdAt: "asc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
-    prisma.certification.count(),
+    prisma.certification.count({ where }),
   ]);
 
   return (
@@ -33,7 +41,14 @@ export default async function AdminCertificationsPage({
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Certifications" }]} />
       </div>
 
-      <CertificationList certifications={certifications} total={total} page={page} pageSize={PAGE_SIZE} />
+      <CertificationList
+        certifications={certifications}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        q={q ?? ""}
+        published={published ?? ""}
+      />
     </div>
   );
 }

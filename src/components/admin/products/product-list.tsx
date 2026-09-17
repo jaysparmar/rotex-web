@@ -1,11 +1,10 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { ChevronRight, Trash2, Plus, Layers, Search, SlidersHorizontal, X } from "lucide-react";
+import { ChevronRight, Trash2, Plus, Layers, Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +21,9 @@ import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { TypeToConfirmDialog } from "@/components/admin/products/type-to-confirm-dialog";
 import { ProductFiltersSheet } from "@/components/admin/products/product-filters-sheet";
 import { ImportProductsButton } from "@/components/admin/products/import-products-button";
+import { FilterChips } from "@/components/admin/filter-chips";
+import { useAdminListUrl } from "@/hooks/use-admin-list-url";
+import { useDebouncedUrlSearch } from "@/hooks/use-debounced-url-search";
 import {
   deleteProduct,
   deleteProducts,
@@ -73,14 +75,10 @@ export function ProductList({
   industries: IndustryOption[];
   attributeValues: Record<string, string[]>;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { pageHref, removeParams, clearAll } = useAdminListUrl();
+  const { search, onSearchChange: handleSearchChange } = useDebouncedUrlSearch(q);
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<ProductRow | null>(null);
-  const [search, setSearch] = useState(q);
-  const [prevQ, setPrevQ] = useState(q);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -89,35 +87,12 @@ export function ProductList({
   const [filterDeleteTarget, setFilterDeleteTarget] = useState<FilterDeleteTarget | null>(null);
   const [countingType, setCountingType] = useState<"variable" | "simple" | null>(null);
 
-  if (q !== prevQ) {
-    setPrevQ(q);
-    setSearch(q);
-  }
-
   const searchKey = `${q}|${page}|${FILTER_KEYS.map((k) => filters[k] ?? "").join("|")}`;
   const [prevSearchKey, setPrevSearchKey] = useState(searchKey);
   if (searchKey !== prevSearchKey) {
     setPrevSearchKey(searchKey);
     setSelectedIds(new Set());
     setSelectAllAcrossPages(false);
-  }
-
-  function handleSearchChange(value: string) {
-    setSearch(value);
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      const params = new URLSearchParams(searchParams);
-      if (value) params.set("q", value);
-      else params.delete("q");
-      params.delete("page");
-      router.push(`${pathname}?${params.toString()}`);
-    }, 350);
-  }
-
-  function pageHref(nextPage: number) {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", String(nextPage));
-    return `${pathname}?${params.toString()}`;
   }
 
   function confirmDelete() {
@@ -255,21 +230,12 @@ export function ProductList({
     return ATTR_LABEL_BY_KEY[key] ?? key;
   }
 
-  function removeFilter(key: (typeof FILTER_KEYS)[number]) {
-    const params = new URLSearchParams(searchParams);
-    params.delete(key);
-    params.delete("page");
-    router.push(`${pathname}?${params.toString()}`);
-  }
-
-  function clearAllFilters() {
-    const params = new URLSearchParams(searchParams);
-    for (const key of FILTER_KEYS) params.delete(key);
-    params.delete("page");
-    router.push(`${pathname}?${params.toString()}`);
-  }
-
   const activeFilters = FILTER_KEYS.filter((k) => filters[k]);
+  const filterChips = activeFilters.map((key) => ({
+    key,
+    label: filterFieldLabel(key),
+    value: resolveFilterLabel(key, filters[key]!),
+  }));
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const selectionCount = selectAllAcrossPages ? total : selectedIds.size;
 
@@ -326,29 +292,11 @@ export function ProductList({
         </div>
       </div>
 
-      {activeFilters.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5">
-          {activeFilters.map((key) => (
-            <Badge key={key} variant="outline" className="gap-1 pr-1">
-              {filterFieldLabel(key)}: {resolveFilterLabel(key, filters[key]!)}
-              <button
-                type="button"
-                className="rounded-full p-0.5 hover:bg-muted"
-                onClick={() => removeFilter(key)}
-              >
-                <X className="size-3" />
-              </button>
-            </Badge>
-          ))}
-          <button
-            type="button"
-            className="text-xs text-muted-foreground underline-offset-2 hover:underline"
-            onClick={clearAllFilters}
-          >
-            Clear all
-          </button>
-        </div>
-      )}
+      <FilterChips
+        chips={filterChips}
+        onRemove={(key) => removeParams([key])}
+        onClearAll={() => clearAll([...FILTER_KEYS])}
+      />
 
       {selectionCount > 0 && (
         <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-2">

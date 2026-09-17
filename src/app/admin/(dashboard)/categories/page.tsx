@@ -1,15 +1,37 @@
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { CategoryFlatList } from "@/components/admin/categories/category-flat-list";
 
-export default async function AdminCategoriesPage() {
-  const categories = await prisma.category.findMany({
-    orderBy: [{ company: { name: "asc" } }, { order: "asc" }],
-    include: {
-      company: { select: { id: true, name: true } },
-      _count: { select: { products: true, subCategories: true } },
-    },
-  });
+const PAGE_SIZE = 20;
+
+export default async function AdminCategoriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; q?: string; companyId?: string }>;
+}) {
+  const { page: pageParam, q, companyId } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const where: Prisma.CategoryWhereInput = {
+    ...(q ? { OR: [{ name: { contains: q } }, { slug: { contains: q } }] } : {}),
+    ...(companyId ? { companyId } : {}),
+  };
+
+  const [categories, total, companies] = await Promise.all([
+    prisma.category.findMany({
+      where,
+      orderBy: [{ company: { name: "asc" } }, { order: "asc" }],
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+      include: {
+        company: { select: { id: true, name: true } },
+        _count: { select: { products: true, subCategories: true } },
+      },
+    }),
+    prisma.category.count({ where }),
+    prisma.company.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+  ]);
 
   const rows = categories.map((c) => ({
     id: c.id,
@@ -34,7 +56,15 @@ export default async function AdminCategoriesPage() {
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Categories" }]} />
       </div>
 
-      <CategoryFlatList categories={rows} />
+      <CategoryFlatList
+        categories={rows}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        q={q ?? ""}
+        companyId={companyId ?? ""}
+        companies={companies}
+      />
     </div>
   );
 }

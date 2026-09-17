@@ -2,8 +2,16 @@ import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { IndustryList } from "@/components/admin/industries/industry-list";
 
-export default async function AdminIndustriesPage() {
+export default async function AdminIndustriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
+  const where = q ? { OR: [{ name: { contains: q } }, { slug: { contains: q } }] } : {};
+
   const industries = await prisma.industry.findMany({
+    where,
     orderBy: { createdAt: "asc" },
     include: {
       subIndustries: {
@@ -30,7 +38,7 @@ export default async function AdminIndustriesPage() {
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Industries" }]} />
       </div>
 
-      <IndustryList industries={rows} />
+      <IndustryList industries={rows} q={q ?? ""} />
     </div>
   );
 }

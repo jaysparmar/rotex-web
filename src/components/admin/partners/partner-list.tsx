@@ -2,40 +2,47 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
-import { usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Handshake } from "lucide-react";
+import { Pencil, Trash2, Plus, Handshake, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdminPagination } from "@/components/ui/admin-pagination";
 import { PartnerFormDialog } from "@/components/admin/partners/partner-form-dialog";
 import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { deletePartner, togglePartnerPublished } from "@/app/admin/(dashboard)/partners/actions";
+import { useAdminListUrl } from "@/hooks/use-admin-list-url";
+import { useDebouncedUrlSearch } from "@/hooks/use-debounced-url-search";
 
 type Partner = { id: string; name: string; logo: string; published: boolean };
+
+const PUBLISHED_OPTIONS = [
+  { value: "", label: "All" },
+  { value: "true", label: "Published" },
+  { value: "false", label: "Unpublished" },
+];
 
 export function PartnerList({
   partners,
   total,
   page,
   pageSize,
+  q,
+  published,
 }: {
   partners: Partner[];
   total: number;
   page: number;
   pageSize: number;
+  q: string;
+  published: string;
 }) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { pageHref, setParam } = useAdminListUrl();
+  const { search, onSearchChange } = useDebouncedUrlSearch(q);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
-  function pageHref(nextPage: number) {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", String(nextPage));
-    return `${pathname}?${params.toString()}`;
-  }
 
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<Partner | null>(null);
@@ -67,7 +74,35 @@ export function PartnerList({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-full max-w-xs">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search by name..."
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <Select
+            items={PUBLISHED_OPTIONS}
+            value={published}
+            onValueChange={(v) => setParam("published", v as string)}
+          >
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
+            <SelectContent>
+              {PUBLISHED_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <PartnerFormDialog
           trigger={
             <Button size="sm" className="gap-1.5">
@@ -80,7 +115,11 @@ export function PartnerList({
 
       {total === 0 ? (
         <div className="rounded-lg border border-border">
-          <EmptyState icon={Handshake} title="No partners yet" description="Add a partner to get started." />
+          <EmptyState
+            icon={Handshake}
+            title={q || published ? "No partners match your filters" : "No partners yet"}
+            description={q || published ? "Try a different search or filter." : "Add a partner to get started."}
+          />
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">

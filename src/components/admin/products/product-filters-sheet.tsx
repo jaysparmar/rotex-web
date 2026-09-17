@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useAdminListUrl } from "@/hooks/use-admin-list-url";
 import {
   Sheet,
   SheetContent,
@@ -40,9 +40,7 @@ export function ProductFiltersSheet({
   industries: IndustryOption[];
   attributeValues: Record<string, string[]>;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { searchParams, pathname, router } = useAdminListUrl();
 
   const [pending, setPending] = useState<ProductFilterParams>(filters);
   const [prevKey, setPrevKey] = useState(filtersKey(filters));

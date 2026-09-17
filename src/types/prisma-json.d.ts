@@ -95,6 +95,8 @@ declare global {
       };
       /* Gate for /join/partner-sales-tools. Read server-side only. */
       partnerTools?: { password: string };
+      /* Floating WhatsApp button, bottom-right on every public page. */
+      whatsapp?: { enabled: boolean; link: string };
     };
 
     type AdminConfigData = {

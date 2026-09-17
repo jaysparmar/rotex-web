@@ -2,16 +2,19 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
-import { usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Award as AwardIcon, Pencil, Trash2, Plus } from "lucide-react";
+import { Award as AwardIcon, Pencil, Trash2, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdminPagination } from "@/components/ui/admin-pagination";
 import { AwardFormDialog } from "@/components/admin/awards/award-form-dialog";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { deleteAward, toggleAwardPublished } from "@/app/admin/(dashboard)/awards/actions";
+import { useAdminListUrl } from "@/hooks/use-admin-list-url";
+import { useDebouncedUrlSearch } from "@/hooks/use-debounced-url-search";
 
 type Award = {
   id: string;
@@ -24,27 +27,36 @@ type Award = {
   published: boolean;
 };
 
+const PUBLISHED_OPTIONS = [
+  { value: "", label: "All" },
+  { value: "true", label: "Published" },
+  { value: "false", label: "Unpublished" },
+];
+
 export function AwardList({
   awards,
   total,
   page,
   pageSize,
+  q,
+  year,
+  published,
+  years,
 }: {
   awards: Award[];
   total: number;
   page: number;
   pageSize: number;
+  q: string;
+  year: string;
+  published: string;
+  years: string[];
 }) {
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<Award | null>(null);
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  function pageHref(nextPage: number) {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", String(nextPage));
-    return `${pathname}?${params.toString()}`;
-  }
+  const { pageHref, setParam } = useAdminListUrl();
+  const { search, onSearchChange } = useDebouncedUrlSearch(q);
+  const yearOptions = [{ value: "", label: "All years" }, ...years.map((y) => ({ value: y, label: y }))];
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -75,7 +87,47 @@ export function AwardList({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-full max-w-xs">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search by title..."
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <Select items={yearOptions} value={year} onValueChange={(v) => setParam("year", v as string)}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="All years" />
+            </SelectTrigger>
+            <SelectContent>
+              {yearOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            items={PUBLISHED_OPTIONS}
+            value={published}
+            onValueChange={(v) => setParam("published", v as string)}
+          >
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
+            <SelectContent>
+              {PUBLISHED_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <AwardFormDialog
           trigger={
             <Button size="sm" className="gap-1.5">
@@ -88,7 +140,11 @@ export function AwardList({
 
       {awards.length === 0 ? (
         <div className="rounded-lg border border-border">
-          <EmptyState icon={AwardIcon} title="No awards yet" description="Add an award to get started." />
+          <EmptyState
+            icon={AwardIcon}
+            title={q || year || published ? "No awards match your filters" : "No awards yet"}
+            description={q || year || published ? "Try a different search or filter." : "Add an award to get started."}
+          />
         </div>
       ) : (
         <div className="divide-y divide-border rounded-lg border border-border">

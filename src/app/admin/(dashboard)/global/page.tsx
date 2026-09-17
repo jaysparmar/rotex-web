@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PanelTop, PanelBottom, LayoutPanelLeft } from "lucide-react";
+import { PanelTop, PanelBottom, LayoutPanelLeft, MessageCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 
@@ -21,6 +21,12 @@ const SECTIONS = [
     label: "Admin Panel",
     description: "Sidebar logo for the admin panel itself — separate light and dark theme images.",
     icon: LayoutPanelLeft,
+  },
+  {
+    key: "whatsapp",
+    label: "WhatsApp Button",
+    description: "Floating WhatsApp button shown in the bottom-right corner of every public page.",
+    icon: MessageCircle,
   },
 ];
 

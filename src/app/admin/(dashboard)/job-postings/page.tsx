@@ -1,24 +1,33 @@
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { JobPostingList } from "@/components/admin/job-postings/job-posting-list";
+import { buildJobPostingWhere, type JobPostingFilterParams } from "@/lib/job-posting-filters";
 
 const PAGE_SIZE = 20;
+
+type SearchParams = JobPostingFilterParams & { page?: string };
 
 export default async function AdminJobPostingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
-  const { page: pageParam } = await searchParams;
+  const params = await searchParams;
+  const { page: pageParam, ...filters } = params;
+  const q = filters.q ?? "";
   const page = Math.max(1, Number(pageParam) || 1);
+  const where = buildJobPostingWhere(filters);
 
-  const [jobs, total] = await Promise.all([
+  const [jobs, total, categories, locations] = await Promise.all([
     prisma.jobPosting.findMany({
+      where,
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
-    prisma.jobPosting.count(),
+    prisma.jobPosting.count({ where }),
+    prisma.jobPosting.findMany({ distinct: ["category"], select: { category: true }, orderBy: { category: "asc" } }),
+    prisma.jobPosting.findMany({ distinct: ["location"], select: { location: true }, orderBy: { location: "asc" } }),
   ]);
 
   return (
@@ -33,7 +42,16 @@ export default async function AdminJobPostingsPage({
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Job Postings" }]} />
       </div>
 
-      <JobPostingList jobs={jobs} total={total} page={page} pageSize={PAGE_SIZE} />
+      <JobPostingList
+        jobs={jobs}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        q={q}
+        filters={filters}
+        categories={categories.map((c) => c.category)}
+        locations={locations.map((l) => l.location)}
+      />
     </div>
   );
 }

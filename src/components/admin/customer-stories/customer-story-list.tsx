@@ -2,40 +2,55 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
-import { usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Quote } from "lucide-react";
+import { Pencil, Trash2, Plus, Quote, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdminPagination } from "@/components/ui/admin-pagination";
 import { CustomerStoryFormDialog } from "@/components/admin/customer-stories/customer-story-form-dialog";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { deleteCustomerStory, toggleCustomerStoryPublished } from "@/app/admin/(dashboard)/customer-stories/actions";
+import { useAdminListUrl } from "@/hooks/use-admin-list-url";
+import { useDebouncedUrlSearch } from "@/hooks/use-debounced-url-search";
 
 type Story = { id: string; quote: string; author: string; company: string; image: string; mediaType: string; published: boolean };
+
+const PUBLISHED_OPTIONS = [
+  { value: "", label: "All" },
+  { value: "true", label: "Published" },
+  { value: "false", label: "Unpublished" },
+];
+
+const MEDIA_TYPE_OPTIONS = [
+  { value: "", label: "All media" },
+  { value: "image", label: "Image" },
+  { value: "video", label: "Video" },
+];
 
 export function CustomerStoryList({
   stories,
   total,
   page,
   pageSize,
+  q,
+  published,
+  mediaType,
 }: {
   stories: Story[];
   total: number;
   page: number;
   pageSize: number;
+  q: string;
+  published: string;
+  mediaType: string;
 }) {
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<Story | null>(null);
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  function pageHref(nextPage: number) {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", String(nextPage));
-    return `${pathname}?${params.toString()}`;
-  }
+  const { pageHref, setParam } = useAdminListUrl();
+  const { search, onSearchChange } = useDebouncedUrlSearch(q);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -66,7 +81,51 @@ export function CustomerStoryList({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-full max-w-xs">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search by author, company, or quote..."
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <Select
+            items={MEDIA_TYPE_OPTIONS}
+            value={mediaType}
+            onValueChange={(v) => setParam("mediaType", v as string)}
+          >
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="All media" />
+            </SelectTrigger>
+            <SelectContent>
+              {MEDIA_TYPE_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            items={PUBLISHED_OPTIONS}
+            value={published}
+            onValueChange={(v) => setParam("published", v as string)}
+          >
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
+            <SelectContent>
+              {PUBLISHED_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <CustomerStoryFormDialog
           trigger={
             <Button size="sm" className="gap-1.5">
@@ -79,7 +138,13 @@ export function CustomerStoryList({
 
       {stories.length === 0 ? (
         <div className="rounded-lg border border-border">
-          <EmptyState icon={Quote} title="No customer stories yet" description="Add a customer story to get started." />
+          <EmptyState
+            icon={Quote}
+            title={q || published || mediaType ? "No customer stories match your filters" : "No customer stories yet"}
+            description={
+              q || published || mediaType ? "Try a different search or filter." : "Add a customer story to get started."
+            }
+          />
         </div>
       ) : (
         <div className="divide-y divide-border rounded-lg border border-border">

@@ -11,11 +11,9 @@ import { TextField, TextAreaField, FieldGrid, SelectField, SwitchField, Field } 
 import { SaveBar } from "@/components/admin/section-form-shell";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PERK_ICON_OPTIONS } from "@/lib/job-perk-icons";
+import { EMPLOYMENT_TYPE_OPTIONS, WORK_MODE_OPTIONS } from "@/lib/job-posting-constants";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { createJobPosting, updateJobPosting } from "@/app/admin/(dashboard)/job-postings/actions";
-
-const EMPLOYMENT_TYPE_OPTIONS = ["Full-time", "Part-time", "Contract", "Internship"].map((v) => ({ value: v, label: v }));
-const WORK_MODE_OPTIONS = ["On-site", "Hybrid", "Remote"].map((v) => ({ value: v, label: v }));
 
 type JobPostingFormValues = {
   company: string;

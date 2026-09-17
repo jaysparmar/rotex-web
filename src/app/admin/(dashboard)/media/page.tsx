@@ -1,9 +1,32 @@
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { MediaLibraryClient } from "@/components/admin/media-library-client";
 
-export default async function AdminMediaPage() {
-  const assets = await prisma.mediaAsset.findMany({ orderBy: { createdAt: "desc" } });
+const PAGE_SIZE = 24;
+
+export default async function AdminMediaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; q?: string; type?: string }>;
+}) {
+  const { page: pageParam, q, type } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const where: Prisma.MediaAssetWhereInput = {
+    ...(q ? { filename: { contains: q } } : {}),
+    ...(type ? { type } : {}),
+  };
+
+  const [assets, total] = await Promise.all([
+    prisma.mediaAsset.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.mediaAsset.count({ where }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -26,6 +49,11 @@ export default async function AdminMediaPage() {
           alt: a.alt,
           createdAt: a.createdAt.toISOString(),
         }))}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        q={q ?? ""}
+        type={type ?? ""}
       />
     </div>
   );

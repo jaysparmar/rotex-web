@@ -1,3 +1,4 @@
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,19 +10,28 @@ const PAGE_SIZE = 20;
 export default async function AdminAwardsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; year?: string; published?: string }>;
 }) {
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, q, year, published } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
-  const [awards, total, heroSection] = await Promise.all([
+  const where: Prisma.AwardWhereInput = {
+    ...(q ? { title: { contains: q } } : {}),
+    ...(year ? { year } : {}),
+    ...(published === "true" ? { published: true } : {}),
+    ...(published === "false" ? { published: false } : {}),
+  };
+
+  const [awards, total, heroSection, years] = await Promise.all([
     prisma.award.findMany({
+      where,
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
-    prisma.award.count(),
+    prisma.award.count({ where }),
     prisma.aboutSection.findUnique({ where: { key: "awards" } }),
+    prisma.award.findMany({ distinct: ["year"], select: { year: true }, orderBy: { year: "desc" } }),
   ]);
 
   return (
@@ -36,7 +46,16 @@ export default async function AdminAwardsPage({
         <Breadcrumb items={[{ label: "Dashboard", href: "/admin" }, { label: "Awards" }]} />
       </div>
 
-      <AwardList awards={awards} total={total} page={page} pageSize={PAGE_SIZE} />
+      <AwardList
+        awards={awards}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        q={q ?? ""}
+        year={year ?? ""}
+        published={published ?? ""}
+        years={years.map((y) => y.year)}
+      />
 
       {heroSection && (
         <Card>

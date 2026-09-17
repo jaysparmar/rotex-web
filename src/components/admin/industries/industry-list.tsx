@@ -3,22 +3,25 @@
 import { useState, useTransition, Fragment } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Trash2, Plus, Pencil, ChevronRight, Factory } from "lucide-react";
+import { Trash2, Plus, Pencil, ChevronRight, Factory, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { deleteIndustry, deleteSubIndustry } from "@/app/admin/(dashboard)/industries/actions";
+import { useDebouncedUrlSearch } from "@/hooks/use-debounced-url-search";
 
 type SubIndustryRow = { id: string; name: string; slug: string };
 type IndustryRow = { id: string; name: string; slug: string; subIndustryCount: number; subIndustries: SubIndustryRow[] };
 
 type DeleteTarget = { kind: "industry"; industry: IndustryRow } | { kind: "sub"; sub: SubIndustryRow };
 
-export function IndustryList({ industries }: { industries: IndustryRow[] }) {
+export function IndustryList({ industries, q }: { industries: IndustryRow[]; q: string }) {
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<DeleteTarget | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const { search, onSearchChange } = useDebouncedUrlSearch(q);
 
   function toggleExpanded(id: string) {
     setExpanded((prev) => {
@@ -46,7 +49,17 @@ export function IndustryList({ industries }: { industries: IndustryRow[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full max-w-xs">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search by name or slug..."
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+
         <Link href="/admin/industries/new">
           <Button size="sm" className="gap-1.5">
             <Plus className="size-3.5" />
@@ -57,7 +70,11 @@ export function IndustryList({ industries }: { industries: IndustryRow[] }) {
 
       {industries.length === 0 ? (
         <div className="overflow-hidden rounded-lg border border-border">
-          <EmptyState icon={Factory} title="No industries yet" description="Add an industry to get started." />
+          <EmptyState
+            icon={Factory}
+            title={q ? "No industries match your search" : "No industries yet"}
+            description={q ? "Try a different search." : "Add an industry to get started."}
+          />
         </div>
       ) : (
         <Table>
