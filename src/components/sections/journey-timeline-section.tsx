@@ -198,8 +198,7 @@ export function JourneyTimelineSection({
         <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-3xl leading-8 lg:leading-10">
           {heading}
         </h2>
-        {/* Arrows are mobile-only — desktop relies on autoplay + drag scroll */}
-        <div className="flex lg:hidden items-center gap-3.5 shrink-0">
+        <div className="flex items-center gap-3.5 shrink-0">
           <button
             onClick={() => scroll("left")}
             aria-label="Previous"

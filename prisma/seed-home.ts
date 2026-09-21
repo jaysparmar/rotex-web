@@ -15,9 +15,11 @@ const GLOBAL_CONFIG: PrismaJson.GlobalConfigData = {
         label: "Products",
         href: "/products",
         enabled: true,
-        // Mega menu intentionally off — product categories aren't client-approved yet.
-        // Switch to "Product Categories (live data)" in admin once they are.
-        megaMenu: null,
+        megaMenuSource: {
+          type: "products",
+          selectedIds: ["Solenoid Valve", "Angle Seat Valve"],
+          cta: { text: "Talk to experts to choose the right product", href: "/contact" },
+        },
       },
       {
         id: "nav_002",

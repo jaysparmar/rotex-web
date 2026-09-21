@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { GradientButton } from "@/components/ui/gradient-button";
-import { Menu } from "lucide-react";
+import { Menu, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { IoChevronDownOutline } from "react-icons/io5";
 import { SearchIcon } from "@/components/ui/icons";
 import { SearchModal } from "@/components/layout/search-modal";
@@ -367,35 +367,103 @@ function FloatingLogo({
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 
-// ─── Mobile accordion content — mirrors the desktop mega menu panels ──────────
+// ─── Mobile drill-down panel — replaces the root list with a "< Back" screen ──
+
+function MobileBackRow({ onBack }: { onBack: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onBack}
+      className="flex items-center gap-1 py-3 text-sm font-medium font-montserrat text-stone-900"
+    >
+      <ChevronLeft size={16} />
+      Back
+    </button>
+  );
+}
+
+function MobileDrillRow({
+  href,
+  label,
+  description,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  description?: string;
+  onClick: () => void;
+}) {
+  if (description) {
+    return (
+      <Link
+        href={href}
+        onClick={onClick}
+        className="flex flex-col gap-0.5 py-3 border-b border-neutral-200 last:border-b-0"
+      >
+        <span className="text-sm font-medium font-montserrat text-stone-900">{label}</span>
+        <span className="text-xs font-medium font-montserrat text-stone-500">{description}</span>
+      </Link>
+    );
+  }
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="flex items-center justify-between py-3 border-b border-neutral-200 last:border-b-0"
+    >
+      <span className="text-base font-medium font-montserrat text-stone-900">{label}</span>
+      <Plus size={16} className="shrink-0 text-[#EF3E23]" />
+    </Link>
+  );
+}
 
 function MobileMegaMenuContent({
   megaMenu,
   onNavigate,
+  onBack,
 }: {
   megaMenu: PrismaJson.MegaMenuConfig;
   onNavigate: () => void;
+  onBack: () => void;
 }) {
+  const [categoryIdx, setCategoryIdx] = useState<number | null>(null);
+
   if (megaMenu.type === "category-switcher") {
-    return (
-      <div className="flex flex-col gap-4 pl-4 pb-2">
-        {megaMenu.categories.map((cat) => (
-          <div key={cat.label} className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold font-montserrat uppercase tracking-wide text-white/50">
-              {cat.label}
-            </span>
-            {cat.items.map((item) => (
-              <Link
+    if (categoryIdx !== null) {
+      const category = megaMenu.categories[categoryIdx];
+      return (
+        <div className="flex flex-col">
+          <MobileBackRow onBack={() => setCategoryIdx(null)} />
+          <div className="flex flex-col">
+            {category.items.map((item) => (
+              <MobileDrillRow
                 key={item.href}
                 href={item.href}
+                label={item.label}
+                description={item.description}
                 onClick={onNavigate}
-                className="py-1.5 text-sm font-medium font-montserrat text-white/75 hover:text-white transition-colors"
-              >
-                {item.label}
-              </Link>
+              />
             ))}
           </div>
-        ))}
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col">
+        <MobileBackRow onBack={onBack} />
+        <div className="flex flex-col">
+          {megaMenu.categories.map((cat, i) => (
+            <button
+              key={cat.label}
+              type="button"
+              onClick={() => setCategoryIdx(i)}
+              className="flex items-center justify-between py-3 border-b border-neutral-200 last:border-b-0"
+            >
+              <span className="text-base font-medium font-montserrat text-stone-900">{cat.label}</span>
+              <Plus size={16} className="shrink-0 text-[#EF3E23]" />
+            </button>
+          ))}
+        </div>
       </div>
     );
   }
@@ -403,34 +471,37 @@ function MobileMegaMenuContent({
   const allItems = megaMenu.columns.flatMap((col) => col.groups);
 
   return (
-    <div className="flex flex-col gap-4 pl-4 pb-2">
-      {allItems.map((group) => (
-        <div key={group.heading} className="flex flex-col gap-1.5">
-          {group.href ? (
-            <Link
+    <div className="flex flex-col">
+      <MobileBackRow onBack={onBack} />
+      <div className="flex flex-col">
+        {allItems.map((group) =>
+          group.href ? (
+            <MobileDrillRow
+              key={group.heading}
               href={group.href}
+              label={group.heading}
+              description={group.description}
               onClick={onNavigate}
-              className="text-sm font-semibold font-montserrat text-white hover:text-white/80 transition-colors"
-            >
-              {group.heading}
-            </Link>
+            />
           ) : (
-            <span className="text-xs font-semibold font-montserrat uppercase tracking-wide text-white/50">
-              {group.heading}
-            </span>
-          )}
-          {(group.items ?? group.itemColumns?.flat() ?? []).map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className="py-1.5 text-sm font-medium font-montserrat text-white/75 hover:text-white transition-colors"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      ))}
+            <div key={group.heading} className="flex flex-col gap-1.5 py-3 border-b border-neutral-200 last:border-b-0">
+              <span className="text-xs font-semibold font-montserrat uppercase tracking-wide text-stone-500">
+                {group.heading}
+              </span>
+              {(group.items ?? group.itemColumns?.flat() ?? []).map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onNavigate}
+                  className="py-1.5 text-sm font-medium font-montserrat text-stone-900"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          )
+        )}
+      </div>
     </div>
   );
 }
@@ -441,10 +512,10 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [heroActive, setHeroActive] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [mobileOpenItem, setMobileOpenItem] = useState<string | null>(null);
+  const [mobileNavItem, setMobileNavItem] = useState<NavItem | null>(null);
   const closeSheet = useCallback(() => {
     setSheetOpen(false);
-    setMobileOpenItem(null);
+    setMobileNavItem(null);
   }, []);
   const scrolled = useScrolled(60);
   const pathname = usePathname();
@@ -629,56 +700,46 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
               >
                 <Menu className="h-5 w-5" />
               </SheetTrigger>
-              <SheetContent
-                side="right"
-                className="w-72 overflow-y-auto border-white/10"
-                style={{ background: "#201D1D" }}
-              >
-                <div className="flex flex-col gap-1 mt-6 px-2">
-                  <Link href={config.logo.href} onClick={closeSheet} className="mb-4">
-                    <Image
-                      src={config.logo.src}
-                      alt={config.logo.alt}
-                      width={144}
-                      height={28}
-                      unoptimized
-                      className="w-36 h-8 object-contain"
+              <SheetContent side="right" className="w-[90%] max-w-96 overflow-y-auto bg-white" showCloseButton={false}>
+                <div className="flex h-full flex-col gap-1 px-5">
+                  {mobileNavItem?.megaMenu ? (
+                    <MobileMegaMenuContent
+                      key={mobileNavItem.id}
+                      megaMenu={mobileNavItem.megaMenu}
+                      onNavigate={closeSheet}
+                      onBack={() => setMobileNavItem(null)}
                     />
-                  </Link>
-                  {navItems.map((item) =>
-                    item.megaMenu ? (
-                      <div key={item.id} className="flex flex-col">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setMobileOpenItem((cur) => (cur === item.id ? null : item.id))
-                          }
-                          className="flex items-center justify-between px-2 py-3 text-sm font-medium font-montserrat text-white/75 hover:text-white hover:bg-white/5 rounded-md transition-colors"
-                        >
-                          {item.label}
-                          <IoChevronDownOutline
-                            size={14}
-                            className={`text-white/60 transition-transform duration-150 ${
-                              mobileOpenItem === item.id ? "rotate-180" : ""
-                            }`}
-                          />
-                        </button>
-                        {mobileOpenItem === item.id && (
-                          <MobileMegaMenuContent megaMenu={item.megaMenu} onNavigate={closeSheet} />
-                        )}
-                      </div>
-                    ) : (
-                      <Link
-                        key={item.id}
-                        href={item.href}
-                        onClick={closeSheet}
-                        className="flex items-center justify-between px-2 py-3 text-sm font-medium font-montserrat text-white/75 hover:text-white hover:bg-white/5 rounded-md transition-colors"
-                      >
-                        {item.label}
-                      </Link>
-                    )
+                  ) : (
+                    <div className="flex flex-col">
+                      {navItems.map((item) =>
+                        item.megaMenu ? (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => setMobileNavItem(item)}
+                            className="flex items-center justify-between py-3 border-b border-neutral-200 last:border-b-0"
+                          >
+                            <span className="text-base font-medium font-montserrat text-stone-900">
+                              {item.label}
+                            </span>
+                            <ChevronRight size={16} className="shrink-0 text-stone-900" />
+                          </button>
+                        ) : (
+                          <Link
+                            key={item.id}
+                            href={item.href}
+                            onClick={closeSheet}
+                            className="flex items-center py-3 border-b border-neutral-200 last:border-b-0"
+                          >
+                            <span className="text-base font-medium font-montserrat text-stone-900">
+                              {item.label}
+                            </span>
+                          </Link>
+                        )
+                      )}
+                    </div>
                   )}
-                  <div className="mt-4">
+                  <div className="mt-auto pb-6">
                     <GradientButton
                       href={config.header.cta.href}
                       className="w-full"

@@ -45,7 +45,7 @@ export function IndustryOverview({ sectionTitle, overview, stats }: IndustryOver
 
         {/* Title + body + read more */}
         <div className="flex-1 flex flex-col gap-4">
-          <h2 className="text-neutral-500 text-xl lg:text-3xl font-normal font-montserrat leading-8 lg:leading-11">
+          <h2 className="text-[#201D1D] text-xl lg:text-3xl font-medium font-montserrat leading-8 lg:leading-11">
             {sectionTitle}
           </h2>
 

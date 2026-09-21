@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ProductGallery } from "@/components/ui/product-gallery";
 import { VariantConfigurator } from "@/components/ui/variant-configurator";
 import { ProductTabs } from "@/components/ui/product-tabs";
+import { BreadcrumbTrail } from "@/components/ui/breadcrumb-trail";
 import { ProductQuoteFormInline, ProductQuoteFormSheet } from "@/components/sections/product-quote-form";
 import { crumbsFromCategory } from "@/lib/breadcrumb";
 import type { ProductDetail, ProductVariant } from "@/lib/product-detail-data";
@@ -45,32 +45,17 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
     : product.certificates;
 
   return (
-    <div className="container flex flex-col gap-16 pt-32 lg:pt-36 pb-12">
-      {/* Breadcrumb */}
-      <nav className="flex flex-wrap items-center gap-3">
-        {breadcrumb.map((crumb, i) => (
-          <span key={i} className="flex items-center gap-3">
-            {i > 0 && (
-              <span className="text-stone-900 text-xs font-semibold font-montserrat uppercase tracking-wide">/</span>
-            )}
-            {crumb.href ? (
-              <Link href={crumb.href} className="text-stone-900 text-sm font-semibold font-montserrat leading-5 hover:text-[#EF3E23]">
-                {crumb.label}
-              </Link>
-            ) : (
-              <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">{crumb.label}</span>
-            )}
-          </span>
-        ))}
-      </nav>
-      
+    <div className="container flex flex-col gap-10 lg:gap-16 pt-28 lg:pt-32 pb-12">
+      {/* Breadcrumb — shows the full trail whenever it fits on one line;
+          collapses the middle crumbs to "..." only once it would wrap */}
+      <BreadcrumbTrail crumbs={breadcrumb} />
 
       {/* Hero: info + gallery */}
       <div className="flex justify-between items-start gap-10 flex-wrap lg:flex-nowrap">
-        <div className="w-full lg:max-w-144 flex flex-col gap-10">
+        <div className="order-2 lg:order-1 w-full lg:max-w-144 flex flex-col gap-10">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-              <p className="text-orange-600 text-xl font-bold font-montserrat uppercase tracking-[4px]">
+              <p className="text-orange-600 text-xl font-bold font-montserrat uppercase leading-5 tracking-[4px]">
                 {product.code}
               </p>
               <div className="flex flex-col gap-1.5">
@@ -78,18 +63,18 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
                   {tags.map((tag, i) => (
                     <span key={tag} className="flex items-center gap-2.5">
                       {i > 0 && <span className="size-1 bg-stone-900 rounded-full" />}
-                      <span className="text-stone-900 text-xs font-semibold font-montserrat uppercase">{tag}</span>
+                      <span className="text-stone-900 text-xs font-semibold font-montserrat uppercase leading-5">{tag}</span>
                     </span>
                   ))}
                 </div>
-                <h1 className="text-black text-4xl font-normal font-montserrat leading-10">{product.name}</h1>
+                <h1 className="text-black text-2xl font-medium leading-8 lg:text-4xl lg:font-normal lg:leading-10 font-montserrat">{product.name}</h1>
               </div>
-              <p className="text-black text-base font-medium font-montserrat leading-6">{product.description}</p>
+              <p className="text-stone-500 text-sm leading-5 lg:text-black lg:text-base lg:leading-6 font-medium font-montserrat">{product.description}</p>
             </div>
 
             {product.industriesServed.length > 0 && (
               <div className="flex flex-col gap-1.5">
-                <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase tracking-wide">
+                <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
                   Industries served
                 </p>
                 <div className="flex flex-wrap items-start gap-2">
@@ -105,7 +90,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
 
             {heroCertificates.length > 0 && (
               <div className="flex flex-col gap-3">
-                <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase tracking-wide">
+                <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
                   Certificates
                 </p>
                 <div className="flex flex-wrap items-center gap-2.5">
@@ -125,21 +110,25 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
           <button
             type="button"
             onClick={handleHeroQuoteClick}
-            className="w-60 px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
+            className="w-full lg:w-60 px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
           >
-            <span className="text-center text-white text-sm font-semibold font-montserrat uppercase">
+            <span className="text-center text-white text-sm font-semibold font-montserrat uppercase leading-5">
               Request a Quote
             </span>
           </button>
         </div>
 
-        <ProductGallery images={product.images} alt={product.name} />
+        <div className="order-1 lg:order-2 mb-8 w-full lg:mb-0 lg:flex-1 lg:max-w-158">
+          <ProductGallery images={product.images} alt={product.name} />
+        </div>
       </div>
 
       {/* Variant configurator + tabs */}
       {isVariable && product.variants ? (
         <div className="flex flex-col gap-7">
-          <h2 className="text-stone-900 text-4xl font-normal font-montserrat leading-10">Configure Product Variant</h2>
+          <h2 className="text-stone-900 text-2xl font-medium leading-8 lg:text-4xl lg:font-normal lg:leading-10 font-montserrat">
+            Configure Product Variant
+          </h2>
           <div className="flex justify-between items-start gap-10 flex-wrap lg:flex-nowrap">
             <div className="w-full lg:max-w-120">
               <VariantConfigurator

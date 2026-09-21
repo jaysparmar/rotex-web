@@ -35,7 +35,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const PAGE_ITEMS = [
+export const PAGE_ITEMS = [
   { href: "/admin/home", label: "Home Page", icon: Home },
   { href: "/admin/about", label: "About Page", icon: Info },
   { href: "/admin/contact", label: "Contact Page", icon: Phone },
@@ -46,7 +46,7 @@ const PAGE_ITEMS = [
   { href: "/admin/legal", label: "Legal Pages", icon: Shield },
 ];
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { href: "/admin/media", label: "Media Library", icon: Images },
   { href: "/admin/awards", label: "Awards", icon: Award },
   { href: "/admin/products", label: "Products", icon: Package },
@@ -66,6 +66,8 @@ const NAV_ITEMS = [
   { href: "/admin/enquiries", label: "Enquiries", icon: Mail },
   { href: "/admin/global", label: "Global Config", icon: Settings },
 ];
+
+export const DASHBOARD_ITEM = { href: "/admin", label: "Dashboard", icon: LayoutDashboard };
 
 export function AdminNavContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();

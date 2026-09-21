@@ -129,7 +129,7 @@ export function IndustriesSection({ heading, industries }: IndustriesSectionProp
           {/* ── LEFT: heading + tabs ── */}
           <div className="w-96 shrink-0 flex flex-col justify-between self-stretch">
             <div className="flex flex-col gap-2">
-              <h2 className="text-gradient-orange-dark font-montserrat font-normal leading-10 text-4xl">
+              <h2 className="text-gradient-orange-dark font-montserrat font-medium leading-10 text-4xl">
                 {heading.title}
               </h2>
               <p className="text-zinc-500 text-sm font-medium font-montserrat leading-6">

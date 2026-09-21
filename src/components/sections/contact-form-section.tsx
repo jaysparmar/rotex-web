@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { digitsOnlyKeyDown } from "@/lib/utils";
+import { digitsOnlyKeyDown, scrollToFirstFormError } from "@/lib/utils";
 import { useForm, useWatch, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,6 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FilterCombobox } from "@/components/ui/filter-combobox";
 import { ImageView } from "@/components/ui/image-view";
 import { COUNTRY_NAMES, getCitiesForCountry } from "@/lib/world-countries";
+import { HoneypotFields } from "@/components/ui/honeypot-fields";
+import { PhoneCodeSelect } from "@/components/ui/phone-code-select";
+import { useRecaptcha } from "@/hooks/use-recaptcha";
+import { RECAPTCHA_TOKEN_FIELD } from "@/lib/spam-protection-fields";
 import partner1 from "@/assets/Images/trustPartners/img_1.png";
 import partner2 from "@/assets/Images/trustPartners/img_2.png";
 import partner3 from "@/assets/Images/trustPartners/img_3.png";
@@ -62,9 +66,9 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-function Field({ label, error, children, className = "" }: { label: string; error?: string; children: React.ReactNode; className?: string }) {
+function Field({ label, error, children, className = "", name }: { label: string; error?: string; children: React.ReactNode; className?: string; name?: string }) {
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`} data-field={name} tabIndex={name ? -1 : undefined}>
       <label className={labelCls}>{label}</label>
       {children}
       {error && <p className={errorCls}>{error}</p>}
@@ -111,14 +115,6 @@ function FormSelect({
   );
 }
 
-function ChevronDown() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M2 4L6 8L10 4" stroke="#1c1917" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 type ContactFormSectionProps = {
   eyebrow?: string;
   heading?: string;
@@ -151,6 +147,7 @@ export function ContactFormSection({
   industryOptions = INDUSTRY_OPTIONS,
 }: ContactFormSectionProps) {
   const [submitError, setSubmitError] = useState<string>();
+  const [dialCode, setDialCode] = useState("+91");
   const {
     register,
     control,
@@ -160,6 +157,7 @@ export function ContactFormSection({
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+  const { getToken } = useRecaptcha();
 
   const selectedCountry = useWatch({ control, name: "country" });
   const cityOptions = useMemo(() => getCitiesForCountry(selectedCountry ?? ""), [selectedCountry]);
@@ -179,6 +177,9 @@ export function ContactFormSection({
     body.append("city", data.city);
     body.append("message", data.message);
     if (data.company) body.append("company", data.company);
+
+    const recaptchaToken = await getToken("contact_form");
+    if (recaptchaToken) body.append(RECAPTCHA_TOKEN_FIELD, recaptchaToken);
 
     const res = await fetch("/api/v1/enquiries", { method: "POST", body });
     const json = await res.json();
@@ -239,18 +240,19 @@ export function ContactFormSection({
 
         {/* Right: Form card */}
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit, scrollToFirstFormError)}
           className="flex-1 p-5 lg:p-7 bg-white rounded-2xl shadow-[0px_1px_3px_0px_rgba(0,0,0,0.10),0px_1px_2px_-1px_rgba(0,0,0,0.10)] outline outline-1 -outline-offset-1 outline-neutral-200 flex flex-col gap-6"
         >
+          <HoneypotFields />
           <Field label="Full Name" error={errors.fullName?.message}>
             <input {...register("fullName")} placeholder="e.g. John Doe" className={inputCls(!!errors.fullName)} />
           </Field>
 
-          <Field label="Enquiry type" error={errors.enquiryType?.message}>
+          <Field label="Enquiry type" error={errors.enquiryType?.message} name="enquiryType">
             <FormSelect control={control} name="enquiryType" placeholder="Select Enquiry Type" options={enquiryTypeOptions} hasError={!!errors.enquiryType} />
           </Field>
 
-          <Field label="Product type" error={errors.product?.message}>
+          <Field label="Product type" error={errors.product?.message} name="product">
             <FormSelect control={control} name="product" placeholder="Select Product Type" options={productTypeOptions} hasError={!!errors.product} />
           </Field>
 
@@ -258,10 +260,7 @@ export function ContactFormSection({
             <div className="flex-1 flex flex-col gap-2">
               <label className={labelCls}>Phone number</label>
               <div className={`flex bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 overflow-hidden ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
-                <div className="px-3 py-2.5 border-r border-gray-200 flex items-center gap-2 shrink-0">
-                  <span className="text-stone-900 text-sm font-medium font-montserrat leading-5">+91</span>
-                  <ChevronDown />
-                </div>
+                <PhoneCodeSelect value={dialCode} onChange={setDialCode} />
                 <input
                   {...register("phone")}
                   type="tel"
@@ -284,7 +283,7 @@ export function ContactFormSection({
           </Field>
 
           <div className="flex flex-col gap-5 lg:flex-row">
-            <div className="flex-1 flex flex-col gap-2">
+            <div className="flex-1 flex flex-col gap-2" data-field="country" tabIndex={-1}>
               <Controller
                 control={control}
                 name="country"
@@ -305,7 +304,7 @@ export function ContactFormSection({
               {errors.country && <p className={errorCls}>{errors.country.message}</p>}
             </div>
 
-            <div className="flex-1 flex flex-col gap-2">
+            <div className="flex-1 flex flex-col gap-2" data-field="city" tabIndex={-1}>
               <Controller
                 control={control}
                 name="city"
@@ -324,7 +323,7 @@ export function ContactFormSection({
             </div>
           </div>
 
-          <Field label="Industry" error={errors.industryName?.message}>
+          <Field label="Industry" error={errors.industryName?.message} name="industryName">
             <FormSelect control={control} name="industryName" placeholder="Select Industry" options={industryOptions} hasError={!!errors.industryName} />
           </Field>
 

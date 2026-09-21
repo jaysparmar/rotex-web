@@ -1,4 +1,10 @@
-import { DollarSign, Building2, GraduationCap, Plane, Heart, Clock, Users, Award } from "lucide-react";
+import {
+  DollarSign, Building2, GraduationCap, Plane, Heart, Clock, Users, Award,
+  Shield, Home, Car, Coffee, Laptop, Gift, BookOpen, Sun, Umbrella, Star,
+  ThumbsUp, Zap, Trophy, Stethoscope, Baby, Dumbbell, PiggyBank, Wallet,
+  CalendarCheck, MapPin, Utensils, Wifi, Bus, TrendingUp, Handshake, Sparkles,
+  Target, Rocket, Globe, ShieldCheck,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export const PERK_ICON_OPTIONS: { key: string; label: string; Icon: LucideIcon }[] = [
@@ -10,6 +16,36 @@ export const PERK_ICON_OPTIONS: { key: string; label: string; Icon: LucideIcon }
   { key: "clock", label: "Clock (flexibility)", Icon: Clock },
   { key: "users", label: "Users (team)", Icon: Users },
   { key: "award", label: "Award (recognition)", Icon: Award },
+  { key: "shield", label: "Shield (insurance)", Icon: Shield },
+  { key: "shield-check", label: "Shield Check (security)", Icon: ShieldCheck },
+  { key: "home", label: "Home (remote work)", Icon: Home },
+  { key: "car", label: "Car (transport)", Icon: Car },
+  { key: "bus", label: "Bus (commute)", Icon: Bus },
+  { key: "coffee", label: "Coffee (perks/snacks)", Icon: Coffee },
+  { key: "utensils", label: "Utensils (meals)", Icon: Utensils },
+  { key: "laptop", label: "Laptop (equipment)", Icon: Laptop },
+  { key: "wifi", label: "Wifi (connectivity)", Icon: Wifi },
+  { key: "gift", label: "Gift (bonus/rewards)", Icon: Gift },
+  { key: "book-open", label: "Book (learning)", Icon: BookOpen },
+  { key: "sun", label: "Sun (leave/holidays)", Icon: Sun },
+  { key: "umbrella", label: "Umbrella (protection)", Icon: Umbrella },
+  { key: "star", label: "Star (recognition)", Icon: Star },
+  { key: "thumbs-up", label: "Thumbs Up (culture)", Icon: ThumbsUp },
+  { key: "zap", label: "Zap (fast growth)", Icon: Zap },
+  { key: "trophy", label: "Trophy (achievement)", Icon: Trophy },
+  { key: "stethoscope", label: "Stethoscope (medical)", Icon: Stethoscope },
+  { key: "baby", label: "Baby (parental leave)", Icon: Baby },
+  { key: "dumbbell", label: "Dumbbell (fitness)", Icon: Dumbbell },
+  { key: "piggy-bank", label: "Piggy Bank (savings)", Icon: PiggyBank },
+  { key: "wallet", label: "Wallet (allowance)", Icon: Wallet },
+  { key: "calendar-check", label: "Calendar Check (leave)", Icon: CalendarCheck },
+  { key: "map-pin", label: "Map Pin (location)", Icon: MapPin },
+  { key: "trending-up", label: "Trending Up (growth)", Icon: TrendingUp },
+  { key: "handshake", label: "Handshake (partnership)", Icon: Handshake },
+  { key: "sparkles", label: "Sparkles (culture)", Icon: Sparkles },
+  { key: "target", label: "Target (goals)", Icon: Target },
+  { key: "rocket", label: "Rocket (career growth)", Icon: Rocket },
+  { key: "globe", label: "Globe (global exposure)", Icon: Globe },
 ];
 
 const PERK_ICON_MAP: Record<string, LucideIcon> = Object.fromEntries(

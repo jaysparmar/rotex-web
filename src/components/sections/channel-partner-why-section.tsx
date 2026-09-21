@@ -68,7 +68,7 @@ export function ChannelPartnerWhySection({
               style={{ top: `calc(8rem + ${i * 5}rem)`, zIndex: i + 1 }}
             >
               <div className="rounded-xl bg-white p-7 shadow-[0px_-4px_0px_0px_rgba(239,62,35,1.00)] flex flex-col gap-6">
-                <h3 className="text-gradient-hero font-montserrat font-semibold text-xl leading-7">
+                <h3 className="text-gradient-orange-black-radial font-montserrat font-semibold text-xl leading-7">
                   {card.title}
                 </h3>
                 <ul className="flex flex-col gap-4">

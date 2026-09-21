@@ -33,7 +33,7 @@ export function CareerOpenPositionsSection({
   return (
     <section id="positions" className="scroll-mt-24 lg:scroll-mt-32 bg-neutral-100 py-14 lg:py-20">
       <div className="container flex flex-col gap-10 lg:gap-14">
-        <h2 className="text-center text-gradient-orange-dark font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
+        <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
           {heading}
         </h2>
 

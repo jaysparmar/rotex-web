@@ -22,7 +22,7 @@ type Enquiry = {
   company: string | null;
   designation: string | null;
   message: string;
-  fileUrl: string | null;
+  fileUrls: string[];
   createdAt: Date;
 };
 
@@ -79,10 +79,14 @@ function EnquiryCard({ enquiry, tab }: { enquiry: Enquiry; tab: string }) {
         <p className="rounded-md bg-muted/40 p-3 text-sm text-muted-foreground">{e.message}</p>
       )}
 
-      {e.fileUrl && (
-        <a href={e.fileUrl} target="_blank" rel="noreferrer" className="inline-block text-sm text-primary hover:underline">
-          View attached file
-        </a>
+      {e.fileUrls.length > 0 && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
+          {e.fileUrls.map((url, i) => (
+            <a key={url} href={url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline">
+              {e.fileUrls.length > 1 ? `Attachment ${i + 1}` : "View attached file"}
+            </a>
+          ))}
+        </div>
       )}
     </div>
   );

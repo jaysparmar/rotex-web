@@ -5,7 +5,11 @@ import { JobPostingEditForm } from "@/components/admin/job-postings/job-posting-
 
 export default async function AdminJobPostingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const job = await prisma.jobPosting.findUnique({ where: { id } });
+  const [job, companies, categories] = await Promise.all([
+    prisma.jobPosting.findUnique({ where: { id } }),
+    prisma.company.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
+    prisma.category.findMany({ orderBy: { name: "asc" }, select: { name: true }, distinct: ["name"] }),
+  ]);
   if (!job) notFound();
 
   return (
@@ -24,7 +28,11 @@ export default async function AdminJobPostingDetailPage({ params }: { params: Pr
         />
       </div>
 
-      <JobPostingEditForm job={job} />
+      <JobPostingEditForm
+        job={job}
+        companyOptions={companies.map((c) => c.name)}
+        tagOptions={categories.map((c) => c.name)}
+      />
     </div>
   );
 }

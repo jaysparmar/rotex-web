@@ -4,6 +4,7 @@ import path from "path";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiSuccess, apiError } from "@/lib/api-response";
+import { checkSpamProtection } from "@/lib/spam-protection";
 
 const schema = z.object({
   fullName: z.string().min(2),
@@ -27,6 +28,17 @@ const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
+
+  const spamCheck = await checkSpamProtection(req, formData, "job-applications");
+  if (spamCheck.blocked) {
+    if (spamCheck.silent) {
+      return apiSuccess({ id: "ok" }, new Date());
+    }
+    if (spamCheck.reason.startsWith("recaptcha")) {
+      return apiError("VERIFICATION_FAILED", "Verification failed — please refresh and try again.", 403);
+    }
+    return apiError("RATE_LIMITED", "Too many submissions — please try again later.", 429);
+  }
 
   const parsed = schema.safeParse({
     fullName: formData.get("fullName"),

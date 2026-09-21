@@ -44,7 +44,7 @@ export function CustomerStoryCard({ media, quote, author, company, className }: 
 
       {/* Quote + author */}
       <div className="flex flex-col gap-10 lg:gap-3 p-3.5 lg:p-0 bg-white lg:bg-transparent rounded-bl-[10px] rounded-br-2xl lg:rounded-none outline outline-1 -outline-offset-1 lg:outline-0 outline-neutral-200">
-        <p className="text-stone-500 lg:text-stone-900 font-montserrat font-medium text-base leading-6">
+        <p className="text-stone-500 lg:text-stone-900 font-montserrat font-medium text-base leading-5 lg:leading-6">
           {quote}
         </p>
 

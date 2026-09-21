@@ -31,7 +31,7 @@ export function AboutHeroSection({ title, description, breadcrumbLabel = "About 
 
         {/* Breadcrumb — Figma: left 85, top 120 */}
         <nav
-          className="relative lg:absolute flex items-center gap-3 px-6 pt-10 lg:px-0 lg:pt-0 lg:left-21.25 lg:top-30"
+          className="relative lg:absolute flex items-center gap-3 px-6 pt-28 lg:px-0 lg:pt-0 lg:left-21.25 lg:top-32"
           aria-label="Breadcrumb"
         >
           <Link

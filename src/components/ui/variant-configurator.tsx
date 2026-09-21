@@ -6,6 +6,38 @@ import { VARIANT_AXES, type ProductVariant, type VariantAxisKey } from "@/lib/pr
 
 type Selection = Record<VariantAxisKey, string>;
 
+// Parses plain numbers ("0.8"), simple fractions ("1/8\"", "3/4"), and mixed
+// numbers ("1 1/4\"") into a comparable number; returns null for anything
+// else so non-numeric axes (e.g. Type) keep their natural order.
+function parseNumericValue(value: string): number | null {
+  const cleaned = value.trim().replace(/["”]/g, "");
+
+  const mixed = cleaned.match(/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+  if (mixed) {
+    const denominator = Number(mixed[3]);
+    return denominator !== 0 ? Number(mixed[1]) + Number(mixed[2]) / denominator : null;
+  }
+
+  const fraction = cleaned.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+  if (fraction) {
+    const denominator = Number(fraction[2]);
+    return denominator !== 0 ? Number(fraction[1]) / denominator : null;
+  }
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : null;
+}
+
+function sortOptions(values: string[]): string[] {
+  const parsed = values.map(parseNumericValue);
+  if (parsed.every((n) => n !== null)) {
+    return values
+      .map((value, i) => ({ value, n: parsed[i] as number }))
+      .sort((a, b) => a.n - b.n)
+      .map((entry) => entry.value);
+  }
+  return values;
+}
+
 function matches(variant: ProductVariant, selection: Partial<Selection>) {
   return VARIANT_AXES.every(({ key }) => {
     const want = selection[key];
@@ -67,7 +99,7 @@ export function VariantConfigurator({
   const optionsByAxis = useMemo(() => {
     const map: Record<VariantAxisKey, string[]> = {} as Record<VariantAxisKey, string[]>;
     for (const { key } of VARIANT_AXES) {
-      map[key] = Array.from(new Set(variants.map((v) => v[key])));
+      map[key] = sortOptions(Array.from(new Set(variants.map((v) => v[key]))));
     }
     return map;
   }, [variants]);
@@ -118,7 +150,7 @@ export function VariantConfigurator({
       <button
         type="button"
         onClick={onRequestQuote}
-        className="w-fit px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
+        className="w-full lg:w-fit px-6 py-3.5 bg-orange-600 hover:bg-orange-700 rounded-full flex justify-center items-center gap-3.5 transition-colors"
       >
         <span className="text-center text-white text-sm font-semibold font-montserrat uppercase leading-5">
           Request Quote for This Variant

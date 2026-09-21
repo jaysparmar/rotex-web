@@ -67,12 +67,52 @@ async function resolveIndustriesMenu(source: PrismaJson.MegaMenuSource): Promise
 async function resolveProductsMenu(source: PrismaJson.MegaMenuSource): Promise<PrismaJson.CategorySwitcherMenu> {
   const rows = await prisma.category.findMany({
     where: { products: { some: {} } },
-    select: { name: true },
+    select: {
+      name: true,
+      slug: true,
+      subCategories: {
+        where: { products: { some: {} } },
+        select: { name: true, slug: true, description: true },
+        orderBy: { order: "asc" },
+      },
+    },
     orderBy: { name: "asc" },
   });
-  const categories = [...new Set(rows.map((r) => r.name))]
-    .filter((c) => source.selectedIds.includes(c))
-    .map((label) => ({ label, items: [] }));
+
+  // Preserve the order the admin picked things in (selectedIds order), not DB/alphabetical order.
+  const byOrder = (a: string, b: string) => source.selectedIds.indexOf(a) - source.selectedIds.indexOf(b);
+
+  // Sub-category names like "2 Way"/"3 Way"/"5 Way" should read in numeric
+  // order regardless of the admin-set DB order; names without a leading
+  // number (e.g. "Normally Open") keep the DB order untouched.
+  const sortSubCategories = <T extends { name: string }>(subs: T[]): T[] => {
+    const leadingNumber = (name: string) => {
+      const match = name.match(/^\s*(\d+(?:\.\d+)?)/);
+      return match ? Number(match[1]) : null;
+    };
+    const numbers = subs.map((s) => leadingNumber(s.name));
+    if (numbers.every((n) => n !== null)) {
+      return subs
+        .map((s, i) => ({ s, n: numbers[i] as number }))
+        .sort((a, b) => a.n - b.n)
+        .map((entry) => entry.s);
+    }
+    return subs;
+  };
+
+  const categories = rows
+    .filter((c) => source.selectedIds.includes(c.name))
+    .sort((a, b) => byOrder(a.name, b.name))
+    .map((c) => ({
+      label: c.name,
+      items: sortSubCategories(c.subCategories).map((sub) => ({
+        label: sub.name,
+        description: sub.description ?? "",
+        href: `/products?category=${c.slug}&type=${sub.slug}`,
+      })),
+      viewAllLabel: `View all ${c.name}`,
+      viewAllHref: `/products?category=${c.slug}`,
+    }));
 
   return {
     type: "category-switcher",

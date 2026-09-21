@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { digitsOnlyKeyDown } from "@/lib/utils";
+import { digitsOnlyKeyDown, scrollToFirstFormError } from "@/lib/utils";
 import { useForm, Controller, type Control, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,6 +9,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { FilterCombobox } from "@/components/ui/filter-combobox";
 import { PhoneCodeSelect } from "@/components/ui/phone-code-select";
 import { COUNTRY_NAMES } from "@/lib/world-countries";
+import { HoneypotFields } from "@/components/ui/honeypot-fields";
+import { useRecaptcha } from "@/hooks/use-recaptcha";
+import { RECAPTCHA_TOKEN_FIELD } from "@/lib/spam-protection-fields";
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 
@@ -38,6 +41,7 @@ function useQuoteForm(productCode: string, productName: string) {
   const [requestType, setRequestType] = useState<RequestType>("enquiry");
 
   const form = useForm<FormData>({ resolver: zodResolver(schema) });
+  const { getToken } = useRecaptcha();
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(undefined);
@@ -50,6 +54,9 @@ function useQuoteForm(productCode: string, productName: string) {
     for (const [key, value] of Object.entries(data)) {
       if (value !== undefined) body.append(key, value);
     }
+
+    const recaptchaToken = await getToken("product_quote");
+    if (recaptchaToken) body.append(RECAPTCHA_TOKEN_FIELD, recaptchaToken);
 
     const res = await fetch("/api/v1/enquiries", { method: "POST", body });
     const json = await res.json();
@@ -88,13 +95,14 @@ function QuoteFormFields({
   const [dialCode, setDialCode] = useState("+91");
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit(onSubmit, scrollToFirstFormError)} className="flex flex-col gap-6">
+      <HoneypotFields />
       <Field label="Full Name" error={errors.fullName?.message}>
         <input {...register("fullName")} placeholder="e.g. John Doe" className={inputCls(!!errors.fullName)} />
       </Field>
 
       <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
-        <Field label="Industry" error={errors.industry?.message} className="flex-1">
+        <Field label="Industry" error={errors.industry?.message} className="flex-1" name="industry">
           {industries.length > 0 ? (
             <FormSelect
               control={control}
@@ -139,7 +147,7 @@ function QuoteFormFields({
       </div>
 
       <div className="flex flex-col gap-5 sm:flex-row">
-        <div className="flex-1 flex flex-col gap-2">
+        <div className="flex-1 flex flex-col gap-2" data-field="country" tabIndex={-1}>
           <Controller
             control={control}
             name="country"
@@ -299,12 +307,12 @@ function selectLikeCls(hasError: boolean) {
 }
 
 function Field({
-  label, error, children, className = "",
+  label, error, children, className = "", name,
 }: {
-  label: string; error?: string; children: React.ReactNode; className?: string;
+  label: string; error?: string; children: React.ReactNode; className?: string; name?: string;
 }) {
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`} data-field={name} tabIndex={name ? -1 : undefined}>
       <label className={labelCls}>{label}</label>
       {children}
       {error && <p className={errorCls}>{error}</p>}

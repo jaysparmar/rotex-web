@@ -5,20 +5,36 @@ import Image, { type StaticImageData } from "next/image";
 import { IoChevronBackOutline, IoChevronForwardOutline, IoAddOutline, IoRemoveOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 3;
+const ZOOM_STEP = 0.5;
+
 export function ProductGallery({ images, alt }: { images: (StaticImageData | string)[]; alt: string }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [zoomed, setZoomed] = useState(false);
+  const [zoom, setZoom] = useState(ZOOM_MIN);
 
   const showArrows = images.length > 1;
 
   const goTo = (dir: -1 | 1) => {
     setActiveIndex((prev) => (prev + dir + images.length) % images.length);
+    setZoom(ZOOM_MIN);
   };
 
+  const selectImage = (i: number) => {
+    setActiveIndex(i);
+    setZoom(ZOOM_MIN);
+  };
+
+  const zoomIn = () => setZoom((z) => Math.min(ZOOM_MAX, +(z + ZOOM_STEP).toFixed(2)));
+  const zoomOut = () => setZoom((z) => Math.max(ZOOM_MIN, +(z - ZOOM_STEP).toFixed(2)));
+
   return (
-    <div className="w-full aspect-[630/530] max-w-158 bg-neutral-100 rounded-3xl relative">
-      <div className="absolute inset-0 flex items-center justify-center p-14">
-        <div className={cn("relative w-full h-full transition-transform duration-200", zoomed && "scale-125")}>
+    <div className="w-full aspect-square lg:aspect-[630/530] max-w-158 bg-neutral-100 rounded-2xl lg:rounded-3xl relative">
+      <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-2xl p-14 lg:rounded-3xl">
+        <div
+          className="relative w-full h-full transition-transform duration-200"
+          style={{ transform: `scale(${zoom})` }}
+        >
           <Image src={images[activeIndex]} alt={alt} fill className="object-contain" sizes="630px" />
         </div>
       </div>
@@ -27,17 +43,19 @@ export function ProductGallery({ images, alt }: { images: (StaticImageData | str
       <div className="absolute top-4 right-4 flex items-center gap-1.5">
         <button
           type="button"
-          onClick={() => setZoomed(true)}
+          onClick={zoomIn}
+          disabled={zoom >= ZOOM_MAX}
           aria-label="Zoom in"
-          className="size-7 flex items-center justify-center rounded-md bg-white border border-neutral-200 text-stone-500 hover:text-stone-900 transition-colors"
+          className="size-8 flex items-center justify-center rounded-md bg-white border border-neutral-200 text-stone-500 hover:text-stone-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
         >
           <IoAddOutline size={16} />
         </button>
         <button
           type="button"
-          onClick={() => setZoomed(false)}
+          onClick={zoomOut}
+          disabled={zoom <= ZOOM_MIN}
           aria-label="Zoom out"
-          className="size-7 flex items-center justify-center rounded-md bg-white border border-neutral-200 text-stone-500 hover:text-stone-900 transition-colors"
+          className="size-8 flex items-center justify-center rounded-md bg-white border border-neutral-200 text-stone-500 hover:text-stone-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
         >
           <IoRemoveOutline size={16} />
         </button>
@@ -60,9 +78,9 @@ export function ProductGallery({ images, alt }: { images: (StaticImageData | str
               <button
                 key={i}
                 type="button"
-                onClick={() => setActiveIndex(i)}
+                onClick={() => selectImage(i)}
                 className={cn(
-                  "size-16 relative rounded-lg overflow-hidden border bg-white",
+                  "w-16 h-20 relative rounded-lg overflow-hidden border bg-white",
                   i === activeIndex ? "border-stone-900" : "border-transparent"
                 )}
               >

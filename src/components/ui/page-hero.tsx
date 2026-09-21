@@ -3,12 +3,15 @@ import React from "react";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import defaultBg from "@/assets/Images/breadcurmbBackgrounds/default_bg.jpg";
+import defaultBgMobile from "@/assets/Images/breadcurmbBackgrounds/default_bg_mobile.jpg";
 
 type PageHeroProps = {
   title: string;
   description?: string;
   bg?: StaticImageData | string;
+  mobileBg?: StaticImageData | string;
   children?: React.ReactNode;
 };
 
@@ -31,7 +34,7 @@ function slugToLabel(slug: string): string {
     .join(" ");
 }
 
-export function PageHero({ title, description, bg, children }: PageHeroProps) {
+export function PageHero({ title, description, bg, mobileBg, children }: PageHeroProps) {
   const pathname = usePathname();
 
   const segments = pathname.split("/").filter(Boolean);
@@ -51,11 +54,19 @@ export function PageHero({ title, description, bg, children }: PageHeroProps) {
     // Figma: 625px on mobile, 630px on desktop
     <section className="relative w-full h-156.25 lg:h-157.5 overflow-hidden">
       <Image
+        src={mobileBg ?? bg ?? defaultBgMobile}
+        alt=""
+        fill
+        priority
+        className="object-fill object-center lg:hidden"
+        aria-hidden="true"
+      />
+      <Image
         src={bg ?? defaultBg}
         alt=""
         fill
         priority
-        className="object-cover object-center"
+        className="hidden object-cover object-center lg:block"
         aria-hidden="true"
       />
       {/* Scrim — mobile. Figma exports this as bg-linear-333, but a CSS 333deg
@@ -75,25 +86,25 @@ export function PageHero({ title, description, bg, children }: PageHeroProps) {
         style={{ background: "linear-gradient(to left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.9) 100%)" }}
       />
 
-      <div className="container relative z-10 h-full flex flex-col justify-between pt-36 pb-20">
+      <div className="container relative z-10 h-full flex flex-col justify-between pt-28 lg:pt-32 pb-10 lg:pb-20">
         {/* Breadcrumb trail */}
-        <nav className="flex items-center gap-3" aria-label="Breadcrumb">
+        <nav className="flex flex-nowrap items-center gap-3 overflow-hidden" aria-label="Breadcrumb">
           {crumbs.map((item, i) => (
-            <div key={i} className="flex items-center gap-3">
+            <div key={i} className={cn("flex items-center gap-3", i === crumbs.length - 1 && "min-w-0")}>
               {i > 0 && (
-                <span className="text-subtext text-sm font-semibold font-montserrat leading-5">
+                <span className="shrink-0 text-subtext text-sm font-semibold font-montserrat leading-5">
                   /
                 </span>
               )}
               {item.href ? (
                 <Link
                   href={item.href}
-                  className="text-subtext text-sm font-semibold font-montserrat leading-5 hover:text-white transition-colors"
+                  className="shrink-0 text-subtext text-sm font-semibold font-montserrat leading-5 hover:text-white transition-colors"
                 >
                   {item.label}
                 </Link>
               ) : (
-                <span className="text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">
+                <span className="truncate text-[#EF3E23] text-sm font-semibold font-montserrat leading-5">
                   {item.label}
                 </span>
               )}
@@ -109,7 +120,7 @@ export function PageHero({ title, description, bg, children }: PageHeroProps) {
               {title}
             </h1>
             {description && (
-              <p className="w-full lg:w-121.25 text-stone-300 text-sm lg:text-base font-normal font-montserrat leading-7 lg:leading-8">
+              <p className="w-full lg:w-121.25 text-stone-300 text-sm lg:text-base font-normal font-montserrat leading-5 lg:leading-6">
                 {description}
               </p>
             )}

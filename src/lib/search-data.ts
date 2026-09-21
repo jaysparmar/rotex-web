@@ -1,6 +1,7 @@
 import type { StaticImageData } from "next/image";
 import { prisma } from "@/lib/prisma";
 import { getProductsList } from "@/lib/products-data";
+import { buildSearchOr } from "@/lib/search-terms";
 import { flattenDownloadItems, type DownloadItem } from "@/lib/downloads-data";
 import type { ResourceItem, ResourceType } from "@/lib/resource-types";
 
@@ -58,25 +59,27 @@ export async function matchingIndustryNames(q: string, limit: number): Promise<s
     return industries.map((i) => i.name);
   }
 
+  const searchOr = buildSearchOr(query);
   const industries = await prisma.industry.findMany({
     where: {
       OR: [
-        { name: { contains: query } },
-        { subIndustries: { some: { name: { contains: query } } } },
-        { products: { some: { name: { contains: query } } } },
-        { products: { some: { modelNumber: { contains: query } } } },
+        ...searchOr.map((term) => ({ name: { contains: term } })),
+        ...searchOr.map((term) => ({ subIndustries: { some: { name: { contains: term } } } } as const)),
+        ...searchOr.map((term) => ({ products: { some: { name: { contains: term } } } } as const)),
+        ...searchOr.map((term) => ({ products: { some: { modelNumber: { contains: term } } } } as const)),
       ],
     },
     select: { name: true, subIndustries: { select: { name: true } } },
     take: limit,
   });
 
-  const lowerQuery = query.toLowerCase();
+  const lowerQueries = searchOr.map((t) => t.toLowerCase());
+  const includesAny = (name: string) => lowerQueries.some((q) => name.toLowerCase().includes(q));
   return Array.from(
     new Set(
       industries.flatMap((ind) => {
-        if (ind.name.toLowerCase().includes(lowerQuery)) return [ind.name];
-        const matchingSubIndustries = ind.subIndustries.filter((s) => s.name.toLowerCase().includes(lowerQuery));
+        if (includesAny(ind.name)) return [ind.name];
+        const matchingSubIndustries = ind.subIndustries.filter((s) => includesAny(s.name));
         if (matchingSubIndustries.length > 0) return matchingSubIndustries.map((s) => s.name);
         return ind.subIndustries.length === 0 ? [ind.name] : ind.subIndustries.map((s) => s.name);
       })

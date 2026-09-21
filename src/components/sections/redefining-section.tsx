@@ -75,7 +75,7 @@ function Counter({ raw, suffix, comma, suffixClassName }: { raw: number; suffix:
   return (
     <span ref={ref}>
       {display}
-      {suffix && <span className={`${suffixClassName ?? ""} -ml-1.5`}>{suffix}</span>}
+      {suffix && <span className={suffixClassName}>{suffix}</span>}
     </span>
   );
 }
@@ -95,12 +95,12 @@ export function RedefiningSection({
   const visibleStats = stats.filter((s) => s.published !== false);
 
   return (
-    <section className="bg-white py-14 lg:py-20">
+    <section className="bg-white pt-6 pb-14 lg:py-20">
       <div className="container px-5 sm:px-10 lg:px-20">
 
         {/* Heading + Subtext */}
         <div className="flex flex-col items-center gap-5 mb-14">
-          <h2 className="text-3xl lg:text-4xl font-normal font-montserrat leading-10 text-center">
+          <h2 className="text-3xl lg:text-4xl font-medium font-montserrat leading-10 text-center">
             <span className="text-gradient-orange-dark">{heading.title}</span>
           </h2>
           <p className="text-center text-stone-500 text-sm lg:text-base font-medium font-montserrat leading-6 max-w-2xl">
@@ -142,7 +142,7 @@ export function RedefiningSection({
         <div className="hidden lg:flex lg:items-center gap-10 lg:gap-24">
 
           {/* Left tagline */}
-          <h3 className="font-montserrat font-normal text-stone-900 text-3xl lg:text-4xl leading-10 lg:shrink-0">
+          <h3 className="font-montserrat font-medium text-stone-900 text-3xl lg:text-4xl leading-10 lg:shrink-0">
             {tagline.prefix} <br />
             <span className="text-gradient-highlight">{tagline.highlight}</span> {tagline.suffix}
           </h3>

@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { ChevronDown, LogOut, User } from "lucide-react";
+import { ChevronDown, ExternalLink, LogOut, User } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/admin/theme-toggle";
 import { MobileSidebarTrigger } from "@/components/admin/mobile-sidebar";
+import { AdminSearch } from "@/components/admin/admin-search";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -32,7 +34,21 @@ export function AdminHeader({
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
       <MobileSidebarTrigger logoLight={logoLight} logoDark={logoDark} />
 
+      <div className="hidden lg:block">
+        <AdminSearch />
+      </div>
+
       <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          nativeButton={false}
+          render={<Link href="/" target="_blank" rel="noopener noreferrer" />}
+        >
+          <ExternalLink />
+          View Website
+        </Button>
+
         <ThemeToggle />
 
         <DropdownMenu>

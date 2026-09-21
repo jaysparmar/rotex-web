@@ -34,7 +34,7 @@ export function AwardCard({ year, title, description, url, image, className }: A
             <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{year}</p>
             <h3 className="text-[#EF3E23] text-xl font-semibold font-montserrat leading-7">{title}</h3>
           </div>
-          <p className="text-stone-900 text-sm font-medium font-montserrat leading-6">{description}</p>
+          <p className="text-stone-900 text-sm font-medium font-montserrat leading-6 line-clamp-3">{description}</p>
         </div>
 
         <span className="inline-flex w-fit items-center gap-2.5 px-5 py-3 bg-white rounded-[45px] transition-colors duration-200 group-hover:bg-[#EF3E23]">

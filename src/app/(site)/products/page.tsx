@@ -29,7 +29,7 @@ export default async function ProductsPage({
     getCategoriesWithProducts(),
     getSubCategoriesWithProducts(category),
     getProductsList({ categorySlug: category, subCategorySlug: type, search, page, pageSize: PAGE_SIZE, ...attrFilters }),
-    getAttributeValuesByKey(),
+    getAttributeValuesByKey(category),
   ]);
 
   return (

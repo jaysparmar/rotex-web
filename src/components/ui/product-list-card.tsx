@@ -23,7 +23,7 @@ export function ProductListCard({ slug, code, name, category, image, tags = [] }
         <span className="px-3 sm:px-5 py-1 bg-white rounded-full outline outline-1 -outline-offset-1 outline-neutral-200 text-stone-900 text-[10px] sm:text-xs font-semibold font-montserrat leading-4 sm:leading-6">
           {category}
         </span>
-        <div className="w-full max-w-64 h-24 sm:h-48 relative overflow-hidden mx-auto">
+        <div className="w-full max-w-64 h-28 sm:h-48 relative overflow-hidden mx-auto">
           <Image
             src={image}
             alt={name}
@@ -35,21 +35,23 @@ export function ProductListCard({ slug, code, name, category, image, tags = [] }
       </div>
 
       {/* Bottom: code + name + tags */}
-      <div className="self-stretch flex flex-col gap-1 sm:gap-1.5 min-w-0">
-        <p className="text-[#EF3E23] text-xs sm:text-sm font-medium font-montserrat leading-4 sm:leading-5 truncate">{code}</p>
-        <p className="text-stone-900 group-hover:text-[#EF3E23] text-sm sm:text-lg font-medium font-montserrat leading-5 sm:leading-6 line-clamp-2">
-          {name}
-        </p>
+      <div className="self-stretch flex flex-col gap-2 min-w-0">
+        <div className="flex flex-col gap-0.5 sm:gap-1">
+          <p className="text-[#EF3E23] text-xs sm:text-sm font-medium font-montserrat leading-4 sm:leading-5 truncate">{code}</p>
+          <p className="text-stone-900 group-hover:text-[#EF3E23] text-sm sm:text-lg font-medium font-montserrat leading-5 sm:leading-6 line-clamp-2">
+            {name}
+          </p>
+        </div>
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 sm:gap-1.5">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2 sm:px-3 py-0.5 bg-white rounded-full outline outline-1 -outline-offset-1 outline-neutral-200 text-stone-900 text-[10px] sm:text-xs font-medium font-montserrat leading-4 sm:leading-5"
-              >
-                {tag}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="px-2 sm:px-3 py-0.5 bg-white rounded-full outline outline-1 -outline-offset-1 outline-neutral-200 text-stone-900 text-[10px] sm:text-xs font-medium font-montserrat leading-4 sm:leading-5">
+              {tags[0]}
+            </span>
+            {tags.length > 1 && (
+              <span className="text-stone-500 text-[10px] sm:text-xs font-medium font-montserrat leading-4">
+                +{tags.length - 1} More
               </span>
-            ))}
+            )}
           </div>
         )}
       </div>

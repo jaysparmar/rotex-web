@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { PRODUCT_ATTRIBUTES, type ProductAttributeKey } from "@/lib/product-constants";
 import type { ProductSummary, CategoryWithCount, SubCategoryWithCount } from "@/lib/products-data";
 import breadcrumbBg from "@/assets/Images/breadcurmbBackgrounds/default_bg.jpg";
+import mobileBreadcrumbBg from "@/assets/Images/breadcurmbBackgrounds/default_bg_mobile.jpg";
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -132,28 +133,32 @@ function FilterFields({
         )}
       </div>
 
-      {PRODUCT_ATTRIBUTES.map(({ key, label }) => {
-        const options = attributeValues[key] ?? [];
-        if (options.length === 0) return null;
-        return (
-          <FilterCombobox
-            key={key}
-            label={label}
-            placeholder={`Select ${label}`}
-            options={options}
-            value={activeFilters[key] ? [activeFilters[key] as string] : []}
-            onChange={(val) => onFilterChange(key, val[0])}
-            multiple={false}
-          />
-        );
-      })}
+      {PRODUCT_ATTRIBUTES.some(({ key }) => (attributeValues[key] ?? []).length > 0) ? (
+        PRODUCT_ATTRIBUTES.map(({ key, label }) => {
+          const options = attributeValues[key] ?? [];
+          if (options.length === 0) return null;
+          return (
+            <FilterCombobox
+              key={key}
+              label={label}
+              placeholder={`Select ${label}`}
+              options={options}
+              value={activeFilters[key] ? [activeFilters[key] as string] : []}
+              onChange={(val) => onFilterChange(key, val[0])}
+              multiple={false}
+            />
+          );
+        })
+      ) : (
+        <p className="text-stone-400 text-sm font-medium font-montserrat">No available filters.</p>
+      )}
     </>
   );
 }
 
 function FilterSidebar(props: FilterFieldsProps) {
   return (
-    <aside className="hidden lg:flex w-full lg:w-80 shrink-0 flex-col gap-7 pt-3">
+    <aside className="hidden lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-6rem)] w-full lg:w-80 shrink-0 flex-col gap-7 self-start overflow-y-auto pt-3">
       <FilterFields {...props} />
     </aside>
   );
@@ -309,6 +314,11 @@ export function ProductsPageClient({
     else params.delete("category");
     params.delete("type");
     params.delete("page");
+    // Attribute filter options are scoped per category — a value picked
+    // under one category (e.g. Orifice under Solenoid Valves) isn't valid
+    // once you switch to a category that doesn't have that attribute at all
+    // (e.g. Actuators), so it must not silently keep filtering the results.
+    for (const { key } of PRODUCT_ATTRIBUTES) params.delete(key);
     navigate(params);
   };
 
@@ -358,20 +368,27 @@ export function ProductsPageClient({
     if (nextPage > 1) params.set("page", String(nextPage));
     else params.delete("page");
     navigate(params);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Clicking a page button focuses it, and mobile browsers then auto-scroll
+    // the focused element back into view — which races our scroll-to-top and
+    // wins, leaving the user stuck mid-list. Blur it and defer to the next
+    // frame so our scroll runs after that focus-scroll settles.
+    (document.activeElement as HTMLElement | null)?.blur();
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
   };
 
   const scrollTabs = (dir: "left" | "right") => {
     tabsRef.current?.scrollBy({ left: dir === "right" ? 200 : -200, behavior: "smooth" });
   };
 
-  const hasActiveFilters =
-    Boolean(activeSubCategorySlug) || PRODUCT_ATTRIBUTES.some(({ key }) => Boolean(activeFilters[key]));
+  const activeFilterCount =
+    (activeSubCategorySlug ? 1 : 0) + PRODUCT_ATTRIBUTES.filter(({ key }) => Boolean(activeFilters[key])).length;
+  const hasActiveFilters = activeFilterCount > 0;
 
   return (
     <div>
       <PageHero
         bg={breadcrumbBg}
+        mobileBg={mobileBreadcrumbBg}
         title="All Products"
         description="Precision on–off control engineered by Rotex for safety-critical and high-duty industrial environments."
       />
@@ -398,9 +415,14 @@ export function ProductsPageClient({
           <button
             type="button"
             onClick={() => setFiltersOpen(true)}
-            className="lg:hidden w-full px-5 py-3 bg-neutral-100 rounded-sm text-center text-stone-900 text-sm font-semibold font-montserrat leading-6"
+            className="lg:hidden flex w-full items-center justify-center gap-2 px-5 py-3 bg-neutral-100 rounded-sm text-stone-900 text-sm font-semibold font-montserrat leading-6"
           >
-            Filters{hasActiveFilters ? " •" : ""}
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="flex size-5 items-center justify-center rounded-full bg-[#EF3E23] text-xs font-semibold font-montserrat text-white">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
 
           <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
@@ -423,7 +445,11 @@ export function ProductsPageClient({
                 />
               </div>
               <SheetFooter>
-                <Button type="button" onClick={() => setFiltersOpen(false)}>
+                <Button
+                  type="button"
+                  onClick={() => setFiltersOpen(false)}
+                  className="h-12.5 w-full rounded-full bg-orange-600 hover:bg-orange-700 text-sm font-semibold uppercase"
+                >
                   Show Results
                 </Button>
               </SheetFooter>
@@ -431,10 +457,10 @@ export function ProductsPageClient({
           </Sheet>
 
           {/* Category tabs */}
-          <div className="relative bg-white border-b border-stone-200 pt-3">
+          <div className="relative bg-white border-b border-stone-200 pt-3 lg:sticky lg:top-24 lg:z-10">
             <div
               ref={tabsRef}
-              className="no-scrollbar flex gap-5 overflow-x-auto"
+              className="no-scrollbar flex gap-2 sm:gap-5 overflow-x-auto overflow-y-hidden touch-pan-x"
               style={{ scrollbarWidth: "none" }}
             >
               {tabs.map((tab) => (
@@ -442,7 +468,7 @@ export function ProductsPageClient({
                   key={tab.slug ?? "all"}
                   onClick={() => goToTab(tab.slug)}
                   className={cn(
-                    "shrink-0 px-2.5 py-4 sm:py-6 border-b-2 -mb-px text-base sm:text-lg font-semibold font-montserrat leading-5 whitespace-nowrap transition-colors duration-150",
+                    "shrink-0 px-2.5 py-2.5 sm:py-6 border-b-2 -mb-px text-sm sm:text-lg font-semibold font-montserrat leading-5 whitespace-nowrap transition-colors duration-150",
                     tab.slug === activeCategorySlug
                       ? "border-[#EF3E23] text-[#EF3E23]"
                       : "border-transparent text-stone-900 hover:text-[#EF3E23]"
@@ -484,13 +510,13 @@ export function ProductsPageClient({
 
           {/* Products grid */}
           {isPending ? (
-            <div className="grid grid-cols-2 xl:grid-cols-3 gap-5 relative z-0">
+            <div className="grid grid-cols-2 xl:grid-cols-3 gap-2.5 sm:gap-5 relative z-0">
               {Array.from({ length: 6 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />
               ))}
             </div>
           ) : products.length > 0 ? (
-            <div className="grid grid-cols-2 xl:grid-cols-3 gap-5 relative z-0">
+            <div className="grid grid-cols-2 xl:grid-cols-3 gap-2.5 sm:gap-5 relative z-0">
               {products.map((product) => (
                 <ProductListCard key={product.slug} {...product} />
               ))}

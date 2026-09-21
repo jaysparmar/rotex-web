@@ -1,12 +1,16 @@
 "use client";
 import { useRef, useState } from "react";
-import { digitsOnlyKeyDown } from "@/lib/utils";
+import { digitsOnlyKeyDown, scrollToFirstFormError } from "@/lib/utils";
 import { useForm, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { HexIcon } from "@/components/ui/hex-icon";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterCombobox } from "@/components/ui/filter-combobox";
+import { HoneypotFields } from "@/components/ui/honeypot-fields";
+import { PhoneCodeSelect } from "@/components/ui/phone-code-select";
+import { useRecaptcha } from "@/hooks/use-recaptcha";
+import { RECAPTCHA_TOKEN_FIELD } from "@/lib/spam-protection-fields";
 import { COUNTRY_NAMES } from "@/lib/world-countries";
 
 // ── Schema ────────────────────────────────────────────────────────────────────
@@ -38,7 +42,9 @@ const PRODUCTS = ["Solenoid Valve", "Angle Seat Valve", "Actuators", "Positioner
 export function IndustryEnquiryForm({ industryName }: { industryName: string }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [submitError, setSubmitError] = useState<string>();
-  const [fileName, setFileName] = useState<string>();
+  const [files, setFiles] = useState<File[]>([]);
+  const [dialCode, setDialCode] = useState("+91");
+  const { getToken } = useRecaptcha();
 
   const {
     register,
@@ -58,8 +64,9 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
     for (const [key, value] of Object.entries(data)) {
       if (value !== undefined) body.append(key, value);
     }
-    const file = fileRef.current?.files?.[0];
-    if (file) body.append("file", file);
+    for (const file of files) body.append("file", file);
+    const recaptchaToken = await getToken("industry_enquiry");
+    if (recaptchaToken) body.append(RECAPTCHA_TOKEN_FIELD, recaptchaToken);
 
     const res = await fetch("/api/v1/enquiries", { method: "POST", body });
     const json = await res.json();
@@ -107,14 +114,15 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
 
         {/* Form card */}
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit, scrollToFirstFormError)}
           className="flex-1 p-5 lg:p-7 bg-white rounded-2xl shadow-[0px_1px_3px_0px_rgba(0,0,0,0.10),0px_1px_2px_-1px_rgba(0,0,0,0.10)] outline outline-1 -outline-offset-1 outline-neutral-200 flex flex-col gap-5 lg:gap-6"
         >
+          <HoneypotFields />
           <Field label="Full Name" error={errors.fullName?.message}>
             <input {...register("fullName")} placeholder="e.g. John Doe" className={inputCls(!!errors.fullName)} />
           </Field>
 
-          <Field label="Enquiry Type" error={errors.enquiryType?.message}>
+          <Field label="Enquiry Type" error={errors.enquiryType?.message} name="enquiryType">
             <FormSelect
               control={control}
               name="enquiryType"
@@ -124,7 +132,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
             />
           </Field>
 
-          <Field label="Product" error={errors.product?.message}>
+          <Field label="Product" error={errors.product?.message} name="product">
             <FormSelect
               control={control}
               name="product"
@@ -139,10 +147,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
             <div className="flex-1 flex flex-col gap-2">
               <label className={labelCls}>Phone number</label>
               <div className={`flex h-11 bg-gray-50 rounded-lg outline outline-1 -outline-offset-1 overflow-hidden ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
-                <div className="px-3 border-r border-gray-200 flex items-center gap-2 shrink-0">
-                  <span className="text-stone-900 text-sm font-medium font-montserrat leading-5">+91</span>
-                  <ChevronDown />
-                </div>
+                <PhoneCodeSelect value={dialCode} onChange={setDialCode} />
                 <input
                   {...register("phone")}
                   type="tel"
@@ -162,7 +167,7 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
 
           {/* Country + City */}
           <div className="flex flex-col gap-5 lg:flex-row">
-            <div className="flex-1 flex flex-col gap-2">
+            <div className="flex-1 flex flex-col gap-2" data-field="country" tabIndex={-1}>
               <Controller
                 control={control}
                 name="country"
@@ -204,14 +209,15 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
             />
           </Field>
 
-          {/* File upload */}
-          <div>
+          {/* File upload — multiple files can be selected and uploaded */}
+          <div className="flex flex-col gap-2">
             <input
               ref={fileRef}
               type="file"
+              multiple
               className="hidden"
               accept=".pdf,.doc,.docx,.jpg,.png"
-              onChange={(e) => setFileName(e.target.files?.[0]?.name)}
+              onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
             />
             <button
               type="button"
@@ -219,8 +225,25 @@ export function IndustryEnquiryForm({ industryName }: { industryName: string }) 
               className="w-full h-11 px-5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 flex items-center justify-center gap-2 text-[#EF3E23] text-xs font-semibold font-montserrat uppercase leading-5 hover:bg-gray-100 transition-colors"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 4l3-3 3 3M1 10v1.5A1.5 1.5 0 002.5 13h9A1.5 1.5 0 0013 11.5V10" stroke="#dc2626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              {fileName ?? "Upload File"}
+              {files.length > 0 ? `${files.length} file${files.length > 1 ? "s" : ""} selected` : "Upload Files"}
             </button>
+            {files.length > 0 && (
+              <ul className="flex flex-col gap-1">
+                {files.map((file, i) => (
+                  <li key={`${file.name}-${i}`} className="flex items-center justify-between gap-2 text-sm text-stone-600">
+                    <span className="truncate">{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                      className="shrink-0 text-stone-400 hover:text-[#EF3E23] transition-colors"
+                      aria-label={`Remove ${file.name}`}
+                    >
+                      ✕
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {submitError && (
@@ -259,12 +282,12 @@ function inputCls(hasError: boolean) {
 }
 
 function Field({
-  label, error, children, className = "",
+  label, error, children, className = "", name,
 }: {
-  label: string; error?: string; children: React.ReactNode; className?: string;
+  label: string; error?: string; children: React.ReactNode; className?: string; name?: string;
 }) {
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`} data-field={name} tabIndex={name ? -1 : undefined}>
       <label className={labelCls}>{label}</label>
       {children}
       {error && <p className={errorCls}>{error}</p>}
@@ -317,13 +340,5 @@ function FormSelect({
         </Select>
       )}
     />
-  );
-}
-
-function ChevronDown() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M2 4L6 8L10 4" stroke="#1c1917" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }

@@ -1,16 +1,22 @@
 "use client";
 import { useMemo, useState } from "react";
-import { digitsOnlyKeyDown } from "@/lib/utils";
+import { digitsOnlyKeyDown, scrollToFirstFormError } from "@/lib/utils";
 import { useForm, useWatch, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterCombobox } from "@/components/ui/filter-combobox";
 import { HexIcon } from "@/components/ui/hex-icon";
+import { HoneypotFields } from "@/components/ui/honeypot-fields";
+import { PhoneCodeSelect } from "@/components/ui/phone-code-select";
+import { useRecaptcha } from "@/hooks/use-recaptcha";
+import { RECAPTCHA_TOKEN_FIELD } from "@/lib/spam-protection-fields";
+import { PRODUCT_FAMILIES } from "@/lib/product-constants";
 import { COUNTRY_NAMES, getCitiesForCountry } from "@/lib/world-countries";
 
 const DEFAULT_BUSINESS_TYPES = ["Distributor", "Supplier", "System Integrator", "OEM Partner"];
 const DEFAULT_INDUSTRIES = ["Oil & Gas", "Chemical", "Power", "Mining", "Industrial Automation"];
+const DEFAULT_PRODUCT_TYPES = [...PRODUCT_FAMILIES];
 
 const labelCls = "text-stone-500 text-sm font-medium font-montserrat leading-5";
 const errorCls = "text-red-500 text-xs font-montserrat mt-0.5";
@@ -36,15 +42,16 @@ const schema = z.object({
   city: z.string().min(1, "Please select a city"),
   businessType: z.string().min(1, "Please select a business type"),
   industriesServed: z.string().min(1, "Please select an industry"),
+  productType: z.string().min(1, "Please select a product type"),
   otherIndustriesServed: z.string().optional(),
   message: z.string().min(10, "Tell us a bit more (at least 10 characters)"),
 });
 
 type FormData = z.infer<typeof schema>;
 
-function Field({ label, error, children, className = "" }: { label: string; error?: string; children: React.ReactNode; className?: string }) {
+function Field({ label, error, children, className = "", name }: { label: string; error?: string; children: React.ReactNode; className?: string; name?: string }) {
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`} data-field={name} tabIndex={name ? -1 : undefined}>
       <label className={labelCls}>{label}</label>
       {children}
       {error && <p className={errorCls}>{error}</p>}
@@ -60,7 +67,7 @@ function FormSelect({
   hasError,
 }: {
   control: Control<FormData>;
-  name: "country" | "city" | "businessType" | "industriesServed";
+  name: "country" | "city" | "businessType" | "industriesServed" | "productType";
   placeholder: string;
   options: string[];
   hasError: boolean;
@@ -89,14 +96,6 @@ function FormSelect({
   );
 }
 
-function ChevronDown() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M2 4L6 8L10 4" stroke="#1c1917" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 type SupplierFormSectionProps = {
   headingPrefix?: string;
   headingHighlight?: string;
@@ -107,6 +106,7 @@ type SupplierFormSectionProps = {
   cityOptions?: string[];
   businessTypeOptions?: string[];
   industryOptions?: string[];
+  productTypeOptions?: string[];
   /** @deprecated Country field no longer preselects a value; placeholder shows by default. */
   defaultCountry?: string;
 };
@@ -126,8 +126,11 @@ export function SupplierFormSection({
   description = "If you are looking to enrich your product offering portfolio. Apply for becoming our prestigious league of channel partners with us.",
   businessTypeOptions = DEFAULT_BUSINESS_TYPES,
   industryOptions = DEFAULT_INDUSTRIES,
+  productTypeOptions = DEFAULT_PRODUCT_TYPES,
 }: SupplierFormSectionProps) {
   const [submitError, setSubmitError] = useState<string>();
+  const [dialCode, setDialCode] = useState("+91");
+  const { getToken } = useRecaptcha();
   const {
     register,
     control,
@@ -149,13 +152,15 @@ export function SupplierFormSection({
     body.append("industryName", data.otherIndustriesServed?.trim() || data.industriesServed);
     body.append("fullName", data.fullName);
     body.append("enquiryType", data.businessType);
-    body.append("product", "Supplier Application");
+    body.append("product", data.productType);
     body.append("phone", data.phone);
     body.append("email", data.email);
     body.append("country", data.country);
     body.append("city", data.city);
     body.append("company", data.companyName);
     body.append("message", data.message);
+    const recaptchaToken = await getToken("supplier_application");
+    if (recaptchaToken) body.append(RECAPTCHA_TOKEN_FIELD, recaptchaToken);
 
     const res = await fetch("/api/v1/enquiries", { method: "POST", body });
     const json = await res.json();
@@ -167,15 +172,15 @@ export function SupplierFormSection({
   };
 
   return (
-    <section id="form" className="scroll-mt-24 lg:scroll-mt-32 bg-white py-14 lg:py-20">
+    <section id="form" className="scroll-mt-24 lg:scroll-mt-32 bg-white pt-8 pb-14 lg:py-20">
       <div className="container flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16">
         {/* Left copy */}
         <div className="lg:w-121.75 lg:shrink-0 flex flex-col gap-8">
           <div className="flex flex-col gap-4">
-            <h2 className="text-stone-900 text-2xl lg:text-4xl font-normal font-montserrat leading-9 lg:leading-10">
+            <h2 className="text-stone-900 text-2xl lg:text-4xl font-semibold font-montserrat leading-8 lg:leading-10">
               {headingPrefix} <span className="text-primary">{headingHighlight}</span>
             </h2>
-            <p className="text-stone-500 text-base font-medium font-montserrat leading-6">
+            <p className="text-stone-500 text-sm lg:text-base font-medium font-montserrat leading-5 lg:leading-6">
               {description}
             </p>
           </div>
@@ -194,9 +199,10 @@ export function SupplierFormSection({
 
         {/* Form card */}
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit, scrollToFirstFormError)}
           className="flex-1 p-5 lg:p-7 bg-white rounded-2xl shadow-[0px_1px_3px_0px_rgba(0,0,0,0.10),0px_1px_2px_-1px_rgba(0,0,0,0.10)] outline outline-1 -outline-offset-1 outline-neutral-200 flex flex-col gap-6"
         >
+          <HoneypotFields />
           <Field label="Full Name" error={errors.fullName?.message}>
             <input {...register("fullName")} placeholder="e.g. John Doe" className={inputCls(!!errors.fullName)} />
           </Field>
@@ -209,10 +215,7 @@ export function SupplierFormSection({
             <div className="flex-1 flex flex-col gap-2">
               <label className={labelCls}>Phone number</label>
               <div className={`flex bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 overflow-hidden ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
-                <div className="px-3 py-2.5 border-r border-gray-200 flex items-center gap-2 shrink-0">
-                  <span className="text-stone-900 text-sm font-medium font-montserrat leading-5">+91</span>
-                  <ChevronDown />
-                </div>
+                <PhoneCodeSelect value={dialCode} onChange={setDialCode} />
                 <input
                   {...register("phone")}
                   type="tel"
@@ -231,7 +234,7 @@ export function SupplierFormSection({
           </div>
 
           <div className="flex flex-col gap-5 lg:flex-row">
-            <div className="flex-1 flex flex-col gap-2">
+            <div className="flex-1 flex flex-col gap-2" data-field="country" tabIndex={-1}>
               <Controller
                 control={control}
                 name="country"
@@ -252,7 +255,7 @@ export function SupplierFormSection({
               {errors.country && <p className={errorCls}>{errors.country.message}</p>}
             </div>
 
-            <div className="flex-1 flex flex-col gap-2">
+            <div className="flex-1 flex flex-col gap-2" data-field="city" tabIndex={-1}>
               <Controller
                 control={control}
                 name="city"
@@ -272,22 +275,28 @@ export function SupplierFormSection({
           </div>
 
           <div className="flex flex-col gap-5 lg:flex-row">
-            <Field label="Business Type" error={errors.businessType?.message} className="flex-1">
+            <Field label="Business Type" error={errors.businessType?.message} className="flex-1" name="businessType">
               <FormSelect control={control} name="businessType" placeholder="Business Type" options={businessTypeOptions} hasError={!!errors.businessType} />
             </Field>
 
-            <Field label="Industries Served" error={errors.industriesServed?.message} className="flex-1">
+            <Field label="Industries Served" error={errors.industriesServed?.message} className="flex-1" name="industriesServed">
               <FormSelect control={control} name="industriesServed" placeholder="Select" options={industryOptions} hasError={!!errors.industriesServed} />
             </Field>
           </div>
 
-          <Field label="Other Industries Served">
-            <input
-              {...register("otherIndustriesServed")}
-              placeholder="e.g. Energy, Chemicals, Packaging, Textiles"
-              className={inputCls(false)}
-            />
-          </Field>
+          <div className="flex flex-col gap-5 lg:flex-row">
+            <Field label="Product Type" error={errors.productType?.message} className="flex-1" name="productType">
+              <FormSelect control={control} name="productType" placeholder="Select Product Type" options={productTypeOptions} hasError={!!errors.productType} />
+            </Field>
+
+            <Field label="Other Industries Served" className="flex-1">
+              <input
+                {...register("otherIndustriesServed")}
+                placeholder="e.g. Energy, Chemicals, Packaging, Textiles"
+                className={inputCls(false)}
+              />
+            </Field>
+          </div>
 
           <Field label="Your Message" error={errors.message?.message}>
             <textarea

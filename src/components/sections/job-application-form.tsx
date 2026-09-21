@@ -1,10 +1,14 @@
 "use client";
 import { useRef, useState } from "react";
-import { digitsOnlyKeyDown } from "@/lib/utils";
+import { digitsOnlyKeyDown, scrollToFirstFormError } from "@/lib/utils";
 import { useForm, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { HoneypotFields } from "@/components/ui/honeypot-fields";
+import { PhoneCodeSelect } from "@/components/ui/phone-code-select";
+import { useRecaptcha } from "@/hooks/use-recaptcha";
+import { RECAPTCHA_TOKEN_FIELD } from "@/lib/spam-protection-fields";
 
 const DEFAULT_EXPERIENCE = ["0-1 years", "1-3 years", "3-5 years", "5-10 years", "10+ years"];
 
@@ -37,9 +41,9 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-function Field({ label, error, children, className = "" }: { label: string; error?: string; children: React.ReactNode; className?: string }) {
+function Field({ label, error, children, className = "", name }: { label: string; error?: string; children: React.ReactNode; className?: string; name?: string }) {
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`} data-field={name} tabIndex={name ? -1 : undefined}>
       <label className={labelCls}>{label}</label>
       {children}
       {error && <p className={errorCls}>{error}</p>}
@@ -84,14 +88,6 @@ function FormSelect({
   );
 }
 
-function ChevronDown() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M2 4L6 8L10 4" stroke="#1c1917" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 type JobApplicationFormProps = {
   experienceOptions?: string[];
   positionOptions?: string[];
@@ -108,12 +104,14 @@ export function JobApplicationForm({
   const fileRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string>();
   const [submitError, setSubmitError] = useState<string>();
+  const [dialCode, setDialCode] = useState("+91");
   const {
     register,
     control,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues: { position: defaultPosition ?? "" } });
+  const { getToken } = useRecaptcha();
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(undefined);
@@ -131,6 +129,9 @@ export function JobApplicationForm({
     const file = fileRef.current?.files?.[0];
     if (file) body.append("resume", file);
 
+    const recaptchaToken = await getToken("job_application");
+    if (recaptchaToken) body.append(RECAPTCHA_TOKEN_FIELD, recaptchaToken);
+
     const res = await fetch("/api/v1/job-applications", { method: "POST", body });
     const json = await res.json();
 
@@ -142,9 +143,10 @@ export function JobApplicationForm({
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit, scrollToFirstFormError)}
       className={`flex flex-col gap-6 rounded-2xl bg-white p-5 outline outline-1 -outline-offset-1 outline-neutral-200 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.10),0px_1px_2px_-1px_rgba(0,0,0,0.10)] lg:p-7 ${className}`}
     >
+      <HoneypotFields />
       <Field label="Full Name" error={errors.fullName?.message}>
         <input {...register("fullName")} placeholder="e.g. John Doe" className={inputCls(!!errors.fullName)} />
       </Field>
@@ -157,10 +159,7 @@ export function JobApplicationForm({
         <div className="flex-1 flex flex-col gap-2">
           <label className={labelCls}>Phone number</label>
           <div className={`flex bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 overflow-hidden ${errors.phone ? "outline-red-400" : "outline-gray-200"}`}>
-            <div className="px-3 py-2.5 border-r border-gray-200 flex items-center gap-2 shrink-0">
-              <span className="text-stone-900 text-sm font-medium font-montserrat leading-5">+91</span>
-              <ChevronDown />
-            </div>
+            <PhoneCodeSelect value={dialCode} onChange={setDialCode} />
             <input
               {...register("phone")}
               type="tel"
@@ -174,12 +173,12 @@ export function JobApplicationForm({
         </div>
       </div>
 
-      <Field label="Position you are applying for" error={errors.position?.message}>
+      <Field label="Position you are applying for" error={errors.position?.message} name="position">
         <FormSelect control={control} name="position" placeholder="Select" options={positionOptions} hasError={!!errors.position} />
       </Field>
 
       <div className="flex flex-col gap-5 lg:flex-row">
-        <Field label="Years of experience" error={errors.experience?.message} className="flex-1">
+        <Field label="Years of experience" error={errors.experience?.message} className="flex-1" name="experience">
           <FormSelect control={control} name="experience" placeholder="Select" options={experienceOptions} hasError={!!errors.experience} />
         </Field>
 
@@ -238,7 +237,7 @@ export function JobApplicationForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full px-6 py-3.5 bg-orange-600 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-900 transition-colors duration-150 disabled:opacity-50"
+          className="w-full px-6 py-3.5 bg-[#EF3E23] rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-900 transition-colors duration-150 disabled:opacity-50"
         >
           {isSubmitting ? "Submitting…" : "Submit all details"}
         </button>

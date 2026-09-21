@@ -1,13 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useForm, FormProvider, useFieldArray, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { TextField, FieldGrid } from "@/components/admin/form-fields";
-import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveAboutSection } from "@/app/admin/(dashboard)/about/actions";
+
+const MAX_RESOURCES = 3;
+const PAGE_SIZE = 10;
 
 type Resource = { id: string; type: string; title: string; slug: string; image: string };
 type Tab = { id: string; label: string; cta: { label: string; href: string }; resourceIds: string[] };
@@ -70,34 +76,151 @@ export function ResourcesForm({
   );
 }
 
+function ResourceRow({ resource }: { resource: Resource }) {
+  return (
+    <>
+      <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
+        {resource.image && (
+          <Image src={resource.image} alt={resource.title} width={40} height={40} className="size-full object-cover" unoptimized />
+        )}
+      </div>
+      <span className="flex-1 truncate text-sm font-medium">{resource.title}</span>
+    </>
+  );
+}
+
+// The public site always shows exactly MAX_RESOURCES cards per tab, so the
+// picker enforces that cap up front instead of letting admins pick an
+// arbitrary number and silently truncating on the frontend. With dozens of
+// resources, an always-visible toggle-per-item list doesn't scale — the
+// browsable list is paginated (PAGE_SIZE at a time, filterable by search)
+// so its height stays constant no matter how many resources exist.
 function ResourcePicker({ tabIndex, typeId, options }: { tabIndex: number; typeId: string; options: Resource[] }) {
   const form = useFormContext<FormValues>();
-  const selected = form.watch(`tabs.${tabIndex}.resourceIds`) ?? [];
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const selectedIds: string[] = form.watch(`tabs.${tabIndex}.resourceIds`) ?? [];
+  const byId = new Map(options.map((r) => [r.id, r]));
+  const selectedResources = selectedIds.map((id) => byId.get(id)).filter((r): r is Resource => Boolean(r));
 
-  function toggle(id: string, checked: boolean) {
-    const current = form.getValues(`tabs.${tabIndex}.resourceIds`) ?? [];
-    form.setValue(`tabs.${tabIndex}.resourceIds`, checked ? [...current, id] : current.filter((r) => r !== id));
+  const atLimit = selectedIds.length >= MAX_RESOURCES;
+  const trimmedQuery = query.trim().toLowerCase();
+  const browsable = options.filter(
+    (r) => !selectedIds.includes(r.id) && (!trimmedQuery || r.title.toLowerCase().includes(trimmedQuery))
+  );
+  const totalPages = Math.max(1, Math.ceil(browsable.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages - 1);
+  const pageItems = browsable.slice(currentPage * PAGE_SIZE, currentPage * PAGE_SIZE + PAGE_SIZE);
+
+  function updateQuery(value: string) {
+    setQuery(value);
+    setPage(0);
+  }
+
+  function add(id: string) {
+    if (atLimit) return;
+    form.setValue(`tabs.${tabIndex}.resourceIds`, [...selectedIds, id]);
+  }
+
+  function remove(id: string) {
+    form.setValue(
+      `tabs.${tabIndex}.resourceIds`,
+      selectedIds.filter((r) => r !== id)
+    );
   }
 
   return (
-    <div className="space-y-1 border-t border-border pt-4">
-      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{typeId.replace("-", " ")}</span>
-      <div className="rounded-lg border border-border">
-        {options.length === 0 && (
-          <p className="p-4 text-sm text-muted-foreground">No published resources of this type yet. Add some on the Resources page first.</p>
-        )}
-        {options.map((resource) => (
-          <div key={resource.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
-            <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-              {resource.image && (
-                <Image src={resource.image} alt={resource.title} width={40} height={40} className="size-full object-cover" unoptimized />
-              )}
-            </div>
-            <span className="flex-1 truncate text-sm font-medium">{resource.title}</span>
-            <Switch checked={selected.includes(resource.id)} onCheckedChange={(v) => toggle(resource.id, v)} />
-          </div>
-        ))}
+    <div className="space-y-3 border-t border-border pt-4">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{typeId.replace("-", " ")}</span>
+        <span className="text-xs text-muted-foreground">
+          {selectedIds.length}/{MAX_RESOURCES} selected
+        </span>
       </div>
+
+      {options.length === 0 ? (
+        <p className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
+          No published resources of this type yet. Add some on the Resources page first.
+        </p>
+      ) : (
+        <>
+          {selectedResources.length > 0 && (
+            <div className="rounded-lg border border-border">
+              {selectedResources.map((resource) => (
+                <div key={resource.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
+                  <ResourceRow resource={resource} />
+                  <button
+                    type="button"
+                    onClick={() => remove(resource.id)}
+                    aria-label={`Remove ${resource.title}`}
+                    className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Input
+              value={query}
+              onChange={(e) => updateQuery(e.target.value)}
+              placeholder={atLimit ? `Max ${MAX_RESOURCES} selected — remove one to add another` : "Search..."}
+            />
+
+            {pageItems.length > 0 ? (
+              <div className="rounded-lg border border-border">
+                {pageItems.map((resource) => (
+                  <button
+                    key={resource.id}
+                    type="button"
+                    disabled={atLimit}
+                    onClick={() => add(resource.id)}
+                    className="flex w-full items-center gap-4 border-b border-border p-4 text-left last:border-b-0 hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+                  >
+                    <ResourceRow resource={resource} />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
+                {trimmedQuery ? "No matches." : "All resources of this type are already selected."}
+              </p>
+            )}
+
+            {browsable.length > PAGE_SIZE && (
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>
+                  {browsable.length} available · Page {currentPage + 1} of {totalPages}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage <= 0}
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  >
+                    <ChevronLeft className="size-4" />
+                    Previous
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage >= totalPages - 1}
+                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  >
+                    Next
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

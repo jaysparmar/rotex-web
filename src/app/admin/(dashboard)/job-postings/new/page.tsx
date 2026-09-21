@@ -1,7 +1,13 @@
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { JobPostingEditForm } from "@/components/admin/job-postings/job-posting-edit-form";
+import { prisma } from "@/lib/prisma";
 
-export default function AdminNewJobPostingPage() {
+export default async function AdminNewJobPostingPage() {
+  const [companies, categories] = await Promise.all([
+    prisma.company.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
+    prisma.category.findMany({ orderBy: { name: "asc" }, select: { name: true }, distinct: ["name"] }),
+  ]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -18,7 +24,10 @@ export default function AdminNewJobPostingPage() {
         />
       </div>
 
-      <JobPostingEditForm />
+      <JobPostingEditForm
+        companyOptions={companies.map((c) => c.name)}
+        tagOptions={categories.map((c) => c.name)}
+      />
     </div>
   );
 }

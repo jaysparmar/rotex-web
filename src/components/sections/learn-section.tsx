@@ -63,7 +63,7 @@ export function LearnSection({ heading = "Resources", tabs = defaultTabs }: Lear
       <div className="container">
 
         {/* Heading — Figma mobile: 24px / leading-8 */}
-        <h2 className="font-montserrat font-medium lg:font-normal text-2xl lg:text-4xl leading-8 lg:leading-10 mb-5 lg:mb-6">
+        <h2 className="font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10 mb-5 lg:mb-6">
           <span className="text-gradient-orange-dark">{heading}</span>
         </h2>
 

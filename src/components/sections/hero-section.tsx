@@ -133,9 +133,9 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
                   {titleRest && <span className="block lg:inline lg:ml-2">{titleRest}</span>}
                 </h1>
 
-                {/* Figma — mobile: 12px / leading-5 / stone-300; desktop: 16px / leading-6 */}
+                {/* Body Copy 2 on mobile (14px), Body Copy 1 on desktop (16px) — per design team feedback, was too small at 12px */}
                 <p
-                  className="max-w-[547px] text-stone-300 lg:text-subtext text-xs lg:text-base font-medium leading-5 lg:leading-6"
+                  className="max-w-[547px] text-stone-300 lg:text-subtext text-sm lg:text-base font-medium leading-5 lg:leading-6"
                   style={{ fontFamily: "'Montserrat', sans-serif" }}
                 >
                   {slide.description}

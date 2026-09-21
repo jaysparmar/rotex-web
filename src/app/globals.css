@@ -410,3 +410,17 @@
     background-clip: text;
   }
 }
+
+/* iOS Safari auto-zooms the page on focusing any form control whose
+   computed font-size is under 16px — most of our inputs/selects use
+   text-sm (14px), so every input tap zoomed the whole page in. Forcing
+   16px on mobile only (viewport keeps its own responsive text-* size
+   above this breakpoint) stops the zoom without touching every input
+   component individually. */
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

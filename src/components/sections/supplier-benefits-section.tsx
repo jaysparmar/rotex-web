@@ -66,7 +66,7 @@ export function SupplierBenefitsSection({
   cta = { label: "Apply as a Supplier", href: "#form" },
 }: SupplierBenefitsSectionProps) {
   return (
-    <section className="bg-white py-14 lg:py-20">
+    <section className="bg-white pt-14 pb-8 lg:py-20">
       <div className="container flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-16">
         {/* Left: heading + stats */}
         <div className="lg:flex-1 flex flex-col gap-14">
@@ -95,7 +95,7 @@ export function SupplierBenefitsSection({
         {/* Figma "Gradient/Orange to Black Radial" — the shared token uses the
             brand hexes (#ff9a00 → #f03900 → #950000 → #000000); the Tailwind
             amber-500/orange-600 pair it replaced are off-brand approximations. */}
-        <div className="lg:w-118.25 lg:shrink-0 p-10 bg-gradient-orange-black-radial rounded-xl flex flex-col justify-between gap-10">
+        <div className="lg:w-118.25 lg:shrink-0 p-6 lg:p-10 bg-gradient-orange-black-radial rounded-xl flex flex-col justify-between gap-10">
           <ul className="flex flex-col gap-4">
             {benefits.map((b) => (
               <li key={b} className="flex items-start gap-3">

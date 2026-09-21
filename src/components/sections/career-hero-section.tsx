@@ -16,8 +16,8 @@ export function CareerHeroSection({
   hasOpenPositions = true,
 }: CareerHeroSectionProps) {
   return (
-    <section className="relative bg-stone-900 pt-28 pb-16 lg:pb-20 overflow-hidden">
-      <div className="container relative">
+    <section className="relative bg-stone-900 min-h-[640px] lg:min-h-0 pt-28 pb-16 lg:pb-20 overflow-hidden">
+      <div className="container relative h-full flex flex-col">
         <Image
           src={careerHero}
           alt=""
@@ -40,15 +40,24 @@ export function CareerHeroSection({
           <p className="text-white text-sm lg:text-base font-normal font-montserrat leading-6">
             {description}
           </p>
-          {hasOpenPositions && (
-            <Link
-              href="#positions"
-              className="inline-flex w-fit items-center justify-center gap-1.5 px-6 py-3.5 rounded-full bg-stone-100 text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-primary hover:text-white transition-colors duration-200"
-            >
-              {cta.label}
-            </Link>
-          )}
         </div>
+
+        {/* Illustration — desktop version is absolute (above); mobile gets its
+            own centered, in-flow copy since it was previously hidden outright. */}
+        <Image
+          src={careerHero}
+          alt=""
+          className="lg:hidden mx-auto mt-auto mb-8 w-64 h-auto pointer-events-none"
+        />
+
+        {hasOpenPositions && (
+          <Link
+            href="#positions"
+            className="relative mb-6 lg:mb-0 w-full lg:w-fit inline-flex items-center justify-center gap-1.5 px-6 py-3.5 rounded-full bg-stone-100 text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-primary hover:text-white transition-colors duration-200"
+          >
+            {cta.label}
+          </Link>
+        )}
       </div>
     </section>
   );

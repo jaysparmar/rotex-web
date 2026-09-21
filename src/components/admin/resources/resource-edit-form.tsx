@@ -15,6 +15,7 @@ import { SaveBar } from "@/components/admin/section-form-shell";
 import { adminFetch } from "@/lib/admin-fetch";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { slugify } from "@/lib/utils";
+import { RESOURCE_PRODUCT_CATEGORIES, RESOURCE_INDUSTRIES } from "@/lib/resource-taxonomy";
 import { createResource, updateResource } from "@/app/admin/(dashboard)/resources/actions";
 
 export const RESOURCE_TYPES = [
@@ -48,7 +49,13 @@ type Resource = {
   content: string;
 };
 
-export function ResourceEditForm({ resource, defaultType }: { resource?: Resource; defaultType?: string }) {
+export function ResourceEditForm({
+  resource,
+  defaultType,
+}: {
+  resource?: Resource;
+  defaultType?: string;
+}) {
   const router = useRouter();
   const slugTouched = useRef(Boolean(resource));
   const form = useForm<ResourceFormValues>({
@@ -125,8 +132,20 @@ export function ResourceEditForm({ resource, defaultType }: { resource?: Resourc
             <TextField label="Slug" {...form.register("slug", { required: true })} onChange={handleSlugChange} />
             <MediaField name="image" mediaType="image" showAlt={false} previewFit="contain" />
             <FieldGrid>
-              <TextField label="Product tag" {...form.register("product")} />
-              <TextField label="Industry tag" {...form.register("industry")} />
+              <SelectField
+                label="Product tag"
+                placeholder="Select product category"
+                options={RESOURCE_PRODUCT_CATEGORIES.map((p) => ({ value: p, label: p }))}
+                defaultValue={resource?.product ?? ""}
+                {...form.register("product")}
+              />
+              <SelectField
+                label="Industry tag"
+                placeholder="Select industry"
+                options={RESOURCE_INDUSTRIES.map((i) => ({ value: i, label: i }))}
+                defaultValue={resource?.industry ?? ""}
+                {...form.register("industry")}
+              />
             </FieldGrid>
             <TextField label="Extra tags (comma separated)" {...form.register("extraTags")} />
             <SwitchField

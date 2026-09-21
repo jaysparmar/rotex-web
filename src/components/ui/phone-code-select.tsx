@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { IoChevronDownOutline, IoCheckmarkOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import {
@@ -17,14 +18,21 @@ type PhoneCodeSelectProps = {
   onChange: (dial: string) => void;
 };
 
+const PANEL_HEIGHT = 280; // search input + max-h-64 list, roughly
+
 export function PhoneCodeSelect({ value, onChange }: PhoneCodeSelectProps) {
   const [open, setOpen] = useState(false);
+  const [panelPos, setPanelPos] = useState({ top: 0, bottom: 0, left: 0, width: 288, dropUp: false });
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
     function handleOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current && !containerRef.current.contains(e.target as Node) &&
+        !(e.target as HTMLElement).closest("[data-phone-code-panel]")
+      ) {
         setOpen(false);
       }
     }
@@ -37,8 +45,23 @@ export function PhoneCodeSelect({ value, onChange }: PhoneCodeSelectProps) {
   return (
     <div ref={containerRef} className="relative shrink-0">
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (!open && triggerRef.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const dropUp = spaceBelow < PANEL_HEIGHT && rect.top > spaceBelow;
+            setPanelPos({
+              top: rect.bottom + 4,
+              bottom: window.innerHeight - rect.top + 4,
+              left: rect.left,
+              width: Math.max(rect.width, 288),
+              dropUp,
+            });
+          }
+          setOpen((o) => !o);
+        }}
         className="h-full px-3 border-r border-gray-200 flex items-center gap-1.5 shrink-0"
       >
         <span className="text-base leading-none">{selected?.flag}</span>
@@ -49,8 +72,21 @@ export function PhoneCodeSelect({ value, onChange }: PhoneCodeSelectProps) {
         />
       </button>
 
-      {open && (
-        <div className="absolute left-0 top-[calc(100%+4px)] z-50 w-72 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden">
+      {/* Portaled to <body> — a plain absolute panel here would be clipped by
+          the phone row's own `overflow-hidden` (used to clip the pill's
+          rounded corners), so it's positioned fixed instead, computed from
+          the trigger's actual screen position, with a viewport-aware flip. */}
+      {open && typeof document !== "undefined" && createPortal(
+        <div
+          data-phone-code-panel
+          style={{
+            position: "fixed",
+            left: panelPos.left,
+            width: panelPos.width,
+            ...(panelPos.dropUp ? { bottom: panelPos.bottom } : { top: panelPos.top }),
+          }}
+          className="z-50 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden"
+        >
           <Command>
             <CommandInput placeholder="Search country..." />
             <CommandList className="max-h-64">
@@ -78,7 +114,8 @@ export function PhoneCodeSelect({ value, onChange }: PhoneCodeSelectProps) {
               </CommandGroup>
             </CommandList>
           </Command>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

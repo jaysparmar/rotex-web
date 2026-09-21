@@ -1,15 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useForm, FormProvider, useFieldArray, useFormContext, Controller, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ChevronDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { TextField, TextAreaField, FieldGrid, SelectField, SwitchField, Field } from "@/components/admin/form-fields";
 import { SaveBar } from "@/components/admin/section-form-shell";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PERK_ICON_OPTIONS } from "@/lib/job-perk-icons";
 import { EMPLOYMENT_TYPE_OPTIONS, WORK_MODE_OPTIONS } from "@/lib/job-posting-constants";
 import { useSaveAction } from "@/hooks/use-save-action";
@@ -46,7 +47,15 @@ type JobPosting = {
   published: boolean;
 };
 
-export function JobPostingEditForm({ job }: { job?: JobPosting }) {
+export function JobPostingEditForm({
+  job,
+  companyOptions = [],
+  tagOptions = [],
+}: {
+  job?: JobPosting;
+  companyOptions?: string[];
+  tagOptions?: string[];
+}) {
   const router = useRouter();
   const form = useForm<JobPostingFormValues>({
     defaultValues: {
@@ -98,7 +107,12 @@ export function JobPostingEditForm({ job }: { job?: JobPosting }) {
           </CardHeader>
           <CardContent className="space-y-4">
             <TextField label="Job Title" {...form.register("title", { required: true })} />
-            <TextField label="Company" {...form.register("company", { required: true })} />
+            <SelectField
+              label="Company"
+              options={companyOptions.map((c) => ({ value: c, label: c }))}
+              defaultValue={form.getValues("company")}
+              {...form.register("company", { required: true })}
+            />
             <FieldGrid>
               <TextField label="Category" {...form.register("category", { required: true })} />
               <TextField label="Location" {...form.register("location", { required: true })} />
@@ -117,7 +131,13 @@ export function JobPostingEditForm({ job }: { job?: JobPosting }) {
                 {...form.register("workMode")}
               />
             </FieldGrid>
-            <TextField label="Tag (e.g. Solenoid Valves)" {...form.register("tag")} />
+            <SelectField
+              label="Tag"
+              placeholder="Select category"
+              options={tagOptions.map((t) => ({ value: t, label: t }))}
+              defaultValue={form.getValues("tag")}
+              {...form.register("tag")}
+            />
             <SwitchField
               label="Published"
               checked={form.watch("published")}
@@ -179,38 +199,120 @@ function StringListField({ name, label, addLabel }: { name: "whatYouDo" | "whatW
 }
 
 /** Icon dropdown for one perk row — shows a small preview of the currently
- * selected icon next to the trigger, and next to each option in the list,
- * so the admin can see exactly which glyph they're placing. */
+ * selected icon next to the trigger, and next to each option in the list, so
+ * the admin can see exactly which glyph they're placing. Searchable (rather
+ * than a plain <Select>) since the catalog runs to three dozen icons and a
+ * flat scroll list doesn't scale — type to filter by name/label instead. */
 function PerkIconSelect({ index }: { index: number }) {
   const form = useFormContext<JobPostingFormValues>();
   const value = useWatch({ control: form.control, name: `whatYouGet.${index}.icon` });
   const selected = PERK_ICON_OPTIONS.find((o) => o.key === value) ?? PERK_ICON_OPTIONS[0];
+
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [panelPos, setPanelPos] = useState({ top: 0, bottom: 0, left: 0, width: 288, dropUp: false });
+  const PANEL_HEIGHT = 320; // search input + max-h-64 list, roughly
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleOutside(e: MouseEvent) {
+      if (
+        containerRef.current && !containerRef.current.contains(e.target as Node) &&
+        !(e.target as HTMLElement).closest("[data-perk-icon-panel]")
+      ) {
+        setOpen(false);
+        setQuery("");
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [open]);
+
+  const filtered = PERK_ICON_OPTIONS.filter((o) =>
+    o.label.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
     <Controller
       control={form.control}
       name={`whatYouGet.${index}.icon`}
       render={({ field }) => (
-        <Select
-          items={PERK_ICON_OPTIONS.map((o) => ({ value: o.key, label: o.label }))}
-          value={field.value}
-          onValueChange={(v) => field.onChange(v ?? PERK_ICON_OPTIONS[0].key)}
-        >
-          <SelectTrigger className="w-full">
+        <div ref={containerRef} className="relative">
+          <button
+            ref={triggerRef}
+            type="button"
+            onClick={() => {
+              if (!open && triggerRef.current) {
+                const rect = triggerRef.current.getBoundingClientRect();
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const dropUp = spaceBelow < PANEL_HEIGHT && rect.top > spaceBelow;
+                setPanelPos({
+                  top: rect.bottom + 4,
+                  bottom: window.innerHeight - rect.top + 4,
+                  left: rect.left,
+                  width: Math.max(rect.width, 240),
+                  dropUp,
+                });
+              }
+              setOpen((o) => !o);
+            }}
+            className="flex h-9 w-full items-center gap-2 rounded-md border border-input bg-transparent px-3 text-sm"
+          >
             <selected.Icon className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.75} />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {PERK_ICON_OPTIONS.map((opt) => (
-              <SelectItem key={opt.key} value={opt.key}>
-                <span className="flex items-center gap-2">
-                  <opt.Icon className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.75} />
-                  {opt.label}
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            <span className="flex-1 truncate text-left">{selected.label}</span>
+            <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+          </button>
+
+          {/* Portaled to <body> — a plain absolute panel here would be clipped
+              by Card's `overflow-hidden`, so it's positioned fixed instead,
+              computed from the trigger's actual screen position. */}
+          {open && typeof document !== "undefined" && createPortal(
+            <div
+              data-perk-icon-panel
+              style={{
+                position: "fixed",
+                left: panelPos.left,
+                width: panelPos.width,
+                ...(panelPos.dropUp ? { bottom: panelPos.bottom } : { top: panelPos.top }),
+              }}
+              className="z-50 rounded-md border bg-popover shadow-lg overflow-hidden"
+            >
+              <div className="border-b p-2">
+                <Input
+                  autoFocus
+                  placeholder="Search icons..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="h-8"
+                />
+              </div>
+              <div className="max-h-64 overflow-y-auto p-1">
+                {filtered.length === 0 && (
+                  <p className="px-2 py-3 text-center text-sm text-muted-foreground">No icons found.</p>
+                )}
+                {filtered.map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => {
+                      field.onChange(opt.key);
+                      setOpen(false);
+                      setQuery("");
+                    }}
+                    className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
+                  >
+                    <opt.Icon className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.75} />
+                    <span className="flex-1 truncate text-left">{opt.label}</span>
+                    {opt.key === field.value && <Check className="size-3.5 shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            </div>,
+            document.body
+          )}
+        </div>
       )}
     />
   );

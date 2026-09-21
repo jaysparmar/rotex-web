@@ -116,7 +116,7 @@ export function TrustedCountriesBanner({
   const rotateLat = BASE_LAT + dragOffsetY;
 
   return (
-    <section ref={sectionRef} className="bg-white py-16 lg:py-20 overflow-hidden">
+    <section ref={sectionRef} className="bg-white pt-16 lg:pt-20 pb-8 lg:pb-10 overflow-hidden">
       <div className="container flex flex-col items-center text-center gap-3">
         <motion.h2
           initial={{ opacity: 0, y: 16 }}

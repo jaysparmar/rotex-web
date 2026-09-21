@@ -4,6 +4,10 @@ import { ResourceCard } from "@/components/ui/resource-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { RESOURCE_PRODUCT_CATEGORIES, RESOURCE_INDUSTRIES } from "@/lib/resource-taxonomy";
 import type { ResourceItem } from "@/lib/resource-types";
 
 type ResourcesGridSectionProps = {
@@ -12,9 +16,8 @@ type ResourcesGridSectionProps = {
   basePath: string;
 };
 
-// 9 per page — Load More appends another 9.
-const PAGE_SIZE = 9;
-const ALL = "All";
+// 15 per page — Load More appends another 15.
+const PAGE_SIZE = 15;
 
 /* Mobile: tight auto-width pills so all three fit one row at 375px.
    Desktop: wider fixed boxes. */
@@ -29,7 +32,7 @@ function ChevronDown() {
   );
 }
 
-/* Multi-select filter — an empty selection means "all". */
+/* Desktop multi-select filter — an empty selection means "all". */
 function MultiFilter({
   label,
   selected,
@@ -39,7 +42,7 @@ function MultiFilter({
   label: string;
   selected: string[];
   onChange: (next: string[]) => void;
-  options: string[];
+  options: readonly string[];
 }) {
   const summary =
     selected.length === 0 ? label : selected.length === 1 ? selected[0] : `${selected.length} selected`;
@@ -96,14 +99,122 @@ function SortSelect({ value, onChange }: { value: string; onChange: (v: string) 
   );
 }
 
+/* Pill toggle used inside the mobile filter drawer. */
+function FilterPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "px-4 py-2 rounded-full text-sm font-medium font-montserrat leading-5 border transition-colors",
+        active
+          ? "bg-red-50 border-[#EF3E23] text-[#EF3E23]"
+          : "bg-white border-neutral-200 text-stone-900 hover:border-stone-400"
+      )}
+    >
+      {label}
+    </button>
+  );
+}
+
+/* Mobile: single "Filters" button opening a bottom-sheet drawer with pill
+   groups for Product and Industry — matches the Figma drawer exactly,
+   instead of two separate small dropdown popovers. */
+function MobileFilterDrawer({
+  product,
+  setProduct,
+  industry,
+  setIndustry,
+  hasActiveFilters,
+  clearFilters,
+}: {
+  product: string[];
+  setProduct: (v: string[]) => void;
+  industry: string[];
+  setIndustry: (v: string[]) => void;
+  hasActiveFilters: boolean;
+  clearFilters: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const toggle = (list: string[], setList: (v: string[]) => void, opt: string) =>
+    setList(list.includes(opt) ? list.filter((o) => o !== opt) : [...list, opt]);
+
+  return (
+    <div className="lg:hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="w-full px-2 py-3 bg-neutral-100 rounded-sm flex justify-center items-center gap-2.5 text-stone-900 text-sm font-semibold font-montserrat leading-6"
+      >
+        Filters{hasActiveFilters ? " •" : ""}
+      </button>
+
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl">
+          <SheetHeader>
+            <SheetTitle>Filters</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 flex flex-col gap-6 overflow-y-auto px-4">
+            <div className="flex flex-col gap-3">
+              <span className="text-neutral-400 text-xs font-semibold font-montserrat uppercase leading-5">
+                Product
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <FilterPill label="All Products" active={product.length === 0} onClick={() => setProduct([])} />
+                {RESOURCE_PRODUCT_CATEGORIES.map((opt) => (
+                  <FilterPill
+                    key={opt}
+                    label={opt}
+                    active={product.includes(opt)}
+                    onClick={() => toggle(product, setProduct, opt)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <span className="text-neutral-400 text-xs font-semibold font-montserrat uppercase leading-5">
+                Industry
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <FilterPill label="All Industries" active={industry.length === 0} onClick={() => setIndustry([])} />
+                {RESOURCE_INDUSTRIES.map((opt) => (
+                  <FilterPill
+                    key={opt}
+                    label={opt}
+                    active={industry.includes(opt)}
+                    onClick={() => toggle(industry, setIndustry, opt)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+          <SheetFooter className="flex-row items-center gap-4">
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="shrink-0 text-[#EF3E23] text-xs font-semibold font-montserrat hover:underline"
+              >
+                Clear all
+              </button>
+            )}
+            <Button type="button" onClick={() => setOpen(false)} className="flex-1">
+              Show Results
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
 export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGridSectionProps) {
   const [product, setProduct] = useState<string[]>([]);
   const [industry, setIndustry] = useState<string[]>([]);
   const [sort, setSort] = useState<"Newest" | "Oldest">("Newest");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-
-  const products = useMemo(() => Array.from(new Set(posts.map((p) => p.product).filter(Boolean))), [posts]);
-  const industries = useMemo(() => Array.from(new Set(posts.map((p) => p.industry).filter(Boolean))), [posts]);
 
   const filteredPosts = useMemo(() => {
     // An empty selection means "all", so nothing is filtered out.
@@ -121,6 +232,7 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
 
   const visiblePosts = filteredPosts.slice(0, visibleCount);
   const hasMore = visibleCount < filteredPosts.length;
+  const hasActiveFilters = product.length > 0 || industry.length > 0;
 
   const resetAndSet =
     (setter: (v: string[]) => void) =>
@@ -129,6 +241,12 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
       setVisibleCount(PAGE_SIZE);
     };
 
+  const clearFilters = () => {
+    setProduct([]);
+    setIndustry([]);
+    setVisibleCount(PAGE_SIZE);
+  };
+
   return (
     <section className="py-12 lg:py-16">
       <div className="container flex flex-col gap-6">
@@ -136,21 +254,34 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
           {heading}
         </h2>
 
-        {/* nowrap + horizontal scroll keeps the three filters on one line even if
-            a label is long; lg re-enables wrapping and right-alignment */}
-        <div className="flex flex-nowrap lg:flex-wrap justify-start lg:justify-end items-center gap-2 lg:gap-3 overflow-x-auto no-scrollbar lg:overflow-visible">
+        <MobileFilterDrawer
+          product={product}
+          setProduct={resetAndSet(setProduct)}
+          industry={industry}
+          setIndustry={resetAndSet(setIndustry)}
+          hasActiveFilters={hasActiveFilters}
+          clearFilters={clearFilters}
+        />
+
+        {/* Desktop filter row */}
+        <div className="hidden lg:flex flex-wrap justify-end items-center gap-3">
           <MultiFilter
             label="All Products"
             selected={product}
             onChange={resetAndSet(setProduct)}
-            options={products}
+            options={RESOURCE_PRODUCT_CATEGORIES}
           />
           <MultiFilter
             label="All Industries"
             selected={industry}
             onChange={resetAndSet(setIndustry)}
-            options={industries}
+            options={RESOURCE_INDUSTRIES}
           />
+          <SortSelect value={sort} onChange={(v) => setSort(v as "Newest" | "Oldest")} />
+        </div>
+
+        {/* Mobile: sort still needs its own control since it's not in the drawer */}
+        <div className="lg:hidden">
           <SortSelect value={sort} onChange={(v) => setSort(v as "Newest" | "Oldest")} />
         </div>
 
@@ -171,7 +302,7 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
           {/* full-width on mobile per Figma, content-width on desktop */}
           <button
             onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-            className="w-full lg:w-auto px-6 py-3.5 bg-white rounded-[47px] shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] outline-[0.5px] -outline-offset-1 outline-[#EF3E23] text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 hover:bg-[#EF3E23] hover:text-white transition-colors duration-150 overflow-hidden"
+            className="w-full lg:w-auto px-6 py-3.5 bg-white rounded-[47px] outline-[0.5px] -outline-offset-1 outline-[#EF3E23] text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 hover:bg-[#EF3E23] hover:text-white transition-colors duration-150 overflow-hidden"
           >
             Load More
           </button>

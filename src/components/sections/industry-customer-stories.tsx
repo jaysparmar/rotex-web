@@ -19,9 +19,14 @@ export function IndustryCustomerStories({ stories }: Props) {
     <section className="bg-white pt-10 lg:pt-16 pb-14 lg:pb-24 border-t border-stone-100">
       <div className="container flex flex-col gap-8 lg:gap-10">
         <div className="flex items-center justify-between">
-          <h3 className="text-stone-900 text-xl lg:text-2xl font-medium font-montserrat leading-7 lg:leading-8">
-            Customer Stories
-          </h3>
+          <div className="flex flex-col gap-1.5">
+            <h3 className="text-stone-900 text-xl lg:text-2xl font-medium font-montserrat leading-7 lg:leading-8">
+              Customer Stories
+            </h3>
+            <p className="text-stone-500 text-sm lg:text-base font-medium font-montserrat leading-5 lg:leading-6">
+              Trusted across industries, proven in action
+            </p>
+          </div>
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-7">
             <button className="cs-prev size-10 rounded-full bg-orange-600/10 outline-1 -outline-offset-1 outline-stone-200 flex items-center justify-center hover:outline-orange-600 transition-colors duration-150">

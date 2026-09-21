@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 
 const ChannelPartnerFlatMap = dynamic(() => import("./channel-partner-flat-map"), {
   ssr: false,
-  loading: () => <div className="w-full aspect-[16/9] bg-stone-100 animate-pulse rounded-xl" />,
+  loading: () => <div className="w-full aspect-square sm:aspect-[16/9] bg-stone-100 animate-pulse rounded-xl" />,
 });
 
 type Pin = { name: string; stateOrCity?: string | null; partnerCompany?: string | null; coordinates: [number, number] };
@@ -24,7 +24,7 @@ export function ChannelPartnerMapSection({
   return (
     <section className="bg-white py-14 lg:py-20">
       <div className="container">
-        <div className="text-center mb-6o">
+        <div className="text-center mb-6">
           <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
             {heading}
           </h2>
@@ -34,13 +34,14 @@ export function ChannelPartnerMapSection({
         </div>
 
         <div className="relative">
-          <div className="w-full aspect-[16/9]">
+          <div className="w-full aspect-square sm:aspect-[16/9]">
             <ChannelPartnerFlatMap pins={pins} />
           </div>
-          <p className="absolute left-0 bottom-24 max-w-64 text-[#EF3E23] font-montserrat font-medium text-sm leading-6">
-            {callout}
-          </p>
         </div>
+
+        <p className="mt-6 max-w-64 text-[#EF3E23] font-montserrat font-medium text-sm leading-6">
+          {callout}
+        </p>
       </div>
     </section>
   );

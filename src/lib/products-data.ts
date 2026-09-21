@@ -1,5 +1,6 @@
 import type { StaticImageData } from "next/image";
 import { prisma } from "@/lib/prisma";
+import { buildSearchOr } from "@/lib/search-terms";
 import product1 from "@/assets/Images/products/product_1.png";
 import type { Crumb, ProductDetail, ProductVariant as UIVariant, SpecItem } from "@/lib/product-detail-data";
 
@@ -111,20 +112,35 @@ export async function getProductsList(params: ProductListFilterParams = {}): Pro
     if (value) attrFilter[key] = value;
   }
 
+  const searchOr = search?.trim() ? buildSearchOr(search.trim()) : null;
+
   const where = {
     ...(categorySlug ? { category: { slug: categorySlug } } : {}),
     ...(subCategorySlug ? { subCategory: { slug: subCategorySlug } } : {}),
     ...(Object.keys(attrFilter).length ? { variants: { some: attrFilter } } : {}),
-    ...(search?.trim()
+    ...(searchOr
       ? {
           OR: [
-            { name: { contains: search.trim() } },
-            { modelNumber: { contains: search.trim() } },
-            { description: { contains: search.trim() } },
-            { features: { contains: search.trim() } },
-            { category: { name: { contains: search.trim() } } },
-            { subCategory: { name: { contains: search.trim() } } },
-            { industries: { some: { name: { contains: search.trim() } } } },
+            ...searchOr.map((term) => ({ name: { contains: term } })),
+            ...searchOr.map((term) => ({ modelNumber: { contains: term } })),
+            ...searchOr.map((term) => ({ description: { contains: term } })),
+            ...searchOr.map((term) => ({ features: { contains: term } })),
+            ...searchOr.map((term) => ({ category: { name: { contains: term } } })),
+            ...searchOr.map((term) => ({ subCategory: { name: { contains: term } } })),
+            ...searchOr.map((term) => ({ industries: { some: { name: { contains: term } } } })),
+            // Parent-attribute search — a product's own listing text may say nothing
+            // about e.g. "Direct Acting" or a specific orifice size, but one of its
+            // variants often does.
+            ...searchOr.flatMap((term) => [
+              { variants: { some: { variantType: { contains: term } } } },
+              { variants: { some: { size: { contains: term } } } },
+              { variants: { some: { orifice: { contains: term } } } },
+              { variants: { some: { minOperatingTemp: { contains: term } } } },
+              { variants: { some: { maxOperatingTemp: { contains: term } } } },
+              { variants: { some: { flowFactor: { contains: term } } } },
+              { variants: { some: { features: { contains: term } } } },
+              { variants: { some: { description: { contains: term } } } },
+            ]),
           ],
         }
       : {}),

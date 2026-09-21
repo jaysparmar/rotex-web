@@ -49,7 +49,7 @@ export function CustomerStoriesSection({
         {/* Header */}
         <div className="flex flex-col gap-1.5 lg:flex-row lg:items-end lg:justify-between lg:gap-3 mb-8 lg:mb-10">
           <div className="flex flex-col gap-1.5 lg:gap-3">
-            <h2 className="text-gradient-orange-dark font-montserrat font-normal text-2xl lg:text-4xl leading-8 lg:leading-10">
+            <h2 className="text-gradient-orange-dark font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
               {heading.title}
             </h2>
             <p className="text-stone-500 font-montserrat font-medium text-sm lg:text-base leading-5 lg:leading-6">
