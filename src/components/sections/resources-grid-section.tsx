@@ -7,13 +7,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { RESOURCE_PRODUCT_CATEGORIES, RESOURCE_INDUSTRIES } from "@/lib/resource-taxonomy";
+import { matchesIndustryFilter, matchesProductFilter } from "@/lib/resource-filters";
 import type { ResourceItem } from "@/lib/resource-types";
+import type { ResolvedTag, IndustryOption } from "@/lib/resource-tags";
 
 type ResourcesGridSectionProps = {
   heading: string;
   posts: ResourceItem[];
   basePath: string;
+  products: ResolvedTag[];
+  industries: IndustryOption[];
 };
 
 // 15 per page — Load More appends another 15.
@@ -42,13 +45,14 @@ function MultiFilter({
   label: string;
   selected: string[];
   onChange: (next: string[]) => void;
-  options: readonly string[];
+  options: { id: string; name: string }[];
 }) {
+  const selectedNames = options.filter((o) => selected.includes(o.id)).map((o) => o.name);
   const summary =
-    selected.length === 0 ? label : selected.length === 1 ? selected[0] : `${selected.length} selected`;
+    selectedNames.length === 0 ? label : selectedNames.length === 1 ? selectedNames[0] : `${selectedNames.length} selected`;
 
-  const toggle = (opt: string, checked: boolean) =>
-    onChange(checked ? [...selected, opt] : selected.filter((o) => o !== opt));
+  const toggle = (id: string, checked: boolean) =>
+    onChange(checked ? [...selected, id] : selected.filter((o) => o !== id));
 
   return (
     <Popover>
@@ -63,15 +67,80 @@ function MultiFilter({
         </label>
         {options.map((opt) => (
           <label
-            key={opt}
+            key={opt.id}
             className="flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-stone-100 cursor-pointer"
           >
             <Checkbox
-              checked={selected.includes(opt)}
-              onCheckedChange={(c) => toggle(opt, c === true)}
+              checked={selected.includes(opt.id)}
+              onCheckedChange={(c) => toggle(opt.id, c === true)}
             />
-            <span className="text-sm font-medium font-montserrat text-stone-900">{opt}</span>
+            <span className="text-sm font-medium font-montserrat text-stone-900">{opt.name}</span>
           </label>
+        ))}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+/* Desktop multi-select filter for industries — top-level industries expand to show
+   their sub-industries indented underneath. Checking a top-level industry rolls up
+   to match resources tagged with any of its sub-industries too (matchesIndustryFilter). */
+function IndustryMultiFilter({
+  label,
+  selected,
+  onChange,
+  industries,
+}: {
+  label: string;
+  selected: string[];
+  onChange: (next: string[]) => void;
+  industries: IndustryOption[];
+}) {
+  const allNames = new Map<string, string>();
+  industries.forEach((i) => {
+    allNames.set(i.id, i.name);
+    i.subIndustries.forEach((s) => allNames.set(s.id, s.name));
+  });
+  const selectedNames = selected.map((id) => allNames.get(id)).filter(Boolean) as string[];
+  const summary =
+    selectedNames.length === 0 ? label : selectedNames.length === 1 ? selectedNames[0] : `${selectedNames.length} selected`;
+
+  const toggle = (id: string, checked: boolean) =>
+    onChange(checked ? [...selected, id] : selected.filter((o) => o !== id));
+
+  return (
+    <Popover>
+      <PopoverTrigger className={TRIGGER_CLS}>
+        <span className="truncate">{summary}</span>
+        <ChevronDown />
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-64 p-2 flex flex-col gap-0.5 max-h-96 overflow-y-auto">
+        <label className="flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-stone-100 cursor-pointer">
+          <Checkbox checked={selected.length === 0} onCheckedChange={() => onChange([])} />
+          <span className="text-sm font-medium font-montserrat text-stone-900">{label}</span>
+        </label>
+        {industries.map((industry) => (
+          <div key={industry.id}>
+            <label className="flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-stone-100 cursor-pointer">
+              <Checkbox
+                checked={selected.includes(industry.id)}
+                onCheckedChange={(c) => toggle(industry.id, c === true)}
+              />
+              <span className="text-sm font-medium font-montserrat text-stone-900">{industry.name}</span>
+            </label>
+            {industry.subIndustries.map((sub) => (
+              <label
+                key={sub.id}
+                className="flex items-center gap-2.5 rounded-md px-2 py-2 pl-6 hover:bg-stone-100 cursor-pointer"
+              >
+                <Checkbox
+                  checked={selected.includes(sub.id)}
+                  onCheckedChange={(c) => toggle(sub.id, c === true)}
+                />
+                <span className="text-sm font-medium font-montserrat text-stone-500">{sub.name}</span>
+              </label>
+            ))}
+          </div>
         ))}
       </PopoverContent>
     </Popover>
@@ -127,6 +196,8 @@ function MobileFilterDrawer({
   setIndustry,
   hasActiveFilters,
   clearFilters,
+  products,
+  industries,
 }: {
   product: string[];
   setProduct: (v: string[]) => void;
@@ -134,6 +205,8 @@ function MobileFilterDrawer({
   setIndustry: (v: string[]) => void;
   hasActiveFilters: boolean;
   clearFilters: () => void;
+  products: ResolvedTag[];
+  industries: IndustryOption[];
 }) {
   const [open, setOpen] = useState(false);
 
@@ -162,12 +235,12 @@ function MobileFilterDrawer({
               </span>
               <div className="flex flex-wrap gap-2">
                 <FilterPill label="All Products" active={product.length === 0} onClick={() => setProduct([])} />
-                {RESOURCE_PRODUCT_CATEGORIES.map((opt) => (
+                {products.map((opt) => (
                   <FilterPill
-                    key={opt}
-                    label={opt}
-                    active={product.includes(opt)}
-                    onClick={() => toggle(product, setProduct, opt)}
+                    key={opt.id}
+                    label={opt.name}
+                    active={product.includes(opt.id)}
+                    onClick={() => toggle(product, setProduct, opt.id)}
                   />
                 ))}
               </div>
@@ -179,14 +252,22 @@ function MobileFilterDrawer({
               </span>
               <div className="flex flex-wrap gap-2">
                 <FilterPill label="All Industries" active={industry.length === 0} onClick={() => setIndustry([])} />
-                {RESOURCE_INDUSTRIES.map((opt) => (
+                {industries.flatMap((ind) => [
                   <FilterPill
-                    key={opt}
-                    label={opt}
-                    active={industry.includes(opt)}
-                    onClick={() => toggle(industry, setIndustry, opt)}
-                  />
-                ))}
+                    key={ind.id}
+                    label={ind.name}
+                    active={industry.includes(ind.id)}
+                    onClick={() => toggle(industry, setIndustry, ind.id)}
+                  />,
+                  ...ind.subIndustries.map((sub) => (
+                    <FilterPill
+                      key={sub.id}
+                      label={`— ${sub.name}`}
+                      active={industry.includes(sub.id)}
+                      onClick={() => toggle(industry, setIndustry, sub.id)}
+                    />
+                  )),
+                ])}
               </div>
             </div>
           </div>
@@ -210,25 +291,32 @@ function MobileFilterDrawer({
   );
 }
 
-export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGridSectionProps) {
+export function ResourcesGridSection({ heading, posts, basePath, products, industries }: ResourcesGridSectionProps) {
   const [product, setProduct] = useState<string[]>([]);
   const [industry, setIndustry] = useState<string[]>([]);
   const [sort, setSort] = useState<"Newest" | "Oldest">("Newest");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
+  const subIndustryParentMap = useMemo(() => {
+    const map = new Map<string, string>();
+    industries.forEach((ind) => ind.subIndustries.forEach((sub) => map.set(sub.id, ind.id)));
+    return map;
+  }, [industries]);
+
   const filteredPosts = useMemo(() => {
     // An empty selection means "all", so nothing is filtered out.
     let list = posts.filter(
       (p) =>
-        (product.length === 0 || product.includes(p.product)) &&
-        (industry.length === 0 || industry.includes(p.industry))
+        (product.length === 0 || product.some((id) => matchesProductFilter(p.products.map((t) => t.id), id))) &&
+        (industry.length === 0 ||
+          industry.some((id) => matchesIndustryFilter(p.industries.map((t) => t.id), id, subIndustryParentMap)))
     );
     list = [...list].sort((a, b) => {
       const diff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       return sort === "Newest" ? -diff : diff;
     });
     return list;
-  }, [posts, product, industry, sort]);
+  }, [posts, product, industry, sort, subIndustryParentMap]);
 
   const visiblePosts = filteredPosts.slice(0, visibleCount);
   const hasMore = visibleCount < filteredPosts.length;
@@ -261,21 +349,18 @@ export function ResourcesGridSection({ heading, posts, basePath }: ResourcesGrid
           setIndustry={resetAndSet(setIndustry)}
           hasActiveFilters={hasActiveFilters}
           clearFilters={clearFilters}
+          products={products}
+          industries={industries}
         />
 
         {/* Desktop filter row */}
         <div className="hidden lg:flex flex-wrap justify-end items-center gap-3">
-          <MultiFilter
-            label="All Products"
-            selected={product}
-            onChange={resetAndSet(setProduct)}
-            options={RESOURCE_PRODUCT_CATEGORIES}
-          />
-          <MultiFilter
+          <MultiFilter label="All Products" selected={product} onChange={resetAndSet(setProduct)} options={products} />
+          <IndustryMultiFilter
             label="All Industries"
             selected={industry}
             onChange={resetAndSet(setIndustry)}
-            options={RESOURCE_INDUSTRIES}
+            industries={industries}
           />
           <SortSelect value={sort} onChange={(v) => setSort(v as "Newest" | "Oldest")} />
         </div>

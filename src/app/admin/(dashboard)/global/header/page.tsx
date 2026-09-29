@@ -43,7 +43,7 @@ export default async function AdminGlobalHeaderPage() {
       </div>
 
       <HeaderConfigForm
-        initialData={{ logo: config.logo, header: config.header }}
+        initialData={{ logo: config.logo, favicon: config.favicon ?? { src: "" }, header: config.header }}
         footer={config.footer}
         industries={industries}
         productCategories={productCategories}

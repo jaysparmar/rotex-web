@@ -39,16 +39,22 @@ export function CaseStudiesHeroSection({ featured }: { featured: ResourceItem[] 
                 <div className="absolute inset-0 bg-linear-to-b from-black/0 to-black/80" />
 
                 <div className="absolute top-5 left-5 flex items-center gap-2.5">
-                  {post.product && (
-                    <span className="px-4 py-1 bg-zinc-100 rounded-3xl text-stone-900 text-xs font-semibold font-montserrat uppercase leading-5">
-                      {post.product}
+                  {post.products.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="px-4 py-1 bg-zinc-100 rounded-3xl text-stone-900 text-xs font-semibold font-montserrat uppercase leading-5"
+                    >
+                      {tag.name}
                     </span>
-                  )}
-                  {post.industry && (
-                    <span className="px-4 py-1 bg-zinc-100 rounded-3xl text-stone-900 text-xs font-semibold font-montserrat uppercase leading-5">
-                      {post.industry}
+                  ))}
+                  {post.industries.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="px-4 py-1 bg-zinc-100 rounded-3xl text-stone-900 text-xs font-semibold font-montserrat uppercase leading-5"
+                    >
+                      {tag.name}
                     </span>
-                  )}
+                  ))}
                 </div>
 
                 {/* brand orange (#EF3E23) — [#EF3E23] (#dc2626) reads too dark */}

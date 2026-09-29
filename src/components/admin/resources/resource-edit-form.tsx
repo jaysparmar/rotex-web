@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, FormProvider, useFormContext } from "react-hook-form";
+import { useForm, FormProvider, useFormContext, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { Editor } from "@tinymce/tinymce-react";
@@ -15,7 +15,10 @@ import { SaveBar } from "@/components/admin/section-form-shell";
 import { adminFetch } from "@/lib/admin-fetch";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { slugify } from "@/lib/utils";
-import { RESOURCE_PRODUCT_CATEGORIES, RESOURCE_INDUSTRIES } from "@/lib/resource-taxonomy";
+import { IndustryTreePicker, type IndustryTreeOption } from "@/components/admin/resources/industry-tree-picker";
+import { MultiSelectDropdown, type MultiSelectOption } from "@/components/admin/resources/multi-select-dropdown";
+import { TagsCombobox } from "@/components/admin/resources/tags-combobox";
+import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
 import { createResource, updateResource } from "@/app/admin/(dashboard)/resources/actions";
 
 export const RESOURCE_TYPES = [
@@ -30,9 +33,10 @@ type ResourceFormValues = {
   slug: string;
   published: boolean;
   image: { src: string };
-  product: string;
-  industry: string;
-  extraTags: string;
+  productIds: string[];
+  industryIds: string[];
+  extraTags: string[];
+  relatedIds: string[];
   content: string;
 };
 
@@ -43,18 +47,29 @@ type Resource = {
   slug: string;
   image: string;
   published: boolean;
-  product: string;
-  industry: string;
+  productIds: string[];
+  industryIds: string[];
   extraTags: string[];
+  relatedIds: string[];
   content: string;
 };
+
+type RelatedResourceOption = { id: string; type: string; title: string; image: string };
 
 export function ResourceEditForm({
   resource,
   defaultType,
+  products,
+  industries,
+  existingExtraTags,
+  relatedOptions,
 }: {
   resource?: Resource;
   defaultType?: string;
+  products: MultiSelectOption[];
+  industries: IndustryTreeOption[];
+  existingExtraTags: string[];
+  relatedOptions: RelatedResourceOption[];
 }) {
   const router = useRouter();
   const slugTouched = useRef(Boolean(resource));
@@ -65,9 +80,10 @@ export function ResourceEditForm({
       slug: resource?.slug ?? "",
       published: resource?.published ?? true,
       image: { src: resource?.image ?? "" },
-      product: resource?.product ?? "",
-      industry: resource?.industry ?? "",
-      extraTags: (resource?.extraTags ?? []).join(", "),
+      productIds: resource?.productIds ?? [],
+      industryIds: resource?.industryIds ?? [],
+      extraTags: resource?.extraTags ?? [],
+      relatedIds: resource?.relatedIds ?? [],
       content: resource?.content ?? "",
     },
   });
@@ -92,9 +108,10 @@ export function ResourceEditForm({
       slug: values.slug.trim() || slugify(values.title),
       published: values.published,
       image: values.image.src,
-      product: values.product,
-      industry: values.industry,
-      extraTags: values.extraTags.split(",").map((t) => t.trim()).filter(Boolean),
+      productIds: values.productIds,
+      industryIds: values.industryIds,
+      extraTags: values.extraTags,
+      relatedIds: values.relatedIds,
       content: values.content,
     };
     run(async () => {
@@ -132,27 +149,34 @@ export function ResourceEditForm({
             <TextField label="Slug" {...form.register("slug", { required: true })} onChange={handleSlugChange} />
             <MediaField name="image" mediaType="image" showAlt={false} previewFit="contain" />
             <FieldGrid>
-              <SelectField
-                label="Product tag"
-                placeholder="Select product category"
-                options={RESOURCE_PRODUCT_CATEGORIES.map((p) => ({ value: p, label: p }))}
-                defaultValue={resource?.product ?? ""}
-                {...form.register("product")}
-              />
-              <SelectField
-                label="Industry tag"
-                placeholder="Select industry"
-                options={RESOURCE_INDUSTRIES.map((i) => ({ value: i, label: i }))}
-                defaultValue={resource?.industry ?? ""}
-                {...form.register("industry")}
-              />
+              <Field label="Product tag">
+                <ProductsField products={products} />
+              </Field>
+              <Field label="Industry tag">
+                <IndustriesField industries={industries} />
+              </Field>
             </FieldGrid>
-            <TextField label="Extra tags (comma separated)" {...form.register("extraTags")} />
+            <Field label="Extra tags">
+              <ExtraTagsField existingExtraTags={existingExtraTags} />
+            </Field>
             <SwitchField
               label="Published"
               checked={form.watch("published")}
               onCheckedChange={(v) => form.setValue("published", v)}
             />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Related</CardTitle>
+            <CardDescription>
+              Pick which same-type resources show in the &quot;Related&quot; section on this post&apos;s detail
+              page. Checked = shown on site, in the order picked. Leave empty to hide the section entirely.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RelatedField relatedOptions={relatedOptions} excludeId={resource?.id} />
           </CardContent>
         </Card>
 
@@ -169,6 +193,76 @@ export function ResourceEditForm({
         <SaveBar pending={pending} error={error} success={success} />
       </form>
     </FormProvider>
+  );
+}
+
+function ProductsField({ products }: { products: MultiSelectOption[] }) {
+  const form = useFormContext<ResourceFormValues>();
+  const selected = useWatch({ control: form.control, name: "productIds" }) ?? [];
+
+  return (
+    <MultiSelectDropdown
+      options={products}
+      selectedIds={selected}
+      onChange={(ids) => form.setValue("productIds", ids)}
+      placeholder="Select product categories"
+      emptyMessage="No product categories yet."
+    />
+  );
+}
+
+function IndustriesField({ industries }: { industries: IndustryTreeOption[] }) {
+  const form = useFormContext<ResourceFormValues>();
+  const selected = useWatch({ control: form.control, name: "industryIds" }) ?? [];
+
+  return (
+    <IndustryTreePicker
+      industries={industries}
+      selectedIds={selected}
+      onChange={(ids) => form.setValue("industryIds", ids)}
+    />
+  );
+}
+
+function ExtraTagsField({ existingExtraTags }: { existingExtraTags: string[] }) {
+  const form = useFormContext<ResourceFormValues>();
+  const selected = useWatch({ control: form.control, name: "extraTags" }) ?? [];
+
+  return (
+    <TagsCombobox
+      existingTags={existingExtraTags}
+      selected={selected}
+      onChange={(tags) => form.setValue("extraTags", tags)}
+    />
+  );
+}
+
+function RelatedField({
+  relatedOptions,
+  excludeId,
+}: {
+  relatedOptions: RelatedResourceOption[];
+  excludeId?: string;
+}) {
+  const form = useFormContext<ResourceFormValues>();
+  const selected = useWatch({ control: form.control, name: "relatedIds" }) ?? [];
+  const type = useWatch({ control: form.control, name: "type" });
+
+  const options = relatedOptions.filter((r) => r.type === type && r.id !== excludeId);
+
+  function toggle(id: string, checked: boolean) {
+    const current: string[] = form.getValues("relatedIds") ?? [];
+    form.setValue("relatedIds", checked ? [...current, id] : current.filter((v) => v !== id));
+  }
+
+  return (
+    <ItemPickerGrid
+      items={options.map((r) => ({ id: r.id, image: r.image, label: r.title }))}
+      selectedIds={selected}
+      onToggle={toggle}
+      emptyMessage="No other published resources of this type yet."
+      imageFit="cover"
+    />
   );
 }
 

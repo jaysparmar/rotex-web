@@ -2,13 +2,30 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { ResourceEditForm } from "@/components/admin/resources/resource-edit-form";
+import { getIndustryTreeOptions, getProductCategoryOptions, getExistingExtraTags } from "@/lib/resource-tags";
 
 export default async function AdminResourceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const record = await prisma.resource.findUnique({ where: { id } });
+  const [record, products, industries, existingExtraTags, relatedOptions] = await Promise.all([
+    prisma.resource.findUnique({ where: { id } }),
+    getProductCategoryOptions(),
+    getIndustryTreeOptions(),
+    getExistingExtraTags(),
+    prisma.resource.findMany({
+      where: { published: true, id: { not: id } },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, type: true, title: true, image: true },
+    }),
+  ]);
   if (!record) notFound();
 
-  const resource = { ...record, extraTags: (record.extraTags as string[]) ?? [] };
+  const resource = {
+    ...record,
+    productIds: (record.productIds as string[]) ?? [],
+    industryIds: (record.industryIds as string[]) ?? [],
+    extraTags: (record.extraTags as string[]) ?? [],
+    relatedIds: (record.relatedIds as string[]) ?? [],
+  };
 
   return (
     <div className="space-y-6">
@@ -26,7 +43,13 @@ export default async function AdminResourceDetailPage({ params }: { params: Prom
         />
       </div>
 
-      <ResourceEditForm resource={resource} />
+      <ResourceEditForm
+        resource={resource}
+        products={products.map((p) => ({ id: p.id, label: p.name }))}
+        industries={industries}
+        existingExtraTags={existingExtraTags}
+        relatedOptions={relatedOptions}
+      />
     </div>
   );
 }

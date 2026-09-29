@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdminPagination } from "@/components/ui/admin-pagination";
 import { CustomerStoryFormDialog } from "@/components/admin/customer-stories/customer-story-form-dialog";
+import { ImageLightboxTrigger, VideoLightboxTrigger } from "@/components/admin/image-lightbox";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { deleteCustomerStory, toggleCustomerStoryPublished } from "@/app/admin/(dashboard)/customer-stories/actions";
@@ -152,16 +153,20 @@ export function CustomerStoryList({
           <div key={story.id} className="flex flex-wrap items-center gap-4 p-4">
             <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
               {story.image && story.mediaType === "video" ? (
-                <video src={story.image} className="size-full object-cover" muted />
+                <VideoLightboxTrigger src={story.image} className="block size-full">
+                  <video src={story.image} className="size-full pointer-events-none object-cover" muted />
+                </VideoLightboxTrigger>
               ) : story.image ? (
-                <Image
-                  src={story.image}
-                  alt={story.author}
-                  width={48}
-                  height={48}
-                  className="size-full object-cover"
-                  unoptimized
-                />
+                <ImageLightboxTrigger src={story.image} alt={story.author} className="block size-full">
+                  <Image
+                    src={story.image}
+                    alt={story.author}
+                    width={48}
+                    height={48}
+                    className="size-full object-cover"
+                    unoptimized
+                  />
+                </ImageLightboxTrigger>
               ) : null}
             </div>
 

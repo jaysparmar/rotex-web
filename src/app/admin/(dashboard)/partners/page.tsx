@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { PartnerList } from "@/components/admin/partners/partner-list";
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 50;
 
 export default async function AdminPartnersPage({
   searchParams,

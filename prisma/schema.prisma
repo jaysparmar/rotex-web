@@ -352,10 +352,14 @@ model Resource {
   title     String
   slug      String
   image     String
-  product   String   @default("")
-  industry  String   @default("")
+  /// [StringList]
+  productIds  Json   @default("[]")
+  /// [StringList]
+  industryIds Json   @default("[]")
   /// [StringList]
   extraTags Json     @default("[]")
+  /// [StringList]
+  relatedIds Json    @default("[]")
   content   String   @default("")
   published Boolean  @default(true)
   createdAt DateTime @default(now())

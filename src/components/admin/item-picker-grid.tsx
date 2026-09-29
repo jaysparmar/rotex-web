@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Search, ImageOff } from "lucide-react";
 import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,14 @@ export function ItemPickerGrid({
     setPage(1);
   }
 
+  const allSelected = items.length > 0 && items.every((item) => selectedIds.includes(item.id));
+
+  function toggleAll(checked: boolean) {
+    for (const item of items) {
+      if (selectedIds.includes(item.id) !== checked) onToggle(item.id, checked);
+    }
+  }
+
   if (items.length === 0) {
     return (
       <div className="rounded-lg border border-border p-4">
@@ -54,17 +63,25 @@ export function ItemPickerGrid({
 
   return (
     <div className="space-y-3">
-      {items.length > 8 && (
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder={`Search ${items.length} items by name...`}
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-8"
-          />
-        </div>
-      )}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {items.length > 8 ? (
+          <div className="relative flex-1 min-w-48">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder={`Search ${items.length} items by name...`}
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        ) : (
+          <div />
+        )}
+        <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <Checkbox checked={allSelected} onCheckedChange={(v) => toggleAll(v === true)} />
+          <span>{allSelected ? "Deselect all" : "Select all"}</span>
+        </label>
+      </div>
       <div className="grid grid-cols-2 gap-4 rounded-lg border border-border p-4 sm:grid-cols-3 lg:grid-cols-4">
         {visibleItems.length === 0 && (
           <p className="col-span-full text-sm text-muted-foreground">No items match &quot;{search}&quot;.</p>

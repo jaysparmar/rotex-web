@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getProductsList } from "@/lib/products-data";
 import { buildSearchOr } from "@/lib/search-terms";
 import { flattenDownloadItems, type DownloadItem } from "@/lib/downloads-data";
+import { createResourceTagResolver } from "@/lib/resource-tags";
 import type { ResourceItem, ResourceType } from "@/lib/resource-types";
 
 // ─── Modal quick-suggestions (Products, Industries) ────────────────────────────
@@ -212,17 +213,12 @@ export async function searchResources(
     published: true,
     ...(query
       ? {
-          OR: [
-            { title: { contains: query } },
-            { content: { contains: query } },
-            { product: { contains: query } },
-            { industry: { contains: query } },
-          ],
+          OR: [{ title: { contains: query } }, { content: { contains: query } }],
         }
       : {}),
   };
 
-  const [records, total] = await Promise.all([
+  const [records, total, resolver] = await Promise.all([
     prisma.resource.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -230,6 +226,7 @@ export async function searchResources(
       take: pageSize,
     }),
     prisma.resource.count({ where }),
+    createResourceTagResolver(),
   ]);
 
   const items: ResourceItem[] = records.map((r) => ({
@@ -238,8 +235,8 @@ export async function searchResources(
     slug: r.slug,
     title: r.title,
     image: r.image,
-    product: r.product,
-    industry: r.industry,
+    products: resolver.resolveProducts((r.productIds as string[]) ?? []),
+    industries: resolver.resolveIndustries((r.industryIds as string[]) ?? []),
     extraTags: (r.extraTags as string[]) ?? [],
     content: r.content,
     createdAt: r.createdAt.toISOString(),

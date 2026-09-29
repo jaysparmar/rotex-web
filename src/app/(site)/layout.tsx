@@ -16,10 +16,26 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
-export const metadata: Metadata = {
-  title: "Rotex | Industrial Solutions",
-  description: "Leading provider of industrial rotary solutions and equipment",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getResolvedGlobalConfig();
+  const favicon = config.favicon?.src;
+
+  return {
+    title: "Rotex | Industrial Solutions",
+    description: "Leading provider of industrial rotary solutions and equipment",
+    icons: favicon
+      ? { icon: favicon, shortcut: favicon, apple: favicon }
+      : {
+          icon: [
+            { url: "/favicon.ico", sizes: "any" },
+            { url: "/favicon.svg", type: "image/svg+xml" },
+            { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+          ],
+          apple: "/apple-touch-icon.png",
+        },
+    manifest: favicon ? undefined : "/site.webmanifest",
+  };
+}
 
 const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 

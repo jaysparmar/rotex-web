@@ -1,3 +1,5 @@
+import type { ResolvedTag } from "@/lib/resource-tags";
+
 // "news" (not "news-updates") matches the type id already used by the admin
 // Resource form and the About page's Resources-section picker — keep in sync.
 export type ResourceType = "blogs" | "news" | "case-studies";
@@ -8,15 +10,17 @@ export type ResourceItem = {
   slug: string;
   title: string;
   image: string;
-  product: string;
-  industry: string;
+  products: ResolvedTag[];
+  industries: ResolvedTag[];
   extraTags: string[];
   content: string;
   createdAt: string;
 };
 
 export function getResourceTags(post: ResourceItem): string[] {
-  return [post.product, post.industry, ...post.extraTags].filter(Boolean);
+  return [...post.products.map((p) => p.name), ...post.industries.map((i) => i.name), ...post.extraTags].filter(
+    Boolean
+  );
 }
 
 export function formatResourceDate(iso: string): string {

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Upload, Loader2 } from "lucide-react";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
 import { TextField, TextAreaField, FieldGrid, Field } from "@/components/admin/form-fields";
+import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 import { Button } from "@/components/ui/button";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveAboutSection } from "@/app/admin/(dashboard)/about/actions";
@@ -73,8 +74,10 @@ export function GrowWithRotexForm({
           </div>
         </Field>
         {image && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={image} alt="" className="h-32 w-full rounded-lg border border-border object-cover" />
+          <ImageLightboxTrigger src={image} alt="" className="block w-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={image} alt="" className="h-32 w-full rounded-lg border border-border object-cover" />
+          </ImageLightboxTrigger>
         )}
 
         <div className="space-y-3 rounded-lg border border-border p-4">

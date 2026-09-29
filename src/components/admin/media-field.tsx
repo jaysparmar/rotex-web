@@ -6,7 +6,7 @@ import { Upload, Link2, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, TextField } from "@/components/admin/form-fields";
 import { cn } from "@/lib/utils";
-import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
+import { ImageLightboxTrigger, VideoLightboxTrigger } from "@/components/admin/image-lightbox";
 import { adminFetch } from "@/lib/admin-fetch";
 
 export function MediaField({
@@ -130,7 +130,13 @@ export function MediaField({
               <img src={src} alt="" className={cn("h-32 w-full", previewFit === "contain" ? "object-contain" : "object-cover")} />
             </ImageLightboxTrigger>
           ) : (
-            <video src={src} className={cn("h-32 w-full", previewFit === "contain" ? "object-contain" : "object-cover")} muted />
+            <VideoLightboxTrigger src={src} className="block w-full">
+              <video
+                src={src}
+                className={cn("h-32 w-full pointer-events-none", previewFit === "contain" ? "object-contain" : "object-cover")}
+                muted
+              />
+            </VideoLightboxTrigger>
           )}
         </div>
       )}

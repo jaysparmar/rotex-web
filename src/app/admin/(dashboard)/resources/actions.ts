@@ -16,9 +16,10 @@ export type ResourceInput = {
   slug: string;
   image: string;
   published: boolean;
-  product: string;
-  industry: string;
+  productIds: string[];
+  industryIds: string[];
   extraTags: string[];
+  relatedIds: string[];
   content: string;
 };
 

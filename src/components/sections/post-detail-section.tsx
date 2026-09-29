@@ -39,16 +39,22 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
             {/* Header */}
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-1.5 flex-wrap">
-                {post.product && (
-                  <span className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5">
-                    {post.product}
+                {post.products.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5"
+                  >
+                    {tag.name}
                   </span>
-                )}
-                {post.industry && (
-                  <span className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5">
-                    {post.industry}
+                ))}
+                {post.industries.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5"
+                  >
+                    {tag.name}
                   </span>
-                )}
+                ))}
               </div>
               <h1 className="text-stone-900 text-3xl font-medium font-montserrat leading-10">{post.title}</h1>
               <div className="h-px bg-stone-300" />

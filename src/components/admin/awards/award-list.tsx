@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdminPagination } from "@/components/ui/admin-pagination";
 import { AwardFormDialog } from "@/components/admin/awards/award-form-dialog";
+import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { deleteAward, toggleAwardPublished } from "@/app/admin/(dashboard)/awards/actions";
@@ -150,7 +151,11 @@ export function AwardList({
         <div className="divide-y divide-border rounded-lg border border-border">
           {awards.map((award) => (
             <div key={award.id} className="flex flex-wrap items-center gap-4 p-4">
-              <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
+              <ImageLightboxTrigger
+                src={award.image}
+                alt={award.title}
+                className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30"
+              >
                 {award.image && (
                   <Image
                     src={award.image}
@@ -161,7 +166,7 @@ export function AwardList({
                     unoptimized
                   />
                 )}
-              </div>
+              </ImageLightboxTrigger>
 
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{award.title}</p>

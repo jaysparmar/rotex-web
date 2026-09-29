@@ -1,0 +1,1 @@
+ALTER TABLE "Resource" ADD COLUMN "relatedIds" JSONB NOT NULL DEFAULT '[]';

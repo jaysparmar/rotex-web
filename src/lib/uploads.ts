@@ -20,6 +20,18 @@ const CONTENT_TYPES: Record<string, string> = {
   ".gif": "image/gif",
   ".mp4": "video/mp4",
   ".webm": "video/webm",
+  // Browsers only render PDFs inline — everything else here downloads regardless
+  // of Content-Type, but a correct type still matters for the file the browser saves.
+  ".pdf": "application/pdf",
+  ".doc": "application/msword",
+  ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".xls": "application/vnd.ms-excel",
+  ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ".ppt": "application/vnd.ms-powerpoint",
+  ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ".zip": "application/zip",
+  ".csv": "text/csv",
+  ".txt": "text/plain",
 };
 
 export function contentTypeFor(filename: string): string {
