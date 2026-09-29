@@ -200,8 +200,11 @@
   }
 
   @media (width >= 1280px) {
-    max-width: 1280px;
-    padding-inline: 0;
+    /* 1280 content + 2*2.5rem padding — keeps a real 2.5rem edge gap right at
+       1280px instead of jumping straight to 0 (margin-inline: auto alone
+       only picks up slack once the viewport clears this max-width). */
+    max-width: calc(1280px + 5rem);
+    padding-inline: 2.5rem;
   }
 }
 
@@ -314,7 +317,7 @@
 @media (width >= 640px)  { .container-left-pad { padding-left: 1.5rem; } }
 @media (width >= 768px)  { .container-left-pad { padding-left: 2rem; } }
 @media (width >= 1024px) { .container-left-pad { padding-left: 2.5rem; } }
-@media (width >= 1280px) { .container-left-pad { padding-left: calc((100vw - 1280px) / 2); } }
+@media (width >= 1280px) { .container-left-pad { padding-left: max(2.5rem, calc((100vw - 1280px) / 2)); } }
 
 /* ── Marquee animation ── */
 @keyframes marquee {
