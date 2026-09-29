@@ -31,6 +31,7 @@ import {
   Building2,
   SlidersHorizontal,
   Tag,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -65,6 +66,7 @@ export const NAV_ITEMS = [
   { href: "/admin/resources", label: "Resources", icon: BookOpen },
   { href: "/admin/enquiries", label: "Enquiries", icon: Mail },
   { href: "/admin/global", label: "Global Config", icon: Settings },
+  { href: "/admin/seo", label: "SEO Settings", icon: Search },
 ];
 
 export const DASHBOARD_ITEM = { href: "/admin", label: "Dashboard", icon: LayoutDashboard };

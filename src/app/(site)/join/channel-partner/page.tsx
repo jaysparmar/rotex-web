@@ -5,7 +5,10 @@ import { ChannelPartnerBenefitsSection } from "@/components/sections/channel-par
 import { ChannelPartnerMapSection } from "@/components/sections/channel-partner-map-section";
 import { CustomerStoriesSection } from "@/components/sections/customer-stories-section";
 import { ChannelPartnerFormSection } from "@/components/sections/channel-partner-form-section";
+import type { Metadata } from "next";
 import { fetchChannelPartnerSection, fetchIndustries } from "@/lib/site-api";
+import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 
 type IndustriesData = { industries: { id: string; name: string }[] };
 
@@ -35,7 +38,12 @@ type FormData = {
   defaultCountry: string;
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata(await getPageSeo("join-channel-partner"), SITE_METADATA_FALLBACK);
+}
+
 export default async function ChannelPartnerPage() {
+  const seo = await getPageSeo("join-channel-partner");
   const [hero, stats, why, benefits, map, stories, form, industriesData] = await Promise.all([
     fetchChannelPartnerSection<HeroData>("hero"),
     fetchChannelPartnerSection<StatsData>("stats"),
@@ -52,6 +60,7 @@ export default async function ChannelPartnerPage() {
 
   return (
     <div>
+      <SeoJsonLd schema={seo.schema} />
       {hero?.enabled && (
         <ChannelPartnerHeroSection
           title={hero.title}
