@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const [seo, sections] = await Promise.all([
-    prisma.homeSeo.findUnique({ where: { id: "home" } }),
+    prisma.seoPage.findUnique({ where: { key: "home" } }),
     prisma.homeSection.findMany({ orderBy: { order: "asc" } }),
   ]);
 
