@@ -14,7 +14,7 @@ function FaqCard({ faq }: { faq: PrismaJson.CategoryFaqs[number] }) {
     >
       <div className="flex flex-col gap-2.5 pr-8">
         <h3 className="text-stone-900 font-medium font-montserrat text-xl leading-7">{faq.question}</h3>
-        <Collapsible.Panel className="overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-300 ease-in-out data-[starting-style]:h-0 data-[ending-style]:h-0">
+        <Collapsible.Panel className="overflow-hidden h-(--collapsible-panel-height) transition-[height] duration-300 ease-in-out data-starting-style:h-0 data-ending-style:h-0">
           <div
             className={`text-stone-500 text-sm font-medium font-montserrat leading-5 ${richContentStyles.content}`}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(toRichHtml(faq.answer)) }}
@@ -23,7 +23,7 @@ function FaqCard({ faq }: { faq: PrismaJson.CategoryFaqs[number] }) {
       </div>
       <Collapsible.Trigger
         aria-label="Toggle answer"
-        className="absolute top-3 right-3 cursor-pointer transition-transform duration-300 data-[panel-open]:rotate-45"
+        className="absolute top-3 right-3 cursor-pointer transition-transform duration-300 data-panel-open:rotate-45"
       >
         <HexIcon size={14} />
       </Collapsible.Trigger>
