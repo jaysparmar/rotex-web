@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { CategoryFlatEditForm } from "@/components/admin/categories/category-flat-edit-form";
 
 export default async function AdminEditCategoryPage({ params }: { params: Promise<{ id: string }> }) {
@@ -20,13 +23,24 @@ export default async function AdminEditCategoryPage({ params }: { params: Promis
           <h1 className="text-2xl font-semibold">{category.name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">Edit this category.</p>
         </div>
-        <Breadcrumb
-          items={[
-            { label: "Dashboard", href: "/admin" },
-            { label: "Categories", href: "/admin/categories" },
-            { label: category.name },
-          ]}
-        />
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            nativeButton={false}
+            render={<Link href={`/products?category=${category.slug}`} target="_blank" rel="noopener noreferrer" />}
+          >
+            <ExternalLink />
+            View Products
+          </Button>
+          <Breadcrumb
+            items={[
+              { label: "Dashboard", href: "/admin" },
+              { label: "Categories", href: "/admin/categories" },
+              { label: category.name },
+            ]}
+          />
+        </div>
       </div>
 
       <CategoryFlatEditForm companies={companies} category={category} />

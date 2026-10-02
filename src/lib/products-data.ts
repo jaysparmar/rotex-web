@@ -66,6 +66,15 @@ export async function getCategoriesWithProducts(): Promise<CategoryWithCount[]> 
     .map((c) => ({ id: c.id, slug: c.slug, name: c.name, productCount: c._count.products }));
 }
 
+/** FAQs from every category, combined, for the products listing page FAQ section. */
+export async function getCombinedCategoryFaqs(): Promise<PrismaJson.CategoryFaqs> {
+  const categories = await prisma.category.findMany({
+    orderBy: { order: "asc" },
+    select: { faqs: true },
+  });
+  return categories.flatMap((c) => c.faqs);
+}
+
 export type SubCategoryWithCount = {
   id: string;
   slug: string;

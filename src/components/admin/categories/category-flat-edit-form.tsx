@@ -1,8 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useForm, FormProvider } from "react-hook-form";
-import { TextField, TextAreaField, SelectField, FieldGrid, Field } from "@/components/admin/form-fields";
+import { useForm, FormProvider, useFieldArray } from "react-hook-form";
+import {
+  TextField,
+  TextAreaField,
+  SelectField,
+  FieldGrid,
+  Field,
+  RepeaterItem,
+  AddButton,
+} from "@/components/admin/form-fields";
+import { RichTextField } from "@/components/admin/rich-text-field";
 import { Input } from "@/components/ui/input";
 import { ImageUrlField } from "@/components/admin/image-url-field";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -21,6 +30,7 @@ type FormValues = {
   description: string;
   order: number;
   importReference: string;
+  faqs: PrismaJson.CategoryFaqs;
 };
 
 type CategoryInput = {
@@ -33,6 +43,7 @@ type CategoryInput = {
   description: string | null;
   order: number;
   importReference: string | null;
+  faqs: PrismaJson.CategoryFaqs;
 };
 
 export function CategoryFlatEditForm({
@@ -54,9 +65,11 @@ export function CategoryFlatEditForm({
       description: category?.description ?? "",
       order: category?.order ?? 0,
       importReference: category?.importReference ?? "",
+      faqs: category?.faqs ?? [],
     },
   });
   const { pending, error, success, run } = useSaveAction();
+  const faqsArray = useFieldArray({ control: form.control, name: "faqs" });
 
   function onSubmit(values: FormValues) {
     const { companyId, ...data } = values;
@@ -111,6 +124,24 @@ export function CategoryFlatEditForm({
                 </p>
               </Field>
             </FieldGrid>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>FAQs</CardTitle>
+            <CardDescription>
+              Questions and answers shown in the combined FAQ section on the products listing page.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {faqsArray.fields.map((field, i) => (
+              <RepeaterItem key={field.id} title={`FAQ ${i + 1}`} onRemove={() => faqsArray.remove(i)}>
+                <TextField label="Question" {...form.register(`faqs.${i}.question`)} />
+                <RichTextField name={`faqs.${i}.answer`} label="Answer" />
+              </RepeaterItem>
+            ))}
+            <AddButton label="Add FAQ" onClick={() => faqsArray.append({ question: "", answer: "" })} />
           </CardContent>
         </Card>
 

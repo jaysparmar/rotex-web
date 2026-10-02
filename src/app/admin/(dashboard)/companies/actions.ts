@@ -16,6 +16,7 @@ type CategoryData = {
   description?: string;
   order: number;
   importReference?: string;
+  faqs?: PrismaJson.CategoryFaqs;
 };
 
 type SubCategoryData = CategoryData;
@@ -24,6 +25,7 @@ function revalidateCompanies() {
   revalidatePath("/admin/companies");
   revalidatePath("/admin/categories");
   revalidatePath("/downloads");
+  revalidatePath("/products");
   revalidatePath("/");
 }
 

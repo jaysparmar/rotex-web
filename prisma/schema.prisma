@@ -124,6 +124,9 @@ model Category {
   order           Int      @default(0)
   importReference String?
 
+  /// [CategoryFaqs]
+  faqs Json @default("[]")
+
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
 

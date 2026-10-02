@@ -8,6 +8,8 @@ declare global {
       label: string;
     }[];
 
+    type CategoryFaqs = { question: string; answer: string }[];
+
     type IndustryWhyChoose = {
       title: string;
       highlight: string;

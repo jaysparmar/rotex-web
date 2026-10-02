@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { getCategoriesWithProducts, getProductsList, getSubCategoriesWithProducts } from "@/lib/products-data";
+import {
+  getCategoriesWithProducts,
+  getProductsList,
+  getSubCategoriesWithProducts,
+  getCombinedCategoryFaqs,
+} from "@/lib/products-data";
+import { ProductFaqsSection } from "@/components/sections/product-faqs-section";
 import { getAttributeValuesByKey } from "@/lib/products";
 import { ProductsPageClient } from "./products-page-client";
 import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
@@ -33,11 +39,12 @@ export default async function ProductsPage({
   const page = Math.max(1, Number(pageParam) || 1);
 
   const seo = await getPageSeo("products");
-  const [categories, subCategories, { products, total }, attributeValues] = await Promise.all([
+  const [categories, subCategories, { products, total }, attributeValues, faqs] = await Promise.all([
     getCategoriesWithProducts(),
     getSubCategoriesWithProducts(category),
     getProductsList({ categorySlug: category, subCategorySlug: type, search, page, pageSize: PAGE_SIZE, ...attrFilters }),
     getAttributeValuesByKey(category),
+    getCombinedCategoryFaqs(),
   ]);
 
   return (
@@ -55,6 +62,7 @@ export default async function ProductsPage({
         page={page}
         totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}
       />
+      <ProductFaqsSection faqs={faqs} />
     </>
   );
 }
