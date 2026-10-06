@@ -132,12 +132,14 @@ function FlatMegaMenuPanel({
   onMouseLeave: () => void;
   onClose: () => void;
 }) {
-  const defaultImage =
-    config.image ??
-    config.columns.flatMap((c) => c.groups).find((g) => g.image)?.image;
-  const [hoveredImage, setHoveredImage] = useState<string | undefined>(
-    defaultImage,
-  );
+  type PanelState = { image?: string; caption?: string; href?: string };
+  // Before any hover, default to the featured blog's image (resolved server-side onto the
+  // Blogs card). Only falls back to the admin's static default image if no blog is featured.
+  const blogsGroup = config.columns.flatMap((c) => c.groups).find((g) => g.href === "/blogs");
+  const defaultPanel: PanelState = blogsGroup?.image
+    ? { image: blogsGroup.image, caption: blogsGroup.imageCaption, href: blogsGroup.imageHref }
+    : { image: config.image, caption: config.imageCaption };
+  const [panel, setPanel] = useState<PanelState>(defaultPanel);
 
   return (
     <div
@@ -151,16 +153,17 @@ function FlatMegaMenuPanel({
           {config.columns.map((col, colIdx) => (
             <div
               key={colIdx}
-              className={`flex flex-col gap-11 shrink-0${col.className ? ` ${col.className}` : ""}`}
+              className={`flex flex-col gap-11 shrink-0 ${col.className ?? "w-40 lg:w-48"}`}
             >
               {col.groups.map((group) => (
                 <div
                   key={group.heading}
                   className="flex flex-col gap-2.5"
                   onMouseEnter={() =>
-                    group.image && setHoveredImage(group.image)
+                    group.image &&
+                    setPanel({ image: group.image, caption: group.imageCaption, href: group.imageHref })
                   }
-                  onMouseLeave={() => setHoveredImage(defaultImage)}
+                  onMouseLeave={() => setPanel(defaultPanel)}
                 >
                   {/* Heading */}
                   {group.href && DISABLED_HREFS.has(group.href) ? (
@@ -253,12 +256,12 @@ function FlatMegaMenuPanel({
               />
             </div>
           </Link>
-        ) : hoveredImage ? (
+        ) : panel.image ? (
           <MegaMenuImagePanel
-            src={hoveredImage}
-            caption={config.imageCaption}
-            href={hoveredImage === defaultImage ? config.imageHref : undefined}
-            showCaption={hoveredImage === defaultImage}
+            src={panel.image}
+            caption={panel.caption}
+            href={panel.href}
+            showCaption
             onClose={onClose}
           />
         ) : null}
@@ -302,7 +305,10 @@ function MegaMenuImagePanel({
     </>
   );
 
-  const className = "w-115 h-87.5 shrink-0 self-start ml-auto relative overflow-hidden block";
+  // Scales down on laptop-width viewports (1280-1440) so it doesn't push the dropdown wider
+  // than the screen — full size only kicks in on larger desktops.
+  const className =
+    "w-72 h-54 lg:w-80 lg:h-60 2xl:w-115 2xl:h-87.5 shrink-0 self-start ml-auto relative overflow-hidden block";
 
   if (href) {
     return (
@@ -565,6 +571,19 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setActiveMenu(null);
   }, []);
+
+  // The desktop dropdown has no responsive hide of its own — if the viewport shrinks below
+  // `lg` (e.g. resizing the window) while it's open, it'd otherwise stay stuck on top of the
+  // mobile layout since only the hover triggers that open it are `hidden lg:flex`.
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1023px)");
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      if (e.matches) closeMenu();
+    };
+    handleChange(mql);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, [closeMenu]);
 
   const activeItem = navItems.find((item) => item.id === activeMenu);
 

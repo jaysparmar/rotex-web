@@ -121,14 +121,38 @@ async function resolveProductsMenu(source: PrismaJson.MegaMenuSource): Promise<P
   };
 }
 
-async function resolveFeaturedBlog(menu: PrismaJson.FlatMenu): Promise<PrismaJson.FlatMenu> {
-  if (!menu.featuredBlogSlug) return menu;
-  const blog = await prisma.resource.findFirst({
-    where: { type: "blogs", slug: menu.featuredBlogSlug, published: true },
-    select: { slug: true, title: true, image: true },
-  });
-  if (!blog) return menu;
-  return { ...menu, image: blog.image, imageCaption: blog.title, imageHref: `/blogs/${blog.slug}` };
+// Nav-menu cards whose href points at one of these resource list pages get their hover image
+// resolved dynamically to that type's admin-featured post (falling back to the most recently
+// updated published one — see getFeaturedResources). Keep in sync with the site's actual routes.
+const GROUP_HREF_TO_RESOURCE_TYPE: Record<string, "blogs" | "news" | "case-studies"> = {
+  "/blogs": "blogs",
+  "/news-updates": "news",
+  "/case-studies": "case-studies",
+};
+
+async function resolveFlatMenuFeaturedGroups(menu: PrismaJson.FlatMenu): Promise<PrismaJson.FlatMenu> {
+  const columns = await Promise.all(
+    menu.columns.map(async (column) => {
+      const groups = await Promise.all(
+        column.groups.map(async (group) => {
+          const resourceType = group.href ? GROUP_HREF_TO_RESOURCE_TYPE[group.href] : undefined;
+          if (!resourceType) return group;
+          const resource = await prisma.resource.findFirst({
+            where: { type: resourceType, published: true },
+            orderBy: [{ featured: "desc" }, { updatedAt: "desc" }],
+            select: { slug: true, title: true, image: true },
+          });
+          if (!resource) return group;
+          const basePath = Object.keys(GROUP_HREF_TO_RESOURCE_TYPE).find(
+            (href) => GROUP_HREF_TO_RESOURCE_TYPE[href] === resourceType
+          )!;
+          return { ...group, image: resource.image, imageCaption: resource.title, imageHref: `${basePath}/${resource.slug}` };
+        })
+      );
+      return { ...column, groups };
+    })
+  );
+  return { ...menu, columns };
 }
 
 export async function resolveNavItems(nav: PrismaJson.NavItem[]): Promise<PrismaJson.NavItem[]> {
@@ -141,8 +165,8 @@ export async function resolveNavItems(nav: PrismaJson.NavItem[]): Promise<Prisma
             : await resolveProductsMenu(item.megaMenuSource);
         return { ...item, megaMenu };
       }
-      if (item.megaMenu?.type === "flat" && item.megaMenu.featuredBlogSlug) {
-        return { ...item, megaMenu: await resolveFeaturedBlog(item.megaMenu) };
+      if (item.megaMenu?.type === "flat") {
+        return { ...item, megaMenu: await resolveFlatMenuFeaturedGroups(item.megaMenu) };
       }
       return item;
     })

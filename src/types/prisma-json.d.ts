@@ -36,6 +36,9 @@ declare global {
       href?: string;
       description?: string;
       image?: string;
+      /* Resolved server-side alongside `image` for resource-backed groups (Blogs/News/Case Studies) — not admin-edited directly. */
+      imageCaption?: string;
+      imageHref?: string;
       items?: FlatItem[];
       itemColumns?: FlatItem[][];
     };
@@ -46,10 +49,6 @@ declare global {
       image?: string;
       imageCaption?: string;
       cta?: { text: string; href: string };
-      /* Admin-picked blog slug (Resource type "blogs"). Resolved into image/imageCaption/imageHref at read time. */
-      featuredBlogSlug?: string;
-      /* Resolved server-side from featuredBlogSlug — not admin-edited directly. */
-      imageHref?: string;
     };
 
     type MegaMenuConfig = CategorySwitcherMenu | FlatMenu;

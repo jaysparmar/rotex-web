@@ -32,13 +32,11 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
-type RequestType = "datasheet" | "enquiry";
 
 // ── Shared submit logic ─────────────────────────────────────────────────────────
 
 function useQuoteForm(productCode: string, productName: string) {
   const [submitError, setSubmitError] = useState<string>();
-  const [requestType, setRequestType] = useState<RequestType>("enquiry");
 
   const form = useForm<FormData>({ resolver: zodResolver(schema) });
   const { getToken } = useRecaptcha();
@@ -49,7 +47,7 @@ function useQuoteForm(productCode: string, productName: string) {
     const body = new FormData();
     body.append("source", "product-quote");
     body.append("industryName", data.industry);
-    body.append("enquiryType", requestType);
+    body.append("enquiryType", "enquiry");
     body.append("product", `${productName} (${productCode})`);
     for (const [key, value] of Object.entries(data)) {
       if (value !== undefined) body.append(key, value);
@@ -67,7 +65,7 @@ function useQuoteForm(productCode: string, productName: string) {
     }
   };
 
-  return { form, submitError, setRequestType, onSubmit };
+  return { form, submitError, onSubmit };
 }
 
 // ── Form fields (shared between inline section and sheet) ───────────────────────
@@ -75,13 +73,11 @@ function useQuoteForm(productCode: string, productName: string) {
 function QuoteFormFields({
   form,
   submitError,
-  setRequestType,
   onSubmit,
   industries,
 }: {
   form: UseFormReturn<FormData>;
   submitError: string | undefined;
-  setRequestType: (type: RequestType) => void;
   onSubmit: (data: FormData) => void;
   industries: string[];
 }) {
@@ -193,15 +189,6 @@ function QuoteFormFields({
           <button
             type="submit"
             disabled={isSubmitting}
-            onClick={() => setRequestType("datasheet")}
-            className="px-6 py-3.5 bg-stone-900 rounded-full flex justify-center items-center gap-5 text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-800 transition-colors disabled:opacity-60"
-          >
-            Email me a Datasheet
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            onClick={() => setRequestType("enquiry")}
             className="px-6 py-3.5 bg-orange-600 rounded-full flex justify-center items-center gap-5 text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-orange-700 transition-colors disabled:opacity-60"
           >
             {isSubmitting ? "Sending…" : "Send Enquiry"}
@@ -223,7 +210,7 @@ export function ProductQuoteFormInline({
   productName: string;
   industries: string[];
 }) {
-  const { form, submitError, setRequestType, onSubmit } = useQuoteForm(productCode, productName);
+  const { form, submitError, onSubmit } = useQuoteForm(productCode, productName);
 
   return (
     <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
@@ -237,13 +224,7 @@ export function ProductQuoteFormInline({
       </div>
 
       <div className="w-full lg:max-w-158 p-5 lg:p-7 bg-white rounded-[20px] shadow-[0px_1px_3px_0px_rgba(0,0,0,0.10),0px_1px_2px_-1px_rgba(0,0,0,0.10)] outline outline-1 -outline-offset-1 outline-neutral-200">
-        <QuoteFormFields
-          form={form}
-          submitError={submitError}
-          setRequestType={setRequestType}
-          onSubmit={onSubmit}
-          industries={industries}
-        />
+        <QuoteFormFields form={form} submitError={submitError} onSubmit={onSubmit} industries={industries} />
       </div>
     </div>
   );
@@ -264,7 +245,7 @@ export function ProductQuoteFormSheet({
   productName: string;
   industries: string[];
 }) {
-  const { form, submitError, setRequestType, onSubmit } = useQuoteForm(productCode, productName);
+  const { form, submitError, onSubmit } = useQuoteForm(productCode, productName);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -279,13 +260,7 @@ export function ProductQuoteFormSheet({
         </SheetHeader>
 
         <div className="p-6">
-          <QuoteFormFields
-            form={form}
-            submitError={submitError}
-            setRequestType={setRequestType}
-            onSubmit={onSubmit}
-            industries={industries}
-          />
+          <QuoteFormFields form={form} submitError={submitError} onSubmit={onSubmit} industries={industries} />
         </div>
       </SheetContent>
     </Sheet>

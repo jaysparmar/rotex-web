@@ -15,7 +15,7 @@ import { AdminPagination } from "@/components/ui/admin-pagination";
 import { RESOURCE_TYPES } from "@/components/admin/resources/resource-edit-form";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
-import { deleteResource, toggleResourcePublished } from "@/app/admin/(dashboard)/resources/actions";
+import { deleteResource, toggleResourcePublished, toggleResourceFeatured } from "@/app/admin/(dashboard)/resources/actions";
 import { useAdminListUrl } from "@/hooks/use-admin-list-url";
 import { useDebouncedUrlSearch } from "@/hooks/use-debounced-url-search";
 
@@ -26,6 +26,7 @@ type Resource = {
   slug: string;
   image: string;
   published: boolean;
+  featured: boolean;
   productIds: string[];
   industryIds: string[];
   extraTags: string[];
@@ -90,6 +91,19 @@ export function ResourceList({
       try {
         await toggleResourcePublished(resource.id, published);
         toast.success(`Resource ${published ? "published" : "unpublished"}`);
+      } catch {
+        toast.error("Failed to update resource");
+      }
+    });
+  }
+
+  function handleToggleFeatured(resource: Resource, featured: boolean) {
+    startTransition(async () => {
+      try {
+        await toggleResourceFeatured(resource.id, featured);
+        toast.success(
+          featured ? `"${resource.title}" marked as featured` : `"${resource.title}" removed from featured`
+        );
       } catch {
         toast.error("Failed to update resource");
       }
@@ -179,11 +193,23 @@ export function ResourceList({
                 <p className="truncate text-xs text-muted-foreground">/{resource.slug}</p>
               </div>
 
-              <Switch
-                checked={resource.published}
-                disabled={pending}
-                onCheckedChange={(v) => handleTogglePublished(resource, v)}
-              />
+              <label className="flex flex-col items-center gap-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                Published
+                <Switch
+                  checked={resource.published}
+                  disabled={pending}
+                  onCheckedChange={(v) => handleTogglePublished(resource, v)}
+                />
+              </label>
+
+              <label className="flex flex-col items-center gap-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                Featured
+                <Switch
+                  checked={resource.featured}
+                  disabled={pending}
+                  onCheckedChange={(v) => handleToggleFeatured(resource, v)}
+                />
+              </label>
 
               <Link href={`/admin/resources/${resource.id}`}>
                 <Button variant="ghost" size="icon-sm">

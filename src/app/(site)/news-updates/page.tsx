@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { NewsUpdatesHeroSection } from "@/components/sections/news-updates-hero-section";
 import { ResourcesGridSection } from "@/components/sections/resources-grid-section";
-import { getPublishedResources } from "@/lib/resources";
+import { getPublishedResources, getFeaturedResources } from "@/lib/resources";
 import { getResourceFilterOptions } from "@/lib/resource-tags";
 import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
 import { SeoJsonLd } from "@/components/seo/seo-json-ld";
@@ -12,12 +12,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NewsUpdatesPage() {
   const seo = await getPageSeo("news-updates");
-  const [posts, filterOptions] = await Promise.all([getPublishedResources("news"), getResourceFilterOptions()]);
+  const [posts, featured, filterOptions] = await Promise.all([
+    getPublishedResources("news"),
+    getFeaturedResources("news"),
+    getResourceFilterOptions(),
+  ]);
 
   return (
     <div>
       <SeoJsonLd schema={seo.schema} />
-      <NewsUpdatesHeroSection highlighted={posts.slice(0, 4)} />
+      <NewsUpdatesHeroSection highlighted={featured} />
       <ResourcesGridSection
         heading="All News & Updates"
         posts={posts}

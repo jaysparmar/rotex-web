@@ -23,13 +23,14 @@ export function NewsUpdatesHeroSection({ highlighted }: { highlighted: ResourceI
       <div className="container flex flex-col gap-10">
         <SimpleBreadcrumb current="News & Updates" />
 
-        <div className="flex flex-col lg:flex-row justify-between items-start gap-10">
-          <h1 className="w-full lg:w-96 text-gradient-orange-dark text-2xl lg:text-4xl font-normal font-montserrat leading-8 lg:leading-10 shrink-0">
-            News & Updates You Can&apos;t Miss
-          </h1>
+        {highlighted.length > 0 && (
+          <div className="flex flex-col lg:flex-row justify-between items-start gap-10">
+            <h1 className="w-full lg:w-96 text-gradient-orange-dark text-2xl lg:text-4xl font-normal font-montserrat leading-8 lg:leading-10 shrink-0">
+              News & Updates You Can&apos;t Miss
+            </h1>
 
-          {/* Figma mobile: one card per row, 40px apart; two-up from sm */}
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-10 sm:gap-5">
+            {/* Figma mobile: one card per row, 40px apart; two-up from sm */}
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-10 sm:gap-5">
             {highlighted.map((post) => (
               <Link
                 key={post.slug}
@@ -57,8 +58,9 @@ export function NewsUpdatesHeroSection({ highlighted }: { highlighted: ResourceI
                 </div>
               </Link>
             ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

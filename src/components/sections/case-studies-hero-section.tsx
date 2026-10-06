@@ -23,12 +23,13 @@ export function CaseStudiesHeroSection({ featured }: { featured: ResourceItem[] 
       <div className="container flex flex-col gap-10">
         <SimpleBreadcrumb current="Case Studies" />
 
-        <h1 className="w-full lg:w-162.5 text-gradient-orange-dark text-4xl font-normal font-montserrat leading-10">
-          Stories behind real-world impact across industries and applications
-        </h1>
-
         {featured.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <>
+            <h1 className="w-full lg:w-162.5 text-gradient-orange-dark text-4xl font-normal font-montserrat leading-10">
+              Stories behind real-world impact across industries and applications
+            </h1>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {featured.map((post) => (
               <Link
                 key={post.slug}
@@ -73,7 +74,8 @@ export function CaseStudiesHeroSection({ featured }: { featured: ResourceItem[] 
                 </div>
               </Link>
             ))}
-          </div>
+            </div>
+          </>
         )}
       </div>
     </section>

@@ -365,6 +365,7 @@ model Resource {
   relatedIds Json    @default("[]")
   content   String   @default("")
   published Boolean  @default(true)
+  featured  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

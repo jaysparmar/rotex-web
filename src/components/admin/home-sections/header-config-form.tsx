@@ -12,7 +12,6 @@ import { useSaveAction } from "@/hooks/use-save-action";
 import { saveGlobalConfig } from "@/app/admin/(dashboard)/home/actions";
 
 type IndustryOption = { id: string; name: string; subIndustries: { id: string; name: string }[] };
-type BlogOption = { slug: string; title: string };
 
 type FormValues = {
   logo: { src: string; alt: string; href: string };
@@ -25,13 +24,11 @@ export function HeaderConfigForm({
   footer,
   industries,
   productCategories,
-  blogs,
 }: {
   initialData: FormValues;
   footer: PrismaJson.GlobalConfigData["footer"];
   industries: IndustryOption[];
   productCategories: string[];
-  blogs: BlogOption[];
 }) {
   const form = useForm<FormValues>({ defaultValues: initialData });
   const { pending, error, success, run } = useSaveAction();
@@ -74,7 +71,6 @@ export function HeaderConfigForm({
                 navIndex={i}
                 industries={industries}
                 productCategories={productCategories}
-                blogs={blogs}
                 onSave={form.handleSubmit(onSubmit)}
                 pending={pending}
               />
@@ -97,14 +93,12 @@ function NavItemRow({
   navIndex,
   industries,
   productCategories,
-  blogs,
   onSave,
   pending,
 }: {
   navIndex: number;
   industries: IndustryOption[];
   productCategories: string[];
-  blogs: BlogOption[];
   onSave: () => Promise<void>;
   pending: boolean;
 }) {
@@ -134,7 +128,6 @@ function NavItemRow({
         navIndex={navIndex}
         industries={industries}
         productCategories={productCategories}
-        blogs={blogs}
         onSave={onSave}
         pending={pending}
         trigger={
