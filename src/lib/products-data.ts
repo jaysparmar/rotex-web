@@ -19,6 +19,7 @@ export type CategoryWithCount = {
   id: string;
   slug: string;
   name: string;
+  description: string | null;
   productCount: number;
 };
 
@@ -63,7 +64,7 @@ export async function getCategoriesWithProducts(): Promise<CategoryWithCount[]> 
   });
   return categories
     .filter((c) => c._count.products > 0)
-    .map((c) => ({ id: c.id, slug: c.slug, name: c.name, productCount: c._count.products }));
+    .map((c) => ({ id: c.id, slug: c.slug, name: c.name, description: c.description, productCount: c._count.products }));
 }
 
 /** FAQs from every category, combined, for the products listing page FAQ section. */
@@ -79,6 +80,7 @@ export type SubCategoryWithCount = {
   id: string;
   slug: string;
   name: string;
+  description: string | null;
   productCount: number;
 };
 
@@ -91,12 +93,49 @@ export async function getSubCategoriesWithProducts(categorySlug?: string | null)
   });
   return subCategories
     .filter((s) => s._count.products > 0)
-    .map((s) => ({ id: s.id, slug: s.slug, name: s.name, productCount: s._count.products }));
+    .map((s) => ({ id: s.id, slug: s.slug, name: s.name, description: s.description, productCount: s._count.products }));
+}
+
+export type IndustryWithCount = {
+  id: string;
+  slug: string;
+  name: string;
+  productCount: number;
+};
+
+/** All industries, for the "Industry" filter — unlike the other PLP filters, this lists every
+ * industry regardless of whether the active category currently has a matching product, so picking
+ * one with no matches shows "No products found." rather than making that industry unselectable. */
+export async function getIndustriesWithProducts(categorySlug?: string | null): Promise<IndustryWithCount[]> {
+  const categoryFilter = categorySlug ? { category: { slug: categorySlug } } : {};
+  const industries = await prisma.industry.findMany({ orderBy: { name: "asc" } });
+
+  const counts = await Promise.all(
+    industries.map((industry) =>
+      prisma.product.count({
+        where: {
+          ...categoryFilter,
+          OR: [
+            { industries: { some: { id: industry.id } } },
+            { variants: { some: { industries: { some: { id: industry.id } } } } },
+          ],
+        },
+      })
+    )
+  );
+
+  return industries.map((industry, i) => ({
+    id: industry.id,
+    slug: industry.slug,
+    name: industry.name,
+    productCount: counts[i],
+  }));
 }
 
 export type ProductListFilterParams = {
   categorySlug?: string;
   subCategorySlug?: string;
+  industrySlugs?: string[];
   search?: string;
   size?: string;
   variantType?: string;
@@ -115,44 +154,64 @@ export type ProductListResult = {
 
 /** Paginated products, optionally scoped to a category slug and variant attributes, for the /products listing. */
 export async function getProductsList(params: ProductListFilterParams = {}): Promise<ProductListResult> {
-  const { categorySlug, subCategorySlug, search, page = 1, pageSize = 12, ...attrs } = params;
+  const { categorySlug, subCategorySlug, industrySlugs, search, page = 1, pageSize = 12, ...attrs } = params;
   const attrFilter: Record<string, string> = {};
   for (const [key, value] of Object.entries(attrs)) {
     if (value) attrFilter[key] = value;
   }
 
-  const searchOr = search?.trim() ? buildSearchOr(search.trim()) : null;
+  // Each whitespace-separated word of the query must match *somewhere* (AND across
+  // words), but any field — name, model number, category, a variant's attributes,
+  // etc — satisfies a given word (OR across fields). A plain single-substring match
+  // of the whole query previously required every word in one literal phrase in a
+  // single field, so e.g. "202B 2 Way" (a model number plus a variant's Type) never
+  // matched anything even though both halves are individually valid.
+  const searchTokens = search?.trim() ? search.trim().split(/\s+/).filter(Boolean) : [];
+  const tokenConditions = searchTokens.map((token) => {
+    const variants = buildSearchOr(token);
+    return {
+      OR: variants.flatMap((term) => [
+        { name: { contains: term } },
+        { modelNumber: { contains: term } },
+        { description: { contains: term } },
+        { features: { contains: term } },
+        { category: { name: { contains: term } } },
+        { subCategory: { name: { contains: term } } },
+        { industries: { some: { name: { contains: term } } } },
+        // Parent-attribute search — a product's own listing text may say nothing
+        // about e.g. "Direct Acting" or a specific orifice size, but one of its
+        // variants often does.
+        { variants: { some: { variantType: { contains: term } } } },
+        { variants: { some: { size: { contains: term } } } },
+        { variants: { some: { orifice: { contains: term } } } },
+        { variants: { some: { minOperatingTemp: { contains: term } } } },
+        { variants: { some: { maxOperatingTemp: { contains: term } } } },
+        { variants: { some: { flowFactor: { contains: term } } } },
+        { variants: { some: { features: { contains: term } } } },
+        { variants: { some: { description: { contains: term } } } },
+      ]),
+    };
+  });
+
+  // Industries live on the Product itself for simple products but only on each
+  // ProductVariant for variable products (see getProductBySlug) — match either.
+  // Multiple industries are OR'd together (a product matching any selected industry qualifies).
+  const industryFilter = industrySlugs && industrySlugs.length > 0
+    ? {
+        OR: [
+          { industries: { some: { slug: { in: industrySlugs } } } },
+          { variants: { some: { industries: { some: { slug: { in: industrySlugs } } } } } },
+        ],
+      }
+    : null;
+
+  const andConditions = [...(industryFilter ? [industryFilter] : []), ...tokenConditions];
 
   const where = {
     ...(categorySlug ? { category: { slug: categorySlug } } : {}),
     ...(subCategorySlug ? { subCategory: { slug: subCategorySlug } } : {}),
     ...(Object.keys(attrFilter).length ? { variants: { some: attrFilter } } : {}),
-    ...(searchOr
-      ? {
-          OR: [
-            ...searchOr.map((term) => ({ name: { contains: term } })),
-            ...searchOr.map((term) => ({ modelNumber: { contains: term } })),
-            ...searchOr.map((term) => ({ description: { contains: term } })),
-            ...searchOr.map((term) => ({ features: { contains: term } })),
-            ...searchOr.map((term) => ({ category: { name: { contains: term } } })),
-            ...searchOr.map((term) => ({ subCategory: { name: { contains: term } } })),
-            ...searchOr.map((term) => ({ industries: { some: { name: { contains: term } } } })),
-            // Parent-attribute search — a product's own listing text may say nothing
-            // about e.g. "Direct Acting" or a specific orifice size, but one of its
-            // variants often does.
-            ...searchOr.flatMap((term) => [
-              { variants: { some: { variantType: { contains: term } } } },
-              { variants: { some: { size: { contains: term } } } },
-              { variants: { some: { orifice: { contains: term } } } },
-              { variants: { some: { minOperatingTemp: { contains: term } } } },
-              { variants: { some: { maxOperatingTemp: { contains: term } } } },
-              { variants: { some: { flowFactor: { contains: term } } } },
-              { variants: { some: { features: { contains: term } } } },
-              { variants: { some: { description: { contains: term } } } },
-            ]),
-          ],
-        }
-      : {}),
+    ...(andConditions.length ? { AND: andConditions } : {}),
   };
 
   const [products, total] = await Promise.all([

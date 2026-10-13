@@ -9,9 +9,13 @@ import { PageHero } from "@/components/ui/page-hero";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { PRODUCT_ATTRIBUTES, type ProductAttributeKey } from "@/lib/product-constants";
-import type { ProductSummary, CategoryWithCount, SubCategoryWithCount } from "@/lib/products-data";
+import type { ProductSummary, CategoryWithCount, SubCategoryWithCount, IndustryWithCount } from "@/lib/products-data";
 import breadcrumbBg from "@/assets/Images/breadcurmbBackgrounds/default_bg.jpg";
 import mobileBreadcrumbBg from "@/assets/Images/breadcurmbBackgrounds/default_bg_mobile.jpg";
+
+function collapseWhitespace(text: string): string {
+  return text.replace(/\s+/g, " ").trim();
+}
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -65,6 +69,9 @@ type FilterFieldsProps = {
   subCategories: SubCategoryWithCount[];
   activeSubCategorySlug: string | null;
   onSubCategoryChange: (slug: string | null) => void;
+  industries: IndustryWithCount[];
+  activeIndustrySlugs: string[];
+  onIndustryChange: (slugs: string[]) => void;
   attributeValues: Record<string, string[]>;
   activeFilters: Partial<Record<ProductAttributeKey, string>>;
   onFilterChange: (key: ProductAttributeKey, value: string | undefined) => void;
@@ -101,6 +108,9 @@ function FilterFields({
   subCategories,
   activeSubCategorySlug,
   onSubCategoryChange,
+  industries,
+  activeIndustrySlugs,
+  onIndustryChange,
   attributeValues,
   activeFilters,
   onFilterChange,
@@ -109,6 +119,8 @@ function FilterFields({
   searchValue,
   onSearchChange,
 }: FilterFieldsProps) {
+  const activeIndustries = industries.filter((i) => activeIndustrySlugs.includes(i.slug));
+
   return (
     <>
       <SearchField value={searchValue} onChange={onSearchChange} />
@@ -118,6 +130,20 @@ function FilterFields({
         activeSlug={activeSubCategorySlug}
         onChange={onSubCategoryChange}
       />
+
+      {industries.length > 0 && (
+        <FilterCombobox
+          label="Industry"
+          placeholder="Select Industry"
+          options={industries.map((i) => i.name)}
+          value={activeIndustries.map((i) => i.name)}
+          onChange={(vals) => {
+            const slugs = industries.filter((i) => vals.includes(i.name)).map((i) => i.slug);
+            onIndustryChange(slugs);
+          }}
+          multiple
+        />
+      )}
 
       <div className="flex items-center justify-between">
         <p className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-4 tracking-wide">
@@ -158,7 +184,10 @@ function FilterFields({
 
 function FilterSidebar(props: FilterFieldsProps) {
   return (
-    <aside className="hidden lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-6rem)] w-full lg:w-80 shrink-0 flex-col gap-7 self-start overflow-y-auto pt-3">
+    <aside
+      className="no-scrollbar hidden lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-6rem)] w-full lg:w-80 shrink-0 flex-col gap-7 self-start overflow-y-auto pt-3"
+      style={{ scrollbarWidth: "none" }}
+    >
       <FilterFields {...props} />
     </aside>
   );
@@ -257,6 +286,8 @@ export function ProductsPageClient({
   activeCategorySlug,
   subCategories,
   activeSubCategorySlug,
+  industries,
+  activeIndustrySlugs,
   attributeValues,
   activeFilters,
   activeSearch,
@@ -268,6 +299,8 @@ export function ProductsPageClient({
   activeCategorySlug: string | null;
   subCategories: SubCategoryWithCount[];
   activeSubCategorySlug: string | null;
+  industries: IndustryWithCount[];
+  activeIndustrySlugs: string[];
   attributeValues: Record<string, string[]>;
   activeFilters: Partial<Record<ProductAttributeKey, string>>;
   activeSearch: string;
@@ -280,6 +313,41 @@ export function ProductsPageClient({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(activeSearch);
   const tabs: Tab[] = [{ slug: null, name: "All Products" }, ...categories.map((c) => ({ slug: c.slug, name: c.name }))];
+  const activeCategory = categories.find((c) => c.slug === activeCategorySlug) ?? null;
+  const activeSubCategory = subCategories.find((s) => s.slug === activeSubCategorySlug) ?? null;
+  // Only one selected industry gets its own breadcrumb crumb — with several
+  // selected there's no single clean label to show there.
+  const activeIndustry =
+    activeIndustrySlugs.length === 1 ? industries.find((i) => i.slug === activeIndustrySlugs[0]) ?? null : null;
+  const heroTitle = activeSubCategory?.name ?? activeCategory?.name ?? "All Products";
+  const heroDescriptionSource = activeSubCategory?.description?.trim() || activeCategory?.description?.trim();
+  const heroDescription = heroDescriptionSource
+    ? collapseWhitespace(heroDescriptionSource)
+    : "Precision on–off control engineered by Rotex for safety-critical and high-duty industrial environments.";
+  // Breadcrumb trail: Home / [Industry] / Category / [Sub-category] — every
+  // stop but the last links back to the URL state with only the stops before
+  // it still applied, so clicking an earlier crumb drops the later filters.
+  const heroCrumbs = activeCategory
+    ? (() => {
+        const stops: { label: string; params: string }[] = [];
+        if (activeIndustry) stops.push({ label: activeIndustry.name, params: `industry=${activeIndustry.slug}` });
+        const categoryParams = activeIndustry
+          ? `${stops[0].params}&category=${activeCategory.slug}`
+          : `category=${activeCategory.slug}`;
+        stops.push({ label: activeCategory.name, params: categoryParams });
+        if (activeSubCategory) {
+          const base = stops[stops.length - 1].params;
+          stops.push({ label: activeSubCategory.name, params: `${base}&type=${activeSubCategory.slug}` });
+        }
+        return [
+          { label: "Home", href: "/" },
+          ...stops.map((stop, i) => ({
+            label: stop.label,
+            href: i === stops.length - 1 ? undefined : `/products?${stop.params}`,
+          })),
+        ];
+      })()
+    : undefined;
 
   const tabsRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -302,9 +370,9 @@ export function ProductsPageClient({
     return () => { el.removeEventListener("scroll", updateScrollState); ro.disconnect(); };
   }, [updateScrollState]);
 
-  const navigate = (params: URLSearchParams) => {
+  const navigate = (params: URLSearchParams, scroll = false) => {
     startTransition(() => {
-      router.push(params.size ? `/products?${params.toString()}` : "/products", { scroll: false });
+      router.push(params.size ? `/products?${params.toString()}` : "/products", { scroll });
     });
   };
 
@@ -319,6 +387,7 @@ export function ProductsPageClient({
     // once you switch to a category that doesn't have that attribute at all
     // (e.g. Actuators), so it must not silently keep filtering the results.
     for (const { key } of PRODUCT_ATTRIBUTES) params.delete(key);
+    params.delete("industry");
     navigate(params);
   };
 
@@ -326,6 +395,14 @@ export function ProductsPageClient({
     const params = new URLSearchParams(searchParams);
     if (slug) params.set("type", slug);
     else params.delete("type");
+    params.delete("page");
+    navigate(params);
+  };
+
+  const handleIndustryChange = (slugs: string[]) => {
+    const params = new URLSearchParams(searchParams);
+    if (slugs.length > 0) params.set("industry", slugs.join(","));
+    else params.delete("industry");
     params.delete("page");
     navigate(params);
   };
@@ -342,6 +419,7 @@ export function ProductsPageClient({
     const params = new URLSearchParams(searchParams);
     for (const { key } of PRODUCT_ATTRIBUTES) params.delete(key);
     params.delete("type");
+    params.delete("industry");
     params.delete("page");
     navigate(params);
   };
@@ -367,13 +445,14 @@ export function ProductsPageClient({
     const params = new URLSearchParams(searchParams);
     if (nextPage > 1) params.set("page", String(nextPage));
     else params.delete("page");
-    navigate(params);
-    // Clicking a page button focuses it, and mobile browsers then auto-scroll
-    // the focused element back into view — which races our scroll-to-top and
-    // wins, leaving the user stuck mid-list. Blur it and defer to the next
-    // frame so our scroll runs after that focus-scroll settles.
+    // Clicking a page button focuses it, and mobile browsers then auto-scroll the
+    // focused element back into view, fighting the navigation's own scroll-to-top
+    // and leaving the user stuck mid-list. Blur it before navigating so there's no
+    // focus-scroll left to fight — letting the router scroll to top as part of the
+    // transition itself (not a separate pass after content has already painted,
+    // which is what caused the visible "loads mid-page, then jumps to top" glitch).
     (document.activeElement as HTMLElement | null)?.blur();
-    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+    navigate(params, true);
   };
 
   const scrollTabs = (dir: "left" | "right") => {
@@ -381,7 +460,9 @@ export function ProductsPageClient({
   };
 
   const activeFilterCount =
-    (activeSubCategorySlug ? 1 : 0) + PRODUCT_ATTRIBUTES.filter(({ key }) => Boolean(activeFilters[key])).length;
+    (activeSubCategorySlug ? 1 : 0) +
+    activeIndustrySlugs.length +
+    PRODUCT_ATTRIBUTES.filter(({ key }) => Boolean(activeFilters[key])).length;
   const hasActiveFilters = activeFilterCount > 0;
 
   return (
@@ -389,8 +470,9 @@ export function ProductsPageClient({
       <PageHero
         bg={breadcrumbBg}
         mobileBg={mobileBreadcrumbBg}
-        title="All Products"
-        description="Precision on–off control engineered by Rotex for safety-critical and high-duty industrial environments."
+        title={heroTitle}
+        description={heroDescription}
+        crumbs={heroCrumbs}
       />
 
       <div className="container flex flex-col lg:flex-row gap-8 py-8 sm:py-12 items-start">
@@ -399,6 +481,9 @@ export function ProductsPageClient({
           subCategories={subCategories}
           activeSubCategorySlug={activeSubCategorySlug}
           onSubCategoryChange={handleSubCategoryChange}
+          industries={industries}
+          activeIndustrySlugs={activeIndustrySlugs}
+          onIndustryChange={handleIndustryChange}
           attributeValues={attributeValues}
           activeFilters={activeFilters}
           onFilterChange={handleFilterChange}
@@ -435,6 +520,9 @@ export function ProductsPageClient({
                   subCategories={subCategories}
                   activeSubCategorySlug={activeSubCategorySlug}
                   onSubCategoryChange={handleSubCategoryChange}
+                  industries={industries}
+                  activeIndustrySlugs={activeIndustrySlugs}
+                  onIndustryChange={handleIndustryChange}
                   attributeValues={attributeValues}
                   activeFilters={activeFilters}
                   onFilterChange={handleFilterChange}

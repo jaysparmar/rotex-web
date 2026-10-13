@@ -53,7 +53,7 @@ export function CareerHeroSection({
         {hasOpenPositions && (
           <Link
             href="#positions"
-            className="relative mb-6 lg:mb-0 w-full lg:w-fit inline-flex items-center justify-center gap-1.5 px-6 py-3.5 rounded-full bg-stone-100 text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-primary hover:text-white transition-colors duration-200"
+            className="relative mb-6 lg:mb-0 mt-6  w-full lg:w-fit inline-flex items-center justify-center gap-1.5 px-6 py-3.5 rounded-full bg-stone-100 text-[#EF3E23] text-sm font-bold font-montserrat uppercase leading-5 shadow-[0px_13px_7.8px_-12px_rgba(0,0,0,0.25)] hover:bg-primary hover:text-white transition-colors duration-200"
           >
             {cta.label}
           </Link>

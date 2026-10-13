@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm, FormProvider, type FieldErrors } from "react-hook-form";
 import { toast } from "sonner";
 import { SelectField, FieldGrid } from "@/components/admin/form-fields";
-import { ProductContentFields, type ProductContentFormValues } from "@/components/admin/products/product-content-fields";
+import { ProductContentFields, IndustryFields, type ProductContentFormValues } from "@/components/admin/products/product-content-fields";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { SaveBar } from "@/components/admin/section-form-shell";
 import { useSaveAction } from "@/hooks/use-save-action";
@@ -162,11 +162,11 @@ export function VariantEditForm({
           </CardContent>
         </Card>
 
+        <IndustryFields industryOptions={industryOptions} subIndustryOptions={subIndustryOptions} />
+
         <ProductContentFields
           downloadCategories={downloadCategories}
           certificationOptions={certificationOptions}
-          industryOptions={industryOptions}
-          subIndustryOptions={subIndustryOptions}
           showDescription={false}
         />
 

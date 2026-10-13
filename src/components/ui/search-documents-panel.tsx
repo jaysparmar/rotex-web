@@ -39,7 +39,9 @@ export function SearchDocumentsPanel({
     onFiltersChange({ product: "", productCertificateType: "", qualityCertificateType: "", industry: "" });
   };
 
-  const categories: FilterCategoryConfig[] = [
+  // DownloadsFilterField (desktop <select>) takes a plain string; MobileDownloadsFilters
+  // takes an array (empty = "All"). Same underlying filters, two shapes for the two UIs.
+  const fieldCategories = [
     {
       id: "product",
       rowLabel: "Product",
@@ -82,10 +84,18 @@ export function SearchDocumentsPanel({
     },
   ];
 
+  const mobileCategories: FilterCategoryConfig[] = fieldCategories.map((cat) => ({
+    ...cat,
+    value: cat.value === ALL ? [] : [cat.value],
+    onChange: (next: string[]) => cat.onChange(next[0] ?? ALL),
+  }));
+
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+
   return (
     <div className="flex flex-col gap-5">
       <div className="hidden lg:flex flex-wrap items-center gap-3">
-        {categories.map((cat) => (
+        {fieldCategories.map((cat) => (
           <div key={cat.id} className="w-56">
             <DownloadsFilterField label={cat.rowLabel} placeholder={cat.placeholder} options={cat.options} value={cat.value} onChange={cat.onChange} />
           </div>
@@ -97,7 +107,12 @@ export function SearchDocumentsPanel({
         )}
       </div>
 
-      <MobileDownloadsFilters categories={categories} hasActiveFilters={hasActiveFilters} clearFilters={clearFilters} />
+      <MobileDownloadsFilters
+        categories={mobileCategories}
+        hasActiveFilters={hasActiveFilters}
+        activeFilterCount={activeFilterCount}
+        clearFilters={clearFilters}
+      />
 
       {items.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

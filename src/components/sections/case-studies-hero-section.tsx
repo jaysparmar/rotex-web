@@ -11,7 +11,7 @@ function ArrowUpRight() {
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeLinejoin="round"  
       />
     </svg>
   );
@@ -19,13 +19,13 @@ function ArrowUpRight() {
 
 export function CaseStudiesHeroSection({ featured }: { featured: ResourceItem[] }) {
   return (
-    <section className="pt-28 pb-16 lg:pt-32">
+    <section className="pt-28 pb-8 lg:pt-32 lg:pb-16">
       <div className="container flex flex-col gap-10">
         <SimpleBreadcrumb current="Case Studies" />
 
         {featured.length > 0 && (
           <>
-            <h1 className="w-full lg:w-162.5 text-gradient-orange-dark text-4xl font-normal font-montserrat leading-10">
+            <h1 className="w-full lg:w-162.5 text-gradient-orange-dark text-2xl lg:text-4xl font-normal font-montserrat leading-8 lg:leading-10">
               Stories behind real-world impact across industries and applications
             </h1>
 

@@ -32,22 +32,26 @@ export function ZeroDowntimeCtaSection({
           </div>
 
           <div className="flex flex-wrap items-center gap-4 lg:gap-5">
-            <PillButton
-              href={ctaPrimary.href}
-              tone="lightOrange"
-              size="md"
-              className={`font-bold ${CTA_SHADOW}`}
-            >
-              {ctaPrimary.label}
-            </PillButton>
-            <PillButton
-              href={ctaSecondary.href}
-              tone="dark"
-              size="md"
-              className={`font-bold outline-1 -outline-offset-1 outline-primary ${CTA_SHADOW}`}
-            >
-              {ctaSecondary.label}
-            </PillButton>
+            {ctaPrimary.label && (
+              <PillButton
+                href={ctaPrimary.href}
+                tone="lightOrange"
+                size="md"
+                className={`font-bold ${CTA_SHADOW}`}
+              >
+                {ctaPrimary.label}
+              </PillButton>
+            )}
+            {ctaSecondary.label && (
+              <PillButton
+                href={ctaSecondary.href}
+                tone="dark"
+                size="md"
+                className={`font-bold outline-1 -outline-offset-1 outline-primary ${CTA_SHADOW}`}
+              >
+                {ctaSecondary.label}
+              </PillButton>
+            )}
           </div>
         </div>
       </div>

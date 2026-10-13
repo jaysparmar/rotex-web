@@ -156,13 +156,20 @@ async function getAllDownloadItems(): Promise<DownloadItem[]> {
   return flattenDownloadItems({ products, variants, downloadCategories });
 }
 
+// Same word-tokenized, AND-across-words / OR-across-fields matching as the
+// product search (see getProductsList) — a single whole-phrase substring check
+// meant "Direct Acting" or "Oil and gas" never matched anything whose words were
+// split across title/model/product, or spelled "Oil & Gas" in the data.
 function matchesQuery(item: DownloadItem, query: string): boolean {
-  if (!query) return true;
-  const q = query.toLowerCase();
-  return (
-    item.title.toLowerCase().includes(q) ||
-    item.modelNo.toLowerCase().includes(q) ||
-    item.product.toLowerCase().includes(q)
+  const tokens = query.trim().split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return true;
+
+  const haystacks = [item.title, item.modelNo, item.product].map((s) => s.toLowerCase());
+  return tokens.every((token) =>
+    buildSearchOr(token).some((variant) => {
+      const v = variant.toLowerCase();
+      return haystacks.some((h) => h.includes(v));
+    })
   );
 }
 

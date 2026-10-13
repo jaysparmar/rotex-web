@@ -43,7 +43,11 @@ export function JobDetailSheet({
         <div className="flex flex-col gap-8 p-6 lg:p-8">
           {/* Header */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-start justify-between gap-4">
+            {/* pr-10 keeps "Apply Now" clear of the sheet's close X, which is
+                absolutely positioned (top-3 right-3) relative to the outer
+                sheet popup, not this padded inner content — so it would
+                otherwise sit on top of this row regardless of inner padding. */}
+            <div className="flex items-start justify-between gap-4 pr-10">
               <span className="w-fit px-2 py-1 rounded-lg bg-red-50 text-[#EF3E23] text-xs font-medium font-montserrat leading-4">
                 {job.category}
               </span>

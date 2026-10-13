@@ -70,7 +70,7 @@ export function PartnerToolsLogin({ onUnlock }: { onUnlock: () => void }) {
   }
 
   return (
-    <section className="flex flex-col lg:flex-row lg:min-h-210">
+    <section className="flex flex-col lg:flex-row pt-20 lg:pt-0 lg:min-h-210">
       {/* Left panel — orange radial with the hex mark. Desktop only, per Figma. */}
       <div className="hidden lg:flex lg:w-150.25 shrink-0 items-center justify-center overflow-hidden bg-gradient-yellow">
         <HexMark />

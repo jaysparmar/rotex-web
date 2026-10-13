@@ -281,7 +281,11 @@ function MobileFilterDrawer({
                 Clear all
               </button>
             )}
-            <Button type="button" onClick={() => setOpen(false)} className="flex-1">
+            <Button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="flex-1 h-12 rounded-full bg-[#EF3E23] text-white text-sm font-bold font-montserrat uppercase hover:bg-[#d63418]"
+            >
               Show Results
             </Button>
           </SheetFooter>
@@ -336,7 +340,7 @@ export function ResourcesGridSection({ heading, posts, basePath, products, indus
   };
 
   return (
-    <section className="py-12 lg:py-16">
+    <section className="pt-6 pb-12 lg:py-16">
       <div className="container flex flex-col gap-6">
         <h2 className="text-stone-900 text-2xl lg:text-3xl font-normal font-montserrat leading-8 lg:leading-10">
           {heading}

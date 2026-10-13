@@ -17,10 +17,10 @@ export type ResourceItem = {
   createdAt: string;
 };
 
+// Card chips show the resolved Product/Industry tags only — extraTags is a free-text
+// admin field (no longer editable) kept on the data model but excluded from display.
 export function getResourceTags(post: ResourceItem): string[] {
-  return [...post.products.map((p) => p.name), ...post.industries.map((i) => i.name), ...post.extraTags].filter(
-    Boolean
-  );
+  return [...post.products.map((p) => p.name), ...post.industries.map((i) => i.name)].filter(Boolean);
 }
 
 export function formatResourceDate(iso: string): string {

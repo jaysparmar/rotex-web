@@ -22,7 +22,7 @@ function AnimatedCounter({ value, suffix }: { value: string; suffix?: string }) 
   }, [isInView, count, numeric]);
 
   return (
-    <span ref={ref} className="text-stone-900 text-3xl font-normal font-montserrat leading-10">
+    <span ref={ref} className="text-stone-900 text-xl lg:text-3xl font-normal font-montserrat leading-7 lg:leading-10">
       <motion.span>{rounded}</motion.span>
       {unit}
       {suffix && <span className="text-primary ">{suffix}</span>}
@@ -91,7 +91,7 @@ export function IndustryOverview({ sectionTitle, overview, stats }: IndustryOver
               transition={{ duration: 0.5, delay: i * 0.15 }}
             >
               <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-              <p className="text-stone-500 text-base font-normal font-montserrat uppercase leading-6 text-left">
+              <p className="text-stone-500 text-xs lg:text-base font-normal font-montserrat leading-5 lg:leading-6 text-left">
                 {stat.label}
               </p>
             </motion.div>

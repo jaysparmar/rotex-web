@@ -17,7 +17,6 @@ import { useSaveAction } from "@/hooks/use-save-action";
 import { slugify } from "@/lib/utils";
 import { IndustryTreePicker, type IndustryTreeOption } from "@/components/admin/resources/industry-tree-picker";
 import { MultiSelectDropdown, type MultiSelectOption } from "@/components/admin/resources/multi-select-dropdown";
-import { TagsCombobox } from "@/components/admin/resources/tags-combobox";
 import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
 import { createResource, updateResource } from "@/app/admin/(dashboard)/resources/actions";
 
@@ -61,14 +60,12 @@ export function ResourceEditForm({
   defaultType,
   products,
   industries,
-  existingExtraTags,
   relatedOptions,
 }: {
   resource?: Resource;
   defaultType?: string;
   products: MultiSelectOption[];
   industries: IndustryTreeOption[];
-  existingExtraTags: string[];
   relatedOptions: RelatedResourceOption[];
 }) {
   const router = useRouter();
@@ -156,9 +153,6 @@ export function ResourceEditForm({
                 <IndustriesField industries={industries} />
               </Field>
             </FieldGrid>
-            <Field label="Extra tags">
-              <ExtraTagsField existingExtraTags={existingExtraTags} />
-            </Field>
             <SwitchField
               label="Published"
               checked={form.watch("published")}
@@ -220,19 +214,6 @@ function IndustriesField({ industries }: { industries: IndustryTreeOption[] }) {
       industries={industries}
       selectedIds={selected}
       onChange={(ids) => form.setValue("industryIds", ids)}
-    />
-  );
-}
-
-function ExtraTagsField({ existingExtraTags }: { existingExtraTags: string[] }) {
-  const form = useFormContext<ResourceFormValues>();
-  const selected = useWatch({ control: form.control, name: "extraTags" }) ?? [];
-
-  return (
-    <TagsCombobox
-      existingTags={existingExtraTags}
-      selected={selected}
-      onChange={(tags) => form.setValue("extraTags", tags)}
     />
   );
 }

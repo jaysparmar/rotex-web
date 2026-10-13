@@ -24,21 +24,23 @@ export function ResourceCard({ post, basePath }: ResourceCardProps) {
         className="object-cover"
         unoptimized
       />
-      <div className="min-h-8 flex items-center gap-1.5 flex-wrap">
-        {visibleTags.map((tag) => (
-          <span
-            key={tag}
-            className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5"
-          >
-            {tag}
-          </span>
-        ))}
-        {remaining > 0 && (
-          <span className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5">
-            +{remaining} More
-          </span>
-        )}
-      </div>
+      {visibleTags.length > 0 && (
+        <div className="min-h-8 flex items-center gap-1.5 flex-wrap">
+          {visibleTags.map((tag) => (
+            <span
+              key={tag}
+              className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5"
+            >
+              {tag}
+            </span>
+          ))}
+          {remaining > 0 && (
+            <span className="text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5">
+              +{remaining} More
+            </span>
+          )}
+        </div>
+      )}
       <h3 className="line-clamp-3 min-h-18 text-stone-900 text-lg font-medium font-montserrat leading-6 group-hover:text-[#EF3E23] transition-colors">
         {post.title}
       </h3>

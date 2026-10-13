@@ -13,6 +13,8 @@ type PageHeroProps = {
   bg?: StaticImageData | string;
   mobileBg?: StaticImageData | string;
   children?: React.ReactNode;
+  /** Override the path-derived breadcrumb trail, e.g. for query-param-driven pages. */
+  crumbs?: { label: string; href?: string }[];
 };
 
 const SEGMENT_LABEL_OVERRIDES: Record<string, string> = {
@@ -34,11 +36,11 @@ function slugToLabel(slug: string): string {
     .join(" ");
 }
 
-export function PageHero({ title, description, bg, mobileBg, children }: PageHeroProps) {
+export function PageHero({ title, description, bg, mobileBg, children, crumbs: crumbsOverride }: PageHeroProps) {
   const pathname = usePathname();
 
   const segments = pathname.split("/").filter(Boolean);
-  const crumbs = [
+  const crumbs = crumbsOverride ?? [
     { label: "Home", href: "/" },
     // hrefs are built before filtering so the remaining crumbs keep their full paths
     ...segments
@@ -120,7 +122,7 @@ export function PageHero({ title, description, bg, mobileBg, children }: PageHer
               {title}
             </h1>
             {description && (
-              <p className="w-full lg:w-121.25 text-stone-300 text-sm lg:text-base font-normal font-montserrat leading-5 lg:leading-6">
+              <p className="w-full lg:w-121.25 line-clamp-5 text-stone-300 text-sm lg:text-base font-normal font-montserrat leading-5 lg:leading-6">
                 {description}
               </p>
             )}

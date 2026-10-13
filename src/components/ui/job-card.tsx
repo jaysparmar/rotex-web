@@ -27,7 +27,7 @@ export function JobCard({
   positionOptions?: string[];
 }) {
   return (
-    <div className="bg-white rounded-[10px] border-l-4 border-transparent hover:border-[#EF3E23] transition-colors duration-300 px-4 py-4 flex flex-col gap-5">
+    <div className="bg-white rounded-[10px] border-l-4 border-transparent hover:border-[#EF3E23] transition-colors duration-300 px-4 py-4 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
       <div className="flex flex-col gap-3.5">
         <span className="w-fit px-2 py-1 rounded-[5px] bg-red-50 text-[#EF3E23] text-xs font-medium font-montserrat leading-4">
           {job.category}

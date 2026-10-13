@@ -16,14 +16,14 @@ export function ProductCard({ name, description, image, href, className }: Produ
     <Link
       href={href}
       className={cn(
-        "flex flex-col shrink-0 w-72 p-5 rounded-2xl bg-stone-100 items-center gap-5",
+        "flex flex-col shrink-0 w-80 p-5 rounded-2xl bg-stone-100 items-center gap-5",
         "shadow-[0px_4px_0px_0px_rgba(239,62,35,1)] outline outline-1 outline-offset-[-1px] outline-stone-100",
         "hover:-translate-y-1 transition-transform duration-200",
         className
       )}
     >
       {/* Product image */}
-      <div className="w-64 h-48 overflow-hidden relative rounded-sm">
+      <div className="w-full h-60 overflow-hidden relative rounded-sm">
         <ImageView
           src={image}
           alt={name}

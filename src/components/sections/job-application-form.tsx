@@ -217,11 +217,12 @@ export function JobApplicationForm({
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          className="w-full h-11 px-5 py-2.5 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 flex items-center justify-center gap-1 text-[#EF3E23] text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-gray-100 transition-colors"
+          className="w-full min-h-11 px-5 py-3 bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 outline-gray-200 flex flex-col items-center justify-center text-[#EF3E23] text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-gray-100 transition-colors"
         >
           {fileName ?? (
             <>
-              Upload Resume <span className="font-normal">(PDF OR DOC, MAX 5MB)</span>
+              <span>Upload Resume</span>
+              <span className="font-normal">(PDF OR DOC, MAX 5MB)</span>
             </>
           )}
         </button>

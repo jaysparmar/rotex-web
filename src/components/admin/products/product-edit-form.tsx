@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { TextField, SelectField, FieldGrid } from "@/components/admin/form-fields";
 import { ImageListField } from "@/components/admin/image-list-field";
 import { RichTextField } from "@/components/admin/rich-text-field";
-import { ProductContentFields, type ProductContentFormValues } from "@/components/admin/products/product-content-fields";
+import { ProductContentFields, IndustryFields, type ProductContentFormValues } from "@/components/admin/products/product-content-fields";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { SaveBar } from "@/components/admin/section-form-shell";
 import { useSaveAction } from "@/hooks/use-save-action";
@@ -248,12 +248,15 @@ export function ProductEditForm({
           </CardContent>
         </Card>
 
+        {/* Industries apply to the product itself regardless of simple/variable —
+            variable products don't otherwise have a product-level place to set
+            this, and the PLP industry filter matches on it either way. */}
+        <IndustryFields industryOptions={industryOptions} subIndustryOptions={subIndustryOptions} />
+
         {productType === "simple" && (
           <ProductContentFields
             downloadCategories={downloadCategories}
             certificationOptions={certificationOptions}
-            industryOptions={industryOptions}
-            subIndustryOptions={subIndustryOptions}
           />
         )}
 

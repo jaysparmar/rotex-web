@@ -1,7 +1,7 @@
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { ResourceEditForm } from "@/components/admin/resources/resource-edit-form";
 import { prisma } from "@/lib/prisma";
-import { getIndustryTreeOptions, getProductCategoryOptions, getExistingExtraTags } from "@/lib/resource-tags";
+import { getIndustryTreeOptions, getProductCategoryOptions } from "@/lib/resource-tags";
 
 export default async function AdminNewResourcePage({
   searchParams,
@@ -10,10 +10,9 @@ export default async function AdminNewResourcePage({
 }) {
   const { type } = await searchParams;
 
-  const [products, industries, existingExtraTags, relatedOptions] = await Promise.all([
+  const [products, industries, relatedOptions] = await Promise.all([
     getProductCategoryOptions(),
     getIndustryTreeOptions(),
-    getExistingExtraTags(),
     prisma.resource.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
@@ -41,7 +40,6 @@ export default async function AdminNewResourcePage({
         defaultType={type}
         products={products.map((p) => ({ id: p.id, label: p.name }))}
         industries={industries}
-        existingExtraTags={existingExtraTags}
         relatedOptions={relatedOptions}
       />
     </div>

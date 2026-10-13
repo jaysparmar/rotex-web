@@ -24,17 +24,43 @@ export type ProductContentFormValues = {
   }[];
 };
 
+export function IndustryFields({
+  industryOptions,
+  subIndustryOptions,
+}: {
+  industryOptions: { id: string; name: string }[];
+  subIndustryOptions: { id: string; name: string }[];
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Industries</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <MultiSelectField
+          name="industryIds"
+          label="Industry"
+          placeholder="Select industries..."
+          options={industryOptions.map((i) => ({ value: i.id, label: i.name }))}
+        />
+        <MultiSelectField
+          name="subIndustryIds"
+          label="Sub-Industry"
+          placeholder="Select sub-industries..."
+          options={subIndustryOptions.map((s) => ({ value: s.id, label: s.name }))}
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
 export function ProductContentFields({
   downloadCategories,
   certificationOptions,
-  industryOptions,
-  subIndustryOptions,
   showDescription = true,
 }: {
   downloadCategories: { id: string; name: string }[];
   certificationOptions: string[];
-  industryOptions: { id: string; name: string }[];
-  subIndustryOptions: { id: string; name: string }[];
   showDescription?: boolean;
 }) {
   const form = useFormContext<ProductContentFormValues>();
@@ -54,26 +80,6 @@ export function ProductContentFields({
             label="Certificates"
             placeholder="Select certificates..."
             options={certificationOptions.map((o) => ({ value: o, label: o }))}
-          />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Industries</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <MultiSelectField
-            name="industryIds"
-            label="Industry"
-            placeholder="Select industries..."
-            options={industryOptions.map((i) => ({ value: i.id, label: i.name }))}
-          />
-          <MultiSelectField
-            name="subIndustryIds"
-            label="Sub-Industry"
-            placeholder="Select sub-industries..."
-            options={subIndustryOptions.map((s) => ({ value: s.id, label: s.name }))}
           />
         </CardContent>
       </Card>

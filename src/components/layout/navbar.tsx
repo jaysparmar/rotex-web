@@ -19,6 +19,19 @@ type NavItem = PrismaJson.NavItem;
 // Pages not built yet — render as disabled text instead of a broken link.
 const DISABLED_HREFS = new Set<string>([]);
 
+// A category-switcher category (e.g. "Oil & Gas") only lists its sub-items
+// (Upstream/Midstream/Downstream) — there was no way to click through to the
+// industry's own landing page, only straight into a sub-industry. Falls back
+// to deriving "/industries/oil-gas" from a sub-item's "/industries/oil-gas/upstream"
+// href when the CMS hasn't set an explicit viewAllHref.
+function categorySwitcherHref(cat: PrismaJson.MegaMenuCategory): string | undefined {
+  if (cat.viewAllHref) return cat.viewAllHref;
+  const firstHref = cat.items[0]?.href;
+  if (!firstHref) return undefined;
+  const segments = firstHref.split("/");
+  return segments.length > 3 ? segments.slice(0, 3).join("/") : firstHref;
+}
+
 function chunk<T>(items: T[], size: number): T[][] {
   if (items.length <= size) return [items];
   const columnCount = Math.ceil(items.length / size);
@@ -54,19 +67,24 @@ function CategorySwitcherPanel({
     >
       {/* Left: Category list */}
       <div className="w-72 bg-stone-100 border-r border-stone-300 px-10 py-10 flex flex-col gap-4 shrink-0">
-        {config.categories.map((cat, i) => (
-          <button
-            key={cat.label}
-            onMouseEnter={() => setActiveIdx(i)}
-            className={`px-2.5 py-0.5 text-left border-l-2 text-base font-montserrat leading-6 transition-colors ${
-              i === activeIdx
-                ? "border-[#EF3E23] text-[#EF3E23] font-semibold"
-                : "border-transparent text-stone-900 font-medium hover:text-stone-600"
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
+        {config.categories.map((cat, i) => {
+          const href = categorySwitcherHref(cat);
+          return (
+            <Link
+              key={cat.label}
+              href={href ?? "#"}
+              onMouseEnter={() => setActiveIdx(i)}
+              onClick={onClose}
+              className={`px-2.5 py-0.5 text-left border-l-2 text-base font-montserrat leading-6 transition-colors ${
+                i === activeIdx
+                  ? "border-[#EF3E23] text-[#EF3E23] font-semibold"
+                  : "border-transparent text-stone-900 font-medium hover:text-stone-600"
+              }`}
+            >
+              {cat.label}
+            </Link>
+          );
+        })}
       </div>
 
       {/* Middle: Sub-items */}
@@ -141,6 +159,17 @@ function FlatMegaMenuPanel({
     : { image: config.image, caption: config.imageCaption };
   const [panel, setPanel] = useState<PanelState>(defaultPanel);
 
+  // A column whose heaviest group splits into multiple sub-columns (>6 items,
+  // e.g. Process Industries) is roughly twice as wide as a plain one — render
+  // those last so the narrow columns before them (e.g. Oil & Gas / Power and
+  // Machine Solutions / Automotive / Rail / Aerospace) land adjacent and can
+  // share a row instead of each wrapping alone with empty space beside them.
+  const isWideColumn = (col: FlatMenu["columns"][number]) =>
+    col.groups.some((g) => (g.items?.length ?? 0) > 6 || g.itemColumns);
+  const orderedColumns = [...config.columns].sort(
+    (a, b) => Number(isWideColumn(a)) - Number(isWideColumn(b))
+  );
+
   return (
     <div
       className="fixed top-20 lg:top-24 left-0 right-0 z-61 bg-white border-b border-stone-300 shadow-lg"
@@ -148,12 +177,16 @@ function FlatMegaMenuPanel({
       onMouseLeave={onMouseLeave}
     >
       <div className="flex items-stretch">
-        {/* Content columns */}
-        <div className="flex gap-10 py-10 container-left-pad">
-          {config.columns.map((col, colIdx) => (
+        {/* Content columns — flex-1/min-w-0 so this takes only the space left over
+            after the fixed-size image panel, and flex-wrap so a column that doesn't
+            fit on the first row (e.g. Case Studies, or Machine Solutions/Automotive/
+            Rail/Aerospace once Process Industries grows) drops to the next row
+            instead of overlapping the image. */}
+        <div className="flex flex-wrap gap-x-10 gap-y-6 py-10 container-left-pad flex-1 min-w-0">
+          {orderedColumns.map((col, colIdx) => (
             <div
               key={colIdx}
-              className={`flex flex-col gap-11 shrink-0 ${col.className ?? "w-40 lg:w-48"}`}
+              className={`flex flex-col gap-11 shrink-0 ${col.className ?? "min-w-40 lg:min-w-48"}`}
             >
               {col.groups.map((group) => (
                 <div
@@ -305,10 +338,16 @@ function MegaMenuImagePanel({
     </>
   );
 
-  // Scales down on laptop-width viewports (1280-1440) so it doesn't push the dropdown wider
-  // than the screen — full size only kicks in on larger desktops.
+  // Content columns are flex-1/flex-wrap (see FlatMegaMenuPanel) and reflow around
+  // whatever width this takes, so it no longer needs to shrink on laptop widths to
+  // avoid pushing the dropdown wider than the screen — full size from lg upward.
+  // No fixed height and no self-start, so the parent's items-stretch (the
+  // default cross-axis behavior) makes this match the content column's full
+  // height — including when that content wraps to multiple rows — instead of
+  // staying a fixed height and leaving blank space below it once the content
+  // grows taller than before.
   const className =
-    "w-72 h-54 lg:w-80 lg:h-60 2xl:w-115 2xl:h-87.5 shrink-0 self-start ml-auto relative overflow-hidden block";
+    "w-72 lg:w-115 min-h-54 lg:min-h-87.5 shrink-0 ml-auto relative overflow-hidden block";
 
   if (href) {
     return (
@@ -437,10 +476,19 @@ function MobileMegaMenuContent({
   if (megaMenu.type === "category-switcher") {
     if (categoryIdx !== null) {
       const category = megaMenu.categories[categoryIdx];
+      const viewAllHref = categorySwitcherHref(category);
       return (
         <div className="flex flex-col">
           <MobileBackRow onBack={() => setCategoryIdx(null)} />
           <div className="flex flex-col">
+            {viewAllHref && (
+              <MobileDrillRow
+                key={viewAllHref}
+                href={viewAllHref}
+                label={category.viewAllLabel || `All ${category.label}`}
+                onClick={onNavigate}
+              />
+            )}
             {category.items.map((item) => (
               <MobileDrillRow
                 key={item.href}

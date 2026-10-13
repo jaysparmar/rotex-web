@@ -56,7 +56,7 @@ export async function SubIndustryContent({
   const recommendedProducts = recommendedCategoryIds
     .map((id) => categoryById.get(id))
     .filter((c): c is NonNullable<typeof c> => Boolean(c))
-    .map((c) => ({ name: c.name, image: c.image ?? "", href: `/products?category=${c.slug}` }));
+    .map((c) => ({ name: c.name, image: c.image ?? "", href: `/products?category=${c.slug}&industry=${industry.slug}` }));
 
   return (
     <>

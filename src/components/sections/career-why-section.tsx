@@ -56,7 +56,7 @@ export function CareerWhySection({
     <section className="bg-white py-14 lg:py-20">
       <div className="container flex flex-col gap-10 lg:flex-row lg:gap-16">
         {/* Heading — pinned while cards scroll past */}
-        <div className="lg:w-96 lg:shrink-0">
+        <div className="lg:w-72 xl:w-96 lg:shrink-0">
           <div className="lg:sticky lg:top-32 flex flex-col gap-3">
             <h2 className="text-stone-900 font-montserrat font-medium text-2xl lg:text-4xl leading-8 lg:leading-10">
               {heading}
@@ -76,7 +76,7 @@ export function CareerWhySection({
               style={{ top: `calc(8rem + ${i * 5}rem)`, zIndex: i + 1 }}
             >
               <div className="rounded-2xl bg-white outline outline-1 -outline-offset-1 outline-neutral-200 shadow-[0px_-4px_0px_0px_rgba(239,62,35,1.00)] flex flex-col lg:flex-row items-center overflow-hidden">
-                <div className="flex-1 self-stretch p-8 lg:p-12 flex flex-col justify-between gap-3">
+                <div className="flex-1 min-w-0 self-stretch p-8 lg:p-10 xl:p-12 flex flex-col justify-between gap-3">
                   <h3 className="max-w-64 text-gradient-highlight font-montserrat font-medium text-2xl leading-8">
                     {card.title}
                   </h3>
@@ -85,7 +85,7 @@ export function CareerWhySection({
                   </p>
                 </div>
 
-                <div className="relative w-full h-56 lg:w-80 lg:h-80 shrink-0 lg:m-5 lg:rounded-2xl overflow-hidden">
+                <div className="relative w-full h-56 lg:w-56 lg:h-56 xl:w-80 xl:h-80 shrink-0 lg:m-5 lg:rounded-2xl overflow-hidden">
                   {card.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={card.image} alt={card.title} className="h-full w-full object-cover" />

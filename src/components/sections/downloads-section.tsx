@@ -5,6 +5,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import { DownloadCard } from "@/components/ui/download-card";
 import { DownloadsFilterField } from "@/components/ui/downloads-filter-field";
+import { FilterCombobox } from "@/components/ui/filter-combobox";
 import { MobileDownloadsFilters, type FilterCategoryConfig } from "@/components/ui/mobile-downloads-filters";
 import { Pagination } from "@/components/ui/pagination";
 import { DOWNLOAD_TABS, type DownloadTab, type DownloadItem } from "@/lib/downloads-data";
@@ -25,7 +26,7 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
   const [activeTab, setActiveTab] = useState<PublicTab>(ALL_TAB);
   const [product, setProduct] = useState(ALL);
   const [subCategory, setSubCategory] = useState(ALL);
-  const [industry, setIndustry] = useState(ALL);
+  const [industry, setIndustry] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const resultsTopRef = useRef<HTMLDivElement>(null);
@@ -49,7 +50,7 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
         (activeTab === ALL_TAB || item.tab === activeTab) &&
         (product === ALL || item.product === product) &&
         (subCategory === ALL || item.subCategory === subCategory) &&
-        (industry === ALL || item.industries.includes(industry)) &&
+        (industry.length === 0 || industry.some((i) => item.industries.includes(i))) &&
         (!query || item.title.toLowerCase().includes(query) || item.modelNo.toLowerCase().includes(query))
     );
   }, [items, activeTab, product, subCategory, industry, search]);
@@ -67,12 +68,14 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
     setPage(1);
   };
 
-  const hasActiveFilters = product !== ALL || subCategory !== ALL || industry !== ALL || search !== "";
+  const activeFilterCount =
+    (product !== ALL ? 1 : 0) + (subCategory !== ALL ? 1 : 0) + industry.length + (search !== "" ? 1 : 0);
+  const hasActiveFilters = activeFilterCount > 0;
 
   const clearFilters = () => {
     setProduct(ALL);
     setSubCategory(ALL);
-    setIndustry(ALL);
+    setIndustry([]);
     setSearch("");
     setPage(1);
   };
@@ -101,8 +104,8 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
                 allLabel: "All Products",
                 placeholder: "Select Product",
                 options: productOptions,
-                value: product,
-                onChange: setProduct,
+                value: product === ALL ? [] : [product],
+                onChange: (next) => setProduct(next[0] ?? ALL),
               },
               {
                 id: "subCategory",
@@ -111,8 +114,8 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
                 allLabel: "All Sub Categories",
                 placeholder: "Select Sub Category Product",
                 options: subCategoryOptions,
-                value: subCategory,
-                onChange: setSubCategory,
+                value: subCategory === ALL ? [] : [subCategory],
+                onChange: (next) => setSubCategory(next[0] ?? ALL),
               },
               {
                 id: "industry",
@@ -123,10 +126,12 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
                 options: industryOptions,
                 value: industry,
                 onChange: setIndustry,
+                multiple: true,
               },
             ] satisfies FilterCategoryConfig[]
           }
           hasActiveFilters={hasActiveFilters}
+          activeFilterCount={activeFilterCount}
           clearFilters={clearFilters}
         />
 
@@ -162,7 +167,14 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
             value={subCategory}
             onChange={setSubCategory}
           />
-          <DownloadsFilterField label="Industry Type" placeholder="Select Industry Type" options={industryOptions} value={industry} onChange={setIndustry} />
+          <FilterCombobox
+            label="Industry Type"
+            placeholder="Select Industry Type"
+            options={industryOptions}
+            value={industry}
+            onChange={setIndustry}
+            multiple
+          />
         </aside>
 
         {/* Content */}

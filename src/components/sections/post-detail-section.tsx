@@ -21,8 +21,11 @@ function withHeadingIds(html: string): string {
   });
 }
 
+const HEADER_TAG_COUNT = 2;
+
 export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: PostDetailSectionProps) {
   const tags = getResourceTags(post);
+  const headerTags = tags.slice(0, HEADER_TAG_COUNT);
   const toc = extractToc(post.content);
   const contentHtml = DOMPurify.sanitize(withHeadingIds(post.content), {
     ADD_TAGS: ["iframe"],
@@ -38,24 +41,18 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
           <div className="w-full lg:w-157.5 shrink-0 flex flex-col gap-10">
             {/* Header */}
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {post.products.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5"
-                  >
-                    {tag.name}
-                  </span>
-                ))}
-                {post.industries.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5"
-                  >
-                    {tag.name}
-                  </span>
-                ))}
-              </div>
+              {headerTags.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {headerTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-4 py-1 bg-white rounded-2xl outline-1 -outline-offset-1 outline-stone-300 text-stone-500 text-xs font-semibold font-montserrat uppercase leading-5"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
               <h1 className="text-stone-900 text-3xl font-medium font-montserrat leading-10">{post.title}</h1>
               <div className="h-px bg-stone-300" />
               <span className="text-neutral-400 text-sm font-semibold font-montserrat uppercase leading-5">

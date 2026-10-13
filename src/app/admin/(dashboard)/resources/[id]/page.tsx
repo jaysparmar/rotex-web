@@ -2,15 +2,14 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { ResourceEditForm } from "@/components/admin/resources/resource-edit-form";
-import { getIndustryTreeOptions, getProductCategoryOptions, getExistingExtraTags } from "@/lib/resource-tags";
+import { getIndustryTreeOptions, getProductCategoryOptions } from "@/lib/resource-tags";
 
 export default async function AdminResourceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [record, products, industries, existingExtraTags, relatedOptions] = await Promise.all([
+  const [record, products, industries, relatedOptions] = await Promise.all([
     prisma.resource.findUnique({ where: { id } }),
     getProductCategoryOptions(),
     getIndustryTreeOptions(),
-    getExistingExtraTags(),
     prisma.resource.findMany({
       where: { published: true, id: { not: id } },
       orderBy: { createdAt: "desc" },
@@ -47,7 +46,6 @@ export default async function AdminResourceDetailPage({ params }: { params: Prom
         resource={resource}
         products={products.map((p) => ({ id: p.id, label: p.name }))}
         industries={industries}
-        existingExtraTags={existingExtraTags}
         relatedOptions={relatedOptions}
       />
     </div>

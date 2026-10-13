@@ -65,6 +65,10 @@ function revalidateProducts(id?: string) {
   revalidatePath("/admin/products");
   if (id) revalidatePath(`/admin/products/${id}`);
   revalidatePath("/downloads");
+  // Public PLP (/products) and every product detail page (/products/[slug])
+  // were never invalidated here, so saved changes (e.g. industries) never
+  // showed up on the storefront until an unrelated full rebuild.
+  revalidatePath("/products", "layout");
 }
 
 export async function createProduct(data: ProductInput) {

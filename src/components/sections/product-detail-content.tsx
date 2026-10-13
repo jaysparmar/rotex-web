@@ -51,7 +51,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
       <BreadcrumbTrail crumbs={breadcrumb} />
 
       {/* Hero: info + gallery */}
-      <div className="flex justify-between items-start gap-10 flex-wrap lg:flex-nowrap">
+      <div className="flex justify-between items-start gap-6 lg:gap-10 flex-wrap lg:flex-nowrap">
         <div className="order-2 lg:order-1 w-full lg:max-w-144 flex flex-col gap-10">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
@@ -118,7 +118,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
           </button>
         </div>
 
-        <div className="order-1 lg:order-2 mb-8 w-full lg:mb-0 lg:flex-1 lg:max-w-158">
+        <div className="order-1 lg:order-2 w-full lg:flex-1 lg:max-w-158">
           <ProductGallery images={product.images} alt={product.name} />
         </div>
       </div>

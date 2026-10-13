@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { digitsOnlyKeyDown, scrollToFirstFormError } from "@/lib/utils";
 import { useForm, Controller, type Control, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -247,9 +247,24 @@ export function ProductQuoteFormSheet({
 }) {
   const { form, submitError, onSubmit } = useQuoteForm(productCode, productName);
 
+  // Sheet slides in from the right on desktop (matches Figma), but a right-edge
+  // drawer at 3/4 viewport width is too narrow for this form's two-column rows
+  // on phones — switch to a full-width bottom sheet under the sm breakpoint.
+  const [side, setSide] = useState<"right" | "bottom">("right");
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 639px)");
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => setSide(e.matches ? "bottom" : "right");
+    handleChange(mql);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, []);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full data-[side=right]:sm:max-w-2xl overflow-y-auto p-0 gap-0">
+      <SheetContent
+        side={side}
+        className="data-[side=right]:w-full data-[side=right]:sm:max-w-2xl data-[side=bottom]:max-h-[90vh] data-[side=bottom]:rounded-t-2xl overflow-y-auto p-0 gap-0"
+      >
         <SheetHeader className="p-6 pb-0 gap-2">
           <SheetTitle className="text-orange-600 text-3xl font-normal font-montserrat leading-tight">
             Request a Quote

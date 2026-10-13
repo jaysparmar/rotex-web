@@ -19,7 +19,7 @@ function ArrowUpRight() {
 
 export function NewsUpdatesHeroSection({ highlighted }: { highlighted: ResourceItem[] }) {
   return (
-    <section className="pt-28 pb-16 lg:pt-32">
+    <section className="pt-28 pb-8 lg:pt-32 lg:pb-16">
       <div className="container flex flex-col gap-10">
         <SimpleBreadcrumb current="News & Updates" />
 
