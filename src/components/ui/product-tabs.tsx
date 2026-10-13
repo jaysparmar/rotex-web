@@ -13,6 +13,18 @@ import richContentStyles from "@/components/sections/rich-content.module.css";
 const SECTIONS = ["Features", "Specifications", "Certificates", "Downloads"] as const;
 type Section = (typeof SECTIONS)[number];
 
+// Browsers can only render PDFs, images, and plain text inline — anything else
+// (Word/Excel/PowerPoint) gets saved to disk regardless of target/download
+// attributes. For those, route "View" through Google's document viewer, which
+// *can* render them inline, so View never downloads — only Download does.
+const NATIVELY_VIEWABLE = new Set(["pdf", "jpg", "jpeg", "png", "webp", "gif", "txt", "csv"]);
+
+function getViewUrl(url: string): string {
+  const ext = url.split("?")[0].split(".").pop()?.toLowerCase() ?? "";
+  if (NATIVELY_VIEWABLE.has(ext)) return url;
+  return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+}
+
 function TabRow({ sections, active, onSelect }: { sections: Section[]; active: Section; onSelect: (s: Section) => void }) {
   return (
     <div className="flex items-center gap-8 overflow-x-auto no-scrollbar border-b border-neutral-200">
@@ -212,7 +224,7 @@ export function ProductTabs({
                   </div>
                   <div className="self-start flex items-center gap-2 shrink-0">
                     <a
-                      href={d.url}
+                      href={getViewUrl(d.url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="View document"

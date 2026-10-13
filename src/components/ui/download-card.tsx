@@ -2,6 +2,18 @@ import { IoDocumentTextOutline, IoEyeOutline } from "react-icons/io5";
 import { DownloadIcon } from "@/components/ui/download-icon";
 import type { DownloadItem } from "@/lib/downloads-data";
 
+// Browsers can only render PDFs, images, and plain text inline — anything else
+// (Word/Excel/PowerPoint) gets saved to disk regardless of target/download
+// attributes, no matter what our own markup says. For those, route "View"
+// through Google's document viewer, which *can* render them inline, so View
+// never downloads — only the explicit Download button does.
+const NATIVELY_VIEWABLE = new Set(["pdf", "jpg", "jpeg", "png", "webp", "gif", "txt", "csv"]);
+
+function getViewUrl(item: Pick<DownloadItem, "fileUrl" | "fileType">): string {
+  if (NATIVELY_VIEWABLE.has(item.fileType.toLowerCase())) return item.fileUrl;
+  return `https://docs.google.com/viewer?url=${encodeURIComponent(item.fileUrl)}&embedded=true`;
+}
+
 export function DownloadCard({ item, showCategoryTag = false }: { item: DownloadItem; showCategoryTag?: boolean }) {
   const meta = [
     item.fileType ? `.${item.fileType.toLowerCase()}` : null,
@@ -39,7 +51,7 @@ export function DownloadCard({ item, showCategoryTag = false }: { item: Download
       </div>
       <div className="flex items-center gap-2">
         <a
-          href={item.fileUrl}
+          href={getViewUrl(item)}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="View document"
