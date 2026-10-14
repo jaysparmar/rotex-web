@@ -99,7 +99,7 @@ export function VariantConfigurator({
   const optionsByAxis = useMemo(() => {
     const map: Record<VariantAxisKey, string[]> = {} as Record<VariantAxisKey, string[]>;
     for (const { key } of VARIANT_AXES) {
-      map[key] = sortOptions(Array.from(new Set(variants.map((v) => v[key]))));
+      map[key] = sortOptions(Array.from(new Set(variants.map((v) => v[key]).filter(Boolean))));
     }
     return map;
   }, [variants]);

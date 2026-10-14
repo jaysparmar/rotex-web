@@ -10,7 +10,7 @@ export type Crumb = { label: string; href?: string };
 export type SpecItem = { key: string; value: string };
 export type DownloadItem = { category: string; title: string; url: string };
 
-export type VariantAxisKey = "size" | "variantType" | "orifice" | "minPressure" | "maxPressure" | "flowFactor";
+export type VariantAxisKey = "size" | "variantType" | "orifice" | "minPressure" | "maxPressure" | "flowFactor" | "power";
 
 export type ProductVariant = {
   id: string;
@@ -20,6 +20,7 @@ export type ProductVariant = {
   minPressure: string;
   maxPressure: string;
   flowFactor: string;
+  power: string;
   certificates: string[];
   features: string;
   specifications: SpecItem[];
@@ -53,6 +54,7 @@ export const VARIANT_AXES: { key: VariantAxisKey; label: string }[] = [
   { key: "minPressure", label: "Min. Operating Pressure" },
   { key: "maxPressure", label: "Max. Operating Pressure" },
   { key: "flowFactor", label: "Flow Factor" },
+  { key: "power", label: "Power" },
 ];
 
 // ── Shared mock content ───────────────────────────────────────────────────────
@@ -82,6 +84,7 @@ const SOLENOID_VARIANTS: ProductVariant[] = [
     minPressure: "0",
     maxPressure: "2.5",
     flowFactor: "8",
+    power: "",
     certificates: CERTS,
     features: "Compact direct-acting construction with fast response time, suited for low-flow instrumentation duty.",
     specifications: [
@@ -100,6 +103,7 @@ const SOLENOID_VARIANTS: ProductVariant[] = [
     minPressure: "0",
     maxPressure: "4",
     flowFactor: "7",
+    power: "",
     certificates: CERTS,
     features: "Mid-range orifice for general purpose on/off duty in process skids.",
     specifications: [
@@ -118,6 +122,7 @@ const SOLENOID_VARIANTS: ProductVariant[] = [
     minPressure: "0",
     maxPressure: "6",
     flowFactor: "5",
+    power: "",
     certificates: CERTS,
     features: "Higher flow orifice variant for increased throughput requirements.",
     specifications: [
@@ -136,6 +141,7 @@ const SOLENOID_VARIANTS: ProductVariant[] = [
     minPressure: "0",
     maxPressure: "8",
     flowFactor: "3.5",
+    power: "",
     certificates: CERTS,
     features: "Larger body variant intended for higher pressure differential applications.",
     specifications: [

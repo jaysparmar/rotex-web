@@ -20,6 +20,7 @@ type VariantFormValues = ProductContentFormValues & {
   minOperatingTemp: string;
   maxOperatingTemp: string;
   flowFactor: string;
+  power: string;
 };
 
 type VariantRecord = {
@@ -30,6 +31,7 @@ type VariantRecord = {
   minOperatingTemp: string | null;
   maxOperatingTemp: string | null;
   flowFactor: string | null;
+  power: string | null;
   industries: { id: string }[];
   subIndustries: { id: string }[];
   certificates: unknown;
@@ -68,6 +70,7 @@ export function VariantEditForm({
       minOperatingTemp: variant?.minOperatingTemp ?? NONE,
       maxOperatingTemp: variant?.maxOperatingTemp ?? NONE,
       flowFactor: variant?.flowFactor ?? NONE,
+      power: variant?.power ?? NONE,
       industryIds: variant?.industries.map((i) => i.id) ?? [],
       subIndustryIds: variant?.subIndustries.map((s) => s.id) ?? [],
       certificates: (variant?.certificates as string[] | null) ?? [],
@@ -103,6 +106,7 @@ export function VariantEditForm({
       minOperatingTemp: values.minOperatingTemp === NONE ? null : values.minOperatingTemp,
       maxOperatingTemp: values.maxOperatingTemp === NONE ? null : values.maxOperatingTemp,
       flowFactor: values.flowFactor === NONE ? null : values.flowFactor,
+      power: values.power === NONE ? null : values.power,
       industryIds: values.industryIds,
       subIndustryIds: values.subIndustryIds,
       certificates: values.certificates,

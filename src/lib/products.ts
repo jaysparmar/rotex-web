@@ -77,6 +77,7 @@ export async function getAttributeValuesByKey(categorySlug?: string | null): Pro
       minOperatingTemp: true,
       maxOperatingTemp: true,
       flowFactor: true,
+      power: true,
     },
   });
 

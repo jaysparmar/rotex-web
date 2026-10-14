@@ -143,6 +143,7 @@ export type ProductListFilterParams = {
   minOperatingTemp?: string;
   maxOperatingTemp?: string;
   flowFactor?: string;
+  power?: string;
   page?: number;
   pageSize?: number;
 };
@@ -187,6 +188,7 @@ export async function getProductsList(params: ProductListFilterParams = {}): Pro
         { variants: { some: { minOperatingTemp: { contains: term } } } },
         { variants: { some: { maxOperatingTemp: { contains: term } } } },
         { variants: { some: { flowFactor: { contains: term } } } },
+        { variants: { some: { power: { contains: term } } } },
         { variants: { some: { features: { contains: term } } } },
         { variants: { some: { description: { contains: term } } } },
       ]),
@@ -288,6 +290,7 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
       minPressure: v.minOperatingTemp ?? "",
       maxPressure: v.maxOperatingTemp ?? "",
       flowFactor: v.flowFactor ?? "",
+      power: v.power ?? "",
       certificates: v.certificates as string[],
       features: v.features ?? "",
       specifications: v.specifications as SpecItem[],

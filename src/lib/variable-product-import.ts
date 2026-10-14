@@ -143,8 +143,9 @@ function variantLabel(v: {
   minOperatingTemp: string | null;
   maxOperatingTemp: string | null;
   flowFactor: string | null;
+  power: string | null;
 }) {
-  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor]
+  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor, v.power]
     .filter(Boolean)
     .join(" / ");
 }
@@ -246,8 +247,9 @@ function variantKey(v: {
   minOperatingTemp: string | null;
   maxOperatingTemp: string | null;
   flowFactor: string | null;
+  power: string | null;
 }) {
-  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor]
+  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor, v.power]
     .map((x) => x ?? "")
     .join("");
 }
@@ -427,6 +429,7 @@ export async function analyzeVariableProductImport(
           minOperatingTemp: true,
           maxOperatingTemp: true,
           flowFactor: true,
+          power: true,
         },
       })
     : [];
@@ -538,6 +541,7 @@ export async function analyzeVariableProductImport(
         minOperatingTemp: null,
         maxOperatingTemp: null,
         flowFactor: null,
+        power: null,
       };
       for (const key of ATTRIBUTE_KEYS) {
         const col = attributeCols[key];
@@ -589,6 +593,7 @@ export async function analyzeVariableProductImport(
         minOperatingTemp: attrs.minOperatingTemp,
         maxOperatingTemp: attrs.maxOperatingTemp,
         flowFactor: attrs.flowFactor,
+        power: attrs.power,
         certificates,
         features,
         description,
@@ -790,6 +795,7 @@ export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
           minOperatingTemp,
           maxOperatingTemp,
           flowFactor,
+          power,
           certificates,
           features,
           description,
@@ -804,6 +810,7 @@ export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
             minOperatingTemp,
             maxOperatingTemp,
             flowFactor,
+            power,
             certificates,
             features,
             description,

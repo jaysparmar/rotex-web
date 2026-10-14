@@ -18,6 +18,7 @@ export const PRODUCT_ATTRIBUTES = [
   { key: "minOperatingTemp", label: "Min. Operating Temperature" },
   { key: "maxOperatingTemp", label: "Max. Operating Temperature" },
   { key: "flowFactor", label: "Flow Factor" },
+  { key: "power", label: "Power" },
 ] as const;
 
 export type ProductAttributeKey = (typeof PRODUCT_ATTRIBUTES)[number]["key"];

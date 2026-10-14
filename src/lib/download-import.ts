@@ -143,6 +143,7 @@ export async function analyzeDownloadImport(
           minOperatingTemp: true,
           maxOperatingTemp: true,
           flowFactor: true,
+          power: true,
           downloads: true,
         },
       })
@@ -153,7 +154,7 @@ export async function analyzeDownloadImport(
     if (!variantsByProduct.has(v.productId)) variantsByProduct.set(v.productId, new Map());
     variantsByProduct
       .get(v.productId)!
-      .set(attributeKey({ size: v.size, variantType: v.variantType, orifice: v.orifice, minOperatingTemp: v.minOperatingTemp, maxOperatingTemp: v.maxOperatingTemp, flowFactor: v.flowFactor }), v);
+      .set(attributeKey({ size: v.size, variantType: v.variantType, orifice: v.orifice, minOperatingTemp: v.minOperatingTemp, maxOperatingTemp: v.maxOperatingTemp, flowFactor: v.flowFactor, power: v.power }), v);
   }
 
   const existingDownloadsByTarget = new Map<string, { title: string; url: string }[]>();

@@ -73,6 +73,7 @@ model ProductVariant {
   minOperatingTemp String?
   maxOperatingTemp String?
   flowFactor       String?
+  power            String?
 
   industries    Industry[]
   subIndustries SubIndustry[]
@@ -91,12 +92,12 @@ model ProductVariant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([productId, size, variantType, orifice, minOperatingTemp, maxOperatingTemp, flowFactor])
+  @@unique([productId, size, variantType, orifice, minOperatingTemp, maxOperatingTemp, flowFactor, power])
 }
 
 model AttributeValue {
   id        String   @id @default(cuid())
-  attribute String // "size" | "variantType" | "orifice" | "minOperatingTemp" | "maxOperatingTemp" | "flowFactor"
+  attribute String // "size" | "variantType" | "orifice" | "minOperatingTemp" | "maxOperatingTemp" | "flowFactor" | "power"
   value     String
   order     Int      @default(0)
   createdAt DateTime @default(now())

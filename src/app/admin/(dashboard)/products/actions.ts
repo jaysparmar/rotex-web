@@ -45,6 +45,7 @@ export type VariantInput = ContentFields & {
   minOperatingTemp: string | null;
   maxOperatingTemp: string | null;
   flowFactor: string | null;
+  power: string | null;
 };
 
 function connectIndustries(industryIds: string[], subIndustryIds: string[]) {

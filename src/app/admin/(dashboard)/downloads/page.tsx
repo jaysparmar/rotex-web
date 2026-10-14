@@ -11,8 +11,9 @@ function variantLabel(v: {
   minOperatingTemp: string | null;
   maxOperatingTemp: string | null;
   flowFactor: string | null;
+  power: string | null;
 }) {
-  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor].filter(Boolean).join(" / ");
+  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor, v.power].filter(Boolean).join(" / ");
 }
 
 export default async function AdminDownloadsPage({
@@ -38,6 +39,7 @@ export default async function AdminDownloadsPage({
         minOperatingTemp: true,
         maxOperatingTemp: true,
         flowFactor: true,
+        power: true,
         product: { select: { id: true, name: true, image: true } },
       },
     }),

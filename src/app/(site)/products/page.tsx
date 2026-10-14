@@ -25,6 +25,7 @@ type SearchParams = {
   minOperatingTemp?: string;
   maxOperatingTemp?: string;
   flowFactor?: string;
+  power?: string;
   page?: string;
 };
 

@@ -16,6 +16,7 @@ export type ProductFilterParams = {
   minOperatingTemp?: string;
   maxOperatingTemp?: string;
   flowFactor?: string;
+  power?: string;
 };
 
 const ATTRIBUTE_KEYS = PRODUCT_ATTRIBUTES.map((a) => a.key);
@@ -34,6 +35,7 @@ export const FILTER_KEYS = [
   "minOperatingTemp",
   "maxOperatingTemp",
   "flowFactor",
+  "power",
 ] as const satisfies readonly (keyof ProductFilterParams)[];
 
 export function buildProductWhere(f: ProductFilterParams): Prisma.ProductWhereInput {

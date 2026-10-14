@@ -17,10 +17,11 @@ type VariantRow = {
   minOperatingTemp: string | null;
   maxOperatingTemp: string | null;
   flowFactor: string | null;
+  power: string | null;
 };
 
 function variantLabel(v: VariantRow): string {
-  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor]
+  return [v.size, v.variantType, v.orifice, v.minOperatingTemp, v.maxOperatingTemp, v.flowFactor, v.power]
     .filter(Boolean)
     .join(" / ") || "Unnamed variant";
 }
