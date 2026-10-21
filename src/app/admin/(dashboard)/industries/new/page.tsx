@@ -1,7 +1,20 @@
+import { prisma } from "@/lib/prisma";
+import { getPublishedPartners } from "@/lib/partners";
+import { getPublishedCustomerStories } from "@/lib/customer-stories";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { IndustryEditForm } from "@/components/admin/industries/industry-edit-form";
 
-export default function AdminNewIndustryPage() {
+export default async function AdminNewIndustryPage() {
+  const [allPartners, allStories, categories] = await Promise.all([
+    getPublishedPartners(),
+    getPublishedCustomerStories(),
+    prisma.category.findMany({
+      where: { products: { some: {} } },
+      orderBy: { order: "asc" },
+      select: { id: true, name: true, image: true },
+    }),
+  ]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -20,7 +33,7 @@ export default function AdminNewIndustryPage() {
         />
       </div>
 
-      <IndustryEditForm />
+      <IndustryEditForm allPartners={allPartners} allStories={allStories} categories={categories} />
     </div>
   );
 }

@@ -89,7 +89,9 @@ declare global {
         tagline: string;
         columns: FooterColumn[];
         social: { id: string; platform: string; href: string }[];
-        legal: { copyright: string; links: FooterLink[] };
+        /* `links` is resolved server-side from current LegalPage rows (see resolveFooterLegalLinks)
+           and not admin-edited directly; `disabledLegalKeys` controls which ones show. */
+        legal: { copyright: string; links: FooterLink[]; disabledLegalKeys?: string[] };
         contact: { email: string; phone: string; address: string };
       };
       /* Gate for /join/partner-sales-tools. Read server-side only. */
@@ -103,6 +105,8 @@ declare global {
     type AdminConfigData = {
       sidebarLogoLight: string;
       sidebarLogoDark: string;
+      /* Used site-wide as the backdrop shown behind images while they load or when the real src is missing. */
+      fallbackPlaceholderImage: string;
     };
 
     type SeoMetaData = {

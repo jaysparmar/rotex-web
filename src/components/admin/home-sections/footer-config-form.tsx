@@ -19,25 +19,37 @@ type FormValues = {
   footer: PrismaJson.GlobalConfigData["footer"];
 };
 
+type LegalPageOption = { key: string; title: string };
+
 export function FooterConfigForm({
   initialData,
   logo,
   header,
   industries,
   categories,
+  legalPages,
 }: {
   initialData: FormValues;
   logo: PrismaJson.GlobalConfigData["logo"];
   header: PrismaJson.GlobalConfigData["header"];
   industries: IndustryOption[];
   categories: CategoryOption[];
+  legalPages: LegalPageOption[];
 }) {
   const form = useForm<FormValues>({ defaultValues: initialData });
   const { pending, error, success, run } = useSaveAction();
 
   const columns = useFieldArray({ control: form.control, name: "footer.columns" });
   const social = useFieldArray({ control: form.control, name: "footer.social" });
-  const legalLinks = useFieldArray({ control: form.control, name: "footer.legal.links" });
+  const disabledLegalKeys = form.watch("footer.legal.disabledLegalKeys") ?? [];
+
+  function toggleLegalPage(key: string, enabled: boolean) {
+    const current = form.getValues("footer.legal.disabledLegalKeys") ?? [];
+    form.setValue(
+      "footer.legal.disabledLegalKeys",
+      enabled ? current.filter((k) => k !== key) : [...current, key]
+    );
+  }
 
   function onSubmit(values: FormValues) {
     run(() => saveGlobalConfig({ logo, header, footer: values.footer } as never));
@@ -121,15 +133,31 @@ export function FooterConfigForm({
           />
 
           <TextField label="Legal Copyright" {...form.register("footer.legal.copyright")} />
-          {legalLinks.fields.map((field, i) => (
-            <RepeaterItem key={field.id} title={`Legal Link ${i + 1}`} onRemove={() => legalLinks.remove(i)}>
-              <FieldGrid>
-                <TextField label="Label" {...form.register(`footer.legal.links.${i}.label`)} />
-                <TextField label="Href" {...form.register(`footer.legal.links.${i}.href`)} />
-              </FieldGrid>
-            </RepeaterItem>
-          ))}
-          <AddButton label="Add Legal Link" onClick={() => legalLinks.append({ label: "", href: "" })} />
+
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold">Legal Links</h2>
+            <p className="text-xs text-muted-foreground">
+              Shown automatically from Legal Pages — toggle off to hide one from the footer without deleting it.
+              Manage the pages themselves at Admin → Legal Pages.
+            </p>
+            {legalPages.length === 0 ? (
+              <p className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
+                No legal pages yet. Add one at Admin → Legal Pages.
+              </p>
+            ) : (
+              <div className="divide-y divide-border rounded-lg border border-border">
+                {legalPages.map((page) => (
+                  <div key={page.key} className="flex items-center gap-4 p-4">
+                    <p className="min-w-0 flex-1 truncate text-sm font-medium">{page.title}</p>
+                    <Switch
+                      checked={!disabledLegalKeys.includes(page.key)}
+                      onCheckedChange={(v) => toggleLegalPage(page.key, v)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           <FieldGrid>
             <TextField label="Contact Email" {...form.register("footer.contact.email")} />

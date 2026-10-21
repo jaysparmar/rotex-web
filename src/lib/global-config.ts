@@ -212,10 +212,28 @@ export async function resolveFooterColumns(columns: PrismaJson.FooterColumn[]): 
   );
 }
 
+// Legacy pages keep their own fixed routes; any other legal page renders at the flat /[key] slug.
+const LEGACY_LEGAL_PATH: Record<string, string> = {
+  privacy: "/privacy-policy",
+  terms: "/terms-and-conditions",
+};
+
+export async function resolveFooterLegalLinks(disabledKeys: string[] = []): Promise<PrismaJson.FooterLink[]> {
+  const pages = await prisma.legalPage.findMany({ orderBy: { key: "asc" } });
+  return pages
+    .filter((p) => !disabledKeys.includes(p.key))
+    .map((p) => ({ label: p.title, href: LEGACY_LEGAL_PATH[p.key] ?? `/${p.key}` }));
+}
+
 export async function getResolvedGlobalConfig(): Promise<PrismaJson.GlobalConfigData> {
   const record = await prisma.globalConfig.findUniqueOrThrow({ where: { id: "global" } });
   const config = record.data as PrismaJson.GlobalConfigData;
   const nav = await resolveNavItems(config.header.nav);
   const columns = await resolveFooterColumns(config.footer.columns);
-  return { ...config, header: { ...config.header, nav }, footer: { ...config.footer, columns } };
+  const legalLinks = await resolveFooterLegalLinks(config.footer.legal.disabledLegalKeys);
+  return {
+    ...config,
+    header: { ...config.header, nav },
+    footer: { ...config.footer, columns, legal: { ...config.footer.legal, links: legalLinks } },
+  };
 }

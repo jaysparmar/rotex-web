@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE "Industry" ADD COLUMN "useSubIndustries" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "Industry" ADD COLUMN "partnerIds" JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE "Industry" ADD COLUMN "storyIds" JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE "Industry" ADD COLUMN "challengesTitle" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Industry" ADD COLUMN "solutionsTitle" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Industry" ADD COLUMN "challenges" JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE "Industry" ADD COLUMN "solutions" JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE "Industry" ADD COLUMN "recommendedProducts" JSONB NOT NULL DEFAULT '[]';

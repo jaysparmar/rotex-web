@@ -15,6 +15,14 @@ type IndustryData = {
   importReference?: string | null;
   stats: { value: string; suffix?: string; label: string }[];
   whyChoose: { title: string; highlight: string; cards: { title: string; description: string }[] };
+  useSubIndustries: boolean;
+  partnerIds: string[];
+  storyIds: string[];
+  challengesTitle: string;
+  solutionsTitle: string;
+  challenges: { title: string; description: string }[];
+  solutions: { title: string; description: string }[];
+  recommendedProducts: string[];
 };
 
 type SubIndustryData = {

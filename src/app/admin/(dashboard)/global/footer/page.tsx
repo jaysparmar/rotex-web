@@ -17,6 +17,11 @@ export default async function AdminGlobalFooterPage() {
     select: { id: true, name: true },
   });
 
+  const legalPages = await prisma.legalPage.findMany({
+    orderBy: { key: "asc" },
+    select: { key: true, title: true },
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -41,6 +46,7 @@ export default async function AdminGlobalFooterPage() {
         header={config.header}
         industries={industries}
         categories={categories}
+        legalPages={legalPages}
       />
     </div>
   );

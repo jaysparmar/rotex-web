@@ -2,13 +2,15 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { Search, ImageOff } from "lucide-react";
+import { Search } from "lucide-react";
 import { ImageLightboxTrigger } from "@/components/admin/image-lightbox";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { usePlaceholderImage } from "@/components/providers/placeholder-image-provider";
+import logo from "@/assets/logo.svg";
 
 export type PickerItem = { id: string; image: string; label: string; sublabel?: string };
 
@@ -29,6 +31,7 @@ export function ItemPickerGrid({
 }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const placeholder = usePlaceholderImage();
 
   const filteredItems = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -101,8 +104,15 @@ export function ItemPickerGrid({
                       className={cn(imageFit === "contain" ? "object-contain p-2" : "object-cover")}
                     />
                   ) : (
-                    <div className="flex size-full items-center justify-center text-muted-foreground/40">
-                      <ImageOff className="size-6" />
+                    <div className="flex size-full items-center justify-center bg-stone-100">
+                      <Image
+                        src={placeholder || logo}
+                        alt=""
+                        width={40}
+                        height={14}
+                        unoptimized={Boolean(placeholder)}
+                        className="grayscale opacity-30"
+                      />
                     </div>
                   )}
                 </ImageLightboxTrigger>

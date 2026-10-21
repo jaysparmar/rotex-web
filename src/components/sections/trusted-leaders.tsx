@@ -17,6 +17,14 @@ type TrustedLeadersProps = {
   logos?: LogoItem[];
 };
 
+// Seconds of scroll time per logo, tuned so the on-screen speed (px/sec) stays
+// roughly constant regardless of how many logos are passed in. The "primary"
+// variant renders bigger items with a larger gap (gap-14, up to 96px wide),
+// so each logo needs more time than the "secondary" variant (gap-12, 80px wide)
+// to travel the same visual distance at the same speed.
+const PRIMARY_SECONDS_PER_LOGO = 3;
+const SECONDARY_SECONDS_PER_LOGO = 2.5;
+
 const defaultLogos: LogoItem[] = [
   { id: 0, src: partner1, alt: "Partner" },
   { id: 1, src: partner2, alt: "Partner" },
@@ -58,7 +66,10 @@ export function TrustedLeaders({
               style={{ background: "linear-gradient(to right, #ffffff 20%, transparent 100%)" }} />
             <div className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
               style={{ background: "linear-gradient(to left, #ffffff 20%, transparent 100%)" }} />
-            <div className="animate-marquee flex items-center gap-14 w-max h-14 lg:h-24">
+            <div
+              className="animate-marquee flex items-center gap-14 w-max h-14 lg:h-24"
+              style={{ animationDuration: `${logos.length * PRIMARY_SECONDS_PER_LOGO}s` }}
+            >
               {[...logos, ...logos].map(({ id, src, alt }, i) => (
                 <div key={`${id}-${i}`} className="shrink-0 h-14 lg:h-24 flex items-center">
                   <ImageView
@@ -79,7 +90,10 @@ export function TrustedLeaders({
               style={{ background: "linear-gradient(to right, #ffffff 20%, transparent 100%)" }} />
             <div className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
               style={{ background: "linear-gradient(to left, #ffffff 20%, transparent 100%)" }} />
-            <div className="animate-marquee flex items-center gap-12 w-max h-14 lg:h-16">
+            <div
+              className="animate-marquee flex items-center gap-12 w-max h-14 lg:h-16"
+              style={{ animationDuration: `${logos.length * SECONDARY_SECONDS_PER_LOGO}s` }}
+            >
               {[...logos, ...logos].map(({ id, src, alt }, i) => (
                 <div key={`${id}-${i}`} className="shrink-0 h-14 lg:h-16 flex items-center">
                   <ImageView

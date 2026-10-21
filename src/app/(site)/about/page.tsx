@@ -24,6 +24,7 @@ type StoryData = {
   trustedLabel: string;
   logos: { id: string; src: string; alt: string }[];
   videoSrc: string;
+  videoEnabled?: boolean;
 };
 type MissionVisionData = { mission: string; vision: string };
 type ValuesData = { heading: string; subheading: string; values: { title: string; description: string }[] };
@@ -89,6 +90,7 @@ export default async function AboutPage() {
           trustedLabel={story.trustedLabel}
           logos={story.logos}
           videoSrc={story.videoSrc}
+          videoEnabled={story.videoEnabled}
         />
       )}
 

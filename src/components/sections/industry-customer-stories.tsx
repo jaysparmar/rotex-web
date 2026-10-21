@@ -44,11 +44,12 @@ export function IndustryCustomerStories({ stories }: Props) {
           slidesPerView="auto"
           navigation={{ prevEl: ".cs-prev", nextEl: ".cs-next" }}
           className="!pb-2 w-full"
+          wrapperClass="items-stretch"
         >
           {stories.map((story, i) => (
-            <SwiperSlide key={i} className="!w-[85vw] lg:!w-[578px]">
+            <SwiperSlide key={i} className="!h-auto flex !w-[85vw] lg:!w-[578px]">
               <CustomerStoryCard
-                media={{ type: story.mediaType === "video" ? "video" : "image", src: story.image }}
+                media={story.image ? { type: story.mediaType === "video" ? "video" : "image", src: story.image } : undefined}
                 quote={story.quote}
                 author={story.author}
                 company={story.company}

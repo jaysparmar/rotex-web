@@ -49,24 +49,30 @@ export function ContactOfficesSection({
           {active.offices.map((office) => (
             <div
               key={office.id}
-              className="w-full sm:w-90 bg-white rounded-xl outline outline-1 -outline-offset-1 outline-black/10 flex flex-col overflow-hidden"
+              className="w-full sm:w-90 min-h-55 bg-white rounded-xl outline outline-1 -outline-offset-1 outline-black/10 flex flex-col overflow-hidden"
             >
               <div className="h-2 bg-gradient-orange-radial" />
               <div className="p-6 flex flex-col gap-4">
                 <h3 className="text-neutral-950 text-xl font-medium font-montserrat leading-8">{office.name}</h3>
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-start gap-2">
-                    <MapPin className="size-5 text-neutral-400 shrink-0 mt-0.5" strokeWidth={1.5} />
-                    <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{office.address}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="size-5 text-neutral-400 shrink-0" strokeWidth={1.5} />
-                    <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{office.phone}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="size-5 text-neutral-400 shrink-0" strokeWidth={1.5} />
-                    <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{office.email}</p>
-                  </div>
+                  {office.address && (
+                    <div className="flex items-start gap-2">
+                      <MapPin className="size-5 text-neutral-400 shrink-0 mt-0.5" strokeWidth={1.5} />
+                      <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{office.address}</p>
+                    </div>
+                  )}
+                  {office.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="size-5 text-neutral-400 shrink-0" strokeWidth={1.5} />
+                      <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{office.phone}</p>
+                    </div>
+                  )}
+                  {office.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="size-5 text-neutral-400 shrink-0" strokeWidth={1.5} />
+                      <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{office.email}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

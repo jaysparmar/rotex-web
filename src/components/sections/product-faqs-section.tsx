@@ -17,10 +17,10 @@ function FaqCard({ faq }: { faq: PrismaJson.CategoryFaqs[number] }) {
       className="relative w-full bg-white rounded-lg p-5 outline outline-1 -outline-offset-1 outline-neutral-200 overflow-hidden"
     >
       <div className="flex flex-col gap-2.5 pr-8">
-        <h3 className="text-stone-900 font-medium font-montserrat text-base sm:text-xl leading-6 sm:leading-7">{faq.question}</h3>
+        <h3 className="text-stone-900 font-medium font-montserrat text-sm sm:text-xl leading-5 sm:leading-7">{faq.question}</h3>
         <Collapsible.Panel className="overflow-hidden h-(--collapsible-panel-height) transition-[height] duration-300 ease-in-out data-starting-style:h-0 data-ending-style:h-0">
           <div
-            className={`text-stone-500 text-xs sm:text-sm font-medium font-montserrat leading-5 ${richContentStyles.content}`}
+            className={`text-stone-500 text-xs sm:text-sm font-medium font-montserrat leading-5 [&_p]:!text-xs sm:[&_p]:!text-sm [&_li]:!text-xs sm:[&_li]:!text-sm ${richContentStyles.content}`}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(toRichHtml(faq.answer)) }}
           />
         </Collapsible.Panel>
@@ -40,7 +40,7 @@ export function ProductFaqsSection({ faqs }: { faqs: PrismaJson.CategoryFaqs }) 
 
   return (
     <div className="container py-8 sm:py-12">
-      <h2 className="text-stone-900 text-xl sm:text-2xl font-semibold font-montserrat leading-7 mb-4">
+      <h2 className="text-stone-900 text-lg sm:text-2xl font-semibold font-montserrat leading-6 sm:leading-7 mb-4">
         Frequently Asked Questions
       </h2>
       <div className="flex flex-col gap-3">

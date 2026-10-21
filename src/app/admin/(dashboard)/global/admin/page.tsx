@@ -1,15 +1,9 @@
-import { prisma } from "@/lib/prisma";
+import { getAdminConfig } from "@/lib/admin-config";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { AdminConfigForm } from "@/components/admin/home-sections/admin-config-form";
 
-const DEFAULT_DATA: PrismaJson.AdminConfigData = {
-  sidebarLogoLight: "/logo.svg",
-  sidebarLogoDark: "/logo.svg",
-};
-
 export default async function AdminGlobalAdminPage() {
-  const record = await prisma.adminConfig.findUnique({ where: { id: "admin" } });
-  const data = (record?.data as PrismaJson.AdminConfigData | undefined) ?? DEFAULT_DATA;
+  const data = await getAdminConfig();
 
   return (
     <div className="space-y-6">

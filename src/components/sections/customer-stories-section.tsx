@@ -79,13 +79,13 @@ export function CustomerStoriesSection({
         {/* Card track */}
         <div
           ref={trackRef}
-          className="no-scrollbar flex gap-7 overflow-x-auto scroll-smooth snap-x snap-mandatory lg:snap-none"
+          className="no-scrollbar flex items-stretch gap-7 overflow-x-auto scroll-smooth snap-x snap-mandatory lg:snap-none"
           style={{ scrollbarWidth: "none" }}
         >
           {stories.map((story) => (
             <div key={story.id} className="w-full lg:w-auto shrink-0 snap-center">
               <CustomerStoryCard
-                media={{ type: story.mediaType === "video" ? "video" : "image", src: story.image }}
+                media={story.image ? { type: story.mediaType === "video" ? "video" : "image", src: story.image } : undefined}
                 quote={story.quote}
                 author={story.author}
                 company={story.company}

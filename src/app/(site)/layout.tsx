@@ -9,6 +9,8 @@ import { AskAiButton } from "@/components/layout/ask-ai-button";
 import { PageLoader } from "@/components/ui/page-loader";
 import { HashScroll } from "@/components/ui/hash-scroll";
 import { getResolvedGlobalConfig } from "@/lib/global-config";
+import { getAdminConfig } from "@/lib/admin-config";
+import { PlaceholderImageProvider } from "@/components/providers/placeholder-image-provider";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -41,6 +43,7 @@ const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const config = await getResolvedGlobalConfig();
+  const adminConfig = await getAdminConfig();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -53,13 +56,15 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             strategy="afterInteractive"
           />
         )}
-        <PageLoader />
-        <HashScroll />
-        <Navbar config={config} />
-        <main>{children}</main>
-        <Footer config={config} />
-        <WhatsAppButton config={config.whatsapp} />
-        <AskAiButton config={config.askAi} />
+        <PlaceholderImageProvider value={adminConfig.fallbackPlaceholderImage}>
+          <PageLoader />
+          <HashScroll />
+          <Navbar config={config} />
+          <main>{children}</main>
+          <Footer config={config} />
+          <WhatsAppButton config={config.whatsapp} />
+          <AskAiButton config={config.askAi} />
+        </PlaceholderImageProvider>
       </body>
     </html>
   );

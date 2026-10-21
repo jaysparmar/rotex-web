@@ -22,7 +22,10 @@ type AboutStorySectionProps = {
   trustedLabel?: string;
   logos?: LogoItem[];
   videoSrc?: string;
+  videoEnabled?: boolean;
 };
+
+const SECONDS_PER_LOGO = 2.5;
 
 const defaultParagraphs = [
   "In 1967, in the industrial city of Vadodara, India, a company was founded with a single obsession: build flow control components so precisely engineered that the process plants which depend on them never have to think about them again.",
@@ -56,6 +59,7 @@ export function AboutStorySection({
   trustedLabel = "Trusted by Industry leaders",
   logos = defaultLogos,
   videoSrc = "/media/about-us.mp4",
+  videoEnabled = true,
 }: AboutStorySectionProps) {
   return (
     <section className="bg-white pt-14 lg:pt-20 pb-6 lg:pb-8">
@@ -124,7 +128,10 @@ export function AboutStorySection({
               className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
               style={{ background: "linear-gradient(to left, #ffffff 20%, transparent 100%)" }}
             />
-            <div className="animate-marquee flex items-center gap-12 w-max h-14 lg:h-16">
+            <div
+              className="animate-marquee flex items-center gap-12 w-max h-14 lg:h-16"
+              style={{ animationDuration: `${logos.length * SECONDS_PER_LOGO}s` }}
+            >
               {[...logos, ...logos].map(({ id, src, alt }, i) => (
                 <div key={`${id}-${i}`} className="shrink-0 h-14 lg:h-16 flex items-center">
                   <ImageView
@@ -143,9 +150,11 @@ export function AboutStorySection({
 
         {/* Story video — explicit heights per breakpoint so it never dominates the
             viewport on shorter laptop screens; object-cover crops instead of distorting */}
-        <div className="w-full shrink-0 h-56 sm:h-72 md:h-96 lg:h-105 xl:h-120 2xl:h-150 rounded-2xl overflow-hidden bg-stone-900">
-          <VideoPlayer src={videoSrc} controls />
-        </div>
+        {videoEnabled && (
+          <div className="w-full shrink-0 h-56 sm:h-72 md:h-96 lg:h-105 xl:h-120 2xl:h-150 rounded-2xl overflow-hidden bg-stone-900">
+            <VideoPlayer src={videoSrc} controls />
+          </div>
+        )}
 
       </div>
     </section>

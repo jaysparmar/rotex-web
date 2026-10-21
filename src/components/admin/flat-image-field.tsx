@@ -103,9 +103,9 @@ export function FlatImageField({ name, label }: { name: string; label: string })
       )}
 
       {src && (
-        <ImageLightboxTrigger src={src} alt={label} className="block overflow-hidden rounded-lg border border-border bg-muted/30">
+        <ImageLightboxTrigger src={src} alt={label} className="block overflow-hidden rounded-lg border border-border bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt="" className="h-32 w-full object-cover" />
+          <img src={src} alt="" className="h-32 w-full object-contain p-4" />
         </ImageLightboxTrigger>
       )}
     </div>

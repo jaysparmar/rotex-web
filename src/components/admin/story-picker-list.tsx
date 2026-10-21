@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { usePlaceholderImage } from "@/components/providers/placeholder-image-provider";
+import logo from "@/assets/logo.svg";
 
 export type StoryPickerItem = {
   id: string;
@@ -26,6 +28,7 @@ export function StoryPickerList({
   emptyMessage: string;
 }) {
   const [search, setSearch] = useState("");
+  const placeholder = usePlaceholderImage();
   const filtered = stories.filter((story) => {
     const q = search.trim().toLowerCase();
     if (!q) return true;
@@ -54,7 +57,7 @@ export function StoryPickerList({
         )}
         {filtered.map((story) => (
           <div key={story.id} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
-            <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
+            <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-stone-100">
               {story.image && story.mediaType === "video" ? (
                 <video src={story.image} className="size-full object-cover" muted />
               ) : story.image ? (
@@ -66,7 +69,16 @@ export function StoryPickerList({
                   className="size-full object-cover"
                   unoptimized
                 />
-              ) : null}
+              ) : (
+                <Image
+                  src={placeholder || logo}
+                  alt=""
+                  width={40}
+                  height={14}
+                  unoptimized={Boolean(placeholder)}
+                  className="grayscale opacity-30"
+                />
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">

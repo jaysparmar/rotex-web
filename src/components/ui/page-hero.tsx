@@ -1,11 +1,16 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import defaultBg from "@/assets/Images/breadcurmbBackgrounds/default_bg.jpg";
 import defaultBgMobile from "@/assets/Images/breadcurmbBackgrounds/default_bg_mobile.jpg";
+
+// Roughly where line-clamp-5 starts truncating at the hero's body copy width/size —
+// only show "Read more" when the text is actually long enough to need it.
+const DESCRIPTION_TRUNCATE_THRESHOLD = 280;
 
 type PageHeroProps = {
   title: string;
@@ -38,6 +43,8 @@ function slugToLabel(slug: string): string {
 
 export function PageHero({ title, description, bg, mobileBg, children, crumbs: crumbsOverride }: PageHeroProps) {
   const pathname = usePathname();
+  const [readMoreOpen, setReadMoreOpen] = useState(false);
+  const isTruncated = (description?.length ?? 0) > DESCRIPTION_TRUNCATE_THRESHOLD;
 
   const segments = pathname.split("/").filter(Boolean);
   const crumbs = crumbsOverride ?? [
@@ -122,14 +129,36 @@ export function PageHero({ title, description, bg, mobileBg, children, crumbs: c
               {title}
             </h1>
             {description && (
-              <p className="w-full lg:w-121.25 line-clamp-5 text-stone-300 text-sm lg:text-base font-normal font-montserrat leading-5 lg:leading-6">
-                {description}
-              </p>
+              <div className="w-full lg:w-121.25 flex flex-col gap-1.5">
+                <p className="line-clamp-5 text-stone-300 text-sm lg:text-base font-normal font-montserrat leading-5 lg:leading-6">
+                  {description}
+                </p>
+                {isTruncated && (
+                  <button
+                    type="button"
+                    onClick={() => setReadMoreOpen(true)}
+                    className="self-start text-stone-300 text-sm font-normal font-montserrat leading-5 underline underline-offset-2 hover:text-white transition-colors duration-150"
+                  >
+                    Read more
+                  </button>
+                )}
+              </div>
             )}
           </div>
           {children && <div>{children}</div>}
         </div>
       </div>
+
+      {description && (
+        <Dialog open={readMoreOpen} onOpenChange={setReadMoreOpen}>
+          <DialogContent className="max-w-lg sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm leading-6 text-muted-foreground">{description}</p>
+          </DialogContent>
+        </Dialog>
+      )}
     </section>
   );
 }

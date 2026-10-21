@@ -1,4 +1,4 @@
-import type { Industry, SubIndustry } from "@/generated/prisma/client";
+import type { Industry } from "@/generated/prisma/client";
 import type { StaticImageData } from "next/image";
 import { prisma } from "@/lib/prisma";
 import { getSelectedPartners } from "@/lib/partners";
@@ -27,16 +27,35 @@ const BG_MAP: Record<string, StaticImageData> = {
   process:    defaultBg,
 };
 
+// Structural shape shared by SubIndustry and the Industry's own direct-content
+// fields — lets this component render either a real sub-industry or, when an
+// industry has `useSubIndustries` off, the industry acting as its own "sub-industry".
+type SubIndustryContentData = {
+  name: string;
+  description: string;
+  image: string | null;
+  mobileImage: string | null;
+  partnerIds: unknown;
+  storyIds: unknown;
+  challengesTitle: string;
+  challenges: unknown;
+  solutionsTitle: string;
+  solutions: unknown;
+  recommendedProducts: unknown;
+};
+
 /*
   The body of a sub-sector — rendered both at /industries/[sector]/[sub] and,
-  for the first sub-sector, at /industries/[sector] itself.
+  for the first sub-sector, at /industries/[sector] itself. Also reused for
+  industries with no sub-industries (useSubIndustries: false), fed from the
+  Industry's own direct-content fields instead of a SubIndustry row.
 */
 export async function SubIndustryContent({
   industry,
   subIndustry,
 }: {
   industry: Industry;
-  subIndustry: SubIndustry;
+  subIndustry: SubIndustryContentData;
 }) {
   const bg = subIndustry.image ?? (industry.bgKey ? BG_MAP[industry.bgKey] : undefined);
 

@@ -27,9 +27,12 @@ export function AdminConfigForm({ initialData }: { initialData: FormValues }) {
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-lg space-y-6">
-        <FlatImageField name="sidebarLogoLight" label="Sidebar Logo — Light Theme" />
-        <FlatImageField name="sidebarLogoDark" label="Sidebar Logo — Dark Theme" />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <FlatImageField name="sidebarLogoLight" label="Sidebar Logo — Light Theme" />
+          <FlatImageField name="sidebarLogoDark" label="Sidebar Logo — Dark Theme" />
+          <FlatImageField name="fallbackPlaceholderImage" label="Default Image Placeholder" />
+        </div>
         <SaveBar pending={pending} error={error} success={success} />
       </form>
     </FormProvider>

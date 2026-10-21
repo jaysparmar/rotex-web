@@ -16,6 +16,27 @@ export default async function IndustryPage({ params }: Props) {
   const industry = await getIndustryWithSubIndustries(sector);
   if (!industry) notFound();
 
+  if (!industry.useSubIndustries) {
+    return (
+      <SubIndustryContent
+        industry={industry}
+        subIndustry={{
+          name: industry.name,
+          description: industry.description,
+          image: industry.image,
+          mobileImage: industry.mobileImage,
+          partnerIds: industry.partnerIds,
+          storyIds: industry.storyIds,
+          challengesTitle: industry.challengesTitle,
+          challenges: industry.challenges,
+          solutionsTitle: industry.solutionsTitle,
+          solutions: industry.solutions,
+          recommendedProducts: industry.recommendedProducts,
+        }}
+      />
+    );
+  }
+
   const firstSub = industry.subIndustries[0];
   if (!firstSub) return null;
 

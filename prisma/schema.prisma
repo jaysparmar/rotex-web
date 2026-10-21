@@ -177,6 +177,27 @@ model Industry {
   /// [IndustryWhyChoose]
   whyChoose     Json
 
+  // When true (default, matches existing behavior), this industry is managed via
+  // its Sub-Industries. When false, the direct content fields below are used
+  // instead and rendered straight on the industry page.
+  useSubIndustries Boolean @default(true)
+
+  // Direct content fields (same shape as SubIndustry) — used when useSubIndustries
+  // is false, so the industry can render its own Trusted/Applications/
+  // Recommended Products/Customer Stories sections without a sub-industry.
+  /// [StringList]
+  partnerIds          Json   @default("[]")
+  /// [StringList]
+  storyIds            Json   @default("[]")
+  challengesTitle     String @default("")
+  solutionsTitle      String @default("")
+  /// [CardList]
+  challenges          Json   @default("[]")
+  /// [CardList]
+  solutions           Json   @default("[]")
+  /// [StringList]
+  recommendedProducts Json   @default("[]")
+
   subIndustries SubIndustry[]
   products      Product[]
   variants      ProductVariant[]

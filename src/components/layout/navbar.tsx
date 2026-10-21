@@ -59,6 +59,8 @@ function CategorySwitcherPanel({
   const [activeIdx, setActiveIdx] = useState(0);
   const active = config.categories[activeIdx];
 
+  if (!active) return null;
+
   return (
     <div
       className="fixed top-20 lg:top-24 left-0 right-0 z-61 bg-white border-b border-stone-300 shadow-lg flex"

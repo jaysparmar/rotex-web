@@ -222,17 +222,18 @@ export function ContactFormSection({
               </span>
               <div className="flex-1 h-px bg-black/10" />
             </div>
-            <div className="flex flex-wrap items-center gap-8">
+            <div className="grid grid-cols-4 gap-6">
               {logos.map((logo) => (
-                <ImageView
-                  key={logo.id}
-                  src={logo.src}
-                  alt={logo.alt}
-                  width={90}
-                  height={40}
-                  className="object-contain h-8 w-auto"
-                  unoptimized={typeof logo.src === "string"}
-                />
+                <div key={logo.id} className="h-14 flex items-center justify-start">
+                  <ImageView
+                    src={logo.src}
+                    alt={logo.alt}
+                    width={160}
+                    height={64}
+                    className="object-contain max-h-14 max-w-full w-auto h-auto"
+                    unoptimized={typeof logo.src === "string"}
+                  />
+                </div>
               ))}
             </div>
           </div>

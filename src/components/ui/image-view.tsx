@@ -1,5 +1,8 @@
+"use client";
+
 import Image, { type ImageProps, type StaticImageData } from "next/image";
 import { cn } from "@/lib/utils";
+import { usePlaceholderImage } from "@/components/providers/placeholder-image-provider";
 import logo from "@/assets/logo.svg";
 
 type ImageViewProps = Omit<ImageProps, "src"> & {
@@ -8,9 +11,10 @@ type ImageViewProps = Omit<ImageProps, "src"> & {
 };
 
 function Placeholder() {
+  const placeholder = usePlaceholderImage();
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-stone-100">
-      <Image src={logo} alt="" width={80} height={28} className="grayscale opacity-30" />
+      <Image src={placeholder || logo} alt="" width={80} height={28} className="grayscale opacity-30" />
     </div>
   );
 }
