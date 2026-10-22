@@ -139,7 +139,7 @@ export function ImportUploadStep({
 
             <div className="flex justify-end">
               <Button type="button" size="sm" onClick={onNext}>
-                Next: Map columns
+                Next: Defaults
               </Button>
             </div>
           </CardContent>

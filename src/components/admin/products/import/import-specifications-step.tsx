@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { excelColumnLabel } from "@/lib/excel-columns";
+import { excelColumnLabel, importColumnLabels } from "@/lib/excel-columns";
 import type { ColumnDestination } from "@/lib/variable-product-import";
 import { destinationLabel } from "./types";
 
@@ -29,12 +29,12 @@ export function ImportSpecificationsStep({
   onNext: () => void;
 }) {
   const [search, setSearch] = useState("");
-  const headerValues = grid[headerRow - 1] ?? [];
   const dataRows = grid.slice(headerRow, headerRow + 50);
-  const columnCount = grid.reduce((max, row) => Math.max(max, row.length), 0);
+  const labels = useMemo(() => importColumnLabels(grid, headerRow), [grid, headerRow]);
+  const columnCount = labels.length;
 
   function columnLabel(col: number) {
-    return (headerValues[col] ?? "").trim() || excelColumnLabel(col);
+    return labels[col] ?? excelColumnLabel(col);
   }
 
   function sampleValue(col: number) {
@@ -61,7 +61,7 @@ export function ImportSpecificationsStep({
     if (!q) return allColumns;
     return allColumns.filter((col) => columnLabel(col).toLowerCase().includes(q));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allColumns, search, headerValues]);
+  }, [allColumns, search, labels]);
 
   const alreadyMappedCols = useMemo(
     () => new Set(Object.keys(columnDestinations).map(Number).filter((c) => columnDestinations[c] !== "ignore")),
@@ -76,7 +76,7 @@ export function ImportSpecificationsStep({
     }
     return new Set([...counts.entries()].filter(([, n]) => n > 1).map(([label]) => label));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [specificationColumns, headerValues]);
+  }, [specificationColumns, labels]);
 
   function selectAllVisible() {
     onChange([...new Set([...selected, ...visibleColumns])].sort((a, b) => a - b));

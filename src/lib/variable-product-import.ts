@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
-import { excelColumnLabel } from "@/lib/excel-columns";
+import { excelColumnLabel, importColumnLabels } from "@/lib/excel-columns";
 import { splitReferences } from "@/lib/import-references";
 import { PRODUCT_ATTRIBUTES, PRODUCT_FAMILIES, type ProductAttributeKey } from "@/lib/product-constants";
 import { cleanDownloadName, resolveDownloadColumns, type DownloadImportGrid } from "@/lib/download-grid";
@@ -294,8 +294,8 @@ export async function analyzeVariableProductImport(
   const modelNumberCol = findSingleColumn(mapping, "modelNumber");
   if (modelNumberCol == null) return emptyPlan("No column is mapped to Model Number.");
 
-  const headerValues = grid[mapping.headerRow - 1] ?? [];
-  const columnLabel = (col: number) => (headerValues[col] ?? "").trim() || excelColumnLabel(col);
+  const labels = importColumnLabels(grid, mapping.headerRow);
+  const columnLabel = (col: number) => labels[col] ?? excelColumnLabel(col);
 
   const nameCol = findSingleColumn(mapping, "name");
   const imageCol = findSingleColumn(mapping, "image");

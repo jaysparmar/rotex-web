@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0 -p 5007",
     "build": "next build",
     "start": "kill -9 $(lsof -t -i:5007) 2>/dev/null; next start -p 5007",
     "lint": "eslint",
@@ -84,5 +84,13 @@
   "optionalDependencies": {
     "@tailwindcss/oxide-darwin-arm64": "^4.3.0",
     "lightningcss-darwin-arm64": "^1.32.0"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true,
+    "@prisma/engines@7.10.0": true,
+    "prisma@7.10.0": true,
+    "sharp@0.34.5": true,
+    "esbuild@0.28.2": true,
+    "unrs-resolver@1.12.2": true
   }
 }

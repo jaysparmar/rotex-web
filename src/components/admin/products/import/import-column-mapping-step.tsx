@@ -3,7 +3,7 @@
 import { CircleCheck, CircleAlert } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { excelColumnLabel } from "@/lib/excel-columns";
+import { excelColumnLabel, importColumnLabels } from "@/lib/excel-columns";
 import type { ColumnDestination } from "@/lib/variable-product-import";
 import { PlainSelect } from "./plain-select";
 import { BASE_DESTINATIONS, CLASSIFICATION_DESTINATIONS, type ClassificationState } from "./types";
@@ -29,12 +29,12 @@ export function ImportColumnMappingStep({
   onBack: () => void;
   onNext: () => void;
 }) {
-  const headerValues = grid[headerRow - 1] ?? [];
   const dataRows = grid.slice(headerRow, headerRow + 50);
-  const columnCount = grid.reduce((max, row) => Math.max(max, row.length), 0);
+  const labels = importColumnLabels(grid, headerRow);
+  const columnCount = labels.length;
 
   function columnLabel(col: number) {
-    return (headerValues[col] ?? "").trim() || excelColumnLabel(col);
+    return labels[col] ?? excelColumnLabel(col);
   }
 
   function sampleValue(col: number) {
@@ -132,7 +132,7 @@ export function ImportColumnMappingStep({
             Back
           </Button>
           <Button type="button" size="sm" onClick={onNext}>
-            Next: Specifications
+            Next: Map Industries
           </Button>
         </div>
       </CardContent>

@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['rotex.ezzystack.com'],
   reactCompiler: true,
   images: {
     remotePatterns: [
@@ -10,6 +11,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "rotex.ezzystack.com" },
     ],
   },
+  
   experimental: {
     // Admin media uploads (video especially) exceed the 1MB Server Action default.
     serverActions: { bodySizeLimit: "200mb" },
