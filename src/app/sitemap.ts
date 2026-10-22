@@ -11,6 +11,7 @@ const STATIC_PATHS = [
   "/blogs",
   "/case-studies",
   "/news-updates",
+  "/csr",
   "/about",
   "/about/awards",
   "/contact",
@@ -25,7 +26,7 @@ const STATIC_PATHS = [
 const LEGACY_LEGAL_KEYS = new Set(["privacy", "terms"]);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, industries, subIndustries, blogs, caseStudies, news, legalPages] = await Promise.all([
+  const [products, industries, subIndustries, blogs, caseStudies, news, csr, legalPages] = await Promise.all([
     prisma.product.findMany({ select: { slug: true, updatedAt: true } }),
     prisma.industry.findMany({ select: { slug: true, updatedAt: true } }),
     prisma.subIndustry.findMany({
@@ -34,6 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPublishedResources("blogs"),
     getPublishedResources("case-studies"),
     getPublishedResources("news"),
+    getPublishedResources("csr"),
     prisma.legalPage.findMany({ select: { key: true, updatedAt: true } }),
   ]);
 
@@ -58,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const resourceEntries = (
-    type: "blogs" | "case-studies" | "news-updates",
+    type: "blogs" | "case-studies" | "news-updates" | "csr",
     items: { slug: string; createdAt: string }[]
   ): MetadataRoute.Sitemap =>
     items.map((r) => ({ url: `${BASE_URL}/${type}/${r.slug}`, lastModified: new Date(r.createdAt) }));
@@ -75,6 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...resourceEntries("blogs", blogs),
     ...resourceEntries("case-studies", caseStudies),
     ...resourceEntries("news-updates", news),
+    ...resourceEntries("csr", csr),
     ...legalEntries,
   ];
 }

@@ -16,6 +16,7 @@ const RESERVED_SLUGS = new Set([
   "blogs",
   "case-studies",
   "news-updates",
+  "csr",
   "about",
   "contact",
   "join",

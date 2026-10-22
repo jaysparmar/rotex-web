@@ -124,10 +124,11 @@ async function resolveProductsMenu(source: PrismaJson.MegaMenuSource): Promise<P
 // Nav-menu cards whose href points at one of these resource list pages get their hover image
 // resolved dynamically to that type's admin-featured post (falling back to the most recently
 // updated published one — see getFeaturedResources). Keep in sync with the site's actual routes.
-const GROUP_HREF_TO_RESOURCE_TYPE: Record<string, "blogs" | "news" | "case-studies"> = {
+const GROUP_HREF_TO_RESOURCE_TYPE: Record<string, "blogs" | "news" | "case-studies" | "csr"> = {
   "/blogs": "blogs",
   "/news-updates": "news",
   "/case-studies": "case-studies",
+  "/csr": "csr",
 };
 
 async function resolveFlatMenuFeaturedGroups(menu: PrismaJson.FlatMenu): Promise<PrismaJson.FlatMenu> {

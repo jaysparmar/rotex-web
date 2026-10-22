@@ -24,6 +24,7 @@ export const RESOURCE_TYPES = [
   { id: "case-studies", label: "Case Studies" },
   { id: "news", label: "News & Updates" },
   { id: "blogs", label: "Blogs" },
+  { id: "csr", label: "CSR" },
 ];
 
 type ResourceFormValues = {

@@ -16,6 +16,7 @@ export const SEO_PAGES: { key: string; label: string; path: string }[] = [
   { key: "blogs", label: "Blogs", path: "/blogs" },
   { key: "case-studies", label: "Case Studies", path: "/case-studies" },
   { key: "news-updates", label: "News & Updates", path: "/news-updates" },
+  { key: "csr", label: "CSR", path: "/csr" },
   { key: "about", label: "About", path: "/about" },
   { key: "about-awards", label: "Awards", path: "/about/awards" },
   { key: "contact", label: "Contact", path: "/contact" },

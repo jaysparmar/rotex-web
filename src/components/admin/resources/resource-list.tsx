@@ -173,7 +173,7 @@ export function ResourceList({
           {resources.map((resource) => (
             <div key={resource.id} className="flex flex-wrap items-center gap-4 p-4">
               <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                {resource.image && (
+                {resource.image ? (
                   <Image
                     src={resource.image}
                     alt={resource.title}
@@ -182,6 +182,8 @@ export function ResourceList({
                     className="size-full object-cover"
                     unoptimized
                   />
+                ) : (
+                  <BookOpen className="size-5 text-muted-foreground" />
                 )}
               </div>
 

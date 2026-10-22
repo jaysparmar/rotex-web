@@ -20,6 +20,12 @@ const TYPE_CONFIG: Record<ResourceType, { label: string; singular: string; relat
     relatedHeading: "Related Case Studies",
     basePath: "/case-studies",
   },
+  csr: {
+    label: "CSR",
+    singular: "CSR",
+    relatedHeading: "Related CSR",
+    basePath: "/csr",
+  },
 };
 
 function toResourceItem(

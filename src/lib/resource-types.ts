@@ -2,7 +2,7 @@ import type { ResolvedTag } from "@/lib/resource-tags";
 
 // "news" (not "news-updates") matches the type id already used by the admin
 // Resource form and the About page's Resources-section picker — keep in sync.
-export type ResourceType = "blogs" | "news" | "case-studies";
+export type ResourceType = "blogs" | "news" | "case-studies" | "csr";
 
 export type ResourceItem = {
   id: string;

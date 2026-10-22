@@ -7,6 +7,7 @@ export const FEATURED_RESOURCE_LIMITS: Record<ResourceType, number> = {
   blogs: 1,
   news: 4,
   "case-studies": 2,
+  csr: 1,
 };
 
 export async function getPublishedResources(type: ResourceType): Promise<ResourceItem[]> {
