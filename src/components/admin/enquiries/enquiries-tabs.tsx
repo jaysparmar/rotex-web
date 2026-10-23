@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, MapPin, Building2, FileText, Calendar, Hash } from "lucide-react";
+import { Mail, Phone, MapPin, Building2, FileText, Calendar, Hash, Tag, Factory } from "lucide-react";
 import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdminPagination } from "@/components/ui/admin-pagination";
@@ -42,8 +42,13 @@ function DetailRow({ icon: Icon, label, value }: { icon: React.ElementType; labe
 function EnquiryCard({ enquiry, tab }: { enquiry: Enquiry; tab: string }) {
   const e = enquiry;
   const isSupplier = e.source === "supplier";
+  const isChannelPartner = e.source === "channel-partner";
   const product = !isSupplier && e.product && e.product !== NO_PRODUCT_PLACEHOLDER ? e.product : null;
-  const typeLabel = isSupplier ? `${e.enquiryType} (Supplier)` : e.enquiryType;
+  const typeLabel = isSupplier
+    ? `${e.enquiryType} (Supplier)`
+    : isChannelPartner
+      ? `${e.enquiryType} (Channel Partner)`
+      : e.enquiryType;
 
   return (
     <div className="rounded-lg border border-border p-4 space-y-3">
@@ -72,10 +77,11 @@ function EnquiryCard({ enquiry, tab }: { enquiry: Enquiry; tab: string }) {
         <DetailRow icon={Phone} label="Phone" value={e.phone} />
         <DetailRow icon={MapPin} label="Location" value={[e.city, e.country].filter(Boolean).join(", ")} />
         <DetailRow icon={Building2} label="Company" value={e.company} />
+        <DetailRow icon={Tag} label="Enquiry Type" value={e.enquiryType} />
         <DetailRow icon={FileText} label="Product" value={product} />
-        <DetailRow icon={FileText} label="Designation" value={e.designation} />
         <DetailRow icon={Hash} label="Quantity" value={e.quantity} />
-        {isSupplier && <DetailRow icon={Building2} label="Industries Served" value={e.industryName} />}
+        <DetailRow icon={FileText} label="Designation" value={e.designation} />
+        <DetailRow icon={Factory} label="Industries Served" value={e.industryName} />
       </div>
 
       {e.message && (
@@ -143,12 +149,17 @@ export function EnquiriesTabs({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-1 border-b border-border">
+      <div className="flex items-center gap-1 overflow-x-auto overflow-y-hidden border-b border-border">
         {tabs.map((name) => (
           <button
             key={name}
             onClick={() => changeTab(name)}
-            className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+            title={
+              name === OTHER_TAB
+                ? "Enquiries whose submitted industry doesn't exactly match a current Industry — the raw value they sent is shown on each card."
+                : undefined
+            }
+            className={`-mb-px flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
               active === name
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"

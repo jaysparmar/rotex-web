@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { EnquiriesTabs } from "@/components/admin/enquiries/enquiries-tabs";
-import { buildEnquiryWhere, SUPPLIER_TAB, OTHER_TAB, NO_PRODUCT_PLACEHOLDER } from "@/lib/enquiry-filters";
+import { buildEnquiryWhere, SUPPLIER_TAB, CHANNEL_PARTNER_TAB, OTHER_TAB, NO_PRODUCT_PLACEHOLDER } from "@/lib/enquiry-filters";
 
 const PAGE_SIZE = 20;
 
@@ -17,22 +17,36 @@ export default async function AdminEnquiriesPage({
   const industries = await prisma.industry.findMany({ select: { id: true, name: true }, orderBy: { createdAt: "asc" } });
   const industryNames = industries.map((i) => i.name);
 
-  const [supplierCount, industryGroups, otherCount] = await Promise.all([
+  const [supplierCount, channelPartnerCount, industryGroups, otherCount] = await Promise.all([
     prisma.enquiry.count({ where: { source: "supplier" } }),
-    prisma.enquiry.groupBy({ by: ["industryName"], where: { source: { not: "supplier" } }, _count: true }),
-    prisma.enquiry.count({ where: { source: { not: "supplier" }, industryName: { notIn: industryNames } } }),
+    prisma.enquiry.count({ where: { source: "channel-partner" } }),
+    prisma.enquiry.groupBy({
+      by: ["industryName"],
+      where: { source: { notIn: ["supplier", "channel-partner"] } },
+      _count: true,
+    }),
+    prisma.enquiry.count({
+      where: { source: { notIn: ["supplier", "channel-partner"] }, industryName: { notIn: industryNames } },
+    }),
   ]);
 
   const countByIndustry = Object.fromEntries(industryGroups.map((g) => [g.industryName, g._count]));
 
-  // Supplier applications get their own tab — they were never "about" an
-  // industry, the form just repurposes the same table/columns. "Other" is
-  // anything that isn't Supplier and doesn't match a known industry name.
-  const tabs = [...industryNames, ...(supplierCount > 0 ? [SUPPLIER_TAB] : []), ...(otherCount > 0 ? [OTHER_TAB] : [])];
+  // Supplier and Channel Partner applications get their own tabs — they were
+  // never "about" an industry, the forms just repurpose the same table/columns.
+  // "Other" is anything that isn't one of those and doesn't match a known
+  // industry name.
+  const tabs = [
+    ...industryNames,
+    ...(supplierCount > 0 ? [SUPPLIER_TAB] : []),
+    ...(channelPartnerCount > 0 ? [CHANNEL_PARTNER_TAB] : []),
+    ...(otherCount > 0 ? [OTHER_TAB] : []),
+  ];
 
   const tabCounts: Record<string, number> = {
     ...Object.fromEntries(industryNames.map((n) => [n, countByIndustry[n] ?? 0])),
     [SUPPLIER_TAB]: supplierCount,
+    [CHANNEL_PARTNER_TAB]: channelPartnerCount,
     [OTHER_TAB]: otherCount,
   };
 

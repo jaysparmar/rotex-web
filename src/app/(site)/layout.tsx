@@ -6,6 +6,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { AskAiButton } from "@/components/layout/ask-ai-button";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { PageLoader } from "@/components/ui/page-loader";
 import { HashScroll } from "@/components/ui/hash-scroll";
 import { getResolvedGlobalConfig } from "@/lib/global-config";
@@ -64,6 +65,10 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           <Footer config={config} />
           <WhatsAppButton config={config.whatsapp} />
           <AskAiButton config={config.askAi} />
+          <BackToTopButton
+            hasWhatsApp={Boolean(config.whatsapp?.enabled && config.whatsapp.link)}
+            hasAskAi={Boolean(config.askAi?.enabled && config.askAi.iframeUrl)}
+          />
         </PlaceholderImageProvider>
       </body>
     </html>
