@@ -21,13 +21,11 @@ type Tab = { id: string; label: string; cta: { label: string; href: string }; re
 type FormValues = { enabled: boolean; heading: { title: string }; tabs: Tab[] };
 
 // Every resource type is always available as a tab — admin chooses which ones
-// are actually live via the per-tab Enabled toggle (stored tabs were created
-// before "csr" existed, so it's backfilled below rather than being in the DB).
+// are actually live via the per-tab Enabled toggle.
 const RESOURCE_TYPE_TABS: { id: string; label: string; cta: { label: string; href: string } }[] = [
   { id: "blogs", label: "Blogs", cta: { label: "Read All Blogs", href: "/blogs" } },
   { id: "case-studies", label: "Case Studies", cta: { label: "Read All Case Studies", href: "/case-studies" } },
   { id: "news", label: "News & Updates", cta: { label: "View All News & Updates", href: "/news-updates" } },
-  { id: "csr", label: "CSR", cta: { label: "View All CSR", href: "/csr" } },
 ];
 
 function withAllResourceTypes(tabs: Tab[]): Tab[] {

@@ -39,6 +39,32 @@ const PUBLISHED_OPTIONS = [
   { value: "false", label: "Unpublished" },
 ];
 
+// `resource.image` can be a stale/broken URL (not just empty) — track load
+// failure so a 404 falls back to the placeholder icon instead of the
+// browser's default broken-image box showing truncated alt text.
+function ResourceThumb({ image, title }: { image: string; title: string }) {
+  const [failed, setFailed] = useState(false);
+  const showImage = Boolean(image) && !failed;
+
+  return (
+    <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
+      {showImage ? (
+        <Image
+          src={image}
+          alt={title}
+          width={48}
+          height={48}
+          className="size-full object-cover"
+          unoptimized
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <BookOpen className="size-5 text-muted-foreground" />
+      )}
+    </div>
+  );
+}
+
 export function ResourceList({
   resources,
   total,
@@ -172,20 +198,7 @@ export function ResourceList({
         <div className="divide-y divide-border rounded-lg border border-border">
           {resources.map((resource) => (
             <div key={resource.id} className="flex flex-wrap items-center gap-4 p-4">
-              <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                {resource.image ? (
-                  <Image
-                    src={resource.image}
-                    alt={resource.title}
-                    width={48}
-                    height={48}
-                    className="size-full object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <BookOpen className="size-5 text-muted-foreground" />
-                )}
-              </div>
+              <ResourceThumb image={resource.image} title={resource.title} />
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">

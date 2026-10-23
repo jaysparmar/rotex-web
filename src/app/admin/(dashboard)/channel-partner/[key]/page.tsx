@@ -47,11 +47,6 @@ export default async function AdminChannelPartnerSectionPage({ params }: { param
         })
       : [];
 
-  const allIndustryNames =
-    key === "form"
-      ? (await prisma.industry.findMany({ select: { name: true }, orderBy: { name: "asc" } })).map((i) => i.name)
-      : [];
-
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -70,9 +65,7 @@ export default async function AdminChannelPartnerSectionPage({ params }: { param
       {key === "stories" && (
         <ChannelPartnerStoriesForm {...meta} initialData={data} allStories={allStories} />
       )}
-      {key === "form" && (
-        <ChannelPartnerFormSectionForm {...meta} initialData={data} allIndustryNames={allIndustryNames} />
-      )}
+      {key === "form" && <ChannelPartnerFormSectionForm {...meta} initialData={data} />}
     </div>
   );
 }

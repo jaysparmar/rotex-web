@@ -21,11 +21,6 @@ export default async function AdminSupplierSectionPage({ params }: { params: Pro
   const data = section.data as never;
   const label = LABELS[key] ?? key;
 
-  const allIndustryNames =
-    key === "form"
-      ? (await prisma.industry.findMany({ select: { name: true }, orderBy: { name: "asc" } })).map((i) => i.name)
-      : [];
-
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -38,7 +33,7 @@ export default async function AdminSupplierSectionPage({ params }: { params: Pro
 
       {key === "hero" && <SupplierHeroForm {...meta} initialData={data} />}
       {key === "benefits" && <SupplierBenefitsForm {...meta} initialData={data} />}
-      {key === "form" && <SupplierFormSectionForm {...meta} initialData={data} allIndustryNames={allIndustryNames} />}
+      {key === "form" && <SupplierFormSectionForm {...meta} initialData={data} />}
     </div>
   );
 }

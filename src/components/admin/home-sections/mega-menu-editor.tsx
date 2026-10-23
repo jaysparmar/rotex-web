@@ -1,11 +1,21 @@
 "use client";
 
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Field, TextField, TextAreaField, RepeaterItem, FieldGrid } from "@/components/admin/form-fields";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FlatImageField } from "@/components/admin/flat-image-field";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { GripVertical } from "lucide-react";
 
 type IndustryOption = { id: string; name: string; subIndustries: { id: string; name: string }[] };
 
@@ -115,25 +125,30 @@ function IndustriesPicker({ navIndex, industries }: { navIndex: number; industri
     }
   }
 
-  // Reorder just the industry-level entries within selectedIds — this is what controls
-  // the mega menu's display order, since the site sorts groups by position in selectedIds.
-  function moveIndustry(industryId: string, direction: -1 | 1) {
+  // Reorders just the industry-level entries within selectedIds (sub-industry ids stay
+  // put at their own positions) — this is what controls the mega menu's display order,
+  // since the site sorts groups by position in selectedIds.
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
     const current: string[] = form.getValues(`${base}.selectedIds`) ?? [];
     const positions: number[] = [];
     current.forEach((id, i) => {
       if (industries.some((ind) => ind.id === id)) positions.push(i);
     });
     const idsAtPositions = positions.map((i) => current[i]);
-    const idx = idsAtPositions.indexOf(industryId);
-    const swapWith = idx + direction;
-    if (idx === -1 || swapWith < 0 || swapWith >= idsAtPositions.length) return;
-    [idsAtPositions[idx], idsAtPositions[swapWith]] = [idsAtPositions[swapWith], idsAtPositions[idx]];
+    const oldIndex = idsAtPositions.indexOf(active.id as string);
+    const newIndex = idsAtPositions.indexOf(over.id as string);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(idsAtPositions, oldIndex, newIndex);
     const next = [...current];
     positions.forEach((pos, i) => {
-      next[pos] = idsAtPositions[i];
+      next[pos] = reordered[i];
     });
     form.setValue(`${base}.selectedIds`, next);
   }
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   // Show checked industries first, in their configured order, then unchecked ones.
   const orderedIndustries = [...industries].sort((a, b) => {
@@ -151,58 +166,72 @@ function IndustriesPicker({ navIndex, industries }: { navIndex: number; industri
       {industries.length === 0 && (
         <p className="p-4 text-sm text-muted-foreground">No industries yet. Add some on the Industries page first.</p>
       )}
-      {orderedIndustries.map((industry) => {
-        const industryChecked = selected.includes(industry.id);
-        const orderIdx = checkedIndustryIds.indexOf(industry.id);
-        return (
-          <div key={industry.id} className="border-b border-border p-4 last:border-b-0">
-            <div className="flex items-center gap-2.5">
-              <label className="flex flex-1 items-center gap-2.5">
-                <Checkbox
-                  checked={industryChecked}
-                  onCheckedChange={(checked) => toggleIndustry(industry, checked === true)}
-                />
-                <span className="text-sm font-medium">{industry.name}</span>
-              </label>
-              {industryChecked && (
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    aria-label="Move up"
-                    disabled={orderIdx === 0}
-                    onClick={() => moveIndustry(industry.id, -1)}
-                    className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
-                  >
-                    <ChevronUp className="size-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Move down"
-                    disabled={orderIdx === checkedIndustryIds.length - 1}
-                    onClick={() => moveIndustry(industry.id, 1)}
-                    className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
-                  >
-                    <ChevronDown className="size-3.5" />
-                  </button>
-                </div>
-              )}
-            </div>
-            {industryChecked && industry.subIndustries.length > 0 && (
-              <div className="mt-2 ml-6 space-y-1.5">
-                {industry.subIndustries.map((sub) => (
-                  <label key={sub.id} className="flex items-center gap-2.5">
-                    <Checkbox
-                      checked={selected.includes(sub.id)}
-                      onCheckedChange={(checked) => toggle(sub.id, checked === true)}
-                    />
-                    <span className="text-sm text-muted-foreground">{sub.name}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={checkedIndustryIds} strategy={verticalListSortingStrategy}>
+          {orderedIndustries.map((industry) => (
+            <IndustryPickerRow
+              key={industry.id}
+              industry={industry}
+              checked={selected.includes(industry.id)}
+              selected={selected}
+              onToggleIndustry={(checked) => toggleIndustry(industry, checked)}
+              onToggleSub={toggle}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
+    </div>
+  );
+}
+
+function IndustryPickerRow({
+  industry,
+  checked,
+  selected,
+  onToggleIndustry,
+  onToggleSub,
+}: {
+  industry: IndustryOption;
+  checked: boolean;
+  selected: string[];
+  onToggleIndustry: (checked: boolean) => void;
+  onToggleSub: (id: string, checked: boolean) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: industry.id,
+    disabled: !checked,
+  });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
+
+  return (
+    <div ref={setNodeRef} style={style} className="border-b border-border bg-card p-4 last:border-b-0">
+      <div className="flex items-center gap-2.5">
+        {checked && (
+          <button
+            type="button"
+            {...attributes}
+            {...listeners}
+            aria-label={`Reorder ${industry.name}`}
+            className="cursor-grab touch-none text-muted-foreground outline-none active:cursor-grabbing"
+          >
+            <GripVertical className="size-4" />
+          </button>
+        )}
+        <label className="flex flex-1 items-center gap-2.5">
+          <Checkbox checked={checked} onCheckedChange={(v) => onToggleIndustry(v === true)} />
+          <span className="text-sm font-medium">{industry.name}</span>
+        </label>
+      </div>
+      {checked && industry.subIndustries.length > 0 && (
+        <div className="mt-2 ml-6 space-y-1.5">
+          {industry.subIndustries.map((sub) => (
+            <label key={sub.id} className="flex items-center gap-2.5">
+              <Checkbox checked={selected.includes(sub.id)} onCheckedChange={(v) => onToggleSub(sub.id, v === true)} />
+              <span className="text-sm text-muted-foreground">{sub.name}</span>
+            </label>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

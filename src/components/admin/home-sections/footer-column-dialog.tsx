@@ -11,10 +11,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Field, TextField, SwitchField } from "@/components/admin/form-fields";
-import { Trash2, ChevronUp, ChevronDown } from "lucide-react";
+import { OrderedCheckboxPicker } from "@/components/admin/ordered-checkbox-picker";
+import { Trash2 } from "lucide-react";
 
 type IndustryOption = { id: string; name: string };
 type CategoryOption = { id: string; name: string };
@@ -120,22 +120,11 @@ function useOrderedPicker(base: string) {
   const form = useFormContext();
   const selected: string[] = useWatch({ control: form.control, name: `${base}.selectedIds` }) ?? [];
 
-  function toggle(id: string, checked: boolean) {
-    const current: string[] = form.getValues(`${base}.selectedIds`) ?? [];
-    form.setValue(`${base}.selectedIds`, checked ? [...current, id] : current.filter((v) => v !== id));
+  function setSelected(ids: string[]) {
+    form.setValue(`${base}.selectedIds`, ids);
   }
 
-  function move(id: string, direction: -1 | 1) {
-    const current: string[] = form.getValues(`${base}.selectedIds`) ?? [];
-    const idx = current.indexOf(id);
-    const swapWith = idx + direction;
-    if (idx === -1 || swapWith < 0 || swapWith >= current.length) return;
-    const next = [...current];
-    [next[idx], next[swapWith]] = [next[swapWith], next[idx]];
-    form.setValue(`${base}.selectedIds`, next);
-  }
-
-  return { selected, toggle, move };
+  return { selected, setSelected };
 }
 
 function IndustriesLinksPicker({
@@ -146,57 +135,15 @@ function IndustriesLinksPicker({
   industries: IndustryOption[];
 }) {
   const base = `footer.columns.${columnIndex}.source`;
-  const { selected, toggle, move } = useOrderedPicker(base);
-
-  const ordered = [...industries].sort((a, b) => {
-    const aChecked = selected.includes(a.id);
-    const bChecked = selected.includes(b.id);
-    if (aChecked && bChecked) return selected.indexOf(a.id) - selected.indexOf(b.id);
-    if (aChecked) return -1;
-    if (bChecked) return 1;
-    return 0;
-  });
+  const { selected, setSelected } = useOrderedPicker(base);
 
   return (
-    <div className="space-y-1 rounded-lg border border-border">
-      {industries.length === 0 && (
-        <p className="p-4 text-sm text-muted-foreground">No industries yet. Add some on the Industries page first.</p>
-      )}
-      {ordered.map((industry) => {
-        const checked = selected.includes(industry.id);
-        const orderIdx = selected.indexOf(industry.id);
-        return (
-          <div key={industry.id} className="flex items-center gap-2.5 border-b border-border p-4 last:border-b-0">
-            <label className="flex flex-1 items-center gap-2.5">
-              <Checkbox checked={checked} onCheckedChange={(v) => toggle(industry.id, v === true)} />
-              <span className="text-sm font-medium">{industry.name}</span>
-            </label>
-            {checked && (
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  aria-label="Move up"
-                  disabled={orderIdx === 0}
-                  onClick={() => move(industry.id, -1)}
-                  className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
-                >
-                  <ChevronUp className="size-3.5" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Move down"
-                  disabled={orderIdx === selected.length - 1}
-                  onClick={() => move(industry.id, 1)}
-                  className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
-                >
-                  <ChevronDown className="size-3.5" />
-                </button>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
+    <OrderedCheckboxPicker
+      items={industries.map((i) => ({ id: i.id, label: i.name }))}
+      selected={selected}
+      onChange={setSelected}
+      emptyMessage="No industries yet. Add some on the Industries page first."
+    />
   );
 }
 
@@ -208,57 +155,15 @@ function CategoriesLinksPicker({
   categories: CategoryOption[];
 }) {
   const base = `footer.columns.${columnIndex}.source`;
-  const { selected, toggle, move } = useOrderedPicker(base);
-
-  const ordered = [...categories].sort((a, b) => {
-    const aChecked = selected.includes(a.id);
-    const bChecked = selected.includes(b.id);
-    if (aChecked && bChecked) return selected.indexOf(a.id) - selected.indexOf(b.id);
-    if (aChecked) return -1;
-    if (bChecked) return 1;
-    return 0;
-  });
+  const { selected, setSelected } = useOrderedPicker(base);
 
   return (
-    <div className="space-y-1 rounded-lg border border-border">
-      {categories.length === 0 && (
-        <p className="p-4 text-sm text-muted-foreground">No categories with products yet.</p>
-      )}
-      {ordered.map((category) => {
-        const checked = selected.includes(category.id);
-        const orderIdx = selected.indexOf(category.id);
-        return (
-          <div key={category.id} className="flex items-center gap-2.5 border-b border-border p-4 last:border-b-0">
-            <label className="flex flex-1 items-center gap-2.5">
-              <Checkbox checked={checked} onCheckedChange={(v) => toggle(category.id, v === true)} />
-              <span className="text-sm font-medium">{category.name}</span>
-            </label>
-            {checked && (
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  aria-label="Move up"
-                  disabled={orderIdx === 0}
-                  onClick={() => move(category.id, -1)}
-                  className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
-                >
-                  <ChevronUp className="size-3.5" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Move down"
-                  disabled={orderIdx === selected.length - 1}
-                  onClick={() => move(category.id, 1)}
-                  className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"
-                >
-                  <ChevronDown className="size-3.5" />
-                </button>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
+    <OrderedCheckboxPicker
+      items={categories.map((c) => ({ id: c.id, label: c.name }))}
+      selected={selected}
+      onChange={setSelected}
+      emptyMessage="No categories with products yet."
+    />
   );
 }
 

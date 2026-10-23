@@ -1,7 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronUp, ChevronDown, X, Plus } from "lucide-react";
+import { X, Plus, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -22,8 +32,8 @@ function Thumb({ asset }: { asset: PickerMediaAsset }) {
 /**
  * Reusable picker for admin gallery sections backed by the Media Library.
  * Selected items are shown in the exact order they'll render on the site,
- * with up/down controls to reorder — separate from the "add more" list below,
- * whose order is irrelevant since it's not what gets saved.
+ * drag to reorder — separate from the "add more" list below, whose order is
+ * irrelevant since it's not what gets saved.
  */
 export function GalleryMediaPicker({
   allMedia,
@@ -41,14 +51,7 @@ export function GalleryMediaPicker({
   const byId = new Map(allMedia.map((a) => [a.id, a]));
   const selectedAssets = selectedIds.map((id) => byId.get(id)).filter((a): a is PickerMediaAsset => Boolean(a));
   const unselected = allMedia.filter((a) => !selectedIds.includes(a.id));
-
-  function move(index: number, dir: -1 | 1) {
-    const target = index + dir;
-    if (target < 0 || target >= selectedIds.length) return;
-    const next = [...selectedIds];
-    [next[index], next[target]] = [next[target], next[index]];
-    onChangeSelected(next);
-  }
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   function remove(id: string) {
     onChangeSelected(selectedIds.filter((i) => i !== id));
@@ -62,64 +65,31 @@ export function GalleryMediaPicker({
     onChangeSizes({ ...sizes, [id]: size });
   }
 
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = selectedIds.indexOf(active.id as string);
+    const newIndex = selectedIds.indexOf(over.id as string);
+    if (oldIndex === -1 || newIndex === -1) return;
+    onChangeSelected(arrayMove(selectedIds, oldIndex, newIndex));
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-border">
         <span className="block p-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Selected ({selectedAssets.length}) — shown on site in this order
+          Selected ({selectedAssets.length}) — drag to reorder, shown on site in this order
         </span>
         {selectedAssets.length === 0 && (
           <p className="border-t border-border p-4 text-sm text-muted-foreground">Nothing selected yet.</p>
         )}
-        {selectedAssets.map((asset, i) => (
-          <div key={asset.id} className="flex items-center gap-3 border-t border-border p-3">
-            <div className="flex flex-col">
-              <button
-                type="button"
-                disabled={i === 0}
-                onClick={() => move(i, -1)}
-                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-              >
-                <ChevronUp className="size-4" />
-              </button>
-              <button
-                type="button"
-                disabled={i === selectedAssets.length - 1}
-                onClick={() => move(i, 1)}
-                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-              >
-                <ChevronDown className="size-4" />
-              </button>
-            </div>
-            <Thumb asset={asset} />
-            <span className="flex-1 truncate text-sm font-medium">{asset.filename}</span>
-            <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
-              <button
-                type="button"
-                onClick={() => setSize(asset.id, "wide")}
-                className={cn(
-                  "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                  (sizes[asset.id] ?? "wide") === "wide" ? "bg-background shadow-sm" : "text-muted-foreground"
-                )}
-              >
-                Wide
-              </button>
-              <button
-                type="button"
-                onClick={() => setSize(asset.id, "narrow")}
-                className={cn(
-                  "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                  sizes[asset.id] === "narrow" ? "bg-background shadow-sm" : "text-muted-foreground"
-                )}
-              >
-                Narrow
-              </button>
-            </div>
-            <Button type="button" variant="ghost" size="icon-sm" onClick={() => remove(asset.id)}>
-              <X className="size-3.5 text-destructive" />
-            </Button>
-          </div>
-        ))}
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={selectedIds} strategy={verticalListSortingStrategy}>
+            {selectedAssets.map((asset) => (
+              <SelectedAssetRow key={asset.id} asset={asset} size={sizes[asset.id] ?? "wide"} onSetSize={setSize} onRemove={remove} />
+            ))}
+          </SortableContext>
+        </DndContext>
       </div>
 
       {unselected.length > 0 && (
@@ -139,6 +109,62 @@ export function GalleryMediaPicker({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function SelectedAssetRow({
+  asset,
+  size,
+  onSetSize,
+  onRemove,
+}: {
+  asset: PickerMediaAsset;
+  size: "wide" | "narrow";
+  onSetSize: (id: string, size: "wide" | "narrow") => void;
+  onRemove: (id: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: asset.id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center gap-3 border-t border-border bg-card p-3">
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        aria-label={`Reorder ${asset.filename}`}
+        className="cursor-grab touch-none text-muted-foreground outline-none active:cursor-grabbing"
+      >
+        <GripVertical className="size-4" />
+      </button>
+      <Thumb asset={asset} />
+      <span className="flex-1 truncate text-sm font-medium">{asset.filename}</span>
+      <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+        <button
+          type="button"
+          onClick={() => onSetSize(asset.id, "wide")}
+          className={cn(
+            "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+            size === "wide" ? "bg-background shadow-sm" : "text-muted-foreground"
+          )}
+        >
+          Wide
+        </button>
+        <button
+          type="button"
+          onClick={() => onSetSize(asset.id, "narrow")}
+          className={cn(
+            "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+            size === "narrow" ? "bg-background shadow-sm" : "text-muted-foreground"
+          )}
+        >
+          Narrow
+        </button>
+      </div>
+      <Button type="button" variant="ghost" size="icon-sm" onClick={() => onRemove(asset.id)}>
+        <X className="size-3.5 text-destructive" />
+      </Button>
     </div>
   );
 }

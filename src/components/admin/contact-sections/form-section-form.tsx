@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
@@ -18,11 +19,6 @@ type ContactFormData = {
   certificationsText: string;
   trustLabel: string;
   partnerIds: string[];
-  enquiryTypeOptions: string[];
-  productTypeOptions: string[];
-  countryOptions: string[];
-  cityOptions: string[];
-  defaultCountry: string;
 };
 type FormValues = {
   enabled: boolean;
@@ -33,11 +29,6 @@ type FormValues = {
   certificationsText: string;
   trustLabel: string;
   partnerIds: string[];
-  enquiryTypeOptions: string;
-  productTypeOptions: string;
-  countryOptions: string;
-  cityOptions: string;
-  defaultCountry: string;
 };
 
 export function ContactFormSectionForm({
@@ -59,11 +50,6 @@ export function ContactFormSectionForm({
       certificationsText: initialData.certificationsText,
       trustLabel: initialData.trustLabel,
       partnerIds: initialData.partnerIds ?? [],
-      enquiryTypeOptions: (initialData.enquiryTypeOptions ?? []).join(", "),
-      productTypeOptions: (initialData.productTypeOptions ?? []).join(", "),
-      countryOptions: (initialData.countryOptions ?? []).join(", "),
-      cityOptions: (initialData.cityOptions ?? []).join(", "),
-      defaultCountry: initialData.defaultCountry,
     },
   });
   const { pending, error, success, run } = useSaveAction();
@@ -74,22 +60,8 @@ export function ContactFormSectionForm({
     form.setValue("partnerIds", checked ? [...current, id] : current.filter((p) => p !== id));
   }
 
-  function splitList(value: string) {
-    return value
-      .split(",")
-      .map((v) => v.trim())
-      .filter(Boolean);
-  }
-
   function onSubmit(values: FormValues) {
-    const { enabled, enquiryTypeOptions, productTypeOptions, countryOptions, cityOptions, ...rest } = values;
-    const data: ContactFormData = {
-      ...rest,
-      enquiryTypeOptions: splitList(enquiryTypeOptions),
-      productTypeOptions: splitList(productTypeOptions),
-      countryOptions: splitList(countryOptions),
-      cityOptions: splitList(cityOptions),
-    };
+    const { enabled, ...data } = values;
     run(async () => {
       try {
         await saveContactSection("form", { enabled, data });
@@ -140,16 +112,13 @@ export function ContactFormSectionForm({
           ))}
         </div>
 
-        <div className="space-y-4 rounded-lg border border-border p-4">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Form Dropdown Options</span>
-          <TextField label="Enquiry Types (comma separated)" {...form.register("enquiryTypeOptions")} />
-          <TextField label="Product Types (comma separated)" {...form.register("productTypeOptions")} />
-          <FieldGrid>
-            <TextField label="Countries (comma separated)" {...form.register("countryOptions")} />
-            <TextField label="Cities (comma separated)" {...form.register("cityOptions")} />
-          </FieldGrid>
-          <TextField label="Default Country" {...form.register("defaultCountry")} />
-        </div>
+        <p className="text-xs text-muted-foreground">
+          Form fields (which show, Enquiry Type options, Industry options, etc.) are now configured on the{" "}
+          <Link href="/admin/forms/contact" className="underline">
+            Form Fields → Contact Form
+          </Link>{" "}
+          page instead of here.
+        </p>
 
         <SaveBar pending={pending} error={error} success={success} />
       </form>
