@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PanelTop, PanelBottom, LayoutPanelLeft, MessageCircle, Bot } from "lucide-react";
+import { PanelTop, PanelBottom, LayoutPanelLeft, MessageCircle, Bot, Construction } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 
@@ -33,6 +33,12 @@ const SECTIONS = [
     label: "Ask AI Button",
     description: "Floating Ask AI button that opens an iframe panel on every public page.",
     icon: Bot,
+  },
+  {
+    key: "maintenance",
+    label: "Maintenance Mode",
+    description: "Take the public site offline with a branded holding page while you work.",
+    icon: Construction,
   },
 ];
 

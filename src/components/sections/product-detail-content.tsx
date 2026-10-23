@@ -9,8 +9,15 @@ import { BreadcrumbTrail } from "@/components/ui/breadcrumb-trail";
 import { ProductQuoteFormInline, ProductQuoteFormSheet } from "@/components/sections/product-quote-form";
 import { crumbsFromCategory } from "@/lib/breadcrumb";
 import type { ProductDetail, ProductVariant } from "@/lib/product-detail-data";
+import type { FormFieldKey } from "@/lib/form-config-shared";
 
-export function ProductDetailContent({ product }: { product: ProductDetail }) {
+export function ProductDetailContent({
+  product,
+  formConfig,
+}: {
+  product: ProductDetail;
+  formConfig: Record<FormFieldKey, boolean>;
+}) {
   const isVariable = product.productType === "variable" && !!product.variants;
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
@@ -158,6 +165,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
           productCode={product.code}
           productName={product.name}
           industries={product.industriesServed}
+          config={formConfig}
         />
       ) : (
         <div id="quote-form">
@@ -165,6 +173,7 @@ export function ProductDetailContent({ product }: { product: ProductDetail }) {
             productCode={product.code}
             productName={product.name}
             industries={product.industriesServed}
+            config={formConfig}
           />
         </div>
       )}

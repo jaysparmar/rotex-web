@@ -10,6 +10,8 @@ import { ProductFaqsSection } from "@/components/sections/product-faqs-section";
 import { getAttributeValuesByKey } from "@/lib/products";
 import { ProductsPageClient } from "./products-page-client";
 import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { categorySeoKey } from "@/lib/seo-collections";
+import { prisma } from "@/lib/prisma";
 import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 
 const PAGE_SIZE = 30;
@@ -29,8 +31,15 @@ type SearchParams = {
   page?: string;
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  return buildMetadata(await getPageSeo("products"), SITE_METADATA_FALLBACK);
+export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> {
+  const { category } = await searchParams;
+  if (!category) return buildMetadata(await getPageSeo("products"), SITE_METADATA_FALLBACK);
+
+  const categoryRow = await prisma.category.findFirst({ where: { slug: category }, select: { name: true, description: true } });
+  const fallback = categoryRow
+    ? { title: `${categoryRow.name} | Rotex`, description: categoryRow.description || SITE_METADATA_FALLBACK.description }
+    : SITE_METADATA_FALLBACK;
+  return buildMetadata(await getPageSeo(categorySeoKey(category)), fallback);
 }
 
 export default async function ProductsPage({
@@ -42,7 +51,7 @@ export default async function ProductsPage({
   const page = Math.max(1, Number(pageParam) || 1);
   const industrySlugs = industry ? industry.split(",").filter(Boolean) : [];
 
-  const seo = await getPageSeo("products");
+  const seo = await getPageSeo(category ? categorySeoKey(category) : "products");
   const [categories, subCategories, industries, { products, total }, attributeValues, faqs] = await Promise.all([
     getCategoriesWithProducts(),
     getSubCategoriesWithProducts(category),

@@ -319,6 +319,13 @@ model AdminConfig {
   updatedAt DateTime @updatedAt
 }
 
+model FormConfig {
+  id        String   @id @default("forms")
+  /// [FormConfigData]
+  data      Json
+  updatedAt DateTime @updatedAt
+}
+
 model HomeSection {
   key       String   @id
   enabled   Boolean  @default(true)
@@ -407,6 +414,7 @@ model Enquiry {
   city         String
   company      String?
   designation  String?
+  quantity     String?
   message      String
   /// [StringList]
   fileUrls     Json     @default("[]")

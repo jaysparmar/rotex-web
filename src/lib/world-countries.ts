@@ -21,5 +21,8 @@ const COUNTRY_CODE_BY_NAME = new Map(COUNTRIES.map((c) => [c.name, c.code]));
 export function getCitiesForCountry(countryName: string): string[] {
   const isoCode = COUNTRY_CODE_BY_NAME.get(countryName);
   if (!isoCode) return [];
-  return City.getCitiesOfCountry(isoCode)?.map((c) => c.name).sort((a, b) => a.localeCompare(b)) ?? [];
+  const names = City.getCitiesOfCountry(isoCode)?.map((c) => c.name) ?? [];
+  // The same city name can legitimately appear in more than one state/district
+  // (e.g. "Akola" in India) — dedupe since this list only ever shows/stores a name.
+  return [...new Set(names)].sort((a, b) => a.localeCompare(b));
 }

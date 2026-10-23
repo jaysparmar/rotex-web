@@ -1,9 +1,13 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { PostDetailSection } from "@/components/sections/post-detail-section";
 import { RelatedResourcesSection } from "@/components/sections/related-resources-section";
+import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 import { prisma } from "@/lib/prisma";
 import { createResourceTagResolver, type ResourceTagResolver } from "@/lib/resource-tags";
+import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { resourceSeoKey } from "@/lib/seo-collections";
 import type { ResourceItem, ResourceType } from "@/lib/resource-types";
 
 const TYPE_CONFIG: Record<ResourceType, { label: string; singular: string; relatedHeading: string; basePath: string }> = {
@@ -27,6 +31,12 @@ const TYPE_CONFIG: Record<ResourceType, { label: string; singular: string; relat
     basePath: "/csr",
   },
 };
+
+export async function getResourceMetadata(type: ResourceType, slug: string): Promise<Metadata> {
+  const resource = await prisma.resource.findUnique({ where: { type_slug: { type, slug } }, select: { title: true } });
+  const fallback = resource ? { title: `${resource.title} | Rotex`, description: SITE_METADATA_FALLBACK.description } : SITE_METADATA_FALLBACK;
+  return buildMetadata(await getPageSeo(resourceSeoKey(type, slug)), fallback);
+}
 
 function toResourceItem(
   r: {
@@ -65,9 +75,10 @@ type ResourceDetailPageProps = {
 export async function ResourceDetailPage({ type, slug }: ResourceDetailPageProps) {
   if (!TYPE_CONFIG[type]) notFound();
 
-  const [record, resolver] = await Promise.all([
+  const [record, resolver, seo] = await Promise.all([
     prisma.resource.findUnique({ where: { type_slug: { type, slug } } }),
     createResourceTagResolver(),
+    getPageSeo(resourceSeoKey(type, slug)),
   ]);
   if (!record || !record.published) notFound();
 
@@ -89,6 +100,7 @@ export async function ResourceDetailPage({ type, slug }: ResourceDetailPageProps
 
   return (
     <div>
+      <SeoJsonLd schema={seo.schema} />
       <ScrollToTop />
       <PostDetailSection post={post} typeLabel={label} typeSingular={singular} typeHref={basePath} />
       <RelatedResourcesSection heading={relatedHeading} posts={related} basePath={basePath} />

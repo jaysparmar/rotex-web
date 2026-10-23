@@ -80,7 +80,7 @@ export default async function Home() {
   const featuredProducts = (products?.categories ?? []).map((c) => ({
     name: c.name,
     description: c.description ?? "",
-    image: c.image ?? "/file.svg",
+    image: c.image ?? "",
     href: `/products?category=${c.slug}`,
   }));
   const certifications = await fetchHomeSection<CertificationsData>("certifications");

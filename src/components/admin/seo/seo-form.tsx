@@ -1,38 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, FormProvider, useFieldArray } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { SaveBar } from "@/components/admin/section-form-shell";
-import { TextField, FieldGrid, SwitchField, AddButton, RepeaterItem } from "@/components/admin/form-fields";
+import { TextField, FieldGrid, SwitchField } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
+import { KeywordChipsInput } from "@/components/admin/seo/keyword-chips-input";
 import { Textarea } from "@/components/ui/textarea";
 import { TitleField, DescriptionField } from "@/components/admin/seo/seo-meta-fields";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveSeoPage } from "@/app/admin/(dashboard)/seo/actions";
 import type { SeoMetaData } from "@/lib/seo";
 
-type FormValues = {
-  title: string;
-  description: string;
-  keywords: { value: string }[];
-  ogImage: { src: string; alt: string };
-  canonical: string;
-  noindex: boolean;
-  schema: string;
-};
-
-function toFormValues(data: SeoMetaData): FormValues {
-  return { ...data, keywords: data.keywords.map((value) => ({ value })) };
-}
-
-function toSeoMetaData(values: FormValues): SeoMetaData {
-  return { ...values, keywords: values.keywords.map((k) => k.value).filter(Boolean) };
-}
+type FormValues = SeoMetaData;
 
 export function SeoForm({ pageKey, initialData }: { pageKey: string; initialData: SeoMetaData }) {
-  const form = useForm<FormValues>({ defaultValues: toFormValues(initialData) });
+  const form = useForm<FormValues>({ defaultValues: initialData });
   const { pending, error, success, run } = useSaveAction();
-  const keywords = useFieldArray({ control: form.control, name: "keywords" });
   const [schemaError, setSchemaError] = useState<string>();
 
   function onSubmit(values: FormValues) {
@@ -46,7 +30,7 @@ export function SeoForm({ pageKey, initialData }: { pageKey: string; initialData
       }
     }
     setSchemaError(undefined);
-    run(() => saveSeoPage(pageKey, toSeoMetaData(values)));
+    run(() => saveSeoPage(pageKey, values));
   }
 
   return (
@@ -55,14 +39,9 @@ export function SeoForm({ pageKey, initialData }: { pageKey: string; initialData
         <TitleField name="title" />
         <DescriptionField name="description" />
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Keywords</span>
-          {keywords.fields.map((field, i) => (
-            <RepeaterItem key={field.id} title={`Keyword ${i + 1}`} onRemove={() => keywords.remove(i)}>
-              <TextField label="Keyword" {...form.register(`keywords.${i}.value`)} />
-            </RepeaterItem>
-          ))}
-          <AddButton label="Add Keyword" onClick={() => keywords.append({ value: "" })} />
+          <KeywordChipsInput value={form.watch("keywords")} onChange={(kw) => form.setValue("keywords", kw)} />
         </div>
 
         <div className="space-y-4 rounded-lg border border-border p-4">

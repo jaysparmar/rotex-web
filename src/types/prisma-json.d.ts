@@ -100,6 +100,8 @@ declare global {
       whatsapp?: { enabled: boolean; link: string };
       /* Floating "Ask AI" button that opens an iframe panel, bottom-right on every public page. */
       askAi?: { enabled: boolean; iframeUrl: string; label?: string };
+      /* When enabled, every public page is rewritten to the maintenance page. /admin keeps working. */
+      maintenance?: { enabled: boolean; title?: string; message?: string };
     };
 
     type AdminConfigData = {
@@ -108,6 +110,14 @@ declare global {
       /* Used site-wide as the backdrop shown behind images while they load or when the real src is missing. */
       fallbackPlaceholderImage: string;
     };
+
+    /* One row per enquiry-style form (contact, industry, product-quote, supplier,
+       channel-partner). `fields` is keyed by the common field key (see src/lib/form-config.ts)
+       — true shows the field on that form's site-facing render, false hides it. `industryIds`
+       is the allow-list for the "Industry Served" dropdown (specific Industry/SubIndustry ids)
+       — empty means nothing is picked yet, so no options show. Job application form is separate
+       and not covered here. */
+    type FormConfigData = Record<string, { fields: Record<string, boolean>; industryIds: string[] }>;
 
     type SeoMetaData = {
       title: string;

@@ -1,9 +1,10 @@
 "use client";
 
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
-import { TextField, TextAreaField } from "@/components/admin/form-fields";
+import { TextField, TextAreaField, Field } from "@/components/admin/form-fields";
+import { IndustryNamesPicker } from "@/components/admin/industry-names-picker";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveSupplierSection } from "@/app/admin/(dashboard)/supplier/actions";
 
@@ -25,16 +26,18 @@ type FormValues = {
   countryOptions: string;
   cityOptions: string;
   businessTypeOptions: string;
-  industryOptions: string;
+  industryOptions: string[];
   defaultCountry: string;
 };
 
 export function SupplierFormSectionForm({
   initialEnabled,
   initialData,
+  allIndustryNames,
 }: {
   initialEnabled: boolean;
   initialData: FormSectionData;
+  allIndustryNames: string[];
 }) {
   const form = useForm<FormValues>({
     defaultValues: {
@@ -45,24 +48,24 @@ export function SupplierFormSectionForm({
       countryOptions: (initialData.countryOptions ?? []).join(", "),
       cityOptions: (initialData.cityOptions ?? []).join(", "),
       businessTypeOptions: (initialData.businessTypeOptions ?? []).join(", "),
-      industryOptions: (initialData.industryOptions ?? []).join(", "),
+      industryOptions: initialData.industryOptions ?? [],
       defaultCountry: initialData.defaultCountry,
     },
   });
   const { pending, error, success, run } = useSaveAction();
+  const industryOptions = useWatch({ control: form.control, name: "industryOptions" }) ?? [];
 
   function splitList(value: string) {
     return value.split(",").map((v) => v.trim()).filter(Boolean);
   }
 
   function onSubmit(values: FormValues) {
-    const { enabled, countryOptions, cityOptions, businessTypeOptions, industryOptions, ...rest } = values;
+    const { enabled, countryOptions, cityOptions, businessTypeOptions, ...rest } = values;
     const data: FormSectionData = {
       ...rest,
       countryOptions: splitList(countryOptions),
       cityOptions: splitList(cityOptions),
       businessTypeOptions: splitList(businessTypeOptions),
-      industryOptions: splitList(industryOptions),
     };
     run(async () => {
       try {
@@ -88,7 +91,13 @@ export function SupplierFormSectionForm({
           <TextField label="Countries (comma separated)" {...form.register("countryOptions")} />
           <TextField label="Cities (comma separated)" {...form.register("cityOptions")} />
           <TextField label="Business Types (comma separated)" {...form.register("businessTypeOptions")} />
-          <TextField label="Industries Served (comma separated)" {...form.register("industryOptions")} />
+          <Field label="Industries Served">
+            <IndustryNamesPicker
+              allIndustryNames={allIndustryNames}
+              selected={industryOptions}
+              onChange={(names) => form.setValue("industryOptions", names)}
+            />
+          </Field>
           <TextField label="Default Country" {...form.register("defaultCountry")} />
         </div>
 

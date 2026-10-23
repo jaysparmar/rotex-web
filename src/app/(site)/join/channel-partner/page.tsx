@@ -6,11 +6,10 @@ import { ChannelPartnerMapSection } from "@/components/sections/channel-partner-
 import { CustomerStoriesSection } from "@/components/sections/customer-stories-section";
 import { ChannelPartnerFormSection } from "@/components/sections/channel-partner-form-section";
 import type { Metadata } from "next";
-import { fetchChannelPartnerSection, fetchIndustries } from "@/lib/site-api";
+import { fetchChannelPartnerSection } from "@/lib/site-api";
 import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { getFormConfig, getIndustryOptionsForForm } from "@/lib/form-config";
 import { SeoJsonLd } from "@/components/seo/seo-json-ld";
-
-type IndustriesData = { industries: { id: string; name: string }[] };
 
 type CtaButton = { label: string; href: string };
 type HeroData = { title: string; description: string; image: string; mobileImage?: string; cta: CtaButton };
@@ -44,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ChannelPartnerPage() {
   const seo = await getPageSeo("join-channel-partner");
-  const [hero, stats, why, benefits, map, stories, form, industriesData] = await Promise.all([
+  const [hero, stats, why, benefits, map, stories, form, industryOptions, formConfig] = await Promise.all([
     fetchChannelPartnerSection<HeroData>("hero"),
     fetchChannelPartnerSection<StatsData>("stats"),
     fetchChannelPartnerSection<WhyData>("why"),
@@ -52,11 +51,9 @@ export default async function ChannelPartnerPage() {
     fetchChannelPartnerSection<MapData>("map"),
     fetchChannelPartnerSection<StoriesData>("stories"),
     fetchChannelPartnerSection<FormData>("form"),
-    fetchIndustries<IndustriesData>(),
+    getIndustryOptionsForForm("channel-partner"),
+    getFormConfig(),
   ]);
-
-  const liveIndustryNames = industriesData?.industries.map((i) => i.name) ?? [];
-  const industryOptions = liveIndustryNames.length > 0 ? liveIndustryNames : form?.industryOptions;
 
   return (
     <div>
@@ -105,11 +102,8 @@ export default async function ChannelPartnerPage() {
           headingPrefix={form.headingPrefix}
           headingHighlight={form.headingHighlight}
           description={form.description}
-          countryOptions={form.countryOptions}
-          cityOptions={form.cityOptions}
-          businessTypeOptions={form.businessTypeOptions}
           industryOptions={industryOptions}
-          defaultCountry={form.defaultCountry}
+          config={formConfig["channel-partner"].fields}
         />
       )}
     </div>

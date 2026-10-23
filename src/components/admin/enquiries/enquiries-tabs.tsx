@@ -1,12 +1,13 @@
 "use client";
 
-import { Mail, Phone, MapPin, Building2, FileText, Calendar } from "lucide-react";
+import { Mail, Phone, MapPin, Building2, FileText, Calendar, Hash } from "lucide-react";
+import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdminPagination } from "@/components/ui/admin-pagination";
+import { DateRangePicker } from "@/components/admin/date-range-picker";
+import { ExportEnquiriesButton } from "@/components/admin/enquiries/export-enquiries-button";
 import { useAdminListUrl } from "@/hooks/use-admin-list-url";
 import { OTHER_TAB, NO_PRODUCT_PLACEHOLDER } from "@/lib/enquiry-filters";
-
-const ALL_PRODUCTS = "__all__";
 
 type Enquiry = {
   id: string;
@@ -21,6 +22,7 @@ type Enquiry = {
   city: string;
   company: string | null;
   designation: string | null;
+  quantity: string | null;
   message: string;
   fileUrls: string[];
   createdAt: Date;
@@ -72,6 +74,7 @@ function EnquiryCard({ enquiry, tab }: { enquiry: Enquiry; tab: string }) {
         <DetailRow icon={Building2} label="Company" value={e.company} />
         <DetailRow icon={FileText} label="Product" value={product} />
         <DetailRow icon={FileText} label="Designation" value={e.designation} />
+        <DetailRow icon={Hash} label="Quantity" value={e.quantity} />
         {isSupplier && <DetailRow icon={Building2} label="Industries Served" value={e.industryName} />}
       </div>
 
@@ -102,6 +105,8 @@ export function EnquiriesTabs({
   pageSize,
   product,
   productNames,
+  from,
+  to,
 }: {
   tabs: string[];
   tabCounts: Record<string, number>;
@@ -112,9 +117,21 @@ export function EnquiriesTabs({
   pageSize: number;
   product: string;
   productNames: string[];
+  from: string;
+  to: string;
 }) {
   const { searchParams, pathname, router, pageHref, setParam } = useAdminListUrl();
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  function setDateRange(range: { from?: Date; to?: Date }) {
+    const params = new URLSearchParams(searchParams);
+    if (range.from) params.set("from", format(range.from, "yyyy-MM-dd"));
+    else params.delete("from");
+    if (range.to) params.set("to", format(range.to, "yyyy-MM-dd"));
+    else params.delete("to");
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`);
+  }
 
   function changeTab(name: string) {
     const params = new URLSearchParams(searchParams);
@@ -143,24 +160,31 @@ export function EnquiriesTabs({
         ))}
       </div>
 
-      {productNames.length > 0 && (
-        <Select
-          value={product || ALL_PRODUCTS}
-          onValueChange={(v) => setParam("product", v === ALL_PRODUCTS ? undefined : (v as string))}
-        >
-          <SelectTrigger className="w-56">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL_PRODUCTS}>All products</SelectItem>
-            {productNames.map((p) => (
-              <SelectItem key={p} value={p as string}>
-                {p}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
+      <div className="flex flex-wrap items-center gap-2">
+        {productNames.length > 0 && (
+          <Select value={product} onValueChange={(v) => setParam("product", (v as string) || undefined)}>
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder="All products" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All products</SelectItem>
+              {productNames.map((p) => (
+                <SelectItem key={p} value={p as string}>
+                  {p}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        <DateRangePicker
+          from={from ? new Date(`${from}T00:00:00`) : undefined}
+          to={to ? new Date(`${to}T00:00:00`) : undefined}
+          onChange={setDateRange}
+        />
+
+        <ExportEnquiriesButton tabs={tabs} active={active} />
+      </div>
 
       {enquiries.length === 0 ? (
         <p className="rounded-lg border border-border py-8 text-center text-sm text-muted-foreground">

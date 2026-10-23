@@ -18,6 +18,7 @@ const schema = z.object({
   city: z.string().min(1),
   company: z.string().optional(),
   designation: z.string().optional(),
+  quantity: z.string().optional(),
   message: z.string().min(10),
 });
 
@@ -59,6 +60,7 @@ export async function POST(req: NextRequest) {
     city: formData.get("city"),
     company: formData.get("company") || undefined,
     designation: formData.get("designation") || undefined,
+    quantity: formData.get("quantity") || undefined,
     message: formData.get("message"),
   });
 

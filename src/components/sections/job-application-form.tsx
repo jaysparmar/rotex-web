@@ -101,6 +101,10 @@ export function JobApplicationForm({
   defaultPosition,
   className = "",
 }: JobApplicationFormProps) {
+  // Always offer "Other" so the form still works when no job postings are
+  // open, and so a candidate can apply for something not currently listed.
+  const positions = positionOptions.includes("Other") ? positionOptions : [...positionOptions, "Other"];
+
   const fileRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string>();
   const [submitError, setSubmitError] = useState<string>();
@@ -174,7 +178,7 @@ export function JobApplicationForm({
       </div>
 
       <Field label="Position you are applying for" error={errors.position?.message} name="position">
-        <FormSelect control={control} name="position" placeholder="Select" options={positionOptions} hasError={!!errors.position} />
+        <FormSelect control={control} name="position" placeholder="Select" options={positions} hasError={!!errors.position} />
       </Field>
 
       <div className="flex flex-col gap-5 lg:flex-row">

@@ -20,14 +20,17 @@ function Placeholder() {
 }
 
 export function ImageView({ src, alt, fill, className, containerClassName, ...props }: ImageViewProps) {
+  const hasSrc = Boolean(src);
+
   if (fill) {
     return (
       <div className={cn("relative overflow-hidden bg-stone-100", containerClassName)}>
-        <Placeholder />
-        <Image src={src} alt={alt} fill className={cn("object-cover", className)} {...props} />
+        {hasSrc ? <Image src={src} alt={alt} fill className={cn("object-cover", className)} {...props} /> : <Placeholder />}
       </div>
     );
   }
+
+  if (!hasSrc) return <Placeholder />;
 
   return <Image src={src} alt={alt} className={cn("object-contain", className)} {...props} />;
 }

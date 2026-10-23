@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { ContactHeroSection } from "@/components/sections/contact-hero-section";
 import { ContactFormSection } from "@/components/sections/contact-form-section";
 import { ContactOfficesSection } from "@/components/sections/contact-offices-section";
-import { fetchContactSection, fetchIndustries } from "@/lib/site-api";
-import { INDUSTRY_OPTIONS, type ContactOfficeTab } from "@/lib/contact-data";
+import { fetchContactSection } from "@/lib/site-api";
+import type { ContactOfficeTab } from "@/lib/contact-data";
 import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { getFormConfig, getIndustryOptionsForForm } from "@/lib/form-config";
 import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 
 type HeroData = { breadcrumbLabel: string; title: string; description: string; ctaLabel: string };
@@ -23,23 +24,19 @@ type FormData = {
   cityOptions: string[];
   defaultCountry: string;
 };
-type IndustriesData = { industries: { id: string; slug: string; name: string }[] };
-
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata(await getPageSeo("contact"), SITE_METADATA_FALLBACK);
 }
 
 export default async function ContactPage() {
   const seo = await getPageSeo("contact");
-  const [hero, offices, form, industriesData] = await Promise.all([
+  const [hero, offices, form, industryOptions, formConfig] = await Promise.all([
     fetchContactSection<HeroData>("hero"),
     fetchContactSection<OfficesData>("offices"),
     fetchContactSection<FormData>("form"),
-    fetchIndustries<IndustriesData>(),
+    getIndustryOptionsForForm("contact"),
+    getFormConfig(),
   ]);
-
-  const liveIndustryNames = industriesData?.industries.map((i) => i.name) ?? [];
-  const industryOptions = liveIndustryNames.length > 0 ? liveIndustryNames : INDUSTRY_OPTIONS;
 
   return (
     <div>
@@ -66,12 +63,8 @@ export default async function ContactPage() {
           certificationsText={form.certificationsText}
           trustLabel={form.trustLabel}
           logos={form.logos}
-          enquiryTypeOptions={form.enquiryTypeOptions}
-          productTypeOptions={form.productTypeOptions}
-          countryOptions={form.countryOptions}
-          cityOptions={form.cityOptions}
           industryOptions={industryOptions}
-          defaultCountry={form.defaultCountry}
+          config={formConfig.contact.fields}
         />
       )}
     </div>

@@ -18,7 +18,7 @@ export function CustomerStoryCard({ media, quote, author, company, className }: 
   return (
     <div
       className={cn(
-        "h-full shrink-0 w-full lg:w-144.5 flex flex-col lg:rounded-[10px] lg:bg-white lg:outline-1 lg:-outline-offset-1 lg:outline-neutral-200 lg:p-5 lg:gap-5",
+        "shrink-0 w-full lg:w-144.5 flex flex-col lg:rounded-[10px] lg:bg-white lg:outline-1 lg:-outline-offset-1 lg:outline-neutral-200 lg:p-5 lg:gap-5",
         className
       )}
     >

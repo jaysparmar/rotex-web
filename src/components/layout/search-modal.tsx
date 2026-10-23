@@ -96,7 +96,7 @@ export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChang
                 className="flex flex-col items-center gap-2 p-4 rounded-xl border border-neutral-200 hover:border-[#EF3E23] transition-colors"
               >
                 <div className="relative w-full h-32">
-                  <ImageView src={p.image ?? "/file.svg"} alt={p.name} fill containerClassName="w-full h-full rounded-lg" className="object-contain" />
+                  <ImageView src={p.image ?? ""} alt={p.name} fill containerClassName="w-full h-full rounded-lg" className="object-contain" />
                 </div>
                 <span className="text-[#EF3E23] text-xs font-semibold font-montserrat text-center">{p.name}</span>
               </Link>

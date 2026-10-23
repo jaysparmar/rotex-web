@@ -2,11 +2,10 @@ import { SupplierHeroSection } from "@/components/sections/supplier-hero-section
 import { SupplierBenefitsSection } from "@/components/sections/supplier-benefits-section";
 import { SupplierFormSection } from "@/components/sections/supplier-form-section";
 import type { Metadata } from "next";
-import { fetchSupplierSection, fetchIndustries } from "@/lib/site-api";
+import { fetchSupplierSection } from "@/lib/site-api";
 import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
+import { getFormConfig, getIndustryOptionsForForm } from "@/lib/form-config";
 import { SeoJsonLd } from "@/components/seo/seo-json-ld";
-
-type IndustriesData = { industries: { id: string; name: string }[] };
 
 type CtaButton = { label: string; href: string };
 type HeroData = { title: string; description: string; image: string; mobileImage?: string; cta: CtaButton };
@@ -34,15 +33,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SupplierPage() {
   const seo = await getPageSeo("join-supplier");
-  const [hero, benefits, form, industriesData] = await Promise.all([
+  const [hero, benefits, form, industryOptions, formConfig] = await Promise.all([
     fetchSupplierSection<HeroData>("hero"),
     fetchSupplierSection<BenefitsData>("benefits"),
     fetchSupplierSection<FormData>("form"),
-    fetchIndustries<IndustriesData>(),
+    getIndustryOptionsForForm("supplier"),
+    getFormConfig(),
   ]);
-
-  const liveIndustryNames = industriesData?.industries.map((i) => i.name) ?? [];
-  const industryOptions = liveIndustryNames.length > 0 ? liveIndustryNames : form?.industryOptions;
 
   return (
     <div>
@@ -72,11 +69,8 @@ export default async function SupplierPage() {
           headingPrefix={form.headingPrefix}
           headingHighlight={form.headingHighlight}
           description={form.description}
-          countryOptions={form.countryOptions}
-          cityOptions={form.cityOptions}
-          businessTypeOptions={form.businessTypeOptions}
           industryOptions={industryOptions}
-          defaultCountry={form.defaultCountry}
+          config={formConfig.supplier.fields}
         />
       )}
     </div>

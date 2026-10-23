@@ -8,10 +8,11 @@ const PAGE_SIZE = 20;
 export default async function AdminEnquiriesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; product?: string; page?: string }>;
+  searchParams: Promise<{ tab?: string; product?: string; page?: string; from?: string; to?: string }>;
 }) {
-  const { tab: tabParam, product, page: pageParam } = await searchParams;
+  const { tab: tabParam, product, page: pageParam, from, to } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
+  const dateRange = { from, to };
 
   const industries = await prisma.industry.findMany({ select: { id: true, name: true }, orderBy: { createdAt: "asc" } });
   const industryNames = industries.map((i) => i.name);
@@ -36,13 +37,13 @@ export default async function AdminEnquiriesPage({
   };
 
   const active = tabParam && tabs.includes(tabParam) ? tabParam : (tabs[0] ?? "");
-  const where = buildEnquiryWhere(active, industryNames, product);
+  const where = buildEnquiryWhere(active, industryNames, product, dateRange);
 
   const [enquiries, total, productRows] = await Promise.all([
     prisma.enquiry.findMany({ where, orderBy: { createdAt: "desc" }, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE }),
     prisma.enquiry.count({ where }),
     prisma.enquiry.findMany({
-      where: buildEnquiryWhere(active, industryNames),
+      where: buildEnquiryWhere(active, industryNames, undefined, dateRange),
       distinct: ["product"],
       select: { product: true },
     }),
@@ -74,6 +75,8 @@ export default async function AdminEnquiriesPage({
         pageSize={PAGE_SIZE}
         product={product ?? ""}
         productNames={productNames}
+        from={from ?? ""}
+        to={to ?? ""}
       />
     </div>
   );
