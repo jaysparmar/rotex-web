@@ -68,11 +68,6 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
 
             {/* Body */}
             <div className={styles.content} dangerouslySetInnerHTML={{ __html: contentHtml }} />
-
-            {/* Gallery */}
-            {post.gallery.length > 0 && (
-              <MediaGalleryCarousel images={post.gallery.map((src) => ({ src, alt: post.title }))} />
-            )}
           </div>
 
           {/* Sidebar */}
@@ -123,6 +118,12 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
             </div>
           </aside>
         </div>
+
+        {/* Gallery — full-width below the content/sidebar row, not squeezed into the
+            content column, so "wide"/"narrow" slide sizing has real room to show. */}
+        {post.gallery.length > 0 && (
+          <MediaGalleryCarousel images={post.gallery.map((g) => ({ src: g.url, alt: post.title, size: g.size }))} />
+        )}
       </div>
     </section>
   );

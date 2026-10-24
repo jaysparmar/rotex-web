@@ -384,7 +384,7 @@ model Resource {
   title     String
   slug      String
   image     String
-  /// [StringList]
+  /// [GalleryList]
   gallery   Json     @default("[]")
   /// [StringList]
   productIds  Json   @default("[]")

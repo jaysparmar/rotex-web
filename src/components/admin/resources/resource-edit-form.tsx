@@ -35,6 +35,7 @@ type ResourceFormValues = {
   published: boolean;
   image: { src: string };
   galleryIds: string[];
+  gallerySizes: Record<string, "wide" | "narrow">;
   productIds: string[];
   industryIds: string[];
   extraTags: string[];
@@ -48,7 +49,7 @@ type Resource = {
   title: string;
   slug: string;
   image: string;
-  gallery: string[];
+  gallery: { url: string; size?: "wide" | "narrow" }[];
   published: boolean;
   productIds: string[];
   industryIds: string[];
@@ -76,7 +77,7 @@ export function ResourceEditForm({
 }) {
   const router = useRouter();
   const slugTouched = useRef(Boolean(resource));
-  // Resource.gallery persists plain URLs (shared shape with the frontend swiper); the
+  // Resource.gallery persists by URL (shared shape with the frontend swiper); the
   // Media Library picker works in asset ids, so existing URLs are matched back to ids here.
   const urlToId = new Map(allMedia.map((a) => [a.url, a.id]));
   const form = useForm<ResourceFormValues>({
@@ -86,7 +87,14 @@ export function ResourceEditForm({
       slug: resource?.slug ?? "",
       published: resource?.published ?? true,
       image: { src: resource?.image ?? "" },
-      galleryIds: (resource?.gallery ?? []).map((url) => urlToId.get(url)).filter((id): id is string => Boolean(id)),
+      galleryIds: (resource?.gallery ?? [])
+        .map((g) => urlToId.get(g.url))
+        .filter((id): id is string => Boolean(id)),
+      gallerySizes: Object.fromEntries(
+        (resource?.gallery ?? [])
+          .map((g) => [urlToId.get(g.url), g.size ?? "wide"] as const)
+          .filter((entry): entry is [string, "wide" | "narrow"] => Boolean(entry[0]))
+      ),
       productIds: resource?.productIds ?? [],
       industryIds: resource?.industryIds ?? [],
       extraTags: resource?.extraTags ?? [],
@@ -116,7 +124,12 @@ export function ResourceEditForm({
       slug: values.slug.trim() || slugify(values.title),
       published: values.published,
       image: values.image.src,
-      gallery: values.galleryIds.map((id) => idToUrl.get(id)).filter((url): url is string => Boolean(url)),
+      gallery: values.galleryIds
+        .map((id) => {
+          const url = idToUrl.get(id);
+          return url ? { url, size: values.gallerySizes[id] ?? "wide" } : null;
+        })
+        .filter((g): g is { url: string; size: "wide" | "narrow" } => Boolean(g)),
       productIds: values.productIds,
       industryIds: values.industryIds,
       extraTags: values.extraTags,
@@ -208,7 +221,7 @@ export function ResourceEditForm({
 function GalleryField({ allMedia }: { allMedia: PickerMediaAsset[] }) {
   const form = useFormContext<ResourceFormValues>();
   const selected = useWatch({ control: form.control, name: "galleryIds" }) ?? [];
-  const [sizes, setSizes] = useState<Record<string, "wide" | "narrow">>({});
+  const sizes = useWatch({ control: form.control, name: "gallerySizes" }) ?? {};
 
   if (allMedia.length === 0) {
     return (
@@ -225,7 +238,7 @@ function GalleryField({ allMedia }: { allMedia: PickerMediaAsset[] }) {
       selectedIds={selected}
       sizes={sizes}
       onChangeSelected={(ids) => form.setValue("galleryIds", ids)}
-      onChangeSizes={setSizes}
+      onChangeSizes={(next) => form.setValue("gallerySizes", next)}
     />
   );
 }

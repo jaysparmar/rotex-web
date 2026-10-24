@@ -24,7 +24,7 @@ export default async function AdminResourceDetailPage({ params }: { params: Prom
 
   const resource = {
     ...record,
-    gallery: (record.gallery as string[]) ?? [],
+    gallery: (record.gallery as { url: string; size?: "wide" | "narrow" }[]) ?? [],
     productIds: (record.productIds as string[]) ?? [],
     industryIds: (record.industryIds as string[]) ?? [],
     extraTags: (record.extraTags as string[]) ?? [],

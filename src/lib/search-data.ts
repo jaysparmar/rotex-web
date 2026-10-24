@@ -242,7 +242,7 @@ export async function searchResources(
     slug: r.slug,
     title: r.title,
     image: r.image,
-    gallery: (r.gallery as string[]) ?? [],
+    gallery: (r.gallery as { url: string; size?: "wide" | "narrow" }[]) ?? [],
     products: resolver.resolveProducts((r.productIds as string[]) ?? []),
     industries: resolver.resolveIndustries((r.industryIds as string[]) ?? []),
     extraTags: (r.extraTags as string[]) ?? [],

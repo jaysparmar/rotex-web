@@ -10,7 +10,7 @@ export type ResourceItem = {
   slug: string;
   title: string;
   image: string;
-  gallery: string[];
+  gallery: { url: string; size?: "wide" | "narrow" }[];
   products: ResolvedTag[];
   industries: ResolvedTag[];
   extraTags: string[];
