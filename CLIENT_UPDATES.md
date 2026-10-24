@@ -46,5 +46,17 @@ Plain-language list of everything completed. No technical terms — just what ch
 - The job application form now always shows an "Other" option, so candidates can still apply even if there are no open positions listed.
 - Fixed a few local development environment issues that were blocking work (no impact on the live site).
 
+## 9. Industry Pages
+- Fixed a duplicate hero banner showing twice on some industry pages (once at the top, once again further down) — now shows once.
+- Industries with no sub-sections (e.g. no "Upstream / Midstream / Downstream" tabs) no longer show an empty tab bar or an unrelated stats section — those only appear when there's actually sub-content to show.
+
+## 10. Resources (Blogs / Case Studies / News / CSR)
+- Added a Gallery to each resource — pick multiple images from the Media Library (same picker used on the About page gallery) and they show as a swipeable photo gallery on the article's page.
+
+## 11. Products — Product Family
+- "Product Family" (shown when adding/editing a product) used to be a fixed list of 5 options that only a developer could change. It's now tied to your Categories list — whatever you add/rename/remove under Categories automatically shows up here too, no code change needed.
+- Fixed the admin Categories search bar and company filter dropdown squeezing onto two lines on smaller screens — now stay on one row.
+- Fixed the product filter "Category" dropdown showing empty when no Company was selected — now lists categories from all companies.
+
 ## Not Done Yet
 Nothing currently flagged — all previously noted cleanup items above are done.
