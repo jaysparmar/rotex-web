@@ -34,6 +34,8 @@ export function IndustryTabs({ sectorSlug, subIndustries }: Props) {
     });
   }, [subSlug]);
 
+  if (subIndustries.length === 0) return null;
+
   return (
     <div className="sticky top-20 lg:top-24 z-20 bg-white shadow-[0px_2px_4px_0px_rgba(31,31,31,0.05)]">
       <div className="container">

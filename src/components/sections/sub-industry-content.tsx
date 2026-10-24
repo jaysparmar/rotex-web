@@ -79,7 +79,7 @@ export async function SubIndustryContent({
 
   return (
     <>
-      {bg && (
+      {industry.useSubIndustries && bg && (
         <IndustryHero
           name={subIndustry.name}
           description={subIndustry.description}
