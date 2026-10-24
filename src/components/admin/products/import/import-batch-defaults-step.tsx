@@ -4,7 +4,6 @@ import { CircleCheck, CircleAlert } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PRODUCT_FAMILIES } from "@/lib/product-constants";
 import type { ColumnDestination } from "@/lib/variable-product-import";
 import { PlainSelect } from "./plain-select";
 import type {
@@ -115,6 +114,7 @@ export function ImportBatchDefaultsStep({
   classification,
   onClassificationChange,
   companies,
+  productFamilies,
   error,
   onBack,
   onNext,
@@ -123,6 +123,7 @@ export function ImportBatchDefaultsStep({
   classification: ClassificationState;
   onClassificationChange: (next: ClassificationState) => void;
   companies: CompanyOption[];
+  productFamilies: string[];
   error?: string;
   onBack: () => void;
   onNext: () => void;
@@ -166,7 +167,7 @@ export function ImportBatchDefaultsStep({
     );
   })();
 
-  const productFamilyOptions = PRODUCT_FAMILIES.map((f) => ({ value: f, label: f }));
+  const productFamilyOptions = productFamilies.map((f) => ({ value: f, label: f }));
 
   return (
     <Card>

@@ -23,6 +23,18 @@ export async function getCompanyCategoryTree() {
   });
 }
 
+// Product Family used to be a hardcoded 5-value list (PRODUCT_FAMILIES) — now
+// it reuses whatever top-level Categories admins manage at /admin/categories,
+// deduped by name since the same family name can exist under multiple companies.
+export async function getProductFamilyOptions(): Promise<string[]> {
+  const categories = await prisma.category.findMany({
+    orderBy: { name: "asc" },
+    select: { name: true },
+    distinct: ["name"],
+  });
+  return categories.map((c) => c.name);
+}
+
 export async function getIndustryTree() {
   return prisma.industry.findMany({
     orderBy: { name: "asc" },

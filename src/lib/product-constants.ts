@@ -1,11 +1,3 @@
-export const PRODUCT_FAMILIES = [
-  "Solenoid Valves",
-  "Angle Seat Valves",
-  "Automotive Solutions",
-  "CTIS Actuators",
-  "Positioners",
-] as const;
-
 export const PRODUCT_TYPES = [
   { value: "simple", label: "Simple" },
   { value: "variable", label: "Variable" },

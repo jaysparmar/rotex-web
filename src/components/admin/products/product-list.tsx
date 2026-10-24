@@ -62,6 +62,7 @@ export function ProductList({
   q,
   filters,
   companies,
+  productFamilies,
   industries,
   attributeValues,
 }: {
@@ -72,6 +73,7 @@ export function ProductList({
   q: string;
   filters: ProductFilterParams;
   companies: CompanyOption[];
+  productFamilies: string[];
   industries: IndustryOption[];
   attributeValues: Record<string, string[]>;
 }) {
@@ -450,6 +452,7 @@ export function ProductList({
         onOpenChange={setFilterSheetOpen}
         filters={filters}
         companies={companies}
+        productFamilies={productFamilies}
         industries={industries}
         attributeValues={attributeValues}
       />

@@ -11,6 +11,7 @@ import "./tinymce-theme.css";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { TextField, FieldGrid, SwitchField, SelectField, Field } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
+import { GalleryMediaPicker, type PickerMediaAsset } from "@/components/admin/gallery-media-picker";
 import { SaveBar } from "@/components/admin/section-form-shell";
 import { adminFetch } from "@/lib/admin-fetch";
 import { useSaveAction } from "@/hooks/use-save-action";
@@ -33,6 +34,7 @@ type ResourceFormValues = {
   slug: string;
   published: boolean;
   image: { src: string };
+  galleryIds: string[];
   productIds: string[];
   industryIds: string[];
   extraTags: string[];
@@ -46,6 +48,7 @@ type Resource = {
   title: string;
   slug: string;
   image: string;
+  gallery: string[];
   published: boolean;
   productIds: string[];
   industryIds: string[];
@@ -62,15 +65,20 @@ export function ResourceEditForm({
   products,
   industries,
   relatedOptions,
+  allMedia,
 }: {
   resource?: Resource;
   defaultType?: string;
   products: MultiSelectOption[];
   industries: IndustryTreeOption[];
   relatedOptions: RelatedResourceOption[];
+  allMedia: PickerMediaAsset[];
 }) {
   const router = useRouter();
   const slugTouched = useRef(Boolean(resource));
+  // Resource.gallery persists plain URLs (shared shape with the frontend swiper); the
+  // Media Library picker works in asset ids, so existing URLs are matched back to ids here.
+  const urlToId = new Map(allMedia.map((a) => [a.url, a.id]));
   const form = useForm<ResourceFormValues>({
     defaultValues: {
       type: resource?.type ?? defaultType ?? RESOURCE_TYPES[0].id,
@@ -78,6 +86,7 @@ export function ResourceEditForm({
       slug: resource?.slug ?? "",
       published: resource?.published ?? true,
       image: { src: resource?.image ?? "" },
+      galleryIds: (resource?.gallery ?? []).map((url) => urlToId.get(url)).filter((id): id is string => Boolean(id)),
       productIds: resource?.productIds ?? [],
       industryIds: resource?.industryIds ?? [],
       extraTags: resource?.extraTags ?? [],
@@ -100,12 +109,14 @@ export function ResourceEditForm({
   }
 
   function onSubmit(values: ResourceFormValues) {
+    const idToUrl = new Map(allMedia.map((a) => [a.id, a.url]));
     const payload = {
       type: values.type,
       title: values.title,
       slug: values.slug.trim() || slugify(values.title),
       published: values.published,
       image: values.image.src,
+      gallery: values.galleryIds.map((id) => idToUrl.get(id)).filter((url): url is string => Boolean(url)),
       productIds: values.productIds,
       industryIds: values.industryIds,
       extraTags: values.extraTags,
@@ -146,6 +157,9 @@ export function ResourceEditForm({
             <TextField label="Title" {...form.register("title", { required: true })} onChange={handleTitleChange} />
             <TextField label="Slug" {...form.register("slug", { required: true })} onChange={handleSlugChange} />
             <MediaField name="image" mediaType="image" showAlt={false} previewFit="contain" />
+            <Field label="Gallery">
+              <GalleryField allMedia={allMedia} />
+            </Field>
             <FieldGrid>
               <Field label="Product tag">
                 <ProductsField products={products} />
@@ -188,6 +202,31 @@ export function ResourceEditForm({
         <SaveBar pending={pending} error={error} success={success} />
       </form>
     </FormProvider>
+  );
+}
+
+function GalleryField({ allMedia }: { allMedia: PickerMediaAsset[] }) {
+  const form = useFormContext<ResourceFormValues>();
+  const selected = useWatch({ control: form.control, name: "galleryIds" }) ?? [];
+  const [sizes, setSizes] = useState<Record<string, "wide" | "narrow">>({});
+
+  if (allMedia.length === 0) {
+    return (
+      <p className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
+        No media uploaded yet. Add some on the{" "}
+        <a href="/admin/media" className="underline">Media Library</a> page first.
+      </p>
+    );
+  }
+
+  return (
+    <GalleryMediaPicker
+      allMedia={allMedia}
+      selectedIds={selected}
+      sizes={sizes}
+      onChangeSelected={(ids) => form.setValue("galleryIds", ids)}
+      onChangeSizes={setSizes}
+    />
   );
 }
 

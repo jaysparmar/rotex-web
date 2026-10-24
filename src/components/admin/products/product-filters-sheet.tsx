@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { SelectField, FieldGrid } from "@/components/admin/form-fields";
-import { PRODUCT_ATTRIBUTES, PRODUCT_FAMILIES } from "@/lib/product-constants";
+import { PRODUCT_ATTRIBUTES } from "@/lib/product-constants";
 import { FILTER_KEYS, type ProductFilterParams } from "@/lib/product-filters";
 import type { getCompanyCategoryTree, getIndustryTree } from "@/lib/products";
 
@@ -30,6 +30,7 @@ export function ProductFiltersSheet({
   onOpenChange,
   filters,
   companies,
+  productFamilies,
   industries,
   attributeValues,
 }: {
@@ -37,6 +38,7 @@ export function ProductFiltersSheet({
   onOpenChange: (open: boolean) => void;
   filters: ProductFilterParams;
   companies: CompanyOption[];
+  productFamilies: string[];
   industries: IndustryOption[];
   attributeValues: Record<string, string[]>;
 }) {
@@ -90,8 +92,10 @@ export function ProductFiltersSheet({
   }
 
   const selectedCompany = companies.find((c) => c.id === pending.companyId);
-  const categoryOptions = (selectedCompany?.categories ?? []).map((c) => ({ value: c.id, label: c.name }));
-  const selectedCategory = selectedCompany?.categories.find((c) => c.id === pending.categoryId);
+  // No company picked ("— Any —") still shows every category, across all companies, rather than none.
+  const categoriesInScope = selectedCompany ? selectedCompany.categories : companies.flatMap((c) => c.categories);
+  const categoryOptions = categoriesInScope.map((c) => ({ value: c.id, label: c.name }));
+  const selectedCategory = categoriesInScope.find((c) => c.id === pending.categoryId);
   const subCategoryOptions = [
     { value: NONE, label: "— Any —" },
     ...(selectedCategory?.subCategories ?? []).map((s) => ({ value: s.id, label: s.name })),
@@ -162,7 +166,7 @@ export function ProductFiltersSheet({
               />
               <SelectField
                 label="Product Family"
-                options={[{ value: NONE, label: "— Any —" }, ...PRODUCT_FAMILIES.map((f) => ({ value: f, label: f }))]}
+                options={[{ value: NONE, label: "— Any —" }, ...productFamilies.map((f) => ({ value: f, label: f }))]}
                 value={pending.productFamily ?? NONE}
                 onChange={(e) => set("productFamily", e.target.value)}
               />

@@ -10,13 +10,17 @@ export default async function AdminNewResourcePage({
 }) {
   const { type } = await searchParams;
 
-  const [products, industries, relatedOptions] = await Promise.all([
+  const [products, industries, relatedOptions, allMedia] = await Promise.all([
     getProductCategoryOptions(),
     getIndustryTreeOptions(),
     prisma.resource.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
       select: { id: true, type: true, title: true, image: true },
+    }),
+    prisma.mediaAsset.findMany({
+      orderBy: { createdAt: "desc" },
+      select: { id: true, url: true, type: true, filename: true, alt: true },
     }),
   ]);
 
@@ -41,6 +45,7 @@ export default async function AdminNewResourcePage({
         products={products.map((p) => ({ id: p.id, label: p.name }))}
         industries={industries}
         relatedOptions={relatedOptions}
+        allMedia={allMedia.map((a) => ({ ...a, type: a.type as "image" | "video" }))}
       />
     </div>
   );

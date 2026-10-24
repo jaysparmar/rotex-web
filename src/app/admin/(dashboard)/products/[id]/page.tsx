@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProductEditForm } from "@/components/admin/products/product-edit-form";
 import { ProductDetailHeader } from "@/components/admin/products/product-detail-header";
 import { VariantList } from "@/components/admin/products/variant-list";
-import { getCompanyCategoryTree } from "@/lib/products";
+import { getCompanyCategoryTree, getProductFamilyOptions } from "@/lib/products";
 
 export default async function AdminProductDetailPage({
   params,
@@ -14,7 +14,7 @@ export default async function AdminProductDetailPage({
 }) {
   const { id } = await params;
 
-  const [product, companies, downloadCategories, certifications, industryOptions, subIndustryOptions] =
+  const [product, companies, productFamilies, downloadCategories, certifications, industryOptions, subIndustryOptions] =
     await Promise.all([
       prisma.product.findUnique({
         where: { id },
@@ -27,6 +27,7 @@ export default async function AdminProductDetailPage({
         },
       }),
       getCompanyCategoryTree(),
+      getProductFamilyOptions(),
       prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
       prisma.certification.findMany({ orderBy: { name: "asc" } }),
       prisma.industry.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
@@ -34,6 +35,11 @@ export default async function AdminProductDetailPage({
     ]);
 
   if (!product) notFound();
+
+  // Keep the saved value selectable even if its Category was since renamed/deleted.
+  const productFamilyOptions = productFamilies.includes(product.productFamily)
+    ? productFamilies
+    : [product.productFamily, ...productFamilies];
 
   return (
     <div className="space-y-6">
@@ -63,6 +69,7 @@ export default async function AdminProductDetailPage({
       <ProductEditForm
         product={product}
         companies={companies}
+        productFamilies={productFamilyOptions}
         downloadCategories={downloadCategories}
         certificationOptions={certifications.map((c) => c.name)}
         industryOptions={industryOptions}

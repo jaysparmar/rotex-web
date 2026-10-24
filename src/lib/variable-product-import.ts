@@ -2,7 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { excelColumnLabel, importColumnLabels } from "@/lib/excel-columns";
 import { splitReferences } from "@/lib/import-references";
-import { PRODUCT_ATTRIBUTES, PRODUCT_FAMILIES, type ProductAttributeKey } from "@/lib/product-constants";
+import { PRODUCT_ATTRIBUTES, type ProductAttributeKey } from "@/lib/product-constants";
+import { getProductFamilyOptions } from "@/lib/products";
 import { cleanDownloadName, resolveDownloadColumns, type DownloadImportGrid } from "@/lib/download-grid";
 import type { DownloadCategoryMapping } from "@/lib/download-import";
 import type { ProductInput, VariantInput } from "@/app/admin/(dashboard)/products/actions";
@@ -275,14 +276,14 @@ function resolveClassificationValue(
   return { ok: true, id: match };
 }
 
-function resolveProductFamily(config: ClassificationFieldConfig, firstRow: string[]): Resolved {
+function resolveProductFamily(config: ClassificationFieldConfig, firstRow: string[], families: string[]): Resolved {
   if (config.mode === "fixed") {
     if (!config.value) return { ok: false, reason: "Product Family is not set" };
     return { ok: true, id: config.value };
   }
   const raw = (firstRow[config.column] ?? "").trim();
   if (!raw) return { ok: false, reason: "Missing Product Family" };
-  const match = PRODUCT_FAMILIES.find((f) => f.toLowerCase() === raw.toLowerCase());
+  const match = families.find((f) => f.toLowerCase() === raw.toLowerCase());
   if (!match) return { ok: false, reason: `Product Family "${raw}" not recognized` };
   return { ok: true, id: match };
 }
@@ -336,6 +337,7 @@ export async function analyzeVariableProductImport(
   // category matches), so a name/reference that matches more than one company's category is
   // excluded from the lookup entirely rather than silently picking one.
   const companies = await prisma.company.findMany({ include: { categories: { include: { subCategories: true } } } });
+  const productFamilies = await getProductFamilyOptions();
 
   function addUnique(map: Map<string, string>, seen: Set<string>, key: string, id: string) {
     if (seen.has(key)) {
@@ -491,7 +493,7 @@ export async function analyzeVariableProductImport(
       continue;
     }
 
-    const productFamily = resolveProductFamily(mapping.classification.productFamily, firstRow);
+    const productFamily = resolveProductFamily(mapping.classification.productFamily, firstRow, productFamilies);
     if (!productFamily.ok) {
       errors.push({ rowNumber: firstRowNumber, modelNumber, reason: productFamily.reason });
       continue;

@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import Script from "next/script";
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
 // Applies the persisted theme class before hydration, avoiding a flash of the
 // wrong theme. Runs in place of next-themes' own injected <script> — that one
 // trips React 19's dev-only "script tag encountered while rendering" warning
-// since it renders deep in a client component tree. A plain <script> emitted
-// directly by this Server Component gets React's Document Metadata hoisting
-// instead, which skips that warning path.
+// since it renders deep in a client component tree. next/script with
+// strategy="beforeInteractive" runs before hydration without that warning.
 // (patches/next-themes+0.4.6.patch disables the library's built-in script.)
 const NO_FLASH_SCRIPT = `
 (function () {
@@ -41,7 +41,7 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script id="theme-no-flash" dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
+        <Script id="theme-no-flash" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
       </head>
       <body className={`${montserrat.variable} min-h-screen bg-background font-montserrat text-foreground`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem storageKey="rotex-admin-theme">

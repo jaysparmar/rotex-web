@@ -1,11 +1,12 @@
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { VariableImportWizard } from "@/components/admin/products/import/variable-import-wizard";
-import { getCompanyCategoryTree } from "@/lib/products";
+import { getCompanyCategoryTree, getProductFamilyOptions } from "@/lib/products";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminVariableProductImportPage() {
-  const [companies, downloadCategories, industries, subIndustries] = await Promise.all([
+  const [companies, productFamilies, downloadCategories, industries, subIndustries] = await Promise.all([
     getCompanyCategoryTree(),
+    getProductFamilyOptions(),
     prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
     prisma.industry.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, importReference: true } }),
     prisma.subIndustry.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, importReference: true } }),
@@ -32,6 +33,7 @@ export default async function AdminVariableProductImportPage() {
 
       <VariableImportWizard
         companies={companies}
+        productFamilies={productFamilies}
         downloadCategories={downloadCategories}
         industries={industries}
         subIndustries={subIndustries}

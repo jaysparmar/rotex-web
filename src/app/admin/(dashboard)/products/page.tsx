@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { ProductList } from "@/components/admin/products/product-list";
 import { buildProductWhere, type ProductFilterParams } from "@/lib/product-filters";
-import { getCompanyCategoryTree, getIndustryTree, getAttributeValuesByKey } from "@/lib/products";
+import { getCompanyCategoryTree, getIndustryTree, getAttributeValuesByKey, getProductFamilyOptions } from "@/lib/products";
 
 const PAGE_SIZE = 20;
 
@@ -20,7 +20,7 @@ export default async function AdminProductsPage({
 
   const where = buildProductWhere(filters);
 
-  const [products, total, companies, industries, attributeValues] = await Promise.all([
+  const [products, total, companies, productFamilies, industries, attributeValues] = await Promise.all([
     prisma.product.findMany({
       where,
       orderBy: { modelNumber: "asc" },
@@ -35,6 +35,7 @@ export default async function AdminProductsPage({
     }),
     prisma.product.count({ where }),
     getCompanyCategoryTree(),
+    getProductFamilyOptions(),
     getIndustryTree(),
     getAttributeValuesByKey(),
   ]);
@@ -64,6 +65,7 @@ export default async function AdminProductsPage({
         q={q}
         filters={filters}
         companies={companies}
+        productFamilies={productFamilies}
         industries={industries}
         attributeValues={attributeValues}
       />

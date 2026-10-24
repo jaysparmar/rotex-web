@@ -1,0 +1,1 @@
+ALTER TABLE "Resource" ADD COLUMN "gallery" JSONB NOT NULL DEFAULT '[]';

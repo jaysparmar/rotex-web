@@ -3,6 +3,7 @@ import DOMPurify from "isomorphic-dompurify";
 import { PostBreadcrumb } from "@/components/ui/post-breadcrumb";
 import { PostShareButtons } from "@/components/ui/post-share-buttons";
 import { getResourceTags, formatResourceDate, type ResourceItem } from "@/lib/resource-types";
+import { MediaGalleryCarousel } from "@/components/ui/media-gallery-carousel";
 import { extractToc, slugifyHeading } from "@/lib/markdown-toc";
 import styles from "./rich-content.module.css";
 
@@ -67,6 +68,11 @@ export function PostDetailSection({ post, typeLabel, typeSingular, typeHref }: P
 
             {/* Body */}
             <div className={styles.content} dangerouslySetInnerHTML={{ __html: contentHtml }} />
+
+            {/* Gallery */}
+            {post.gallery.length > 0 && (
+              <MediaGalleryCarousel images={post.gallery.map((src) => ({ src, alt: post.title }))} />
+            )}
           </div>
 
           {/* Sidebar */}

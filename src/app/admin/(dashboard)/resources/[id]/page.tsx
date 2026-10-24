@@ -6,7 +6,7 @@ import { getIndustryTreeOptions, getProductCategoryOptions } from "@/lib/resourc
 
 export default async function AdminResourceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [record, products, industries, relatedOptions] = await Promise.all([
+  const [record, products, industries, relatedOptions, allMedia] = await Promise.all([
     prisma.resource.findUnique({ where: { id } }),
     getProductCategoryOptions(),
     getIndustryTreeOptions(),
@@ -15,11 +15,16 @@ export default async function AdminResourceDetailPage({ params }: { params: Prom
       orderBy: { createdAt: "desc" },
       select: { id: true, type: true, title: true, image: true },
     }),
+    prisma.mediaAsset.findMany({
+      orderBy: { createdAt: "desc" },
+      select: { id: true, url: true, type: true, filename: true, alt: true },
+    }),
   ]);
   if (!record) notFound();
 
   const resource = {
     ...record,
+    gallery: (record.gallery as string[]) ?? [],
     productIds: (record.productIds as string[]) ?? [],
     industryIds: (record.industryIds as string[]) ?? [],
     extraTags: (record.extraTags as string[]) ?? [],
@@ -47,6 +52,7 @@ export default async function AdminResourceDetailPage({ params }: { params: Prom
         products={products.map((p) => ({ id: p.id, label: p.name }))}
         industries={industries}
         relatedOptions={relatedOptions}
+        allMedia={allMedia.map((a) => ({ ...a, type: a.type as "image" | "video" }))}
       />
     </div>
   );

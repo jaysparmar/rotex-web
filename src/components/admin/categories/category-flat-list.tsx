@@ -83,8 +83,8 @@ export function CategoryFlatList({
     <div className="space-y-4">
       <div className="rounded-lg border border-border">
         <div className="flex flex-col gap-3 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative w-full max-w-xs">
+          <div className="flex items-center gap-2">
+            <div className="relative max-w-xs flex-1 min-w-0">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search by name or slug..."
@@ -98,7 +98,7 @@ export function CategoryFlatList({
               value={companyId}
               onValueChange={(v) => setParam("companyId", v as string)}
             >
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-32 shrink-0 sm:w-48">
                 <SelectValue placeholder="All companies" />
               </SelectTrigger>
               <SelectContent>

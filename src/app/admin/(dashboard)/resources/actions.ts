@@ -17,6 +17,7 @@ export type ResourceInput = {
   title: string;
   slug: string;
   image: string;
+  gallery: string[];
   published: boolean;
   productIds: string[];
   industryIds: string[];

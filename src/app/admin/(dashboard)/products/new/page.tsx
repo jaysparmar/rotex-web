@@ -1,11 +1,12 @@
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { ProductEditForm } from "@/components/admin/products/product-edit-form";
 import { prisma } from "@/lib/prisma";
-import { getCompanyCategoryTree } from "@/lib/products";
+import { getCompanyCategoryTree, getProductFamilyOptions } from "@/lib/products";
 
 export default async function AdminNewProductPage() {
-  const [companies, downloadCategories, certifications, industryOptions, subIndustryOptions] = await Promise.all([
+  const [companies, productFamilies, downloadCategories, certifications, industryOptions, subIndustryOptions] = await Promise.all([
     getCompanyCategoryTree(),
+    getProductFamilyOptions(),
     prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
     prisma.certification.findMany({ orderBy: { name: "asc" } }),
     prisma.industry.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
@@ -30,6 +31,7 @@ export default async function AdminNewProductPage() {
 
       <ProductEditForm
         companies={companies}
+        productFamilies={productFamilies}
         downloadCategories={downloadCategories}
         certificationOptions={certifications.map((c) => c.name)}
         industryOptions={industryOptions}

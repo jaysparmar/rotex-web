@@ -11,7 +11,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { SaveBar } from "@/components/admin/section-form-shell";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { createProduct, updateProduct, type ProductInput } from "@/app/admin/(dashboard)/products/actions";
-import { PRODUCT_FAMILIES, PRODUCT_TYPES } from "@/lib/product-constants";
+import { PRODUCT_TYPES } from "@/lib/product-constants";
 
 const NONE = "__none__";
 
@@ -55,6 +55,7 @@ type ProductRecord = {
 export function ProductEditForm({
   product,
   companies,
+  productFamilies,
   downloadCategories,
   certificationOptions,
   industryOptions,
@@ -62,6 +63,7 @@ export function ProductEditForm({
 }: {
   product?: ProductRecord;
   companies: CompanyOption[];
+  productFamilies: string[];
   downloadCategories: { id: string; name: string }[];
   certificationOptions: string[];
   industryOptions: { id: string; name: string }[];
@@ -78,7 +80,7 @@ export function ProductEditForm({
         if (list.length > 0) return list;
         return product?.image ? [product.image] : [];
       })(),
-      productFamily: product?.productFamily ?? PRODUCT_FAMILIES[0],
+      productFamily: product?.productFamily ?? productFamilies[0] ?? "",
       productType: product?.productType ?? "simple",
       companyId: product?.companyId ?? companies[0]?.id ?? "",
       categoryId: product?.categoryId ?? "",
@@ -199,7 +201,7 @@ export function ProductEditForm({
             <FieldGrid>
               <SelectField
                 label="Product Family"
-                options={PRODUCT_FAMILIES.map((f) => ({ value: f, label: f }))}
+                options={productFamilies.map((f) => ({ value: f, label: f }))}
                 defaultValue={form.getValues("productFamily")}
                 {...form.register("productFamily")}
               />

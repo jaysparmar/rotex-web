@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { adminFetch } from "@/lib/admin-fetch";
-import { PRODUCT_FAMILIES } from "@/lib/product-constants";
 import {
   type ColumnDestination,
   type ImportGrid,
@@ -229,11 +228,13 @@ function buildMapping(
 
 export function VariableImportWizard({
   companies,
+  productFamilies,
   industries,
   subIndustries,
   downloadCategories,
 }: {
   companies: CompanyOption[];
+  productFamilies: string[];
   industries: IndustryOption[];
   subIndustries: SubIndustryOption[];
   downloadCategories: DownloadCategoryOption[];
@@ -251,7 +252,7 @@ export function VariableImportWizard({
   const [classification, setClassification] = useState<ClassificationState>({
     category: { mode: "fixed", fixedValue: null },
     subCategory: { mode: "none", fixedValue: null },
-    productFamily: { mode: "fixed", fixedValue: PRODUCT_FAMILIES[0] },
+    productFamily: { mode: "fixed", fixedValue: productFamilies[0] ?? "" },
     categoryMatchBy: "name",
     subCategoryMatchBy: "name",
   });
@@ -374,6 +375,7 @@ export function VariableImportWizard({
           classification={classification}
           onClassificationChange={setClassification}
           companies={companies}
+          productFamilies={productFamilies}
           error={mappingError}
           onBack={() => setStep("upload")}
           onNext={() => setStep("columns")}

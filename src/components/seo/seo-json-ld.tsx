@@ -1,3 +1,5 @@
+import Script from "next/script";
+
 export function SeoJsonLd({ schema }: { schema: string }) {
   const trimmed = schema.trim();
   if (!trimmed) return null;
@@ -10,7 +12,8 @@ export function SeoJsonLd({ schema }: { schema: string }) {
   }
 
   return (
-    <script
+    <Script
+      id="seo-json-ld"
       type="application/ld+json"
       // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: JSON.stringify(parsed) }}
