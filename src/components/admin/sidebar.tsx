@@ -73,6 +73,48 @@ export const NAV_ITEMS = [
 
 export const DASHBOARD_ITEM = { href: "/admin", label: "Dashboard", icon: LayoutDashboard };
 
+function navItem(href: string) {
+  const item = NAV_ITEMS.find((i) => i.href === href);
+  if (!item) throw new Error(`Unknown nav item: ${href}`);
+  return item;
+}
+
+// Groups the same NAV_ITEMS entries under section labels for sidebar display —
+// NAV_ITEMS itself stays flat since admin-search.tsx spreads it directly.
+export const NAV_GROUPS: { label: string; items: typeof NAV_ITEMS }[] = [
+  {
+    label: "Catalog",
+    items: ["/admin/products", "/admin/attributes", "/admin/companies", "/admin/categories"].map(navItem),
+  },
+  {
+    label: "Industries",
+    items: ["/admin/industries", "/admin/countries", "/admin/partners", "/admin/certifications"].map(navItem),
+  },
+  {
+    label: "Content",
+    items: [
+      "/admin/resources",
+      "/admin/customer-stories",
+      "/admin/awards",
+      "/admin/media",
+      "/admin/downloads",
+      "/admin/download-categories",
+    ].map(navItem),
+  },
+  {
+    label: "Careers",
+    items: ["/admin/job-postings", "/admin/job-applications"].map(navItem),
+  },
+  {
+    label: "Engagement",
+    items: ["/admin/enquiries", "/admin/forms"].map(navItem),
+  },
+  {
+    label: "System",
+    items: ["/admin/global", "/admin/seo"].map(navItem),
+  },
+];
+
 export function AdminNavContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const pagesActive = PAGE_ITEMS.some(({ href }) => pathname.startsWith(href));
@@ -84,6 +126,7 @@ export function AdminNavContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+      <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">General</p>
       <Link href="/admin" className="block" onClick={onNavigate}>
         <Button
           variant={pathname === "/admin" ? "secondary" : "ghost"}
@@ -124,20 +167,27 @@ export function AdminNavContent({ onNavigate }: { onNavigate?: () => void }) {
         )}
       </div>
 
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-        const active = pathname.startsWith(href);
-        return (
-          <Link key={href} href={href} className="block" onClick={onNavigate}>
-            <Button
-              variant={active ? "secondary" : "ghost"}
-              className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
-            >
-              <Icon className="size-4" />
-              {label}
-            </Button>
-          </Link>
-        );
-      })}
+      {NAV_GROUPS.map((group) => (
+        <div key={group.label} className="pt-3">
+          <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {group.label}
+          </p>
+          {group.items.map(({ href, label, icon: Icon }) => {
+            const active = pathname.startsWith(href);
+            return (
+              <Link key={href} href={href} className="block" onClick={onNavigate}>
+                <Button
+                  variant={active ? "secondary" : "ghost"}
+                  className="h-9 w-full justify-start gap-3 px-3 text-sm font-medium"
+                >
+                  <Icon className="size-4" />
+                  {label}
+                </Button>
+              </Link>
+            );
+          })}
+        </div>
+      ))}
     </nav>
   );
 }
