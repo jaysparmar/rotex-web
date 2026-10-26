@@ -238,7 +238,8 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
         category: true,
         subCategory: true,
         industries: { select: { name: true } },
-        variants: { include: { industries: { select: { name: true } } } },
+        subIndustries: { select: { name: true } },
+        variants: { include: { industries: { select: { name: true } }, subIndustries: { select: { name: true } } } },
       },
     }),
     prisma.downloadCategory.findMany(),
@@ -254,18 +255,20 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
     { label: product.name },
   ];
 
-  const description = product.description
-    ? firstSentence(product.description)
-    : product.features
-      ? firstSentence(product.features)
-      : `${product.category.name} model ${product.modelNumber}.`;
+  // Simple products only — no fallback to features or a generic string; an
+  // empty short description means the block is hidden on the detail page.
+  const description = product.description ? firstSentence(product.description) : null;
 
   const imageList = (product.images as string[] | null) ?? [];
 
   const industriesServed =
     product.productType === "variable"
-      ? Array.from(new Set(product.variants.flatMap((v) => v.industries.map((i) => i.name))))
-      : product.industries.map((i) => i.name);
+      ? Array.from(
+          new Set(
+            product.variants.flatMap((v) => [...v.industries.map((i) => i.name), ...v.subIndustries.map((i) => i.name)])
+          )
+        )
+      : [...product.industries.map((i) => i.name), ...product.subIndustries.map((i) => i.name)];
 
   const base = {
     slug: product.slug,

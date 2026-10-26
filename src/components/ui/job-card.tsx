@@ -8,7 +8,7 @@ export type JobCardJob = {
   title: string;
   category: string;
   location: string;
-  tag: string;
+  tags: string[];
   employmentType: string;
   workMode: string;
   aboutRole: string;
@@ -42,10 +42,17 @@ export function JobCard({
           </div>
         </div>
 
-        {job.tag && (
-          <span className="w-fit px-1.5 py-1 rounded-[5px] bg-neutral-100 text-neutral-400 font-montserrat font-medium text-xs leading-4">
-            {job.tag}
-          </span>
+        {job.tags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {job.tags.map((tag) => (
+              <span
+                key={tag}
+                className="w-fit px-1.5 py-1 rounded-[5px] bg-neutral-100 text-neutral-400 font-montserrat font-medium text-xs leading-4"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         )}
       </div>
 

@@ -76,7 +76,11 @@ export function ProductDetailContent({
                 </div>
                 <h1 className="text-black text-2xl font-medium leading-8 lg:text-4xl lg:font-normal lg:leading-10 font-montserrat">{product.name}</h1>
               </div>
-              <p className="text-stone-500 text-sm leading-5 lg:text-black lg:text-base lg:leading-6 font-medium font-montserrat">{product.description}</p>
+              {product.description && (
+                <p className="text-stone-500 text-sm leading-5 lg:text-black lg:text-base lg:leading-6 font-medium font-montserrat">
+                  {product.description}
+                </p>
+              )}
             </div>
 
             {product.industriesServed.length > 0 && (

@@ -33,7 +33,7 @@ export type ProductDetail = {
   name: string;
   category: string;
   tags: string[];
-  description: string;
+  description: string | null;
   industriesServed: string[];
   certificates: string[];
   images: (StaticImageData | string)[];

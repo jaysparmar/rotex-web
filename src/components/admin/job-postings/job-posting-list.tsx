@@ -24,7 +24,7 @@ type JobPosting = {
   title: string;
   category: string;
   location: string;
-  tag: string;
+  tags: unknown;
   published: boolean;
 };
 

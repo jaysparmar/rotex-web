@@ -445,7 +445,8 @@ model JobPosting {
   title          String
   category       String
   location       String
-  tag            String
+  /// [StringList]
+  tags           Json     @default("[]")
   employmentType String   @default("Full-time")
   workMode       String   @default("On-site")
   aboutRole      String   @default("")

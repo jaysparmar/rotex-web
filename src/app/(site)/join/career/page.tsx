@@ -67,7 +67,7 @@ export default async function CareerPage() {
             title: j.title,
             category: j.category,
             location: j.location,
-            tag: j.tag,
+            tags: (j.tags as string[] | null) ?? [],
             employmentType: j.employmentType,
             workMode: j.workMode,
             aboutRole: j.aboutRole,

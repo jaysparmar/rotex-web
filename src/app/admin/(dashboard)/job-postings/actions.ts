@@ -8,7 +8,7 @@ type JobPostingInput = {
   title: string;
   category: string;
   location: string;
-  tag: string;
+  tags: string[];
   employmentType: string;
   workMode: string;
   aboutRole: string;

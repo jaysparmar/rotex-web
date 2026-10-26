@@ -261,7 +261,7 @@ export type JobSummary = {
   title: string;
   category: string;
   location: string;
-  tag: string;
+  tags: string[];
   employmentType: string;
   workMode: string;
   aboutRole: string;
@@ -306,7 +306,7 @@ export async function searchJobs(
     title: j.title,
     category: j.category,
     location: j.location,
-    tag: j.tag,
+    tags: (j.tags as string[]) ?? [],
     employmentType: j.employmentType,
     workMode: j.workMode,
     aboutRole: j.aboutRole,

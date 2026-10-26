@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { TextField, TextAreaField, FieldGrid, SelectField, SwitchField, Field } from "@/components/admin/form-fields";
+import { MultiSelectField } from "@/components/admin/multi-select-field";
 import { SaveBar } from "@/components/admin/section-form-shell";
 import { PERK_ICON_OPTIONS } from "@/lib/job-perk-icons";
 import { EMPLOYMENT_TYPE_OPTIONS, WORK_MODE_OPTIONS } from "@/lib/job-posting-constants";
@@ -21,7 +22,7 @@ type JobPostingFormValues = {
   title: string;
   category: string;
   location: string;
-  tag: string;
+  tags: string[];
   employmentType: string;
   workMode: string;
   aboutRole: string;
@@ -37,7 +38,7 @@ type JobPosting = {
   title: string;
   category: string;
   location: string;
-  tag: string;
+  tags: unknown;
   employmentType: string;
   workMode: string;
   aboutRole: string;
@@ -63,7 +64,7 @@ export function JobPostingEditForm({
       title: job?.title ?? "",
       category: job?.category ?? "",
       location: job?.location ?? "",
-      tag: job?.tag ?? "",
+      tags: (job?.tags as string[] | null) ?? [],
       employmentType: job?.employmentType ?? "Full-time",
       workMode: job?.workMode ?? "On-site",
       aboutRole: job?.aboutRole ?? "",
@@ -131,12 +132,11 @@ export function JobPostingEditForm({
                 {...form.register("workMode")}
               />
             </FieldGrid>
-            <SelectField
-              label="Tag"
-              placeholder="Select category"
+            <MultiSelectField
+              name="tags"
+              label="Tags"
+              placeholder="Select tags"
               options={tagOptions.map((t) => ({ value: t, label: t }))}
-              defaultValue={form.getValues("tag")}
-              {...form.register("tag")}
             />
             <SwitchField
               label="Published"
