@@ -24,6 +24,7 @@ export type ResourceInput = {
   extraTags: string[];
   relatedIds: string[];
   content: string;
+  publishedAt: Date | null;
 };
 
 export async function createResource(data: ResourceInput) {

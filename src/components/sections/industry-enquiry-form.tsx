@@ -6,9 +6,13 @@ import type { FormFieldKey } from "@/lib/form-config-shared";
 export function IndustryEnquiryForm({
   industryName,
   config,
+  enquiryTypeOptions,
+  productTypeOptions,
 }: {
   industryName: string;
   config: Record<FormFieldKey, boolean>;
+  enquiryTypeOptions?: readonly string[];
+  productTypeOptions?: readonly { key: string; label: string }[];
 }) {
   return (
     <section className="bg-white py-12 lg:py-[120px]">
@@ -49,6 +53,8 @@ export function IndustryEnquiryForm({
           <CommonEnquiryFields
             formKey="industry"
             config={config}
+            enquiryTypeOptions={enquiryTypeOptions}
+            productTypeOptions={productTypeOptions}
             fixedIndustryName={industryName}
             recaptchaAction="industry_enquiry"
             submitLabel="Send Enquiry"

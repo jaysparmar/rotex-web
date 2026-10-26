@@ -50,6 +50,7 @@ function toResourceItem(
     industryIds: unknown;
     extraTags: unknown;
     content: string;
+    publishedAt: Date | null;
     createdAt: Date;
   },
   resolver: ResourceTagResolver
@@ -65,7 +66,7 @@ function toResourceItem(
     industries: resolver.resolveIndustries((r.industryIds as string[]) ?? []),
     extraTags: (r.extraTags as string[]) ?? [],
     content: r.content,
-    createdAt: r.createdAt.toISOString(),
+    createdAt: (r.publishedAt ?? r.createdAt).toISOString(),
   };
 }
 

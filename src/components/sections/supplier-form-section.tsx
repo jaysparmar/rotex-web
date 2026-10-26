@@ -10,6 +10,7 @@ type SupplierFormSectionProps = {
   description?: string;
   industryOptions?: IndustryOptionGroup[];
   config: Record<FormFieldKey, boolean>;
+  productTypeOptions?: readonly { key: string; label: string }[];
 };
 
 const DEFAULT_BENEFITS = [
@@ -27,6 +28,7 @@ export function SupplierFormSection({
   description = "If you are looking to enrich your product offering portfolio. Apply for becoming our prestigious league of channel partners with us.",
   industryOptions = [],
   config,
+  productTypeOptions,
 }: SupplierFormSectionProps) {
   return (
     <section id="form" className="scroll-mt-24 lg:scroll-mt-32 bg-white pt-8 pb-14 lg:py-20">
@@ -60,6 +62,7 @@ export function SupplierFormSection({
             formKey="supplier"
             config={config}
             industryOptions={industryOptions}
+            productTypeOptions={productTypeOptions}
             recaptchaAction="supplier_application"
             successMessage="Application submitted! We'll be in touch soon."
           />

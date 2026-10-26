@@ -28,6 +28,8 @@ type ContactFormSectionProps = {
   logos?: Logo[];
   industryOptions?: IndustryOptionGroup[];
   config: Record<FormFieldKey, boolean>;
+  enquiryTypeOptions?: readonly string[];
+  productTypeOptions?: readonly { key: string; label: string }[];
 };
 
 export function ContactFormSection({
@@ -40,6 +42,8 @@ export function ContactFormSection({
   logos = defaultLogos,
   industryOptions = [],
   config,
+  enquiryTypeOptions,
+  productTypeOptions,
 }: ContactFormSectionProps) {
   return (
     <section id="contact-form" className="bg-white py-14 lg:py-20">
@@ -96,6 +100,8 @@ export function ContactFormSection({
             formKey="contact"
             config={config}
             industryOptions={industryOptions}
+            enquiryTypeOptions={enquiryTypeOptions}
+            productTypeOptions={productTypeOptions}
             recaptchaAction="contact_form"
             successMessage="Message sent! We'll be in touch soon."
           />

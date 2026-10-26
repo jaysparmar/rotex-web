@@ -4,7 +4,7 @@ import { SupplierFormSection } from "@/components/sections/supplier-form-section
 import type { Metadata } from "next";
 import { fetchSupplierSection } from "@/lib/site-api";
 import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
-import { getFormConfig, getIndustryOptionsForForm } from "@/lib/form-config";
+import { getFormConfig, getProductTypeConfig, getIndustryOptionsForForm } from "@/lib/form-config";
 import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 
 type CtaButton = { label: string; href: string };
@@ -33,12 +33,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SupplierPage() {
   const seo = await getPageSeo("join-supplier");
-  const [hero, benefits, form, industryOptions, formConfig] = await Promise.all([
+  const [hero, benefits, form, industryOptions, formConfig, productTypes] = await Promise.all([
     fetchSupplierSection<HeroData>("hero"),
     fetchSupplierSection<BenefitsData>("benefits"),
     fetchSupplierSection<FormData>("form"),
     getIndustryOptionsForForm("supplier"),
     getFormConfig(),
+    getProductTypeConfig(),
   ]);
 
   return (
@@ -71,6 +72,7 @@ export default async function SupplierPage() {
           description={form.description}
           industryOptions={industryOptions}
           config={formConfig.supplier.fields}
+          productTypeOptions={productTypes}
         />
       )}
     </div>

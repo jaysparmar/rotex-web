@@ -8,7 +8,7 @@ import { ChannelPartnerFormSection } from "@/components/sections/channel-partner
 import type { Metadata } from "next";
 import { fetchChannelPartnerSection } from "@/lib/site-api";
 import { getPageSeo, buildMetadata, SITE_METADATA_FALLBACK } from "@/lib/seo";
-import { getFormConfig, getIndustryOptionsForForm } from "@/lib/form-config";
+import { getFormConfig, getProductTypeConfig, getIndustryOptionsForForm } from "@/lib/form-config";
 import { SeoJsonLd } from "@/components/seo/seo-json-ld";
 
 type CtaButton = { label: string; href: string };
@@ -43,17 +43,19 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ChannelPartnerPage() {
   const seo = await getPageSeo("join-channel-partner");
-  const [hero, stats, why, benefits, map, stories, form, industryOptions, formConfig] = await Promise.all([
-    fetchChannelPartnerSection<HeroData>("hero"),
-    fetchChannelPartnerSection<StatsData>("stats"),
-    fetchChannelPartnerSection<WhyData>("why"),
-    fetchChannelPartnerSection<BenefitsData>("benefits"),
-    fetchChannelPartnerSection<MapData>("map"),
-    fetchChannelPartnerSection<StoriesData>("stories"),
-    fetchChannelPartnerSection<FormData>("form"),
-    getIndustryOptionsForForm("channel-partner"),
-    getFormConfig(),
-  ]);
+  const [hero, stats, why, benefits, map, stories, form, industryOptions, formConfig, productTypes] =
+    await Promise.all([
+      fetchChannelPartnerSection<HeroData>("hero"),
+      fetchChannelPartnerSection<StatsData>("stats"),
+      fetchChannelPartnerSection<WhyData>("why"),
+      fetchChannelPartnerSection<BenefitsData>("benefits"),
+      fetchChannelPartnerSection<MapData>("map"),
+      fetchChannelPartnerSection<StoriesData>("stories"),
+      fetchChannelPartnerSection<FormData>("form"),
+      getIndustryOptionsForForm("channel-partner"),
+      getFormConfig(),
+      getProductTypeConfig(),
+    ]);
 
   return (
     <div>
@@ -104,6 +106,7 @@ export default async function ChannelPartnerPage() {
           description={form.description}
           industryOptions={industryOptions}
           config={formConfig["channel-partner"].fields}
+          productTypeOptions={productTypes}
         />
       )}
     </div>

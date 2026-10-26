@@ -118,7 +118,14 @@ declare global {
        is the allow-list for the "Industry Served" dropdown (specific Industry/SubIndustry ids)
        — empty means nothing is picked yet, so no options show. Job application form is separate
        and not covered here. */
-    type FormConfigData = Record<string, { fields: Record<string, boolean>; industryIds: string[] }>;
+    type FormConfigData = Record<
+      string,
+      { fields: Record<string, boolean>; industryIds: string[]; enquiryTypeOrder?: string[] }
+    >;
+
+    /* Admin-editable display label + order for the fixed Product Type option set — shared
+       across every common form. `key` is the fixed, never-edited canonical option value. */
+    type ProductTypeList = { key: string; label: string }[];
 
     type SeoMetaData = {
       title: string;

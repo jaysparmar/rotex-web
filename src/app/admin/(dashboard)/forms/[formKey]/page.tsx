@@ -1,14 +1,18 @@
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
 import { FormFieldsEditor } from "@/components/admin/forms/form-fields-editor";
-import { getFormConfig, getIndustryTree, FORMS, type FormKey } from "@/lib/form-config";
+import { getFormConfig, getProductTypeConfig, getIndustryTree, FORMS, type FormKey } from "@/lib/form-config";
 
 export default async function AdminFormEditPage({ params }: { params: Promise<{ formKey: string }> }) {
   const { formKey } = await params;
   const form = FORMS.find((f) => f.key === formKey);
   if (!form) notFound();
 
-  const [config, industries] = await Promise.all([getFormConfig(), getIndustryTree()]);
+  const [config, productTypes, industries] = await Promise.all([
+    getFormConfig(),
+    getProductTypeConfig(),
+    getIndustryTree(),
+  ]);
   const entry = config[form.key];
 
   return (
@@ -31,6 +35,8 @@ export default async function AdminFormEditPage({ params }: { params: Promise<{ 
         formKey={form.key as FormKey}
         initial={entry?.fields ?? {}}
         initialIndustryIds={entry?.industryIds ?? []}
+        initialEnquiryTypeOrder={entry?.enquiryTypeOrder ?? []}
+        initialProductTypes={productTypes}
         industries={industries}
       />
     </div>

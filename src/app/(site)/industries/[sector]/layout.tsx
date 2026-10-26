@@ -7,7 +7,7 @@ import { WhyChooseSection } from "@/components/sections/why-choose-section";
 import { IndustryEnquiryForm } from "@/components/sections/industry-enquiry-form";
 import { IndustryHeroCtas } from "@/components/ui/industry-hero-ctas";
 import { getIndustryWithSubIndustries } from "@/lib/industries";
-import { getFormConfig } from "@/lib/form-config";
+import { getFormConfig, getProductTypeConfig } from "@/lib/form-config";
 
 import oilBg        from "@/assets/Images/breadcurmbBackgrounds/oil_bg.jpg";
 import powerBg      from "@/assets/Images/breadcurmbBackgrounds/power_bg.png";
@@ -36,7 +36,11 @@ export const dynamic = "force-dynamic";
 
 export default async function IndustrySectorLayout({ children, params }: Props) {
   const { sector } = await params;
-  const [industry, formConfig] = await Promise.all([getIndustryWithSubIndustries(sector), getFormConfig()]);
+  const [industry, formConfig, productTypes] = await Promise.all([
+    getIndustryWithSubIndustries(sector),
+    getFormConfig(),
+    getProductTypeConfig(),
+  ]);
   if (!industry) notFound();
 
   const bg = industry.bgKey ? BG_MAP[industry.bgKey] : undefined;
@@ -78,7 +82,12 @@ export default async function IndustrySectorLayout({ children, params }: Props) 
       />
 
       <div id="enquiry-form">
-        <IndustryEnquiryForm industryName={industry.name} config={formConfig.industry.fields} />
+        <IndustryEnquiryForm
+          industryName={industry.name}
+          config={formConfig.industry.fields}
+          enquiryTypeOptions={formConfig.industry.enquiryTypeOrder}
+          productTypeOptions={productTypes}
+        />
       </div>
     </div>
   );

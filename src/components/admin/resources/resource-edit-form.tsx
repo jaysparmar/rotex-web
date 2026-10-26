@@ -7,12 +7,18 @@ import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { Editor } from "@tinymce/tinymce-react";
 import { marked } from "marked";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import "./tinymce-theme.css";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { TextField, FieldGrid, SwitchField, SelectField, Field } from "@/components/admin/form-fields";
 import { MediaField } from "@/components/admin/media-field";
 import { GalleryMediaPicker, type PickerMediaAsset } from "@/components/admin/gallery-media-picker";
 import { SaveBar } from "@/components/admin/section-form-shell";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { adminFetch } from "@/lib/admin-fetch";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { slugify } from "@/lib/utils";
@@ -41,6 +47,7 @@ type ResourceFormValues = {
   extraTags: string[];
   relatedIds: string[];
   content: string;
+  publishedAt: Date;
 };
 
 type Resource = {
@@ -56,6 +63,8 @@ type Resource = {
   extraTags: string[];
   relatedIds: string[];
   content: string;
+  publishedAt: Date | null;
+  createdAt: Date;
 };
 
 type RelatedResourceOption = { id: string; type: string; title: string; image: string };
@@ -100,6 +109,7 @@ export function ResourceEditForm({
       extraTags: resource?.extraTags ?? [],
       relatedIds: resource?.relatedIds ?? [],
       content: resource?.content ?? "",
+      publishedAt: resource?.publishedAt ?? resource?.createdAt ?? new Date(),
     },
   });
   const { pending, error, success, run } = useSaveAction();
@@ -135,6 +145,7 @@ export function ResourceEditForm({
       extraTags: values.extraTags,
       relatedIds: values.relatedIds,
       content: values.content,
+      publishedAt: values.publishedAt,
     };
     run(async () => {
       try {
@@ -186,6 +197,9 @@ export function ResourceEditForm({
               checked={form.watch("published")}
               onCheckedChange={(v) => form.setValue("published", v)}
             />
+            <Field label="Published date">
+              <PublishedDateField />
+            </Field>
           </CardContent>
         </Card>
 
@@ -222,6 +236,9 @@ function GalleryField({ allMedia }: { allMedia: PickerMediaAsset[] }) {
   const form = useFormContext<ResourceFormValues>();
   const selected = useWatch({ control: form.control, name: "galleryIds" }) ?? [];
   const sizes = useWatch({ control: form.control, name: "gallerySizes" }) ?? {};
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   if (allMedia.length === 0) {
     return (
@@ -232,6 +249,13 @@ function GalleryField({ allMedia }: { allMedia: PickerMediaAsset[] }) {
     );
   }
 
+  // DndContext (dnd-kit) assigns its a11y description id from a module-level counter,
+  // not React's SSR-safe useId — mounting it only on the client avoids a server/client
+  // id mismatch when other components shift render order before it.
+  if (!mounted) {
+    return <div className="h-24 rounded-lg border border-border bg-muted animate-pulse" />;
+  }
+
   return (
     <GalleryMediaPicker
       allMedia={allMedia}
@@ -240,6 +264,40 @@ function GalleryField({ allMedia }: { allMedia: PickerMediaAsset[] }) {
       onChangeSelected={(ids) => form.setValue("galleryIds", ids)}
       onChangeSizes={(next) => form.setValue("gallerySizes", next)}
     />
+  );
+}
+
+function PublishedDateField() {
+  const form = useFormContext<ResourceFormValues>();
+  const [open, setOpen] = useState(false);
+  const value = useWatch({ control: form.control, name: "publishedAt" });
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        render={
+          <Button
+            variant="outline"
+            className={cn("w-56 justify-start gap-1.5", !value && "text-muted-foreground")}
+          >
+            <CalendarIcon className="size-3.5" />
+            {value ? format(value, "dd MMM yyyy") : "Pick a date"}
+          </Button>
+        }
+      />
+      <PopoverContent align="start" className="w-auto p-0">
+        <Calendar
+          mode="single"
+          defaultMonth={value}
+          selected={value}
+          onSelect={(next) => {
+            if (next) form.setValue("publishedAt", next, { shouldDirty: true });
+            setOpen(false);
+          }}
+          disabled={{ after: new Date() }}
+        />
+      </PopoverContent>
+    </Popover>
   );
 }
 

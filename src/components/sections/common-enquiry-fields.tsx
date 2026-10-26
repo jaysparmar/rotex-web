@@ -13,7 +13,12 @@ import { useRecaptcha } from "@/hooks/use-recaptcha";
 import { RECAPTCHA_TOKEN_FIELD } from "@/lib/spam-protection-fields";
 import { COUNTRY_NAMES, getCitiesForCountry } from "@/lib/world-countries";
 import { digitsOnlyKeyDown, scrollToFirstFormError } from "@/lib/utils";
-import { PRODUCT_TYPE_OPTIONS, ENQUIRY_TYPE_OPTIONS_BY_FORM, type FormFieldKey, type FormKey } from "@/lib/form-config-shared";
+import {
+  DEFAULT_PRODUCT_TYPE_CONFIG,
+  ENQUIRY_TYPE_OPTIONS_BY_FORM,
+  type FormFieldKey,
+  type FormKey,
+} from "@/lib/form-config-shared";
 
 // Every common-form submission maps onto the one generic Enquiry API — this is
 // the only thing distinguishing a form's purpose, since the shared fields and
@@ -100,6 +105,10 @@ export type CommonEnquiryFieldsProps = {
   /** Page already determines the product (e.g. a single product's quote form) — skips
    * rendering the "Product Type" field and sends this value regardless of the toggle. */
   fixedProduct?: string;
+  /** Admin-ordered Enquiry Type options for this form; falls back to the fixed default order. */
+  enquiryTypeOptions?: readonly string[];
+  /** Admin-ordered, admin-labeled Product Type options; falls back to the fixed defaults. */
+  productTypeOptions?: readonly { key: string; label: string }[];
   recaptchaAction: string;
   submitLabel?: string;
   sendingLabel?: string;
@@ -112,6 +121,8 @@ export function CommonEnquiryFields({
   industryOptions = [],
   fixedIndustryName,
   fixedProduct,
+  enquiryTypeOptions: enquiryTypeOptionsProp,
+  productTypeOptions: productTypeOptionsProp,
   recaptchaAction,
   submitLabel = "Submit all details",
   sendingLabel = "Submitting…",
@@ -125,8 +136,9 @@ export function CommonEnquiryFields({
 
   const showIndustry = config.industry && !fixedIndustryName;
   const showProductType = config.productType && !fixedProduct;
-  const enquiryTypeOptions = ENQUIRY_TYPE_OPTIONS_BY_FORM[formKey] ?? [];
+  const enquiryTypeOptions = enquiryTypeOptionsProp ?? ENQUIRY_TYPE_OPTIONS_BY_FORM[formKey] ?? [];
   const showEnquiryType = config.enquiryType && enquiryTypeOptions.length > 0;
+  const productTypeOptions = productTypeOptionsProp ?? DEFAULT_PRODUCT_TYPE_CONFIG;
 
   const schema = useMemo(() => buildSchema(config, showEnquiryType), [config, showEnquiryType]);
   const {
@@ -298,7 +310,7 @@ export function CommonEnquiryFields({
               control={control}
               name="productType"
               placeholder="Select Product Type"
-              options={[...PRODUCT_TYPE_OPTIONS]}
+              options={productTypeOptions.map((o) => o.label)}
               hasError={!!errors.productType}
             />
           </Field>

@@ -9,6 +9,7 @@ type ChannelPartnerFormSectionProps = {
   description?: string;
   industryOptions?: IndustryOptionGroup[];
   config: Record<FormFieldKey, boolean>;
+  productTypeOptions?: readonly { key: string; label: string }[];
 };
 
 export function ChannelPartnerFormSection({
@@ -17,6 +18,7 @@ export function ChannelPartnerFormSection({
   description = "Partner with Rotex to deliver high-performance fluid control solutions backed by engineering excellence, global reach, and consistent demand generation.",
   industryOptions = [],
   config,
+  productTypeOptions,
 }: ChannelPartnerFormSectionProps) {
   return (
     <section id="form" className="scroll-mt-24 lg:scroll-mt-32 bg-white py-14 lg:py-20">
@@ -38,6 +40,7 @@ export function ChannelPartnerFormSection({
             formKey="channel-partner"
             config={config}
             industryOptions={industryOptions}
+            productTypeOptions={productTypeOptions}
             recaptchaAction="channel_partner_application"
             successMessage="Application submitted! We'll be in touch soon."
           />

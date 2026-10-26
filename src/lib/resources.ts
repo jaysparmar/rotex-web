@@ -14,7 +14,7 @@ export async function getPublishedResources(type: ResourceType): Promise<Resourc
   const [records, resolver] = await Promise.all([
     prisma.resource.findMany({
       where: { type, published: true },
-      orderBy: { createdAt: "desc" },
+      orderBy: { publishedAt: "desc" },
     }),
     createResourceTagResolver(),
   ]);
@@ -30,7 +30,7 @@ export async function getPublishedResources(type: ResourceType): Promise<Resourc
     industries: resolver.resolveIndustries((r.industryIds as string[]) ?? []),
     extraTags: (r.extraTags as string[]) ?? [],
     content: r.content,
-    createdAt: r.createdAt.toISOString(),
+    createdAt: (r.publishedAt ?? r.createdAt).toISOString(),
   }));
 }
 
@@ -58,6 +58,6 @@ export async function getFeaturedResources(type: ResourceType): Promise<Resource
     industries: resolver.resolveIndustries((r.industryIds as string[]) ?? []),
     extraTags: (r.extraTags as string[]) ?? [],
     content: r.content,
-    createdAt: r.createdAt.toISOString(),
+    createdAt: (r.publishedAt ?? r.createdAt).toISOString(),
   }));
 }

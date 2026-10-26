@@ -50,6 +50,17 @@ export const PRODUCT_TYPE_OPTIONS = [
   "CTIS",
 ] as const;
 
+/** Default display label + order for the Product Type option set — admin can reorder and
+ * relabel from /admin/forms, but the underlying `key` values above never change. */
+export const DEFAULT_PRODUCT_TYPE_CONFIG: PrismaJson.ProductTypeList = [
+  { key: "Solenoid Valves", label: "Solenoid Valve" },
+  { key: "Angle Seat Valves", label: "Angle Seat Valve" },
+  { key: "Automotive Solutions", label: "Automotive Valve" },
+  { key: "Actuators", label: "Electro Hydraulic Actuator" },
+  { key: "Positioners", label: "Positioner" },
+  { key: "CTIS", label: "CTIS" },
+];
+
 /** Fixed — not admin-editable. Only Contact and Industry forms have an Enquiry Type
  * option set; other forms don't render the field even if the toggle is on. */
 export const ENQUIRY_TYPE_OPTIONS_BY_FORM: Partial<Record<FormKey, readonly string[]>> = {
@@ -82,6 +93,7 @@ export const DEFAULT_FORM_CONFIG: PrismaJson.FormConfigData = {
       fullName: true, companyName: true, phone: true, email: true, country: true, city: true,
       industry: true, enquiryType: true, productType: true, quantity: false, message: true, uploadFile: false,
     },
+    enquiryTypeOrder: [...ENQUIRY_TYPE_OPTIONS_BY_FORM.contact!],
   },
   industry: {
     industryIds: [],
@@ -89,6 +101,7 @@ export const DEFAULT_FORM_CONFIG: PrismaJson.FormConfigData = {
       fullName: true, companyName: true, phone: true, email: true, country: true, city: true,
       industry: false, enquiryType: true, productType: true, quantity: false, message: true, uploadFile: true,
     },
+    enquiryTypeOrder: [...ENQUIRY_TYPE_OPTIONS_BY_FORM.industry!],
   },
   "product-quote": {
     industryIds: [],
