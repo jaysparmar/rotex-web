@@ -97,13 +97,10 @@ function CategorySwitcherPanel({
               key={item.href}
               href={item.href}
               onClick={onClose}
-              className="group w-64 flex flex-col gap-1"
+              className="group w-64"
             >
               <span className="text-stone-900 text-base font-medium font-montserrat leading-6 group-hover:text-[#EF3E23] transition-colors">
                 {item.label}
-              </span>
-              <span className="text-neutral-400 text-xs font-medium font-montserrat leading-5">
-                {item.description}
               </span>
             </Link>
           ))}

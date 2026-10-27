@@ -16,11 +16,20 @@ type HeroData = { title: string; description: string; image: string; mobileImage
 type StatsData = { stats: { value: string; label: string }[]; growthHeading: string; growthDescription: string };
 type WhyData = { heading: string; description: string; cards: { title: string; points: string[] }[] };
 type BenefitsData = { heading: string; benefits: { icon: string; text: string }[] };
+type MapPin = {
+  name: string;
+  coordinates: [number, number];
+  // Standalone (ungrouped) pins carry a single stateOrCity/partnerCompany;
+  // region pins carry a list of every country/company under that region.
+  stateOrCity?: string | null;
+  partnerCompany?: string | null;
+  entries?: { country: string; company: string | null }[];
+};
 type MapData = {
   heading: string;
   description: string;
   callout: string;
-  pins: { name: string; stateOrCity: string | null; partnerCompany: string | null; coordinates: [number, number] }[];
+  pins: MapPin[];
 };
 type StoriesData = {
   heading: { title: string; subtitle: string };

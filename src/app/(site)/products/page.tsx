@@ -3,7 +3,7 @@ import {
   getCategoriesWithProducts,
   getProductsList,
   getSubCategoriesWithProducts,
-  getIndustriesWithProducts,
+  getIndustriesWithSubIndustries,
   getCombinedCategoryFaqs,
 } from "@/lib/products-data";
 import { ProductFaqsSection } from "@/components/sections/product-faqs-section";
@@ -20,6 +20,7 @@ type SearchParams = {
   category?: string;
   type?: string;
   industry?: string;
+  subIndustry?: string;
   search?: string;
   size?: string;
   variantType?: string;
@@ -47,16 +48,26 @@ export default async function ProductsPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const { category, type, industry, search, page: pageParam, ...attrFilters } = await searchParams;
+  const { category, type, industry, subIndustry, search, page: pageParam, ...attrFilters } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
   const industrySlugs = industry ? industry.split(",").filter(Boolean) : [];
+  const subIndustrySlugs = subIndustry ? subIndustry.split(",").filter(Boolean) : [];
 
   const seo = await getPageSeo(category ? categorySeoKey(category) : "products");
   const [categories, subCategories, industries, { products, total }, attributeValues, faqs] = await Promise.all([
     getCategoriesWithProducts(),
     getSubCategoriesWithProducts(category),
-    getIndustriesWithProducts(category),
-    getProductsList({ categorySlug: category, subCategorySlug: type, industrySlugs, search, page, pageSize: PAGE_SIZE, ...attrFilters }),
+    getIndustriesWithSubIndustries(category),
+    getProductsList({
+      categorySlug: category,
+      subCategorySlug: type,
+      industrySlugs,
+      subIndustrySlugs,
+      search,
+      page,
+      pageSize: PAGE_SIZE,
+      ...attrFilters,
+    }),
     getAttributeValuesByKey(category),
     getCombinedCategoryFaqs(),
   ]);
@@ -72,6 +83,7 @@ export default async function ProductsPage({
         activeSubCategorySlug={type ?? null}
         industries={industries}
         activeIndustrySlugs={industrySlugs}
+        activeSubIndustrySlugs={subIndustrySlugs}
         attributeValues={attributeValues}
         activeFilters={attrFilters}
         activeSearch={search ?? ""}

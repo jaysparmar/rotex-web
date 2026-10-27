@@ -32,6 +32,10 @@ const BG_MAP: Record<string, StaticImageData> = {
 // industry has `useSubIndustries` off, the industry acting as its own "sub-industry".
 type SubIndustryContentData = {
   name: string;
+  // Only real SubIndustry rows have a slug — an Industry acting as its own
+  // "sub-industry" (useSubIndustries: false) has none, so product links from
+  // it carry just the parent industry filter.
+  slug?: string;
   description: string;
   image: string | null;
   mobileImage: string | null;
@@ -71,11 +75,16 @@ export async function SubIndustryContent({
         select: { id: true, name: true, slug: true, image: true },
       })
     : [];
+  // `industry` carries the parent industry slug; `subIndustry` carries the
+  // sub-industry slug when viewing a real one — kept as separate params so
+  // the /products filter can tell parent vs. child selection apart.
+  const productsQuery = `industry=${industry.slug}${subIndustry.slug ? `&subIndustry=${subIndustry.slug}` : ""}`;
+
   const categoryById = new Map(recommendedCategories.map((c) => [c.id, c]));
   const recommendedProducts = recommendedCategoryIds
     .map((id) => categoryById.get(id))
     .filter((c): c is NonNullable<typeof c> => Boolean(c))
-    .map((c) => ({ name: c.name, image: c.image ?? "", href: `/products?category=${c.slug}&industry=${industry.slug}` }));
+    .map((c) => ({ name: c.name, image: c.image ?? "", href: `/products?category=${c.slug}&${productsQuery}` }));
 
   return (
     <>
@@ -98,7 +107,7 @@ export async function SubIndustryContent({
       />
 
       <div id="recommended-products">
-        <IndustryProductsSwiper products={recommendedProducts} />
+        <IndustryProductsSwiper products={recommendedProducts} industrySlug={industry.slug} subIndustrySlug={subIndustry.slug} />
       </div>
 
       <IndustryCustomerStories stories={stories} />

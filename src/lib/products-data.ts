@@ -103,39 +103,71 @@ export type IndustryWithCount = {
   productCount: number;
 };
 
-/** All industries, for the "Industry" filter — unlike the other PLP filters, this lists every
+export type IndustryWithSubIndustries = IndustryWithCount & {
+  subIndustries: IndustryWithCount[];
+};
+
+/** All industries with their sub-industries, each with its own product count — feeds the
+ * tree-selection "Industry" filter on /products. Unlike the other PLP filters, this lists every
  * industry regardless of whether the active category currently has a matching product, so picking
  * one with no matches shows "No products found." rather than making that industry unselectable. */
-export async function getIndustriesWithProducts(categorySlug?: string | null): Promise<IndustryWithCount[]> {
+export async function getIndustriesWithSubIndustries(
+  categorySlug?: string | null
+): Promise<IndustryWithSubIndustries[]> {
   const categoryFilter = categorySlug ? { category: { slug: categorySlug } } : {};
-  const industries = await prisma.industry.findMany({ orderBy: { name: "asc" } });
+  const industries = await prisma.industry.findMany({
+    orderBy: { name: "asc" },
+    include: { subIndustries: { orderBy: { name: "asc" } } },
+  });
 
-  const counts = await Promise.all(
-    industries.map((industry) =>
-      prisma.product.count({
-        where: {
-          ...categoryFilter,
+  async function countFor(where: Record<string, unknown>) {
+    return prisma.product.count({ where: { ...categoryFilter, ...where } });
+  }
+
+  const result = await Promise.all(
+    industries.map(async (industry) => {
+      const [industryCount, subCounts] = await Promise.all([
+        countFor({
           OR: [
             { industries: { some: { id: industry.id } } },
             { variants: { some: { industries: { some: { id: industry.id } } } } },
           ],
-        },
-      })
-    )
+        }),
+        Promise.all(
+          industry.subIndustries.map((sub) =>
+            countFor({
+              OR: [
+                { subIndustries: { some: { id: sub.id } } },
+                { variants: { some: { subIndustries: { some: { id: sub.id } } } } },
+              ],
+            })
+          )
+        ),
+      ]);
+
+      return {
+        id: industry.id,
+        slug: industry.slug,
+        name: industry.name,
+        productCount: industryCount,
+        subIndustries: industry.subIndustries.map((sub, i) => ({
+          id: sub.id,
+          slug: sub.slug,
+          name: sub.name,
+          productCount: subCounts[i],
+        })),
+      };
+    })
   );
 
-  return industries.map((industry, i) => ({
-    id: industry.id,
-    slug: industry.slug,
-    name: industry.name,
-    productCount: counts[i],
-  }));
+  return result;
 }
 
 export type ProductListFilterParams = {
   categorySlug?: string;
   subCategorySlug?: string;
   industrySlugs?: string[];
+  subIndustrySlugs?: string[];
   search?: string;
   size?: string;
   variantType?: string;
@@ -155,7 +187,7 @@ export type ProductListResult = {
 
 /** Paginated products, optionally scoped to a category slug and variant attributes, for the /products listing. */
 export async function getProductsList(params: ProductListFilterParams = {}): Promise<ProductListResult> {
-  const { categorySlug, subCategorySlug, industrySlugs, search, page = 1, pageSize = 12, ...attrs } = params;
+  const { categorySlug, subCategorySlug, industrySlugs, subIndustrySlugs, search, page = 1, pageSize = 12, ...attrs } = params;
   const attrFilter: Record<string, string> = {};
   for (const [key, value] of Object.entries(attrs)) {
     if (value) attrFilter[key] = value;
@@ -195,17 +227,25 @@ export async function getProductsList(params: ProductListFilterParams = {}): Pro
     };
   });
 
-  // Industries live on the Product itself for simple products but only on each
-  // ProductVariant for variable products (see getProductBySlug) — match either.
-  // Multiple industries are OR'd together (a product matching any selected industry qualifies).
-  const industryFilter = industrySlugs && industrySlugs.length > 0
-    ? {
-        OR: [
+  // Industries/sub-industries live on the Product itself for simple products but only on
+  // each ProductVariant for variable products (see getProductBySlug) — match either.
+  // Everything selected (across both the parent industry and sub-industry filters) is
+  // OR'd together — a product matching any one of them qualifies.
+  const industryConditions = [
+    ...(industrySlugs && industrySlugs.length > 0
+      ? [
           { industries: { some: { slug: { in: industrySlugs } } } },
           { variants: { some: { industries: { some: { slug: { in: industrySlugs } } } } } },
-        ],
-      }
-    : null;
+        ]
+      : []),
+    ...(subIndustrySlugs && subIndustrySlugs.length > 0
+      ? [
+          { subIndustries: { some: { slug: { in: subIndustrySlugs } } } },
+          { variants: { some: { subIndustries: { some: { slug: { in: subIndustrySlugs } } } } } },
+        ]
+      : []),
+  ];
+  const industryFilter = industryConditions.length > 0 ? { OR: industryConditions } : null;
 
   const andConditions = [...(industryFilter ? [industryFilter] : []), ...tokenConditions];
 

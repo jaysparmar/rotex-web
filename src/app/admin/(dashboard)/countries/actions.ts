@@ -7,6 +7,7 @@ type CountryInput = {
   name: string;
   stateOrCity: string;
   partnerCompany: string;
+  region: string;
   lat: number;
   lng: number;
   published: boolean;
@@ -23,6 +24,7 @@ function toData(input: CountryInput) {
     name: input.name,
     stateOrCity: input.stateOrCity || null,
     partnerCompany: input.partnerCompany || null,
+    region: input.region || null,
     lat: input.lat,
     lng: input.lng,
     published: input.published,

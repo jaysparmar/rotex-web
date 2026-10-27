@@ -1,15 +1,30 @@
 "use client";
 import { memo, useState } from "react";
 import { ComposableMap, ZoomableGroup, Geographies, Geography, Marker } from "react-simple-maps";
-import { Plus, Minus, MapPin } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 type Pin = {
   name: string;
+  coordinates: [number, number];
   stateOrCity?: string | null;
   partnerCompany?: string | null;
-  coordinates: [number, number];
+  // Present on grouped region pins — one row per country/company under the region.
+  entries?: { country: string; company: string | null }[];
 };
+
+function LocationPinIcon({ className }: { className?: string }) {
+  return (
+    <svg width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <path
+        d="M6.33333 0C2.83553 0 0 3.16871 0 6.72917C0 10.2617 2.02138 14.1015 5.17518 15.5756C5.91038 15.9192 6.75629 15.9192 7.49149 15.5756C10.6453 14.1015 12.6667 10.2617 12.6667 6.72917C12.6667 3.16871 9.83114 0 6.33333 0ZM6.33333 7.91667C7.20778 7.91667 7.91667 7.20778 7.91667 6.33333C7.91667 5.45888 7.20778 4.75 6.33333 4.75C5.45888 4.75 4.75 5.45888 4.75 6.33333C4.75 7.20778 5.45888 7.91667 6.33333 7.91667Z"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -62,7 +77,7 @@ function ChannelPartnerFlatMap({ pins }: { pins: Pin[] }) {
       {/* Lets mobile visitors drag/swipe to pan the map — otherwise pins near
           the edges (e.g. Asia, CIS Region) sit partly off the visible area
           with no way to reach them on a touch device. */}
-      <ZoomableGroup zoom={2.2} minZoom={1} maxZoom={4} center={[20, 15]}>
+      <ZoomableGroup zoom={1} minZoom={1} maxZoom={4} center={[20, 15]}>
         <Geographies geography={GEO_URL}>
           {({ geographies }) =>
             geographies.map((geo) => {
@@ -94,10 +109,12 @@ function ChannelPartnerFlatMap({ pins }: { pins: Pin[] }) {
             // Pins on the right side of the map would clip their popup off the
             // edge — flip those to open leftward instead.
             const flip = pin.coordinates[0] > 60;
-            const regionCountries = REGION_COUNTRIES[pin.name];
-            const detail =
-              [pin.stateOrCity, pin.partnerCompany].filter(Boolean).join(" — ") ||
-              (regionCountries ? `Covers ${regionCountries.join(", ")}` : "");
+            // Grouped region pins list every country/company under them;
+            // standalone pins fall back to their own single stateOrCity/partnerCompany.
+            const rows = pin.entries?.length
+              ? pin.entries.map((e) => ({ label: e.country, detail: e.company }))
+              : [{ label: pin.name, detail: [pin.stateOrCity, pin.partnerCompany].filter(Boolean).join(" — ") }];
+            const hasDetail = rows.some((r) => r.detail);
             return (
               <Marker
                 key={pin.name + index}
@@ -110,7 +127,7 @@ function ChannelPartnerFlatMap({ pins }: { pins: Pin[] }) {
                   x={flip ? -286 : 6}
                   y={-12}
                   width={280}
-                  height={380}
+                  height={420}
                   className="overflow-visible"
                   style={{ pointerEvents: "none" }}
                 >
@@ -133,21 +150,26 @@ function ChannelPartnerFlatMap({ pins }: { pins: Pin[] }) {
                     </button>
 
                     <AnimatePresence>
-                      {isOpen && detail && (
+                      {isOpen && hasDetail && (
                         <motion.div
                           initial={{ opacity: 0, y: -8, scale: 0.97 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -8, scale: 0.97 }}
                           transition={{ duration: 0.2, ease: "easeOut" }}
                           style={{ pointerEvents: "auto", transformOrigin: flip ? "top right" : "top left" }}
-                          className="w-64 rounded-lg bg-white p-3 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.25)]"
+                          className="w-64 max-h-80 overflow-y-auto rounded-lg bg-white p-3 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.25)]"
                         >
-                          <p className="flex items-start gap-2">
-                            <MapPin className="size-3.5 shrink-0 mt-0.5 text-stone-400" strokeWidth={2} />
-                            <span className="text-xs font-montserrat leading-4 text-stone-700">
-                              <span className="font-semibold text-stone-900">{pin.name}</span> - {detail}
-                            </span>
-                          </p>
+                          <ul className="flex flex-col gap-2">
+                            {rows.map((row, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <LocationPinIcon className="size-3.5 shrink-0 mt-0.5 text-stone-400" />
+                                <span className="text-xs font-montserrat leading-4 text-stone-700">
+                                  <span className="font-semibold text-stone-900">{row.label}</span>
+                                  {row.detail ? ` - ${row.detail}` : ""}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
                         </motion.div>
                       )}
                     </AnimatePresence>

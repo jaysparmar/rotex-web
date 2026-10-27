@@ -270,6 +270,9 @@ model Country {
   name           String
   stateOrCity    String?
   partnerCompany String?
+  // Groups this country under one map pin (e.g. "Europe", "CIS Region") —
+  // null keeps the old behavior of one pin per country.
+  region         String?
   lat            Float
   lng            Float
   published      Boolean  @default(true)

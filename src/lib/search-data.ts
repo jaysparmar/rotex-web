@@ -29,7 +29,7 @@ async function curatedCategories(limit: number): Promise<SuggestedItem[]> {
   const categoryIds = ((section?.data as Record<string, unknown> | undefined)?.categoryIds as string[]) ?? [];
   if (categoryIds.length === 0) return [];
   const categories = await prisma.category.findMany({
-    where: { id: { in: categoryIds } },
+    where: { id: { in: categoryIds }, products: { some: {} } },
     select: { id: true, slug: true, name: true, image: true },
   });
   const byId = new Map(categories.map((c) => [c.id, c]));

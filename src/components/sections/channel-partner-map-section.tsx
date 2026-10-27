@@ -6,7 +6,13 @@ const ChannelPartnerFlatMap = dynamic(() => import("./channel-partner-flat-map")
   loading: () => <div className="w-full aspect-square sm:aspect-[16/9] bg-stone-100 animate-pulse rounded-xl" />,
 });
 
-type Pin = { name: string; stateOrCity?: string | null; partnerCompany?: string | null; coordinates: [number, number] };
+type Pin = {
+  name: string;
+  coordinates: [number, number];
+  stateOrCity?: string | null;
+  partnerCompany?: string | null;
+  entries?: { country: string; company: string | null }[];
+};
 
 type ChannelPartnerMapSectionProps = {
   heading?: string;
@@ -37,11 +43,11 @@ export function ChannelPartnerMapSection({
           <div className="w-full aspect-square sm:aspect-[16/9]">
             <ChannelPartnerFlatMap pins={pins} />
           </div>
-        </div>
-
-        <p className="mt-6 max-w-64 text-[#EF3E23] font-montserrat font-medium text-sm leading-6">
+        <p className="absolute bottom-10 max-w-64 text-[#EF3E23] font-montserrat font-medium text-sm leading-6">
           {callout}
         </p>
+        </div>
+
       </div>
     </section>
   );

@@ -1,5 +1,6 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { IoChevronDownOutline, IoCheckmarkOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import {
@@ -24,26 +25,43 @@ type FilterComboboxProps = {
 export function FilterCombobox({ label, placeholder, options, value, onChange, multiple = true }: FilterComboboxProps) {
   const [open, setOpen] = useState(false);
   const [dropUp, setDropUp] = useState(false);
+  const [rect, setRect] = useState<{ top: number; bottom: number; left: number; width: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Positioned via a fixed-position portal (not absolute inside the trigger's
+  // own container) so the panel escapes the filter sidebar/sheet's
+  // overflow-y-auto instead of being clipped by it.
+  const updatePosition = useCallback(() => {
+    if (!triggerRef.current) return;
+    const r = triggerRef.current.getBoundingClientRect();
+    setDropUp(window.innerHeight - r.bottom < 280);
+    setRect({ top: r.top, bottom: r.bottom, left: r.left, width: r.width });
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     function handleOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node) &&
+        !(e.target as HTMLElement)?.closest("[data-filter-combobox-panel]")
+      ) {
         setOpen(false);
       }
     }
     document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [open]);
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [open, updatePosition]);
 
   const handleOpen = () => {
-    if (!open && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      // Dropdown is ~260px tall; flip up if less than 280px space below
-      setDropUp(window.innerHeight - rect.bottom < 280);
-    }
+    if (!open) updatePosition();
     setOpen((o) => !o);
   };
 
@@ -92,13 +110,17 @@ export function FilterCombobox({ label, placeholder, options, value, onChange, m
           />
         </button>
 
-        {/* Dropdown */}
-        {open && (
+        {/* Dropdown — fixed-position portal so it isn't clipped by a scrolling ancestor */}
+        {open && rect && createPortal(
           <div
-            className={cn(
-              "absolute left-0 right-0 z-50 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden",
-              dropUp ? "bottom-[calc(100%+4px)]" : "top-[calc(100%+4px)]"
-            )}
+            data-filter-combobox-panel
+            style={{
+              position: "fixed",
+              left: rect.left,
+              width: rect.width,
+              ...(dropUp ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }),
+            }}
+            className="z-50 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden"
           >
             <Command>
               <CommandInput placeholder="Search..." />
@@ -130,7 +152,8 @@ export function FilterCombobox({ label, placeholder, options, value, onChange, m
                 </CommandGroup>
               </CommandList>
             </Command>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>

@@ -41,7 +41,20 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
   }, [page]);
 
   const productOptions = useMemo(() => uniqueOptions(items, "product"), [items]);
-  const subCategoryOptions = useMemo(() => uniqueOptions(items, "subCategory"), [items]);
+  // Scoped to the selected product — a product with no subcategories among
+  // its items yields an empty list, which hides the field below entirely.
+  const subCategoryOptions = useMemo(
+    () => (product === ALL ? [] : uniqueOptions(items.filter((i) => i.product === product), "subCategory")),
+    [items, product]
+  );
+  const hasSubCategoryOptions = subCategoryOptions.length > 0;
+
+  // Changing/clearing the product can invalidate the current subcategory pick.
+  useEffect(() => {
+    if (subCategory !== ALL && !subCategoryOptions.includes(subCategory)) {
+      setSubCategory(ALL);
+    }
+  }, [subCategory, subCategoryOptions]);
 
   const filteredItems = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -107,16 +120,20 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
                 value: product === ALL ? [] : [product],
                 onChange: (next) => setProduct(next[0] ?? ALL),
               },
-              {
-                id: "subCategory",
-                rowLabel: "Sub Category Product",
-                panelTitle: "Select Sub Category Product",
-                allLabel: "All Sub Categories",
-                placeholder: "Select Sub Category Product",
-                options: subCategoryOptions,
-                value: subCategory === ALL ? [] : [subCategory],
-                onChange: (next) => setSubCategory(next[0] ?? ALL),
-              },
+              ...(hasSubCategoryOptions
+                ? [
+                    {
+                      id: "subCategory",
+                      rowLabel: "Sub Category Product",
+                      panelTitle: "Select Sub Category Product",
+                      allLabel: "All Sub Categories",
+                      placeholder: "Select Sub Category Product",
+                      options: subCategoryOptions,
+                      value: subCategory === ALL ? [] : [subCategory],
+                      onChange: (next: string[]) => setSubCategory(next[0] ?? ALL),
+                    },
+                  ]
+                : []),
               {
                 id: "industry",
                 rowLabel: "Industry Type",
@@ -160,13 +177,15 @@ export function DownloadsSection({ items, industryOptions }: { items: DownloadIt
             />
           </div>
           <DownloadsFilterField label="Product" placeholder="Select Product" options={productOptions} value={product} onChange={setProduct} />
-          <DownloadsFilterField
-            label="Sub Category Product"
-            placeholder="Select Sub Category Product"
-            options={subCategoryOptions}
-            value={subCategory}
-            onChange={setSubCategory}
-          />
+          {hasSubCategoryOptions && (
+            <DownloadsFilterField
+              label="Sub Category Product"
+              placeholder="Select Sub Category Product"
+              options={subCategoryOptions}
+              value={subCategory}
+              onChange={setSubCategory}
+            />
+          )}
           <FilterCombobox
             label="Industry Type"
             placeholder="Select Industry Type"

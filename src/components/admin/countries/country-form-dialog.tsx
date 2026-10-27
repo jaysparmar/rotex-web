@@ -21,6 +21,7 @@ type CountryFormValues = {
   name: string;
   stateOrCity: string;
   partnerCompany: string;
+  region: string;
   lat: number;
   lng: number;
   published: boolean;
@@ -35,6 +36,7 @@ export function CountryFormDialog({
     name: string;
     stateOrCity: string | null;
     partnerCompany: string | null;
+    region: string | null;
     lat: number;
     lng: number;
     published: boolean;
@@ -47,6 +49,7 @@ export function CountryFormDialog({
       name: country?.name ?? "",
       stateOrCity: country?.stateOrCity ?? "",
       partnerCompany: country?.partnerCompany ?? "",
+      region: country?.region ?? "",
       lat: country?.lat ?? 0,
       lng: country?.lng ?? 0,
       published: country?.published ?? true,
@@ -87,6 +90,14 @@ export function CountryFormDialog({
               <TextField label="State / City (optional)" {...form.register("stateOrCity")} />
               <TextField label="Partner Company (optional)" {...form.register("partnerCompany")} />
             </FieldGrid>
+            <TextField
+              label="Region (optional)"
+              placeholder="e.g. Europe, CIS Region, Asia"
+              {...form.register("region")}
+            />
+            <p className="-mt-2.5 text-xs text-muted-foreground">
+              Countries sharing the same region collapse into one map pin with a list popup. Leave blank for a standalone pin.
+            </p>
             <FieldGrid>
               <TextField
                 label="Latitude"

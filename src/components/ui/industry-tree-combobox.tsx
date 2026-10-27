@@ -1,10 +1,17 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { IoChevronDownOutline, IoCheckmarkOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 import { Command, CommandEmpty, CommandInput, CommandList } from "@/components/ui/command";
 
-export type IndustryOptionGroup = { name: string; selectable: boolean; subIndustries: { name: string }[] };
+export type IndustryOptionGroup = {
+  name: string;
+  /** Selection key for this row — slug when a caller tracks ids, otherwise falls back to `name`. */
+  value?: string;
+  selectable: boolean;
+  subIndustries: { name: string; value?: string }[];
+};
 
 type IndustryTreeComboboxProps = {
   label: string;
@@ -15,35 +22,53 @@ type IndustryTreeComboboxProps = {
 };
 
 /** Same trigger/popup chrome as FilterCombobox, but renders options grouped by parent
- * industry with sub-industries indented underneath — mirrors the admin industry tree picker. */
+ * industry with sub-industries indented underneath (collapsed by default) — mirrors the
+ * admin industry tree picker. Selection is keyed by `value` (slug), not display name. */
 export function IndustryTreeCombobox({ label, placeholder, groups, value, onChange }: IndustryTreeComboboxProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [dropUp, setDropUp] = useState(false);
+  const [rect, setRect] = useState<{ top: number; bottom: number; left: number; width: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Positioned via a fixed-position portal so the panel escapes the filter
+  // sidebar/sheet's overflow-y-auto instead of being clipped by it.
+  const updatePosition = useCallback(() => {
+    if (!triggerRef.current) return;
+    const r = triggerRef.current.getBoundingClientRect();
+    setDropUp(window.innerHeight - r.bottom < 320);
+    setRect({ top: r.top, bottom: r.bottom, left: r.left, width: r.width });
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     function handleOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node) &&
+        !(e.target as HTMLElement)?.closest("[data-industry-tree-panel]")
+      ) {
         setOpen(false);
       }
     }
     document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [open]);
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [open, updatePosition]);
 
   const handleOpen = () => {
-    if (!open && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setDropUp(window.innerHeight - rect.bottom < 320);
-    }
+    if (!open) updatePosition();
     setOpen((o) => !o);
   };
 
-  const toggle = (name: string) => {
-    onChange(value.includes(name) ? value.filter((v) => v !== name) : [...value, name]);
+  const toggle = (val: string) => {
+    onChange(value.includes(val) ? value.filter((v) => v !== val) : [...value, val]);
   };
 
   const q = query.trim().toLowerCase();
@@ -57,8 +82,18 @@ export function IndustryTreeCombobox({ label, placeholder, groups, value, onChan
         .filter((g) => g.name.toLowerCase().includes(q) || g.subIndustries.length > 0)
     : groups;
 
+  const labelByValue = new Map(
+    groups.flatMap((g) => [
+      [g.value ?? g.name, g.name] as const,
+      ...g.subIndustries.map((s) => [s.value ?? s.name, s.name] as const),
+    ])
+  );
   const triggerLabel =
-    value.length === 0 ? placeholder : value.length === 1 ? value[0] : `${value[0]} +${value.length - 1} more`;
+    value.length === 0
+      ? placeholder
+      : value.length === 1
+      ? labelByValue.get(value[0]) ?? value[0]
+      : `${labelByValue.get(value[0]) ?? value[0]} +${value.length - 1} more`;
 
   return (
     <div className="flex flex-col gap-3">
@@ -78,12 +113,16 @@ export function IndustryTreeCombobox({ label, placeholder, groups, value, onChan
           <IoChevronDownOutline size={12} className={cn("ml-2 shrink-0 text-stone-900 transition-transform duration-150", open && "rotate-180")} />
         </button>
 
-        {open && (
+        {open && rect && createPortal(
           <div
-            className={cn(
-              "absolute left-0 right-0 z-50 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden",
-              dropUp ? "bottom-[calc(100%+4px)]" : "top-[calc(100%+4px)]"
-            )}
+            data-industry-tree-panel
+            style={{
+              position: "fixed",
+              left: rect.left,
+              width: rect.width,
+              ...(dropUp ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }),
+            }}
+            className="z-50 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden"
           >
             <Command shouldFilter={false}>
               <CommandInput placeholder="Search..." value={query} onValueChange={setQuery} />
@@ -92,19 +131,32 @@ export function IndustryTreeCombobox({ label, placeholder, groups, value, onChan
                   <CommandEmpty>No results found.</CommandEmpty>
                 ) : (
                   <div className="py-1">
-                    {filteredGroups.map((g) => (
-                      <div key={g.name}>
-                        <Row label={g.name} checked={value.includes(g.name)} onClick={() => g.selectable && toggle(g.name)} selectable={g.selectable} bold />
-                        {g.subIndustries.map((s) => (
-                          <Row key={s.name} label={s.name} checked={value.includes(s.name)} onClick={() => toggle(s.name)} selectable indent />
-                        ))}
-                      </div>
-                    ))}
+                    {filteredGroups.map((g) => {
+                      const gVal = g.value ?? g.name;
+                      return (
+                        <div key={g.name}>
+                          <Row
+                            label={g.name}
+                            checked={value.includes(gVal)}
+                            onClick={() => g.selectable && toggle(gVal)}
+                            selectable={g.selectable}
+                            bold
+                          />
+                          {g.subIndustries.map((s) => {
+                            const sVal = s.value ?? s.name;
+                            return (
+                              <Row key={sVal} label={s.name} checked={value.includes(sVal)} onClick={() => toggle(sVal)} selectable indent />
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </CommandList>
             </Command>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>

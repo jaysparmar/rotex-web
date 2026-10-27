@@ -11,10 +11,15 @@ type ProductCategory = { name: string; image: string; href: string };
 
 type Props = {
   products: ProductCategory[];
+  industrySlug?: string;
+  subIndustrySlug?: string;
 };
 
-export function IndustryProductsSwiper({ products }: Props) {
+export function IndustryProductsSwiper({ products, industrySlug, subIndustrySlug }: Props) {
   if (products.length === 0) return null;
+  const viewAllHref = industrySlug
+    ? `/products?industry=${industrySlug}${subIndustrySlug ? `&subIndustry=${subIndustrySlug}` : ""}`
+    : "/products";
   return (
     <section className="bg-white py-8 lg:py-10 border-t border-stone-100">
       <div className="container flex flex-col gap-6 lg:gap-8">
@@ -23,7 +28,7 @@ export function IndustryProductsSwiper({ products }: Props) {
             Products Recommended For You
           </h3>
           <Link
-            href="/products"
+            href={viewAllHref}
             className="hidden px-4 py-2 lg:inline-block lg:px-5 lg:py-2.5 rounded-full ring-1 ring-stone-300 text-stone-900 text-xs font-semibold font-montserrat uppercase leading-5 hover:bg-stone-50 transition-colors duration-150"
           >
             View All Products
@@ -68,7 +73,7 @@ export function IndustryProductsSwiper({ products }: Props) {
         </div>
 
         <Link
-          href="/products"
+          href={viewAllHref}
           className="w-full lg:hidden px-5 py-2.5 rounded-full ring-1 ring-stone-300 text-stone-900 text-xs font-semibold font-montserrat uppercase leading-5 text-center hover:bg-stone-50 transition-colors duration-150"
         >
           View All Products

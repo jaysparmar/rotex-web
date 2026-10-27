@@ -5,11 +5,12 @@ import { IoChevronForwardOutline, IoChevronBackOutline, IoSearchOutline } from "
 import { cn } from "@/lib/utils";
 import { ProductListCard } from "@/components/ui/product-list-card";
 import { FilterCombobox } from "@/components/ui/filter-combobox";
+import { IndustryTreeCombobox, type IndustryOptionGroup } from "@/components/ui/industry-tree-combobox";
 import { PageHero } from "@/components/ui/page-hero";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { PRODUCT_ATTRIBUTES, type ProductAttributeKey } from "@/lib/product-constants";
-import type { ProductSummary, CategoryWithCount, SubCategoryWithCount, IndustryWithCount } from "@/lib/products-data";
+import type { ProductSummary, CategoryWithCount, SubCategoryWithCount, IndustryWithSubIndustries } from "@/lib/products-data";
 import breadcrumbBg from "@/assets/Images/breadcurmbBackgrounds/default_bg.jpg";
 import mobileBreadcrumbBg from "@/assets/Images/breadcurmbBackgrounds/default_bg_mobile.jpg";
 
@@ -69,9 +70,10 @@ type FilterFieldsProps = {
   subCategories: SubCategoryWithCount[];
   activeSubCategorySlug: string | null;
   onSubCategoryChange: (slug: string | null) => void;
-  industries: IndustryWithCount[];
+  industries: IndustryWithSubIndustries[];
   activeIndustrySlugs: string[];
-  onIndustryChange: (slugs: string[]) => void;
+  activeSubIndustrySlugs: string[];
+  onIndustryChange: (industrySlugs: string[], subIndustrySlugs: string[]) => void;
   attributeValues: Record<string, string[]>;
   activeFilters: Partial<Record<ProductAttributeKey, string>>;
   onFilterChange: (key: ProductAttributeKey, value: string | undefined) => void;
@@ -110,6 +112,7 @@ function FilterFields({
   onSubCategoryChange,
   industries,
   activeIndustrySlugs,
+  activeSubIndustrySlugs,
   onIndustryChange,
   attributeValues,
   activeFilters,
@@ -119,7 +122,13 @@ function FilterFields({
   searchValue,
   onSearchChange,
 }: FilterFieldsProps) {
-  const activeIndustries = industries.filter((i) => activeIndustrySlugs.includes(i.slug));
+  const industryGroups: IndustryOptionGroup[] = industries.map((i) => ({
+    name: i.name,
+    value: i.slug,
+    selectable: true,
+    subIndustries: i.subIndustries.map((s) => ({ name: s.name, value: s.slug })),
+  }));
+  const subIndustrySlugSet = new Set(industries.flatMap((i) => i.subIndustries.map((s) => s.slug)));
 
   return (
     <>
@@ -132,16 +141,16 @@ function FilterFields({
       />
 
       {industries.length > 0 && (
-        <FilterCombobox
+        <IndustryTreeCombobox
           label="Industry"
           placeholder="Select Industry"
-          options={industries.map((i) => i.name)}
-          value={activeIndustries.map((i) => i.name)}
-          onChange={(vals) => {
-            const slugs = industries.filter((i) => vals.includes(i.name)).map((i) => i.slug);
-            onIndustryChange(slugs);
+          groups={industryGroups}
+          value={[...activeIndustrySlugs, ...activeSubIndustrySlugs]}
+          onChange={(slugs) => {
+            const subIndustrySlugs = slugs.filter((s) => subIndustrySlugSet.has(s));
+            const industrySlugs = slugs.filter((s) => !subIndustrySlugSet.has(s));
+            onIndustryChange(industrySlugs, subIndustrySlugs);
           }}
-          multiple
         />
       )}
 
@@ -288,6 +297,7 @@ export function ProductsPageClient({
   activeSubCategorySlug,
   industries,
   activeIndustrySlugs,
+  activeSubIndustrySlugs,
   attributeValues,
   activeFilters,
   activeSearch,
@@ -299,8 +309,9 @@ export function ProductsPageClient({
   activeCategorySlug: string | null;
   subCategories: SubCategoryWithCount[];
   activeSubCategorySlug: string | null;
-  industries: IndustryWithCount[];
+  industries: IndustryWithSubIndustries[];
   activeIndustrySlugs: string[];
+  activeSubIndustrySlugs: string[];
   attributeValues: Record<string, string[]>;
   activeFilters: Partial<Record<ProductAttributeKey, string>>;
   activeSearch: string;
@@ -315,10 +326,16 @@ export function ProductsPageClient({
   const tabs: Tab[] = [{ slug: null, name: "All Products" }, ...categories.map((c) => ({ slug: c.slug, name: c.name }))];
   const activeCategory = categories.find((c) => c.slug === activeCategorySlug) ?? null;
   const activeSubCategory = subCategories.find((s) => s.slug === activeSubCategorySlug) ?? null;
-  // Only one selected industry gets its own breadcrumb crumb — with several
-  // selected there's no single clean label to show there.
+  // Only one selected industry/sub-industry (and nothing else) gets its own
+  // breadcrumb crumb — with several selected there's no single clean label.
   const activeIndustry =
-    activeIndustrySlugs.length === 1 ? industries.find((i) => i.slug === activeIndustrySlugs[0]) ?? null : null;
+    activeIndustrySlugs.length === 1 && activeSubIndustrySlugs.length === 0
+      ? industries.find((i) => i.slug === activeIndustrySlugs[0]) ?? null
+      : null;
+  const activeSubIndustry =
+    !activeIndustry && activeSubIndustrySlugs.length === 1 && activeIndustrySlugs.length === 0
+      ? industries.flatMap((i) => i.subIndustries).find((s) => s.slug === activeSubIndustrySlugs[0]) ?? null
+      : null;
   const heroTitle = activeSubCategory?.name ?? activeCategory?.name ?? "All Products";
   const heroDescriptionSource = activeSubCategory?.description?.trim() || activeCategory?.description?.trim();
   const heroDescription = heroDescriptionSource ? collapseWhitespace(heroDescriptionSource) : "";
@@ -329,7 +346,8 @@ export function ProductsPageClient({
     ? (() => {
         const stops: { label: string; params: string }[] = [];
         if (activeIndustry) stops.push({ label: activeIndustry.name, params: `industry=${activeIndustry.slug}` });
-        const categoryParams = activeIndustry
+        else if (activeSubIndustry) stops.push({ label: activeSubIndustry.name, params: `subIndustry=${activeSubIndustry.slug}` });
+        const categoryParams = stops.length > 0
           ? `${stops[0].params}&category=${activeCategory.slug}`
           : `category=${activeCategory.slug}`;
         stops.push({ label: activeCategory.name, params: categoryParams });
@@ -386,6 +404,7 @@ export function ProductsPageClient({
     // (e.g. Actuators), so it must not silently keep filtering the results.
     for (const { key } of PRODUCT_ATTRIBUTES) params.delete(key);
     params.delete("industry");
+    params.delete("subIndustry");
     navigate(params);
   };
 
@@ -397,10 +416,12 @@ export function ProductsPageClient({
     navigate(params);
   };
 
-  const handleIndustryChange = (slugs: string[]) => {
+  const handleIndustryChange = (industrySlugs: string[], subIndustrySlugs: string[]) => {
     const params = new URLSearchParams(searchParams);
-    if (slugs.length > 0) params.set("industry", slugs.join(","));
+    if (industrySlugs.length > 0) params.set("industry", industrySlugs.join(","));
     else params.delete("industry");
+    if (subIndustrySlugs.length > 0) params.set("subIndustry", subIndustrySlugs.join(","));
+    else params.delete("subIndustry");
     params.delete("page");
     navigate(params);
   };
@@ -418,6 +439,7 @@ export function ProductsPageClient({
     for (const { key } of PRODUCT_ATTRIBUTES) params.delete(key);
     params.delete("type");
     params.delete("industry");
+    params.delete("subIndustry");
     params.delete("page");
     navigate(params);
   };
@@ -460,6 +482,7 @@ export function ProductsPageClient({
   const activeFilterCount =
     (activeSubCategorySlug ? 1 : 0) +
     activeIndustrySlugs.length +
+    activeSubIndustrySlugs.length +
     PRODUCT_ATTRIBUTES.filter(({ key }) => Boolean(activeFilters[key])).length;
   const hasActiveFilters = activeFilterCount > 0;
 
@@ -481,6 +504,7 @@ export function ProductsPageClient({
           onSubCategoryChange={handleSubCategoryChange}
           industries={industries}
           activeIndustrySlugs={activeIndustrySlugs}
+          activeSubIndustrySlugs={activeSubIndustrySlugs}
           onIndustryChange={handleIndustryChange}
           attributeValues={attributeValues}
           activeFilters={activeFilters}
@@ -520,6 +544,7 @@ export function ProductsPageClient({
                   onSubCategoryChange={handleSubCategoryChange}
                   industries={industries}
                   activeIndustrySlugs={activeIndustrySlugs}
+                  activeSubIndustrySlugs={activeSubIndustrySlugs}
                   onIndustryChange={handleIndustryChange}
                   attributeValues={attributeValues}
                   activeFilters={activeFilters}

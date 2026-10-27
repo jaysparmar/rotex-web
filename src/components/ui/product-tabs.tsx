@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import DOMPurify from "isomorphic-dompurify";
 import { IoEyeOutline, IoChevronDownOutline, IoRemoveOutline } from "react-icons/io5";
 import { cn } from "@/lib/utils";
@@ -67,26 +67,43 @@ function AccordionHeader({ label, open, onClick }: { label: string; open: boolea
   );
 }
 
+// Matches the old line-clamp-8 target (text-sm/leading-5 = 20px * 8 lines).
+// line-clamp itself can't be used here: the rich-content wrapper needs
+// `display: flex` (for gap-based paragraph spacing), and an element can't be
+// both `display: flex` and the `display: -webkit-box` line-clamp requires —
+// whichever class won that conflict, the clamp silently never applied, so
+// "Read more" toggled a state that had no visible effect. A measured
+// max-height collapse truncates regardless of the content's own display.
+const COLLAPSED_HEIGHT_PX = 160;
+
 function FeaturesPanel({ html }: { html: string }) {
   const [expanded, setExpanded] = useState(false);
+  const [overflowing, setOverflowing] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    setOverflowing(el.scrollHeight > COLLAPSED_HEIGHT_PX + 1);
+  }, [html]);
 
   return (
     <div className="flex flex-col gap-3">
       <div
-        className={cn(
-          "max-w-170 text-stone-900 text-sm font-medium font-montserrat leading-5",
-          !expanded && "line-clamp-8",
-          richContentStyles.content
-        )}
+        ref={contentRef}
+        style={!expanded ? { maxHeight: COLLAPSED_HEIGHT_PX, overflow: "hidden" } : undefined}
+        className={cn("max-w-170 text-stone-900 text-sm font-medium font-montserrat leading-5", richContentStyles.content)}
         dangerouslySetInnerHTML={{ __html: html }}
       />
-      <button
-        type="button"
-        onClick={() => setExpanded((e) => !e)}
-        className="w-fit text-left text-neutral-400 text-sm font-medium font-montserrat leading-6 hover:text-stone-600 transition-colors"
-      >
-        {expanded ? "Read less" : "Read more"}
-      </button>
+      {overflowing && (
+        <button
+          type="button"
+          onClick={() => setExpanded((e) => !e)}
+          className="w-fit text-left text-neutral-400 text-sm font-medium font-montserrat leading-6 hover:text-stone-600 transition-colors"
+        >
+          {expanded ? "Read less" : "Read more"}
+        </button>
+      )}
     </div>
   );
 }

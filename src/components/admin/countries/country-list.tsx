@@ -20,6 +20,7 @@ type Country = {
   name: string;
   stateOrCity: string | null;
   partnerCompany: string | null;
+  region: string | null;
   lat: number;
   lng: number;
   published: boolean;
@@ -136,7 +137,14 @@ export function CountryList({
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{country.name}</p>
+                <p className="text-sm font-medium">
+                  {country.name}
+                  {country.region && (
+                    <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
+                      {country.region}
+                    </span>
+                  )}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {[country.stateOrCity, country.partnerCompany].filter(Boolean).join(" — ") ||
                     `${country.lat}, ${country.lng}`}

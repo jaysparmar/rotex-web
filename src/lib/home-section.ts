@@ -67,7 +67,7 @@ export async function getHomeSection(key: string) {
     const categoryIds = (data.categoryIds as string[]) ?? [];
     const categories = categoryIds.length
       ? await prisma.category.findMany({
-          where: { id: { in: categoryIds } },
+          where: { id: { in: categoryIds }, products: { some: {} } },
           select: { id: true, slug: true, name: true, description: true, image: true },
         })
       : [];
