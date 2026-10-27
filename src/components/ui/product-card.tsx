@@ -5,13 +5,12 @@ import type { StaticImageData } from "next/image";
 
 type ProductCardProps = {
   name: string;
-  description: string;
   image: string | StaticImageData;
   href: string;
   className?: string;
 };
 
-export function ProductCard({ name, description, image, href, className }: ProductCardProps) {
+export function ProductCard({ name, image, href, className }: ProductCardProps) {
   return (
     <Link
       href={href}
@@ -38,9 +37,6 @@ export function ProductCard({ name, description, image, href, className }: Produ
         <h3 className="self-stretch text-center text-[#EF3E23] font-montserrat font-semibold text-xl leading-6">
           {name}
         </h3>
-        <p className="w-56 text-center text-black font-montserrat font-medium text-base leading-6">
-          {description}
-        </p>
       </div>
     </Link>
   );

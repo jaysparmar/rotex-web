@@ -61,7 +61,6 @@ export function ProductsSection({ products }: { products: ProductCardData[] }) {
           <ProductCard
             key={product.href}
             name={product.name}
-            description={product.description}
             image={product.image}
             href={product.href}
           />

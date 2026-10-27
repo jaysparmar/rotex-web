@@ -321,9 +321,7 @@ export function ProductsPageClient({
     activeIndustrySlugs.length === 1 ? industries.find((i) => i.slug === activeIndustrySlugs[0]) ?? null : null;
   const heroTitle = activeSubCategory?.name ?? activeCategory?.name ?? "All Products";
   const heroDescriptionSource = activeSubCategory?.description?.trim() || activeCategory?.description?.trim();
-  const heroDescription = heroDescriptionSource
-    ? collapseWhitespace(heroDescriptionSource)
-    : "Precision on–off control engineered by Rotex for safety-critical and high-duty industrial environments.";
+  const heroDescription = heroDescriptionSource ? collapseWhitespace(heroDescriptionSource) : "";
   // Breadcrumb trail: Home / [Industry] / Category / [Sub-category] — every
   // stop but the last links back to the URL state with only the stops before
   // it still applied, so clicking an earlier crumb drops the later filters.

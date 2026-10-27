@@ -102,10 +102,12 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
 
         {/* Content block — Figma: left 80px, top 404.5px, gap-9
             Mobile: relative flow with padding, offset below the fixed h-20 header (80px) + 40px gap;
-            Desktop: absolute positioned, right edge pinned to the hex slider's right edge (94.51%)
-            instead of a fixed width, so the CTA row below can stretch to meet it and push the
-            arrow nav flush right — always on the same line as the buttons. */}
-        <div className="relative lg:absolute z-30 flex flex-col gap-5 lg:gap-9 px-5 pt-26 pb-0 lg:px-0 lg:pt-0 lg:left-[80px] lg:right-[5.49%] lg:top-[404px]">
+            Desktop: absolute positioned, anchored to the canvas bottom (not a fixed top offset) so
+            the buttons/nav row stays put at its original Figma position while a longer title grows
+            upward above it into the spare header space instead of overflowing the 740px canvas.
+            Right edge pinned to the hex slider's right edge (94.51%) instead of a fixed width, so
+            the CTA row below can stretch to meet it and push the arrow nav flush right. */}
+        <div className="relative lg:absolute z-30 flex flex-col justify-center lg:justify-end gap-5 lg:gap-9 px-5 pt-26 pb-0 lg:px-0 lg:pt-0 lg:left-[80px] lg:right-[5.49%] lg:top-0 lg:bottom-[48px]">
 
           {/* Fixed min-height so the button/nav row below stays put across slides —
               text length varies per slide, so without this the row shifted up/down
