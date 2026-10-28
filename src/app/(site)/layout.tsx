@@ -58,7 +58,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           />
         )}
         <PlaceholderImageProvider value={adminConfig.fallbackPlaceholderImage}>
-          <PageLoader />
+          <PageLoader logo={config.logo} />
           <HashScroll />
           <Navbar config={config} />
           <main>{children}</main>

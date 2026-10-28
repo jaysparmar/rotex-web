@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm, FormProvider, useFieldArray, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { SectionMeta, SaveBar } from "@/components/admin/section-form-shell";
@@ -7,6 +8,9 @@ import { TextField, FieldGrid } from "@/components/admin/form-fields";
 import { ItemPickerGrid } from "@/components/admin/item-picker-grid";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { saveHomeSection } from "@/app/admin/(dashboard)/home/actions";
+
+// The homepage Resources section's card grid only ever shows this many per tab.
+const MAX_RESOURCES = 3;
 
 type Resource = { id: string; type: string; title: string; slug: string; image: string };
 type Tab = { id: string; label: string; cta: { label: string; href: string }; resourceIds: string[] };
@@ -47,22 +51,30 @@ export function ResourcesPickerForm({
         <TextField label="Heading Title" {...form.register("heading.title")} />
 
         <div className="space-y-6">
-          {fields.map((field, i) => (
-            <div key={field.id} className="space-y-4 rounded-lg border border-border p-4">
-              <span className="text-sm font-semibold">{form.watch(`tabs.${i}.label`)}</span>
-              <FieldGrid>
-                <TextField label="Tab Label" {...form.register(`tabs.${i}.label`)} />
-                <TextField label="CTA Label" {...form.register(`tabs.${i}.cta.label`)} />
-              </FieldGrid>
-              <TextField label="CTA Href" {...form.register(`tabs.${i}.cta.href`)} />
+          {fields.map((field, i) => {
+            // Tab.id (the resource type, e.g. "case-studies") is the real identifier to
+            // filter/display by — NOT `field.id`, which is react-hook-form's own generated
+            // array key. Tab data happens to use the field name "id" too, which RHF's
+            // useFieldArray silently overwrites in `fields`, so read the real value from
+            // the untouched initialData prop instead.
+            const typeId = initialData.tabs[i]?.id ?? field.id;
+            return (
+              <div key={field.id} className="space-y-4 rounded-lg border border-border p-4">
+                <span className="text-sm font-semibold">{form.watch(`tabs.${i}.label`)}</span>
+                <FieldGrid>
+                  <TextField label="Tab Label" {...form.register(`tabs.${i}.label`)} />
+                  <TextField label="CTA Label" {...form.register(`tabs.${i}.cta.label`)} />
+                </FieldGrid>
+                <TextField label="CTA Href" {...form.register(`tabs.${i}.cta.href`)} />
 
-              <ResourcePicker
-                tabIndex={i}
-                typeId={field.id}
-                options={allResources.filter((r) => r.type === field.id)}
-              />
-            </div>
-          ))}
+                <ResourcePicker
+                  tabIndex={i}
+                  typeId={typeId}
+                  options={allResources.filter((r) => r.type === typeId)}
+                />
+              </div>
+            );
+          })}
         </div>
 
         <SaveBar pending={pending} error={error} success={success} />
@@ -83,6 +95,17 @@ function ResourcePicker({
   const form = useFormContext<FormValues>();
   const selected = form.watch(`tabs.${tabIndex}.resourceIds`) ?? [];
 
+  // A tab saved before the 3-item cap existed can have more selected than that —
+  // the live site already only ever shows the first 3 of them, so trim the form's
+  // state to match on load instead of showing a confusing "8/3 selected" that
+  // doesn't reflect what's actually on the homepage.
+  useEffect(() => {
+    if (selected.length > MAX_RESOURCES) {
+      form.setValue(`tabs.${tabIndex}.resourceIds`, selected.slice(0, MAX_RESOURCES));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function toggle(id: string, checked: boolean) {
     const current = form.getValues(`tabs.${tabIndex}.resourceIds`) ?? [];
     form.setValue(
@@ -102,6 +125,7 @@ function ResourcePicker({
         onToggle={toggle}
         emptyMessage="No published resources of this type yet. Add some on the Resources page first."
         imageFit="cover"
+        maxSelected={MAX_RESOURCES}
       />
     </div>
   );

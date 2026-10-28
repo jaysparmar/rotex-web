@@ -17,6 +17,8 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel = "Delete",
+  pendingLabel,
+  variant = "destructive",
   onConfirm,
   pending,
 }: {
@@ -25,6 +27,8 @@ export function ConfirmDialog({
   title: string;
   description: string;
   confirmLabel?: string;
+  pendingLabel?: string;
+  variant?: "destructive" | "default";
   onConfirm: () => void;
   pending?: boolean;
 }) {
@@ -37,8 +41,8 @@ export function ConfirmDialog({
         </DialogHeader>
         <DialogFooter>
           <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
-          <Button variant="destructive" disabled={pending} onClick={onConfirm}>
-            {pending ? "Deleting..." : confirmLabel}
+          <Button variant={variant} disabled={pending} onClick={onConfirm}>
+            {pending ? (pendingLabel ?? `${confirmLabel}...`) : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

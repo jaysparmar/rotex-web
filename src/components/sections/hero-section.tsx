@@ -33,7 +33,9 @@ type CtaButton = { label: string; href: string };
 type Slide = {
   id: string;
   published?: boolean;
-  title: string;
+  // Missing on slides saved before this existed — treated as "hexagon".
+  layout?: "hexagon" | "fullBg";
+  title: { prefix: string; highlight: string; suffix: string };
   description: string;
   media: { type: "image" | "video"; src: string; alt?: string; mobileSrc?: string };
   cta_buttons: CtaButton[];
@@ -46,7 +48,7 @@ type HeroSectionProps = {
 const defaultSlides: Slide[] = [
   {
     id: "default_1",
-    title: "Flow Control. Where It Matters Most.",
+    title: { prefix: "", highlight: "Flow Control.", suffix: "Where It Matters Most." },
     description:
       "Engineered precise solutions that reduce downtime, enhance safety, and ensure uninterrupted operations across critical industry applications.",
     media: { type: "video", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
@@ -81,33 +83,41 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
 
   const prev = () => setIndex(i => (i - 1 + activeSlides.length) % activeSlides.length);
   const next = () => setIndex(i => (i + 1) % activeSlides.length);
+  const hasMultipleSlides = activeSlides.length > 1;
 
-  // "Flow Control. Where It Matters Most." → lead sentence renders in the brand
-  // gradient, the remainder drops to its own line on mobile (Figma).
-  const [, titleLead = slide.title, titleRest = ""] =
-    slide.title.match(/^([^.]*\.)\s*(.*)$/) ?? [];
+  const titleText = [slide.title.prefix, slide.title.highlight, slide.title.suffix].filter(Boolean).join(" ");
+  const isFullBg = (slide.layout ?? "hexagon") === "fullBg";
 
   return (
     <section className="relative w-full flex justify-center overflow-hidden bg-stone-900">
-      {/* 1440×740 canvas — centers on wide viewports, fills narrow ones */}
-      <div className="relative w-full max-w-[1440px] lg:h-[740px]">
+      {/* Full-background slides: media spans the whole section edge-to-edge (not capped to
+          the 1440px content canvas below), so it never gutters out on wide viewports. */}
+      {isFullBg && <SlideBackgroundMedia index={index} media={slide.media} title={titleText} />}
 
-        {/* Hex slider — desktop only; Figma: left 784px (54.44%), top 160px */}
-        <div
-          className="absolute z-20 hidden lg:block"
-          style={{ left: "54.44%", top: "160px" }}
-        >
-          <HexSlider index={index} media={slide.media} title={slide.title} />
-        </div>
+      {/* 1440×740 canvas — centers on wide viewports, fills narrow ones. Full-background
+          slides need an explicit mobile floor too, since below `lg` the canvas height is
+          otherwise just whatever the content needs, leaving no room for the media layer. */}
+      <div className={`relative w-full max-w-[1440px] lg:h-[740px] ${isFullBg ? "min-h-[600px]" : ""}`}>
+
+        {!isFullBg && (
+          /* Hex slider — desktop only; Figma: left 784px (54.44%), top 160px */
+          <div
+            className="absolute z-20 hidden lg:block"
+            style={{ left: "54.44%", top: "160px" }}
+          >
+            <HexSlider index={index} media={slide.media} title={titleText} />
+          </div>
+        )}
 
         {/* Content block — Figma: left 80px, top 404.5px, gap-9
             Mobile: relative flow with padding, offset below the fixed h-20 header (80px) + 40px gap;
             Desktop: absolute positioned, anchored to the canvas bottom (not a fixed top offset) so
             the buttons/nav row stays put at its original Figma position while a longer title grows
-            upward above it into the spare header space instead of overflowing the 740px canvas.
+            upward above it. `lg:top-24` clamps that growth to clear the fixed h-24 header instead
+            of letting a long title scroll up under it once the header turns solid.
             Right edge pinned to the hex slider's right edge (94.51%) instead of a fixed width, so
             the CTA row below can stretch to meet it and push the arrow nav flush right. */}
-        <div className="relative lg:absolute z-30 flex flex-col justify-center lg:justify-end gap-5 lg:gap-9 px-5 pt-26 pb-0 lg:px-0 lg:pt-0 lg:left-[80px] lg:right-[5.49%] lg:top-0 lg:bottom-[48px]">
+        <div className="relative lg:absolute z-30 flex flex-col justify-center lg:justify-end gap-5 lg:gap-9 px-5 pt-30 pb-0 lg:px-0 lg:pt-0 lg:left-[80px] lg:right-[5.49%] lg:top-24 lg:bottom-[48px]">
 
           {/* Fixed min-height so the button/nav row below stays put across slides —
               text length varies per slide, so without this the row shifted up/down
@@ -131,8 +141,13 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
                     letterSpacing: "-1.3px",
                   }}
                 >
-                  <span className="">{titleLead}</span>
-                  {titleRest && <span className="block lg:inline lg:ml-2">{titleRest}</span>}
+                  {slide.title.prefix && <span>{slide.title.prefix} </span>}
+                  {slide.title.highlight && (
+                    <span className="text-gradient-highlight">{slide.title.highlight}</span>
+                  )}
+                  {slide.title.suffix && (
+                    <span className="block lg:inline lg:ml-2">{slide.title.suffix}</span>
+                  )}
                 </h1>
 
                 {/* Body Copy 2 on mobile (14px), Body Copy 1 on desktop (16px) — per design team feedback, was too small at 12px */}
@@ -162,24 +177,39 @@ export function HeroSection({ slides = defaultSlides }: HeroSectionProps) {
               ))}
             </div>
 
-            <nav aria-label="Banner navigation" className="inline-flex items-center gap-4">
-              <ArrowBtn dir="prev" onClick={prev} />
-              <ArrowBtn dir="next" onClick={next} />
-            </nav>
+            {hasMultipleSlides && (
+              <nav aria-label="Banner navigation" className="inline-flex items-center gap-4">
+                <ArrowBtn dir="prev" onClick={prev} />
+                <ArrowBtn dir="next" onClick={next} />
+              </nav>
+            )}
           </div>
 
-          {/* Mobile: hex video slider — bleeds past the right edge of the screen
-              (Figma: 384px hex in a 384px frame, shifted right so ~9% overflows),
-              clipped by the section's overflow-hidden. Nav arrows stay within the visible area. */}
-          <div className="relative mt-2 -mr-10 lg:hidden">
-            <div className="w-[112%]">
-              <HexSlider index={index} media={slide.media} title={slide.title} fluid />
+          {isFullBg ? (
+            /* Full-background mode: the media is already behind everything (see
+               SlideBackgroundMedia above), so mobile just needs the nav arrows. */
+            hasMultipleSlides && (
+              <nav aria-label="Banner navigation" className="flex items-center gap-3 lg:hidden">
+                <ArrowBtn dir="prev" onClick={prev} />
+                <ArrowBtn dir="next" onClick={next} />
+              </nav>
+            )
+          ) : (
+            /* Mobile: hex video slider — bleeds past the right edge of the screen
+                (Figma: 384px hex in a 384px frame, shifted right so ~9% overflows),
+                clipped by the section's overflow-hidden. Nav arrows stay within the visible area. */
+            <div className="relative mt-2 -mr-10 lg:hidden">
+              <div className="w-[112%]">
+                <HexSlider index={index} media={slide.media} title={titleText} fluid />
+              </div>
+              {hasMultipleSlides && (
+                <nav aria-label="Banner navigation" className="absolute right-[15%] bottom-2 inline-flex items-center gap-3">
+                  <ArrowBtn dir="prev" onClick={prev} />
+                  <ArrowBtn dir="next" onClick={next} />
+                </nav>
+              )}
             </div>
-            <nav aria-label="Banner navigation" className="absolute right-[15%] bottom-2 inline-flex items-center gap-3">
-              <ArrowBtn dir="prev" onClick={prev} />
-              <ArrowBtn dir="next" onClick={next} />
-            </nav>
-          </div>
+          )}
 
         </div>
       </div>
@@ -210,6 +240,57 @@ function HeroOutlineBtn({
     >
       {children}
     </Link>
+  );
+}
+
+/* Full-background layout: media fills the whole canvas behind the text (no hexagon),
+   with a dark gradient over it so the white title/body stay readable. */
+function SlideBackgroundMedia({
+  index,
+  media,
+  title,
+}: {
+  index: number;
+  media: Slide["media"];
+  title: string;
+}) {
+  return (
+    <div className="absolute inset-0 z-0">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={index}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.45, ease: "easeInOut" }}
+          className="absolute inset-0"
+        >
+          {media.type === "video" ? (
+            <VideoPlayer src={media.src} variant="dark" containerClassName="w-full h-full" />
+          ) : (
+            <>
+              {media.mobileSrc && (
+                <ImageView
+                  src={media.mobileSrc}
+                  alt={media.alt ?? title}
+                  fill
+                  containerClassName="w-full h-full md:hidden"
+                  unoptimized
+                />
+              )}
+              <ImageView
+                src={media.src}
+                alt={media.alt ?? title}
+                fill
+                containerClassName={media.mobileSrc ? "w-full h-full hidden md:block" : "w-full h-full"}
+                unoptimized
+              />
+            </>
+          )}
+        </motion.div>
+      </AnimatePresence>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/10" />
+    </div>
   );
 }
 

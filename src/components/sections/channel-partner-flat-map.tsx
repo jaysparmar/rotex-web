@@ -106,9 +106,11 @@ function ChannelPartnerFlatMap({ pins }: { pins: Pin[] }) {
           .sort((a, b) => (a.index === openPin ? 1 : b.index === openPin ? -1 : 0))
           .map(({ pin, index }) => {
             const isOpen = openPin === index;
-            // Pins on the right side of the map would clip their popup off the
-            // edge — flip those to open leftward instead.
-            const flip = pin.coordinates[0] > 60;
+            // Pins near the far right edge of the map would clip their popup off —
+            // flip those to open leftward instead. Threshold is deliberately high
+            // (not just "east of center") so every region pin keeps the dot on the
+            // same side as its label; only a pin truly at the map's edge flips.
+            const flip = pin.coordinates[0] > 150;
             // Grouped region pins list every country/company under them;
             // standalone pins fall back to their own single stateOrCity/partnerCompany.
             const rows = pin.entries?.length

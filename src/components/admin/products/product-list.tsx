@@ -1,10 +1,21 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ChevronRight, Trash2, Plus, Layers, Search, SlidersHorizontal } from "lucide-react";
+import { ChevronRight, Trash2, Plus, Layers, Search, SlidersHorizontal, Copy, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +40,10 @@ import {
   deleteProducts,
   countProductsByFilter,
   deleteProductsByFilter,
+  reorderProducts,
+  duplicateProduct,
 } from "@/app/admin/(dashboard)/products/actions";
+import { useRouter } from "next/navigation";
 import { FILTER_KEYS, type ProductFilterParams } from "@/lib/product-filters";
 import { PRODUCT_ATTRIBUTES } from "@/lib/product-constants";
 import type { getCompanyCategoryTree, getIndustryTree } from "@/lib/products";
@@ -44,6 +58,7 @@ type ProductRow = {
   image: string | null;
   productFamily: string;
   productType: string;
+  order: number;
   company: { name: string };
   category: { name: string };
   subCategory: { name: string } | null;
@@ -81,6 +96,9 @@ export function ProductList({
   const { search, onSearchChange: handleSearchChange } = useDebouncedUrlSearch(q);
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<ProductRow | null>(null);
+  const [toDuplicate, setToDuplicate] = useState<ProductRow | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const router = useRouter();
 
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -88,6 +106,17 @@ export function ProductList({
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [filterDeleteTarget, setFilterDeleteTarget] = useState<FilterDeleteTarget | null>(null);
   const [countingType, setCountingType] = useState<"variable" | "simple" | null>(null);
+  const [rows, setRows] = useState(products);
+  // dnd-kit's a11y ids come from a module-level counter, not React's SSR-safe
+  // useId — rendering DndContext during SSR risks a hydration id mismatch, so
+  // it only mounts client-side (see SortableList for the same pattern).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  // `rows` is a local copy (so drag-reorder can update it optimistically) —
+  // resync whenever the server gives us a new `products` array, e.g. after
+  // router.refresh() on delete/duplicate, or a page/filter navigation.
+  useEffect(() => setRows(products), [products]);
 
   const searchKey = `${q}|${page}|${FILTER_KEYS.map((k) => filters[k] ?? "").join("|")}`;
   const [prevSearchKey, setPrevSearchKey] = useState(searchKey);
@@ -95,6 +124,32 @@ export function ProductList({
     setPrevSearchKey(searchKey);
     setSelectedIds(new Set());
     setSelectAllAcrossPages(false);
+    setRows(products);
+  }
+
+  // Drag-reorder only makes sense against the default, unsorted-by-anything-else
+  // view — a search or filter narrows the row set, and dropping a row into a
+  // position there would silently reassign `order` values that then apply to
+  // the *unfiltered* list, moving products the admin can't currently see.
+  const canReorder = !q && FILTER_KEYS.every((k) => !filters[k]);
+  const dndSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+
+  function handleDragEnd(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = rows.findIndex((r) => r.id === active.id);
+    const newIndex = rows.findIndex((r) => r.id === over.id);
+    const next = arrayMove(rows, oldIndex, newIndex);
+    setRows(next);
+    const pageOffset = (page - 1) * pageSize;
+    startTransition(async () => {
+      try {
+        await reorderProducts(next.map((r) => r.id), pageOffset);
+      } catch {
+        toast.error("Failed to save new order");
+        setRows(rows);
+      }
+    });
   }
 
   function confirmDelete() {
@@ -104,6 +159,7 @@ export function ProductList({
       try {
         await deleteProduct(toDelete.id);
         toast.success(`"${name}" deleted`);
+        router.refresh();
       } catch {
         toast.error(`Failed to delete "${name}"`);
       }
@@ -111,9 +167,9 @@ export function ProductList({
     setToDelete(null);
   }
 
-  const pageIds = products.map((p) => p.id);
+  const pageIds = rows.map((p) => p.id);
   const allPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
-  const showSelectAllBanner = allPageSelected && !selectAllAcrossPages && total > products.length;
+  const showSelectAllBanner = allPageSelected && !selectAllAcrossPages && total > rows.length;
 
   function toggleSelectAllOnPage() {
     if (selectAllAcrossPages) {
@@ -158,6 +214,7 @@ export function ProductList({
         await deleteProducts(ids);
         toast.success(`${ids.length} product${ids.length === 1 ? "" : "s"} deleted`);
         clearSelection();
+        router.refresh();
       } catch {
         toast.error("Failed to delete selected products");
       }
@@ -190,11 +247,30 @@ export function ProductList({
         await deleteProductsByFilter(filter);
         toast.success(`${count} product${count === 1 ? "" : "s"} deleted`);
         clearSelection();
+        router.refresh();
       } catch {
         toast.error("Failed to delete products");
       }
     });
     setFilterDeleteTarget(null);
+  }
+
+  function confirmDuplicate() {
+    if (!toDuplicate) return;
+    const product = toDuplicate;
+    setDuplicatingId(product.id);
+    startTransition(async () => {
+      try {
+        const { id } = await duplicateProduct(product.id);
+        toast.success(`"${product.name}" duplicated`);
+        router.push(`/admin/products/${id}`);
+      } catch {
+        toast.error(`Failed to duplicate "${product.name}"`);
+      } finally {
+        setDuplicatingId(null);
+      }
+    });
+    setToDuplicate(null);
   }
 
   function resolveFilterLabel(key: (typeof FILTER_KEYS)[number], value: string): string {
@@ -324,7 +400,7 @@ export function ProductList({
 
       {showSelectAllBanner && (
         <div className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-border py-2 text-sm text-muted-foreground">
-          All {products.length} products on this page are selected.
+          All {rows.length} products on this page are selected.
           <button
             type="button"
             className="font-medium text-primary hover:underline"
@@ -335,88 +411,94 @@ export function ProductList({
         </div>
       )}
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-10 pl-4 pr-1">
-              <Checkbox
-                checked={selectAllAcrossPages || allPageSelected}
-                onCheckedChange={toggleSelectAllOnPage}
-              />
-            </TableHead>
-            <TableHead>Product</TableHead>
-            <TableHead>Model Number</TableHead>
-            <TableHead>Family</TableHead>
-            <TableHead>Company / Category / Subcategory</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Variants</TableHead>
-            <TableHead className="pr-4 text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {products.length === 0 && <TableEmpty colSpan={8}>No products found.</TableEmpty>}
-          {products.map((product) => (
-            <TableRow key={product.id} hoverable>
-              <TableCell className="pl-4 pr-1">
+      {!canReorder && (
+        <p className="text-xs text-muted-foreground">
+          Clear search and filters to drag-reorder products.
+        </p>
+      )}
+
+      {mounted && canReorder ? (
+        <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={pageIds} strategy={verticalListSortingStrategy}>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-8 pl-4" />
+                  <TableHead className="w-10 pr-1">
+                    <Checkbox
+                      checked={selectAllAcrossPages || allPageSelected}
+                      onCheckedChange={toggleSelectAllOnPage}
+                    />
+                  </TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Model Number</TableHead>
+                  <TableHead>Family</TableHead>
+                  <TableHead>Company / Category / Subcategory</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Variants</TableHead>
+                  <TableHead className="pr-4 text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.length === 0 && <TableEmpty colSpan={9}>No products found.</TableEmpty>}
+                {rows.map((product) => (
+                  <SortableProductRow key={product.id} id={product.id} dragEnabled>
+                    <ProductRowCells
+                      product={product}
+                      checked={selectAllAcrossPages || selectedIds.has(product.id)}
+                      disabled={selectAllAcrossPages}
+                      onToggle={() => toggleRow(product.id)}
+                      pending={pending}
+                      duplicatingId={duplicatingId}
+                      onDuplicate={() => setToDuplicate(product)}
+                      onDelete={() => setToDelete(product)}
+                    />
+                  </SortableProductRow>
+                ))}
+              </TableBody>
+            </Table>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {canReorder && <TableHead className="w-8 pl-4" />}
+              <TableHead className="w-10 pr-1">
                 <Checkbox
-                  checked={selectAllAcrossPages || selectedIds.has(product.id)}
-                  onCheckedChange={() => toggleRow(product.id)}
-                  disabled={selectAllAcrossPages}
+                  checked={selectAllAcrossPages || allPageSelected}
+                  onCheckedChange={toggleSelectAllOnPage}
                 />
-              </TableCell>
-              <TableCell>
-                <Link href={`/admin/products/${product.id}`} className="flex items-center gap-3">
-                  <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
-                    {product.image && (
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        width={36}
-                        height={36}
-                        className="size-full object-contain"
-                        unoptimized
-                      />
-                    )}
-                  </div>
-                  <span className="font-medium hover:underline">{product.name}</span>
-                </Link>
-              </TableCell>
-              <TableCell className="text-muted-foreground">{product.modelNumber}</TableCell>
-              <TableCell>
-                <Badge variant="outline">{product.productFamily}</Badge>
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {product.company.name} / {product.category.name}
-                {product.subCategory ? ` / ${product.subCategory.name}` : ""}
-              </TableCell>
-              <TableCell className="capitalize text-muted-foreground">{product.productType}</TableCell>
-              <TableCell>
-                <span className="flex items-center gap-1 text-muted-foreground">
-                  <Layers className="size-3.5" />
-                  {product.variantCount}
-                </span>
-              </TableCell>
-              <TableCell className="pr-4">
-                <div className="flex items-center justify-end gap-1">
-                  <Link href={`/admin/products/${product.id}`}>
-                    <Button variant="ghost" size="icon-sm">
-                      <ChevronRight className="size-3.5" />
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    disabled={pending}
-                    onClick={() => setToDelete(product)}
-                  >
-                    <Trash2 className="size-3.5 text-destructive" />
-                  </Button>
-                </div>
-              </TableCell>
+              </TableHead>
+              <TableHead>Product</TableHead>
+              <TableHead>Model Number</TableHead>
+              <TableHead>Family</TableHead>
+              <TableHead>Company / Category / Subcategory</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Variants</TableHead>
+              <TableHead className="pr-4 text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {rows.length === 0 && <TableEmpty colSpan={9}>No products found.</TableEmpty>}
+            {rows.map((product) => (
+              <TableRow key={product.id} hoverable>
+                {canReorder && <TableCell className="w-8 pl-4" />}
+                <ProductRowCells
+                  product={product}
+                  checked={selectAllAcrossPages || selectedIds.has(product.id)}
+                  disabled={selectAllAcrossPages}
+                  onToggle={() => toggleRow(product.id)}
+                  pending={pending}
+                  duplicatingId={duplicatingId}
+                  onDuplicate={() => setToDuplicate(product)}
+                  onDelete={() => setToDelete(product)}
+                />
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
 
       <AdminPagination page={page} totalPages={totalPages} total={total} itemLabel="product" pageHref={pageHref} />
 
@@ -426,6 +508,18 @@ export function ProductList({
         title="Delete product"
         description={`Delete "${toDelete?.name}" (${toDelete?.modelNumber})? This also deletes all its variants. This cannot be undone.`}
         onConfirm={confirmDelete}
+        pending={pending}
+      />
+
+      <ConfirmDialog
+        open={toDuplicate !== null}
+        onOpenChange={(open) => !open && setToDuplicate(null)}
+        title="Duplicate product"
+        description={`Duplicate "${toDuplicate?.name}" (${toDuplicate?.modelNumber})? This copies all its content and variants into a new product, which opens for editing.`}
+        confirmLabel="Duplicate"
+        pendingLabel="Duplicating..."
+        variant="default"
+        onConfirm={confirmDuplicate}
         pending={pending}
       />
 
@@ -457,5 +551,126 @@ export function ProductList({
         attributeValues={attributeValues}
       />
     </div>
+  );
+}
+
+function ProductRowCells({
+  product,
+  checked,
+  disabled,
+  onToggle,
+  pending,
+  duplicatingId,
+  onDuplicate,
+  onDelete,
+}: {
+  product: ProductRow;
+  checked: boolean;
+  disabled: boolean;
+  onToggle: () => void;
+  pending: boolean;
+  duplicatingId: string | null;
+  onDuplicate: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <>
+      <TableCell className="pl-4 pr-1 w-10">
+        <Checkbox checked={checked} onCheckedChange={onToggle} disabled={disabled} />
+      </TableCell>
+      <TableCell>
+        <Link href={`/admin/products/${product.id}`} className="flex items-center gap-3">
+          <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
+            {product.image && (
+              <Image
+                src={product.image}
+                alt={product.name}
+                width={36}
+                height={36}
+                className="size-full object-contain"
+                unoptimized
+              />
+            )}
+          </div>
+          <span className="font-medium hover:underline">{product.name}</span>
+        </Link>
+      </TableCell>
+      <TableCell className="text-muted-foreground">{product.modelNumber}</TableCell>
+      <TableCell>
+        <Badge variant="outline">{product.productFamily}</Badge>
+      </TableCell>
+      <TableCell className="text-muted-foreground">
+        {product.company.name} / {product.category.name}
+        {product.subCategory ? ` / ${product.subCategory.name}` : ""}
+      </TableCell>
+      <TableCell className="capitalize text-muted-foreground">{product.productType}</TableCell>
+      <TableCell>
+        <span className="flex items-center gap-1 text-muted-foreground">
+          <Layers className="size-3.5" />
+          {product.variantCount}
+        </span>
+      </TableCell>
+      <TableCell className="pr-4">
+        <div className="flex items-center justify-end gap-1">
+          <Link href={`/admin/products/${product.id}`}>
+            <Button variant="ghost" size="icon-sm">
+              <ChevronRight className="size-3.5" />
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            disabled={pending && duplicatingId === product.id}
+            onClick={onDuplicate}
+            aria-label="Duplicate"
+          >
+            <Copy className="size-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon-sm" disabled={pending} onClick={onDelete}>
+            <Trash2 className="size-3.5 text-destructive" />
+          </Button>
+        </div>
+      </TableCell>
+    </>
+  );
+}
+
+function SortableProductRow({
+  id,
+  dragEnabled,
+  children,
+}: {
+  id: string;
+  dragEnabled: boolean;
+  children: ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    disabled: !dragEnabled,
+  });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
+  return (
+    <tr
+      ref={setNodeRef}
+      style={style}
+      data-slot="table-row"
+      className={cn("transition-colors hover:bg-muted/20", isDragging && "relative z-10 bg-background opacity-80")}
+    >
+      <td className="w-8 pl-4 py-2.5 pr-3">
+        {dragEnabled && (
+          <button
+            type="button"
+            className="cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
+            aria-label="Drag to reorder"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="size-4" />
+          </button>
+        )}
+      </td>
+      {children}
+    </tr>
   );
 }

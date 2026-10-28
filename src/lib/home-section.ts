@@ -54,7 +54,10 @@ export async function getHomeSection(key: string) {
           : [];
         const byId = new Map(resources.map((r) => [r.id, r]));
         const ordered = ids.map((id) => byId.get(id)).filter((r): r is NonNullable<typeof r> => Boolean(r));
-        return { id: tab.id, label: tab.label, cta: tab.cta, resources: ordered };
+        // Defensive cap matching the admin picker's limit — guards any tab saved
+        // before that limit existed, or edited directly, from overflowing the
+        // homepage's fixed 3-card grid.
+        return { id: tab.id, label: tab.label, cta: tab.cta, resources: ordered.slice(0, 3) };
       })
     );
     return apiSuccess(

@@ -9,6 +9,6 @@ export function crumbsFromCategory(category: string | null): Crumb[] | undefined
   return [
     { label: "Home", href: "/" },
     { label: "Products", href: "/products" },
-    { label: category },
+    { label: category, href: `/products?category=${encodeURIComponent(category.toLowerCase())}` },
   ];
 }

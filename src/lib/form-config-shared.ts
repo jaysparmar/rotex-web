@@ -2,6 +2,9 @@
 
 export type FormFieldKey =
   | "fullName"
+  | "firstName"
+  | "lastName"
+  | "designation"
   | "companyName"
   | "phone"
   | "email"
@@ -12,11 +15,26 @@ export type FormFieldKey =
   | "productType"
   | "quantity"
   | "message"
-  | "uploadFile";
+  | "uploadFile"
+  | "consent";
 
-/** Order matches how fields render top-to-bottom on every common form. */
-export const FORM_FIELDS: { key: FormFieldKey; label: string; locked?: boolean }[] = [
-  { key: "fullName", label: "Full Name", locked: true },
+/** Order matches how fields render top-to-bottom on every common form.
+ * `contactOnly` fields only ever render on the Contact form (see
+ * common-enquiry-fields.tsx) — the admin editor hides their toggle on every
+ * other form so it isn't shown where it'd have no effect. `hideOnContact`
+ * is the inverse: a field every other form uses but the Contact form
+ * replaced (Full Name -> First/Last Name), so its toggle is hidden there. */
+export const FORM_FIELDS: {
+  key: FormFieldKey;
+  label: string;
+  locked?: boolean;
+  contactOnly?: boolean;
+  hideOnContact?: boolean;
+}[] = [
+  { key: "fullName", label: "Full Name", locked: true, hideOnContact: true },
+  { key: "firstName", label: "First Name", contactOnly: true },
+  { key: "lastName", label: "Last Name", contactOnly: true },
+  { key: "designation", label: "Designation", contactOnly: true },
   { key: "companyName", label: "Company Name" },
   { key: "phone", label: "Phone Number", locked: true },
   { key: "email", label: "Email", locked: true },
@@ -26,6 +44,7 @@ export const FORM_FIELDS: { key: FormFieldKey; label: string; locked?: boolean }
   { key: "enquiryType", label: "Enquiry Type" },
   { key: "productType", label: "Product Type" },
   { key: "quantity", label: "Quantity" },
+  { key: "consent", label: "Privacy Policy Consent Checkbox", contactOnly: true },
   { key: "message", label: "Message", locked: true },
   { key: "uploadFile", label: "Upload File" },
 ];
@@ -90,38 +109,38 @@ export const DEFAULT_FORM_CONFIG: PrismaJson.FormConfigData = {
   contact: {
     industryIds: [],
     fields: {
-      fullName: true, companyName: true, phone: true, email: true, country: true, city: true,
-      industry: true, enquiryType: true, productType: true, quantity: false, message: true, uploadFile: false,
+      fullName: true, firstName: true, lastName: true, designation: true, companyName: true, phone: true, email: true, country: true, city: true,
+      industry: true, enquiryType: true, productType: true, quantity: false, message: true, uploadFile: false, consent: false,
     },
     enquiryTypeOrder: [...ENQUIRY_TYPE_OPTIONS_BY_FORM.contact!],
   },
   industry: {
     industryIds: [],
     fields: {
-      fullName: true, companyName: true, phone: true, email: true, country: true, city: true,
-      industry: false, enquiryType: true, productType: true, quantity: false, message: true, uploadFile: true,
+      fullName: true, firstName: true, lastName: true, designation: true, companyName: true, phone: true, email: true, country: true, city: true,
+      industry: false, enquiryType: true, productType: true, quantity: false, message: true, uploadFile: true, consent: false,
     },
     enquiryTypeOrder: [...ENQUIRY_TYPE_OPTIONS_BY_FORM.industry!],
   },
   "product-quote": {
     industryIds: [],
     fields: {
-      fullName: true, companyName: true, phone: true, email: true, country: true, city: true,
-      industry: true, enquiryType: false, productType: false, quantity: true, message: true, uploadFile: false,
+      fullName: true, firstName: true, lastName: true, designation: true, companyName: true, phone: true, email: true, country: true, city: true,
+      industry: true, enquiryType: false, productType: false, quantity: true, message: true, uploadFile: false, consent: false,
     },
   },
   supplier: {
     industryIds: [],
     fields: {
-      fullName: true, companyName: true, phone: true, email: true, country: true, city: true,
-      industry: true, enquiryType: false, productType: true, quantity: false, message: true, uploadFile: false,
+      fullName: true, firstName: true, lastName: true, designation: true, companyName: true, phone: true, email: true, country: true, city: true,
+      industry: true, enquiryType: false, productType: true, quantity: false, message: true, uploadFile: false, consent: false,
     },
   },
   "channel-partner": {
     industryIds: [],
     fields: {
-      fullName: true, companyName: true, phone: true, email: true, country: true, city: true,
-      industry: true, enquiryType: false, productType: true, quantity: false, message: true, uploadFile: false,
+      fullName: true, firstName: true, lastName: true, designation: true, companyName: true, phone: true, email: true, country: true, city: true,
+      industry: true, enquiryType: false, productType: true, quantity: false, message: true, uploadFile: false, consent: false,
     },
   },
 };

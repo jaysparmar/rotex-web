@@ -23,10 +23,17 @@ export default async function AdminProductsPage({
   const [products, total, companies, productFamilies, industries, attributeValues] = await Promise.all([
     prisma.product.findMany({
       where,
-      orderBy: { modelNumber: "asc" },
+      orderBy: [{ order: "asc" }, { modelNumber: "asc" }],
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
-      include: {
+      select: {
+        id: true,
+        modelNumber: true,
+        name: true,
+        image: true,
+        productFamily: true,
+        productType: true,
+        order: true,
         company: { select: { name: true } },
         category: { select: { name: true } },
         subCategory: { select: { name: true } },

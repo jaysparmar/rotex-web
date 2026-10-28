@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import logo from "@/assets/logo.svg";
 
-export function PageLoader() {
+export function PageLoader({
+  logo,
+}: {
+  logo: { src: string; alt: string };
+}) {
   const [visible, setVisible] = useState(true);
   const [fading, setFading] = useState(false);
 
@@ -35,28 +38,29 @@ export function PageLoader() {
       {/* Outer glow ring */}
       <div className="relative flex items-center justify-center">
         {/* Spinning gradient ring */}
-        <span className="absolute h-32 w-32 rounded-full border-4 border-transparent animate-spin [border-top-color:#ff9a00] [border-right-color:#EF3E23]" />
-        <span className="absolute h-28 w-28 rounded-full border-2 border-transparent animate-[spin_2s_linear_infinite_reverse] [border-bottom-color:#c31d00] [border-left-color:#950000] opacity-60" />
+        <span className="absolute h-48 w-48 rounded-full border-4 border-transparent animate-spin [border-top-color:#ff9a00] [border-right-color:#EF3E23]" />
+        <span className="absolute h-42 w-42 rounded-full border-2 border-transparent animate-[spin_2s_linear_infinite_reverse] [border-bottom-color:#c31d00] [border-left-color:#950000] opacity-60" />
 
         {/* Logo container */}
-        <div className="relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-black/60 p-4 backdrop-blur-sm">
+        <div className="relative z-10 flex h-30 w-30 items-center justify-center rounded-full bg-black/60 p-5 backdrop-blur-sm">
           <Image
-            src={logo}
-            alt="Rotex"
-            width={72}
-            height={16}
-            className="w-auto h-8 object-contain brightness-0 invert"
+            src={logo.src}
+            alt={logo.alt}
+            width={108}
+            height={60}
+            unoptimized
+            className="w-auto h-16 object-contain"
             priority
           />
         </div>
       </div>
 
       {/* Brand pulse bar */}
-      <div className="mt-10 h-0.5 w-32 overflow-hidden rounded-full bg-neutral-800">
+      <div className="mt-14 h-1 w-48 overflow-hidden rounded-full bg-neutral-800">
         <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-[#ff9a00] via-[#EF3E23] to-[#950000] animate-[loader-bar_1.4s_ease-in-out_infinite]" />
       </div>
 
-      <p className="mt-4 text-xs font-semibold tracking-[0.25em] text-neutral-500 uppercase">
+      <p className="mt-5 text-sm font-semibold tracking-[0.25em] text-neutral-500 uppercase">
         Loading
       </p>
 

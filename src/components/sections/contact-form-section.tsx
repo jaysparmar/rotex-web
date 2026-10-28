@@ -103,6 +103,7 @@ export function ContactFormSection({
             enquiryTypeOptions={enquiryTypeOptions}
             productTypeOptions={productTypeOptions}
             recaptchaAction="contact_form"
+            submitLabel="Submit"
             successMessage="Message sent! We'll be in touch soon."
           />
         </div>

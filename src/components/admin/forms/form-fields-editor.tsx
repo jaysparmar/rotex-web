@@ -55,7 +55,9 @@ export function FormFieldsEditor({
     >
       <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[22rem_1fr]">
         <div className="divide-y divide-border rounded-lg border border-border">
-          {FORM_FIELDS.map((f) => (
+          {FORM_FIELDS.filter(
+            (f) => (!f.contactOnly || formKey === "contact") && !(f.hideOnContact && formKey === "contact")
+          ).map((f) => (
             <div key={f.key} className="flex items-center justify-between gap-4 px-4 py-3">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">{f.label}</span>

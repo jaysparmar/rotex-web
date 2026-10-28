@@ -58,7 +58,7 @@ export function ContactOfficesSection({
                   {office.address && (
                     <div className="flex items-start gap-2">
                       <MapPin className="size-5 text-neutral-400 shrink-0 mt-0.5" strokeWidth={1.5} />
-                      <p className="text-stone-500 text-sm font-medium font-montserrat leading-5">{office.address}</p>
+                      <p className="text-stone-500 text-sm font-medium font-montserrat leading-5 whitespace-pre-line">{office.address}</p>
                     </div>
                   )}
                   {office.phone && (

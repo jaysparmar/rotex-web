@@ -34,6 +34,10 @@ model Product {
   productFamily String // "Solenoid Valves" | "Angle Seat Valves" | "Automotive Solutions" | "CTIS Actuators" | "Positioners"
   productType   String // "simple" | "variable"
 
+  // Manual display order (admin-set) — lower shows first, on both the
+  // admin list and the storefront.
+  order Int @default(0)
+
   company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
   companyId String
 

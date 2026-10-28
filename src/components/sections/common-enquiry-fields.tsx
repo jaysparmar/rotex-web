@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useForm, useWatch, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -60,7 +61,7 @@ function Field({
   name?: string;
 }) {
   return (
-    <div className={`flex flex-col gap-2 ${className}`} data-field={name} tabIndex={name ? -1 : undefined}>
+    <div className={`min-w-0 flex flex-col gap-2 ${className}`} data-field={name} tabIndex={name ? -1 : undefined}>
       <label className={labelCls}>{label}</label>
       {children}
       {error && <p className={errorCls}>{error}</p>}
@@ -68,17 +69,28 @@ function Field({
   );
 }
 
-/** Renders visible children side-by-side on desktop; collapses to one column if only one is present. */
+/** Renders visible children side-by-side once there's room; collapses to one column if only one
+ * is present or if the form's own rendered width is cramped (a container query, not a viewport
+ * breakpoint — this form sits in a narrow sidebar column on some pages even at desktop widths,
+ * so `lg:` alone would force two squeezed columns there). */
 function Row({ children }: { children: React.ReactNode }) {
   const items = (Array.isArray(children) ? children : [children]).filter(Boolean);
   if (items.length === 0) return null;
-  return <div className="flex flex-col gap-5 lg:flex-row">{items}</div>;
+  return <div className="flex flex-col gap-5 @min-[480px]:flex-row">{items}</div>;
 }
 
-function buildSchema(enabled: Record<FormFieldKey, boolean>, showEnquiryType: boolean) {
+function buildSchema(enabled: Record<FormFieldKey, boolean>, showEnquiryType: boolean, formKey: FormKey) {
+  // Contact form only: split name, add Designation, require Company Name and
+  // (if shown) Quantity, and gate submission on the Privacy Policy consent
+  // checkbox when the admin has it enabled. Every other form keeps the
+  // original single Full Name field and optional Company Name/Quantity.
+  const isContact = formKey === "contact";
   return z.object({
-    fullName: z.string().min(2, "Name must be at least 2 characters"),
-    companyName: z.string().optional(),
+    fullName: isContact ? z.string().optional() : z.string().min(2, "Name must be at least 2 characters"),
+    firstName: isContact && enabled.firstName ? z.string().min(1, "First name is required") : z.string().optional(),
+    lastName: isContact && enabled.lastName ? z.string().min(1, "Last name is required") : z.string().optional(),
+    designation: isContact && enabled.designation ? z.string().min(1, "Designation is required") : z.string().optional(),
+    companyName: isContact ? z.string().min(1, "Company name is required") : z.string().optional(),
     phone: z.string().min(10, "Enter a valid 10-digit number").max(15, "Phone number is too long").regex(/^\d+$/, "Digits only"),
     email: z.string().email("Enter a valid email address"),
     country: enabled.country ? z.string().min(1, "Please select a country") : z.string().optional(),
@@ -86,8 +98,12 @@ function buildSchema(enabled: Record<FormFieldKey, boolean>, showEnquiryType: bo
     industry: enabled.industry ? z.array(z.string()).min(1, "Please select at least one industry") : z.array(z.string()).optional(),
     enquiryType: showEnquiryType ? z.string().min(1, "Please select an enquiry type") : z.string().optional(),
     productType: enabled.productType ? z.string().min(1, "Please select a product type") : z.string().optional(),
-    quantity: z.string().optional(),
+    quantity: isContact && enabled.quantity ? z.string().min(1, "Quantity is required") : z.string().optional(),
     message: z.string().min(10, "Tell us a bit more (at least 10 characters)"),
+    consent:
+      isContact && enabled.consent
+        ? z.boolean().refine((v) => v === true, { message: "Please accept the Privacy Policy to continue" })
+        : z.boolean().optional(),
   });
 }
 
@@ -140,14 +156,19 @@ export function CommonEnquiryFields({
   const showEnquiryType = config.enquiryType && enquiryTypeOptions.length > 0;
   const productTypeOptions = productTypeOptionsProp ?? DEFAULT_PRODUCT_TYPE_CONFIG;
 
-  const schema = useMemo(() => buildSchema(config, showEnquiryType), [config, showEnquiryType]);
+  const isContact = formKey === "contact";
+  const showFirstName = isContact && config.firstName;
+  const showLastName = isContact && config.lastName;
+  const showDesignation = isContact && config.designation;
+  const showConsent = isContact && config.consent;
+  const schema = useMemo(() => buildSchema(config, showEnquiryType, formKey), [config, showEnquiryType, formKey]);
   const {
     register,
     control,
     setValue,
     handleSubmit,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) });
+    formState: { errors, isSubmitting, isSubmitSuccessful, isValid },
+  } = useForm<FormValues>({ resolver: zodResolver(schema), mode: "onChange" });
 
   const selectedCountry = useWatch({ control, name: "country" });
   const cityOptions = useMemo(() => getCitiesForCountry(selectedCountry ?? ""), [selectedCountry]);
@@ -159,7 +180,11 @@ export function CommonEnquiryFields({
     const body = new FormData();
     body.append("source", formKey);
     body.append("industryName", fixedIndustryName || data.industry?.join(", ") || "General");
-    body.append("fullName", data.fullName);
+    body.append(
+      "fullName",
+      isContact ? [data.firstName, data.lastName].filter(Boolean).join(" ") : data.fullName ?? ""
+    );
+    if (isContact && data.designation) body.append("designation", data.designation);
     body.append("enquiryType", (showEnquiryType && data.enquiryType) || ENQUIRY_TYPE_BY_FORM[formKey]);
     body.append("product", fixedProduct || data.productType || "General");
     body.append("phone", data.phone);
@@ -184,21 +209,42 @@ export function CommonEnquiryFields({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, scrollToFirstFormError)} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit(onSubmit, scrollToFirstFormError)} className="@container flex flex-col gap-6">
       <HoneypotFields />
 
-      <Field label="Full Name" error={errors.fullName?.message}>
-        <input {...register("fullName")} placeholder="e.g. John Doe" className={inputCls(!!errors.fullName)} />
-      </Field>
+      {isContact ? (
+        <Row>
+          {showFirstName && (
+            <Field key="firstName" label="First Name" error={errors.firstName?.message} className="flex-1">
+              <input {...register("firstName")} placeholder="e.g. John" className={inputCls(!!errors.firstName)} />
+            </Field>
+          )}
+          {showLastName && (
+            <Field key="lastName" label="Last Name" error={errors.lastName?.message} className="flex-1">
+              <input {...register("lastName")} placeholder="e.g. Doe" className={inputCls(!!errors.lastName)} />
+            </Field>
+          )}
+        </Row>
+      ) : (
+        <Field label="Full Name" error={errors.fullName?.message}>
+          <input {...register("fullName")} placeholder="e.g. John Doe" className={inputCls(!!errors.fullName)} />
+        </Field>
+      )}
+
+      {showDesignation && (
+        <Field label="Designation" error={errors.designation?.message}>
+          <input {...register("designation")} placeholder="e.g. Procurement Manager" className={inputCls(!!errors.designation)} />
+        </Field>
+      )}
 
       {config.companyName && (
-        <Field label="Company Name">
-          <input {...register("companyName")} placeholder="e.g. Rotex Automation" className={inputCls(false)} />
+        <Field label="Company Name" error={errors.companyName?.message}>
+          <input {...register("companyName")} placeholder="e.g. Rotex Automation" className={inputCls(!!errors.companyName)} />
         </Field>
       )}
 
       <Row>
-        <div key="phone" className="flex-1 flex flex-col gap-2">
+        <div key="phone" className="min-w-0 flex-1 flex flex-col gap-2">
           <label className={labelCls}>Phone number</label>
           <div
             className={`flex bg-gray-50 rounded-xl outline outline-1 -outline-offset-1 overflow-hidden ${
@@ -225,7 +271,7 @@ export function CommonEnquiryFields({
 
       <Row>
         {config.country && (
-          <div key="country" className="flex-1 flex flex-col gap-2" data-field="country" tabIndex={-1}>
+          <div key="country" className="min-w-0 flex-1 flex flex-col gap-2" data-field="country" tabIndex={-1}>
             <Controller
               control={control}
               name="country"
@@ -249,7 +295,7 @@ export function CommonEnquiryFields({
 
         {config.city &&
           (config.country ? (
-            <div key="city" className="flex-1 flex flex-col gap-2" data-field="city" tabIndex={-1}>
+            <div key="city" className="min-w-0 flex-1 flex flex-col gap-2" data-field="city" tabIndex={-1}>
               <Controller
                 control={control}
                 name="city"
@@ -275,7 +321,7 @@ export function CommonEnquiryFields({
 
       <Row>
         {showIndustry && (
-          <div key="industry" className="flex-1 flex flex-col gap-2" data-field="industry" tabIndex={-1}>
+          <div key="industry" className="min-w-0 flex-1 flex flex-col gap-2" data-field="industry" tabIndex={-1}>
             {industryOptions.length > 0 ? (
               <Controller
                 control={control}
@@ -383,6 +429,28 @@ export function CommonEnquiryFields({
         </div>
       )}
 
+      {showConsent && (
+        <div className="flex flex-col gap-1.5" data-field="consent" tabIndex={-1}>
+          <label className="flex items-start gap-2.5 text-sm font-medium font-montserrat text-stone-600">
+            <input
+              type="checkbox"
+              {...register("consent")}
+              className={`mt-0.5 size-4 shrink-0 rounded border-gray-300 accent-[#EF3E23] ${
+                errors.consent ? "outline outline-1 outline-red-400" : ""
+              }`}
+            />
+            <span>
+              I have read and agree to the{" "}
+              <Link href="/privacy-policy" target="_blank" className="text-[#EF3E23] underline hover:no-underline">
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          </label>
+          {errors.consent && <p className={errorCls}>{errors.consent.message}</p>}
+        </div>
+      )}
+
       {submitError && <p className="text-sm font-medium font-montserrat text-red-600">{submitError}</p>}
 
       {isSubmitSuccessful ? (
@@ -390,8 +458,8 @@ export function CommonEnquiryFields({
       ) : (
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="w-full px-6 py-3.5 bg-orange-600 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-900 transition-colors duration-150 disabled:opacity-60"
+          disabled={isSubmitting || !isValid}
+          className="w-full px-6 py-3.5 bg-orange-600 rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-900 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isSubmitting ? sendingLabel : submitLabel}
         </button>

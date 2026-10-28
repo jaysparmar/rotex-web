@@ -15,7 +15,10 @@ type CtaButton = { label: string; href: string };
 type Slide = {
   id: string;
   published: boolean;
-  title: string;
+  // Missing on slides saved before this existed — treated as "hexagon" (the
+  // original, only layout) wherever it's read.
+  layout?: "hexagon" | "fullBg";
+  title: { prefix: string; highlight: string; suffix: string };
   description: string;
   media: { type: "image" | "video"; src: string; alt?: string; mobileSrc?: string };
   cta_buttons: CtaButton[];
@@ -56,7 +59,8 @@ export function HeroForm({
               append({
                 id: `slide_${Date.now()}`,
                 published: true,
-                title: "",
+                layout: "hexagon",
+                title: { prefix: "", highlight: "", suffix: "" },
                 description: "",
                 media: { type: "image", src: "", alt: "", mobileSrc: "" },
                 cta_buttons: [],
@@ -73,8 +77,16 @@ export function HeroForm({
 
 function SlideCard({ slideIndex, onRemove }: { slideIndex: number; onRemove: () => void }) {
   const form = useFormContextTyped();
-  const title = useWatch({ control: form.control, name: `slides.${slideIndex}.title` });
+  const prefix = useWatch({ control: form.control, name: `slides.${slideIndex}.title.prefix` });
+  const highlight = useWatch({ control: form.control, name: `slides.${slideIndex}.title.highlight` });
+  const suffix = useWatch({ control: form.control, name: `slides.${slideIndex}.title.suffix` });
+  const title = [prefix, highlight, suffix].filter(Boolean).join(" ");
   const mediaType = useWatch({ control: form.control, name: `slides.${slideIndex}.media.type` });
+  // `form.watch(...)` called inline in render (vs. this useWatch hook) doesn't subscribe the
+  // component to re-render on that field's own changes — the Switch below would silently
+  // keep showing its last-rendered state after a click even though the value did update.
+  const published = useWatch({ control: form.control, name: `slides.${slideIndex}.published` });
+  const layout = useWatch({ control: form.control, name: `slides.${slideIndex}.layout` });
 
   return (
     <div className="overflow-hidden rounded-xl border border-border">
@@ -92,10 +104,27 @@ function SlideCard({ slideIndex, onRemove }: { slideIndex: number; onRemove: () 
       <div className="space-y-4 p-4">
         <SwitchField
           label="Published"
-          checked={form.watch(`slides.${slideIndex}.published`)}
+          checked={published}
           onCheckedChange={(v) => form.setValue(`slides.${slideIndex}.published`, v)}
         />
-        <TextField label="Title" {...form.register(`slides.${slideIndex}.title`)} />
+
+        {/* On: the hexagon media shape (current site default). Off: no hexagon — the
+            media fills the slide's full background instead, with text over it. */}
+        <SwitchField
+          label="Hexagon Layout"
+          checked={(layout ?? "hexagon") === "hexagon"}
+          onCheckedChange={(v) => form.setValue(`slides.${slideIndex}.layout`, v ? "hexagon" : "fullBg")}
+        />
+
+        {/* Prefix/suffix render plain; Highlight renders in the brand gradient
+            (same pattern as the Redefining section's tagline). Any part can
+            be left blank — the title just skips it. */}
+        <FieldGrid>
+          <TextField label="Title Prefix" {...form.register(`slides.${slideIndex}.title.prefix`)} />
+          <TextField label="Title Highlight" {...form.register(`slides.${slideIndex}.title.highlight`)} />
+        </FieldGrid>
+        <TextField label="Title Suffix" {...form.register(`slides.${slideIndex}.title.suffix`)} />
+
         <TextAreaField label="Description" {...form.register(`slides.${slideIndex}.description`)} />
 
         <div className="space-y-3 rounded-lg bg-muted/20 p-3">

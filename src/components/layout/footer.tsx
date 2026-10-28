@@ -60,22 +60,19 @@ export function Footer({ config }: { config: PrismaJson.GlobalConfigData }) {
         {/* ── MOBILE ── Figma: 320px content block, centred in the viewport */}
         <div className="w-full max-w-80 mx-auto flex flex-col gap-10 pt-16 pb-10 lg:hidden">
 
-          {/* Logo + tagline */}
+          {/* Logo */}
           <div className="flex flex-col gap-2.5">
             <Link href={logo.href}>
               <Image
                 src={logo.src}
                 alt={logo.alt}
-                width={144}
-                height={32}
+                width={200}
+                height={48}
                 priority
                 unoptimized
-                className="w-36 h-8 object-contain"
+                className="w-50 h-12 object-contain"
               />
             </Link>
-            <p className="text-white text-base font-medium font-montserrat leading-6">
-              {footer.tagline}
-            </p>
           </div>
 
           {/* Link columns */}
@@ -103,22 +100,19 @@ export function Footer({ config }: { config: PrismaJson.GlobalConfigData }) {
         {/* ── DESKTOP ── */}
         <div className="hidden lg:flex flex-col">
 
-          {/* Logo + tagline */}
+          {/* Logo */}
           <div className="pt-30 flex flex-col gap-4">
             <Link href={logo.href}>
               <Image
                 src={logo.src}
                 alt={logo.alt}
-                width={192}
-                height={40}
+                width={260}
+                height={64}
                 priority
                 unoptimized
-                className="w-48 h-10 object-contain"
+                className="w-65 h-auto object-contain"
               />
             </Link>
-            <p className="text-white text-base font-medium font-montserrat leading-6">
-              {footer.tagline}
-            </p>
           </div>
 
           {/* Link columns — Figma pairs the last four groups into two stacked

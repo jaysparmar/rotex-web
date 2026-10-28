@@ -47,7 +47,7 @@ export function IndustriesSection({ heading, industries }: IndustriesSectionProp
 
   return (
     <section className="bg-zinc-100 py-14 lg:py-28">
-      <div className="container   ">
+      <div className="container">
 
         {/* Heading + subtext — Figma mobile: black, font-medium, 24px/leading-8 */}
         <div className="flex flex-col gap-3 mb-11 lg:hidden">

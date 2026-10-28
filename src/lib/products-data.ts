@@ -259,7 +259,7 @@ export async function getProductsList(params: ProductListFilterParams = {}): Pro
   const [products, total] = await Promise.all([
     prisma.product.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
       include: { category: true, subCategory: true },
       skip: (Math.max(1, page) - 1) * pageSize,
       take: pageSize,

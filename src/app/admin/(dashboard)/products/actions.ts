@@ -152,3 +152,97 @@ export async function deleteVariant(id: string) {
   const variant = await prisma.productVariant.delete({ where: { id } });
   revalidateProducts(variant.productId);
 }
+
+// Drag-reorder on the admin list, one page at a time — `pageOffset` is the
+// 0-based index of the page's first row in the unfiltered, order-sorted list,
+// so each page claims its own slice of the order space (page N -> [N*pageSize,
+// (N+1)*pageSize)) without colliding with rows on other pages.
+export async function reorderProducts(orderedIds: string[], pageOffset: number) {
+  await prisma.$transaction(
+    orderedIds.map((id, i) => prisma.product.update({ where: { id }, data: { order: pageOffset + i } }))
+  );
+  revalidateProducts();
+}
+
+// Appends "-copy", then "-copy-2", "-copy-3", ... until the value is free.
+async function dedupeField(
+  field: "slug" | "modelNumber",
+  base: string
+): Promise<string> {
+  let candidate = `${base}-copy`;
+  let n = 2;
+  while (
+    await prisma.product.findUnique({
+      where: field === "slug" ? { slug: candidate } : { modelNumber: candidate },
+      select: { id: true },
+    })
+  ) {
+    candidate = `${base}-copy-${n}`;
+    n += 1;
+  }
+  return candidate;
+}
+
+export async function duplicateProduct(id: string) {
+  const source = await prisma.product.findUniqueOrThrow({
+    where: { id },
+    include: {
+      industries: { select: { id: true } },
+      subIndustries: { select: { id: true } },
+      variants: {
+        include: {
+          industries: { select: { id: true } },
+          subIndustries: { select: { id: true } },
+        },
+      },
+    },
+  });
+
+  const {
+    id: _id,
+    modelNumber,
+    slug,
+    industries,
+    subIndustries,
+    variants,
+    createdAt: _createdAt,
+    updatedAt: _updatedAt,
+    ...rest
+  } = source;
+
+  const [newModelNumber, newSlug] = await Promise.all([
+    dedupeField("modelNumber", modelNumber),
+    dedupeField("slug", slug),
+  ]);
+
+  const clone = await prisma.product.create({
+    data: {
+      ...rest,
+      modelNumber: newModelNumber,
+      slug: newSlug,
+      industries: { connect: industries.map((i) => ({ id: i.id })) },
+      subIndustries: { connect: subIndustries.map((i) => ({ id: i.id })) },
+      variants: {
+        create: variants.map((v) => {
+          const {
+            id: _vid,
+            productId: _pid,
+            industries: vIndustries,
+            subIndustries: vSubIndustries,
+            createdAt: _vCreatedAt,
+            updatedAt: _vUpdatedAt,
+            ...variantRest
+          } = v;
+          return {
+            ...variantRest,
+            industries: { connect: vIndustries.map((i) => ({ id: i.id })) },
+            subIndustries: { connect: vSubIndustries.map((i) => ({ id: i.id })) },
+          };
+        }),
+      },
+    },
+  });
+
+  revalidateProducts();
+  return { id: clone.id };
+}

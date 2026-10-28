@@ -16,7 +16,8 @@ type HeroData = {
   slides: {
     id: string;
     published?: boolean;
-    title: string;
+    layout?: "hexagon" | "fullBg";
+    title: { prefix: string; highlight: string; suffix: string };
     description: string;
     media: { type: "image" | "video"; src: string; alt?: string };
     cta_buttons: { label: string; href: string }[];

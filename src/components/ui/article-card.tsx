@@ -38,8 +38,10 @@ export function ArticleCard({ image, title, href, className }: ArticleCardProps)
         className
       )}
     >
-      {/* Square image with arrow button at top-right */}
-      <div className="relative aspect-square w-full">
+      {/* Wide rectangle — scales with the card's own width via aspect-ratio instead of
+          a fixed pixel height. 344x100 (~3.44:1) read as too wide/short in review;
+          settled on standard 16:9. */}
+      <div className="relative w-full aspect-video">
         <ImageView
           fill
           src={image}

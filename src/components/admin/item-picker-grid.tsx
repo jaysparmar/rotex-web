@@ -22,16 +22,22 @@ export function ItemPickerGrid({
   onToggle,
   emptyMessage,
   imageFit = "contain",
+  maxSelected,
 }: {
   items: PickerItem[];
   selectedIds: string[];
   onToggle: (id: string, checked: boolean) => void;
   emptyMessage: string;
   imageFit?: "contain" | "cover";
+  /** Caps how many items can be selected at once — the frontend card grid this feeds only
+   * ever shows this many, so letting the admin pick more just leaves the rest invisible.
+   * "Select all" is hidden (it would blow past the cap) and further switches disable once hit. */
+  maxSelected?: number;
 }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const placeholder = usePlaceholderImage();
+  const atLimit = maxSelected !== undefined && selectedIds.length >= maxSelected;
 
   const filteredItems = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -80,10 +86,16 @@ export function ItemPickerGrid({
         ) : (
           <div />
         )}
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
-          <Checkbox checked={allSelected} onCheckedChange={(v) => toggleAll(v === true)} />
-          <span>{allSelected ? "Deselect all" : "Select all"}</span>
-        </label>
+        {maxSelected !== undefined ? (
+          <span className="text-sm text-muted-foreground">
+            {selectedIds.length}/{maxSelected} selected
+          </span>
+        ) : (
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <Checkbox checked={allSelected} onCheckedChange={(v) => toggleAll(v === true)} />
+            <span>{allSelected ? "Deselect all" : "Select all"}</span>
+          </label>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-4 rounded-lg border border-border p-4 sm:grid-cols-3 lg:grid-cols-4">
         {visibleItems.length === 0 && (
@@ -118,6 +130,7 @@ export function ItemPickerGrid({
                 </ImageLightboxTrigger>
                 <Switch
                   checked={checked}
+                  disabled={!checked && atLimit}
                   onCheckedChange={(v) => onToggle(item.id, v)}
                   className="absolute right-1.5 top-1.5 border-border bg-muted shadow-sm ring-1 ring-foreground/10 backdrop-blur-sm data-checked:bg-primary"
                   onClick={(e) => e.stopPropagation()}

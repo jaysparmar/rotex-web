@@ -363,51 +363,6 @@ function MegaMenuImagePanel({
 
 const EASE = [0.4, 0, 0.2, 1] as const;
 const DURATION = 0.5;
-const LOGO_DURATION = 0.6;
-
-// ─── Floating Logo ────────────────────────────────────────────────────────────
-
-function FloatingLogo({
-  scrolled,
-  logo,
-}: {
-  scrolled: boolean;
-  logo: { src: string; alt: string; href: string };
-}) {
-  return (
-    <motion.div
-      className="fixed left-0 right-0 pointer-events-none hidden lg:block"
-      style={{ zIndex: 60 }}
-      initial={false}
-      animate={{ top: scrolled ? 32 : 112 }}
-      transition={{ duration: LOGO_DURATION, ease: EASE }}
-    >
-      <div className="container">
-        <Link href={logo.href} className="pointer-events-auto inline-block">
-          <motion.div
-            className="overflow-hidden"
-            initial={false}
-            animate={{
-              width: scrolled ? 144 : 282,
-              height: scrolled ? 31 : 60,
-            }}
-            transition={{ duration: LOGO_DURATION, ease: EASE }}
-          >
-            <Image
-              src={logo.src}
-              alt={logo.alt}
-              width={282}
-              height={60}
-              priority
-              unoptimized
-              className="w-full h-full object-contain object-left"
-            />
-          </motion.div>
-        </Link>
-      </div>
-    </motion.div>
-  );
-}
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 
@@ -636,8 +591,6 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
 
   return (
     <>
-      {transparent && <FloatingLogo scrolled={scrolled} logo={config.logo} />}
-
       <motion.header
         className="fixed top-0 left-0 right-0 z-50"
         initial={false}
@@ -654,36 +607,28 @@ export function Navbar({ config }: { config: PrismaJson.GlobalConfigData }) {
               <Image
                 src={config.logo.src}
                 alt={config.logo.alt}
-                width={96}
-                height={20}
+                width={110}
+                height={24}
                 unoptimized
-                className="w-24 h-5 object-contain"
+                className="w-28 h-6 object-contain"
               />
             </Link>
 
-            {transparent ? (
-              <motion.div
-                className="shrink-0 hidden lg:block"
-                initial={false}
-                animate={{ width: scrolled ? 168 : 0 }}
-                transition={{ duration: LOGO_DURATION, ease: EASE }}
+            <Link
+              href={config.logo.href}
+              className="hidden lg:flex items-center mr-6"
+            >
+              <Image
+                src={config.logo.src}
+                alt={config.logo.alt}
+                width={224}
+                height={56}
+                priority
+                unoptimized
+                className="w-40 xl:w-52 h-auto object-contain"
               />
-            ) : (
-              <Link
-                href={config.logo.href}
-                className="hidden lg:flex items-center mr-6"
-              >
-                <Image
-                  src={config.logo.src}
-                  alt={config.logo.alt}
-                  width={144}
-                  height={31}
-                  unoptimized
-                  className="w-36 h-8 object-contain"
-                />
-              </Link>
-            )}
-
+            </Link>
+ 
             <div className="hidden lg:flex items-center gap-6">
               {navItems.map((item) => (
                 <div
