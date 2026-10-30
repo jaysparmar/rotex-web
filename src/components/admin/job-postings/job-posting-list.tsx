@@ -26,6 +26,7 @@ type JobPosting = {
   location: string;
   tags: unknown;
   published: boolean;
+  publishedAt: Date | null;
 };
 
 function filterFieldLabel(key: (typeof FILTER_KEYS)[number]): string {
@@ -161,6 +162,11 @@ export function JobPostingList({
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <MapPin className="size-3" />
                   {job.location} — {job.company}
+                  {job.publishedAt && (
+                    <span>
+                      · Published {job.publishedAt.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                    </span>
+                  )}
                 </div>
               </div>
 

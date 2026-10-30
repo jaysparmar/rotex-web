@@ -244,7 +244,7 @@ export function JobApplicationForm({
           disabled={isSubmitting}
           className="w-full px-6 py-3.5 bg-[#EF3E23] rounded-full text-white text-sm font-semibold font-montserrat uppercase leading-5 hover:bg-stone-900 transition-colors duration-150 disabled:opacity-50"
         >
-          {isSubmitting ? "Submitting…" : "Submit all details"}
+          {isSubmitting ? "Submitting…" : "Submit"}
         </button>
       )}
     </form>

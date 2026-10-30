@@ -12,7 +12,7 @@ const schema = z.object({
   fullName: z.string().min(2),
   enquiryType: z.string().min(1),
   product: z.string().min(1),
-  phone: z.string().min(10).max(15).regex(/^\d+$/),
+  phone: z.string().min(10).max(20).regex(/^\+\d{1,4} \d{10,15}$/),
   email: z.string().email(),
   country: z.string().min(1),
   city: z.string().min(1),

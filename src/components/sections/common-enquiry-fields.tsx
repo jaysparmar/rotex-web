@@ -140,7 +140,7 @@ export function CommonEnquiryFields({
   enquiryTypeOptions: enquiryTypeOptionsProp,
   productTypeOptions: productTypeOptionsProp,
   recaptchaAction,
-  submitLabel = "Submit all details",
+  submitLabel = "Submit",
   sendingLabel = "Submitting…",
   successMessage = "Submitted! We'll be in touch soon.",
 }: CommonEnquiryFieldsProps) {
@@ -187,11 +187,11 @@ export function CommonEnquiryFields({
     if (isContact && data.designation) body.append("designation", data.designation);
     body.append("enquiryType", (showEnquiryType && data.enquiryType) || ENQUIRY_TYPE_BY_FORM[formKey]);
     body.append("product", fixedProduct || data.productType || "General");
-    body.append("phone", data.phone);
+    body.append("phone", `${dialCode} ${data.phone}`);
     body.append("email", data.email);
     body.append("country", (config.country && data.country) || "N/A");
     body.append("city", (config.city && data.city) || "N/A");
-    if (config.companyName && data.companyName) body.append("company", data.companyName);
+    body.append("company", (config.companyName && data.companyName) || "N/A");
     if (config.quantity && data.quantity) body.append("quantity", data.quantity);
     body.append("message", data.message);
     if (config.uploadFile) for (const file of files) body.append("file", file);

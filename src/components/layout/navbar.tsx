@@ -340,13 +340,12 @@ function MegaMenuImagePanel({
   // Content columns are flex-1/flex-wrap (see FlatMegaMenuPanel) and reflow around
   // whatever width this takes, so it no longer needs to shrink on laptop widths to
   // avoid pushing the dropdown wider than the screen — full size from lg upward.
-  // No fixed height and no self-start, so the parent's items-stretch (the
-  // default cross-axis behavior) makes this match the content column's full
-  // height — including when that content wraps to multiple rows — instead of
-  // staying a fixed height and leaving blank space below it once the content
-  // grows taller than before.
+  // Fixed to aspect-video (matches the 16:9 images admins upload for this panel)
+  // rather than stretching to the content column's height — a taller box was
+  // cropping wide/text-heavy images (e.g. a comparison graphic) down to a
+  // near-square box, cutting off content.
   const className =
-    "w-72 lg:w-115 min-h-54 lg:min-h-87.5 shrink-0 ml-auto relative overflow-hidden block";
+    "w-72 lg:w-115 aspect-video shrink-0 ml-auto relative overflow-hidden block self-start";
 
   if (href) {
     return (

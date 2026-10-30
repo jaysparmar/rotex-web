@@ -38,7 +38,7 @@ export function ProductQuoteFormInline({ productCode, productName, industries, c
           industryOptions={toIndustryGroups(industries)}
           fixedProduct={`${productName} (${productCode})`}
           recaptchaAction="product_quote"
-          submitLabel="Send Enquiry"
+          submitLabel="Submit"
           sendingLabel="Sending…"
           successMessage="Enquiry sent! We'll be in touch soon."
         />
@@ -94,7 +94,7 @@ export function ProductQuoteFormSheet({
             industryOptions={toIndustryGroups(industries)}
             fixedProduct={`${productName} (${productCode})`}
             recaptchaAction="product_quote"
-            submitLabel="Send Enquiry"
+            submitLabel="Submit"
             sendingLabel="Sending…"
             successMessage="Enquiry sent! We'll be in touch soon."
           />

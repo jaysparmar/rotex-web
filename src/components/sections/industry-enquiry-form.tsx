@@ -57,7 +57,7 @@ export function IndustryEnquiryForm({
             productTypeOptions={productTypeOptions}
             fixedIndustryName={industryName}
             recaptchaAction="industry_enquiry"
-            submitLabel="Send Enquiry"
+            submitLabel="Submit"
             sendingLabel="Sending…"
             successMessage="Enquiry sent! We'll be in touch soon."
           />

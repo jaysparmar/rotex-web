@@ -95,13 +95,15 @@ function ResourcePicker({
   const form = useFormContext<FormValues>();
   const selected = form.watch(`tabs.${tabIndex}.resourceIds`) ?? [];
 
-  // A tab saved before the 3-item cap existed can have more selected than that —
-  // the live site already only ever shows the first 3 of them, so trim the form's
-  // state to match on load instead of showing a confusing "8/3 selected" that
-  // doesn't reflect what's actually on the homepage.
+  // Stale ids (resource deleted/recreated elsewhere, no longer in `options`) can't be
+  // unchecked by the admin — they count toward the 3-item cap but render no visible
+  // switch to toggle off, locking the picker. Drop them on load so the count reflects
+  // what's actually selectable. Also re-applies the pre-existing over-cap trim below.
   useEffect(() => {
-    if (selected.length > MAX_RESOURCES) {
-      form.setValue(`tabs.${tabIndex}.resourceIds`, selected.slice(0, MAX_RESOURCES));
+    const validIds = new Set(options.map((o) => o.id));
+    const cleaned = selected.filter((id) => validIds.has(id)).slice(0, MAX_RESOURCES);
+    if (cleaned.length !== selected.length) {
+      form.setValue(`tabs.${tabIndex}.resourceIds`, cleaned);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

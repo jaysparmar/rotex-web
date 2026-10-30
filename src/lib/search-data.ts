@@ -268,6 +268,7 @@ export type JobSummary = {
   whatYouDo: string[];
   whatWeLookFor: string[];
   whatYouGet: { icon: string; label: string }[];
+  publishedAt: string;
 };
 
 export async function searchJobs(
@@ -313,6 +314,7 @@ export async function searchJobs(
     whatYouDo: (j.whatYouDo as string[]) ?? [],
     whatWeLookFor: (j.whatWeLookFor as string[]) ?? [],
     whatYouGet: (j.whatYouGet as { icon: string; label: string }[]) ?? [],
+    publishedAt: (j.publishedAt ?? j.createdAt).toISOString(),
   }));
 
   return { items, total };

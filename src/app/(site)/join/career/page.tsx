@@ -74,6 +74,7 @@ export default async function CareerPage() {
             whatYouDo: (j.whatYouDo as string[] | null) ?? [],
             whatWeLookFor: (j.whatWeLookFor as string[] | null) ?? [],
             whatYouGet: (j.whatYouGet as { icon: string; label: string }[] | null) ?? [],
+            publishedAt: (j.publishedAt ?? j.createdAt).toISOString(),
           }))}
           experienceOptions={form?.experienceOptions}
           positionOptions={positionOptions}

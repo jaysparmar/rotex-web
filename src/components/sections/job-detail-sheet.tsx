@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PerkIcon, PerkIconGradientDefs } from "@/lib/job-perk-icons";
 import { JobApplicationForm } from "@/components/sections/job-application-form";
 import { HexIcon } from "@/components/ui/hex-icon";
+import { formatResourceDate } from "@/lib/resource-types";
 
 export type JobDetail = {
   id: string;
@@ -17,6 +18,7 @@ export type JobDetail = {
   whatYouDo?: string[] | null;
   whatWeLookFor?: string[] | null;
   whatYouGet?: { icon: string; label: string }[] | null;
+  publishedAt?: string;
 };
 
 export function JobDetailSheet({
@@ -73,6 +75,12 @@ export function JobDetailSheet({
               <span>{job.employmentType}</span>
               <span className="text-neutral-300">|</span>
               <span>{job.workMode}</span>
+              {job.publishedAt && (
+                <>
+                  <span className="text-neutral-300">|</span>
+                  <span>Posted {formatResourceDate(job.publishedAt)}</span>
+                </>
+              )}
             </div>
           </div>
 

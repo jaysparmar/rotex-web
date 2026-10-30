@@ -24,13 +24,20 @@ function revalidateJobPostings() {
 }
 
 export async function createJobPosting(data: JobPostingInput) {
-  const created = await prisma.jobPosting.create({ data });
+  const created = await prisma.jobPosting.create({
+    data: { ...data, publishedAt: data.published ? new Date() : null },
+  });
   revalidateJobPostings();
   return created;
 }
 
 export async function updateJobPosting(id: string, data: JobPostingInput) {
-  await prisma.jobPosting.update({ where: { id }, data });
+  // Only stamp publishedAt the first time a posting goes live — re-saving an
+  // already-published posting (editing copy, toggling a tag) shouldn't bump
+  // its "Posted" date on the careers page.
+  const existing = await prisma.jobPosting.findUnique({ where: { id }, select: { publishedAt: true } });
+  const publishedAt = data.published ? (existing?.publishedAt ?? new Date()) : existing?.publishedAt ?? null;
+  await prisma.jobPosting.update({ where: { id }, data: { ...data, publishedAt } });
   revalidateJobPostings();
 }
 
@@ -40,6 +47,8 @@ export async function deleteJobPosting(id: string) {
 }
 
 export async function toggleJobPostingPublished(id: string, published: boolean) {
-  await prisma.jobPosting.update({ where: { id }, data: { published } });
+  const existing = await prisma.jobPosting.findUnique({ where: { id }, select: { publishedAt: true } });
+  const publishedAt = published ? (existing?.publishedAt ?? new Date()) : existing?.publishedAt ?? null;
+  await prisma.jobPosting.update({ where: { id }, data: { published, publishedAt } });
   revalidateJobPostings();
 }

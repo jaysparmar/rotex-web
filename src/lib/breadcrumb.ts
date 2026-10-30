@@ -1,14 +1,14 @@
 import type { Crumb } from "./product-detail-data";
 
-export function productHref(slug: string, category: string): string {
-  return `/product/${slug}?category=${encodeURIComponent(category)}`;
+export function productHref(slug: string, categorySlug: string, categoryName: string): string {
+  return `/product/${slug}?category=${encodeURIComponent(categorySlug)}&categoryName=${encodeURIComponent(categoryName)}`;
 }
 
-export function crumbsFromCategory(category: string | null): Crumb[] | undefined {
-  if (!category) return undefined;
+export function crumbsFromCategory(categorySlug: string | null, categoryName: string | null): Crumb[] | undefined {
+  if (!categorySlug) return undefined;
   return [
     { label: "Home", href: "/" },
     { label: "Products", href: "/products" },
-    { label: category, href: `/products?category=${encodeURIComponent(category.toLowerCase())}` },
+    { label: categoryName ?? categorySlug, href: `/products?category=${encodeURIComponent(categorySlug)}` },
   ];
 }

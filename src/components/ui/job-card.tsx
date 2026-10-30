@@ -1,6 +1,7 @@
 import { MapPin } from "lucide-react";
 import { RotexArrow } from "@/components/ui/rotex-arrow";
 import { JobDetailSheet } from "@/components/sections/job-detail-sheet";
+import { formatResourceDate } from "@/lib/resource-types";
 
 export type JobCardJob = {
   id: string;
@@ -15,6 +16,7 @@ export type JobCardJob = {
   whatYouDo: string[];
   whatWeLookFor: string[];
   whatYouGet: { icon: string; label: string }[];
+  publishedAt: string;
 };
 
 export function JobCard({
@@ -40,6 +42,9 @@ export function JobCard({
             <MapPin className="size-4 text-neutral-400" strokeWidth={1.5} />
             <span className="text-neutral-400 font-montserrat font-medium text-xs leading-5">{job.location}</span>
           </div>
+          <span className="text-neutral-400 font-montserrat font-medium text-xs leading-5">
+            Posted {formatResourceDate(job.publishedAt)}
+          </span>
         </div>
 
         {job.tags.length > 0 && (

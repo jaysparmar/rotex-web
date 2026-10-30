@@ -34,7 +34,7 @@ export function ProductDetailContent({
   };
 
   const searchParams = useSearchParams();
-  const navCrumbs = crumbsFromCategory(searchParams.get("category"));
+  const navCrumbs = crumbsFromCategory(searchParams.get("category"), searchParams.get("categoryName"));
   const breadcrumb = navCrumbs ? [...navCrumbs, { label: product.name }] : product.breadcrumb;
 
   const tags = selectedVariant

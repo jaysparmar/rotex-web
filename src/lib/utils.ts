@@ -34,6 +34,16 @@ export function scrollToFirstFormError<T extends FieldValues>(errors: FieldError
   el.focus({ preventScroll: true });
 }
 
+/** Pulls the 11-char video id out of any common YouTube URL shape
+ * (watch?v=, youtu.be/, /shorts/, /embed/, with trailing params like &t=),
+ * or returns null if `url` isn't a YouTube link at all. */
+export function getYoutubeId(url: string): string | null {
+  const match = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/
+  );
+  return match ? match[1] : null;
+}
+
 export function slugify(s: string): string {
   return s
     .toLowerCase()

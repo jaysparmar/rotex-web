@@ -11,6 +11,7 @@ export type ProductSummary = {
   code: string;
   name: string;
   category: string;
+  categorySlug: string;
   image: StaticImageData | string;
   tags: string[];
 };
@@ -33,7 +34,7 @@ function toSummary(product: {
   modelNumber: string;
   name: string;
   image: string | null;
-  category: { name: string };
+  category: { name: string; slug: string };
   subCategory: { name: string } | null;
 }): ProductSummary {
   return {
@@ -41,6 +42,7 @@ function toSummary(product: {
     code: product.modelNumber,
     name: product.name,
     category: product.category.name,
+    categorySlug: product.category.slug,
     image: product.image ?? PLACEHOLDER_PRODUCT_IMAGE,
     tags: product.subCategory ? [product.subCategory.name] : [],
   };

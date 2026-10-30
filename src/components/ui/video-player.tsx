@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { cn, getYoutubeId } from "@/lib/utils";
 
 type VideoPlayerProps = {
   src: string;
@@ -34,6 +34,7 @@ export function VideoPlayer({
   const [inView, setInView] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const youtubeId = getYoutubeId(src);
 
   // Only fetch the video once it's near the viewport — mounting every slide's
   // <video src> eagerly makes them all compete for Chrome's ~6 connections
@@ -89,26 +90,49 @@ export function VideoPlayer({
       )}
 
       {/* Video */}
-      <video
-        ref={videoRef}
-        src={inView ? src : undefined}
-        preload={inView ? "auto" : "none"}
-        autoPlay={inView && autoPlay}
-        muted={muted}
-        loop={loop}
-        playsInline={playsInline}
-        controls={controls}
-        poster={poster}
-        onCanPlay={() => setLoaded(true)}
-        className={cn(
-          "w-full h-full object-cover transition-opacity duration-500",
-          loaded ? "opacity-100" : "opacity-0",
-          className
-        )}
-      />
+      {youtubeId ? (
+        inView && (
+          <iframe
+            src={`https://www.youtube.com/embed/${youtubeId}?${new URLSearchParams({
+              autoplay: autoPlay ? "1" : "0",
+              mute: muted ? "1" : "0",
+              loop: loop ? "1" : "0",
+              playlist: loop ? youtubeId : "",
+              controls: controls ? "1" : "0",
+              playsinline: playsInline ? "1" : "0",
+            })}`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            onLoad={() => setLoaded(true)}
+            className={cn(
+              "w-full h-full transition-opacity duration-500",
+              loaded ? "opacity-100" : "opacity-0",
+              className
+            )}
+          />
+        )
+      ) : (
+        <video
+          ref={videoRef}
+          src={inView ? src : undefined}
+          preload={inView ? "auto" : "none"}
+          autoPlay={inView && autoPlay}
+          muted={muted}
+          loop={loop}
+          playsInline={playsInline}
+          controls={controls}
+          poster={poster}
+          onCanPlay={() => setLoaded(true)}
+          className={cn(
+            "w-full h-full object-cover transition-opacity duration-500",
+            loaded ? "opacity-100" : "opacity-0",
+            className
+          )}
+        />
+      )}
 
-      {/* Mute toggle — visible on hover */}
-      {showMuteToggle && loaded && (
+      {/* Mute toggle — visible on hover (native <video> only; YouTube iframe has its own controls) */}
+      {showMuteToggle && loaded && !youtubeId && (
         <button
           type="button"
           onClick={toggleMute}
