@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
 import { auth } from "@/lib/auth";
 import { uploadToS3 } from "@/lib/s3";
+import { extensionForType } from "@/lib/uploads";
 
 const ALLOWED_TYPES = new Set([
   "image/jpeg",
@@ -40,10 +40,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: { code: "TOO_LARGE", message: `File exceeds ${MAX_SIZE_MB}MB limit` } }, { status: 400 });
   }
 
-  const ext = path.extname(file.name) || "";
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${extensionForType(file.type)}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  const url = await uploadToS3(`uploads/${filename}`, buffer, file.type);
 
-  return NextResponse.json({ success: true, data: { url } });
+  try {
+    const url = await uploadToS3(`uploads/${filename}`, buffer, file.type);
+    return NextResponse.json({ success: true, data: { url } });
+  } catch {
+    return NextResponse.json({ success: false, error: { code: "UPLOAD_FAILED", message: "Upload failed" } }, { status: 502 });
+  }
 }

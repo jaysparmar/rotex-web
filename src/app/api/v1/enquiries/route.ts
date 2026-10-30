@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
-import path from "path";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiSuccess, apiError } from "@/lib/api-response";
 import { checkSpamProtection } from "@/lib/spam-protection";
 import { uploadToS3 } from "@/lib/s3";
+import { extensionForType } from "@/lib/uploads";
 
 const schema = z.object({
   source: z.enum(["industry", "supplier", "contact", "product-quote", "channel-partner"]).default("industry"),
@@ -80,10 +80,13 @@ export async function POST(req: NextRequest) {
         return apiError("TOO_LARGE", "File exceeds 10MB limit", 400);
       }
 
-      const ext = path.extname(file.name) || "";
-      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${extensionForType(file.type)}`;
       const buffer = Buffer.from(await file.arrayBuffer());
-      fileUrls.push(await uploadToS3(`enquiries/${filename}`, buffer, file.type));
+      try {
+        fileUrls.push(await uploadToS3(`enquiries/${filename}`, buffer, file.type));
+      } catch {
+        return apiError("UPLOAD_FAILED", "File upload failed — please try again.", 502);
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 import "server-only";
 import path from "path";
-import { rm, stat } from "fs/promises";
+import { rm } from "fs/promises";
 import yauzl from "yauzl";
 import { prisma } from "@/lib/prisma";
 import { contentTypeFor } from "@/lib/uploads";
@@ -70,7 +70,7 @@ function destinationFor(jobId: string, entryName: string): { key: string; url: s
     const ext = path.extname(p).toLowerCase();
     return sanitizeSegment(path.basename(p, path.extname(p))) + ext;
   });
-  const key = ["variant-images", jobId, ...segments].map(encodeURIComponent).join("/");
+  const key = ["variant-images", jobId, ...segments].join("/");
   return { key, url: publicUrlFor(key) };
 }
 

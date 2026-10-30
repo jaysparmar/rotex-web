@@ -38,6 +38,20 @@ export function contentTypeFor(filename: string): string {
   return CONTENT_TYPES[path.extname(filename).toLowerCase()] ?? "application/octet-stream";
 }
 
+const EXTENSION_FOR_TYPE: Record<string, string> = Object.fromEntries(
+  Object.entries(CONTENT_TYPES).map(([ext, type]) => [type, ext])
+);
+
+/*
+  Picks a safe, canonical extension from a validated MIME type rather than
+  trusting the browser-supplied filename — an unsanitized filename extension
+  (query strings, spaces, oversized garbage) turns into a broken or
+  unreachable S3 key.
+*/
+export function extensionForType(type: string): string {
+  return EXTENSION_FOR_TYPE[type] ?? "";
+}
+
 /*
   Resolves a request path inside UPLOAD_DIR, refusing anything that escapes it
   (../, absolute paths, encoded traversal).
