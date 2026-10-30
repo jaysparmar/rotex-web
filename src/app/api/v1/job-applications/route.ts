@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiSuccess, apiError } from "@/lib/api-response";
 import { checkSpamProtection } from "@/lib/spam-protection";
+import { uploadToS3 } from "@/lib/s3";
 
 const schema = z.object({
   fullName: z.string().min(2),
@@ -67,15 +67,10 @@ export async function POST(req: NextRequest) {
       return apiError("TOO_LARGE", "Resume exceeds 5MB limit", 400);
     }
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "resumes");
-    await mkdir(uploadDir, { recursive: true });
-
     const ext = path.extname(file.name) || "";
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadDir, filename), buffer);
-
-    resumeUrl = `/uploads/resumes/${filename}`;
+    resumeUrl = await uploadToS3(`resumes/${filename}`, buffer, file.type);
   }
 
   const application = await prisma.jobApplication.create({

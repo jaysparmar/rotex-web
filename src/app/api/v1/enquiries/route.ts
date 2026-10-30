@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiSuccess, apiError } from "@/lib/api-response";
 import { checkSpamProtection } from "@/lib/spam-protection";
+import { uploadToS3 } from "@/lib/s3";
 
 const schema = z.object({
   source: z.enum(["industry", "supplier", "contact", "product-quote", "channel-partner"]).default("industry"),
@@ -72,9 +72,6 @@ export async function POST(req: NextRequest) {
   const fileUrls: string[] = [];
 
   if (files.length > 0) {
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "enquiries");
-    await mkdir(uploadDir, { recursive: true });
-
     for (const file of files) {
       if (!ALLOWED_TYPES.has(file.type)) {
         return apiError("UNSUPPORTED_TYPE", `Unsupported file type: ${file.type}`, 400);
@@ -86,9 +83,7 @@ export async function POST(req: NextRequest) {
       const ext = path.extname(file.name) || "";
       const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
       const buffer = Buffer.from(await file.arrayBuffer());
-      await writeFile(path.join(uploadDir, filename), buffer);
-
-      fileUrls.push(`/uploads/enquiries/${filename}`);
+      fileUrls.push(await uploadToS3(`enquiries/${filename}`, buffer, file.type));
     }
   }
 
