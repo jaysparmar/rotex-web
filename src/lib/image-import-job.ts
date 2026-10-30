@@ -1,11 +1,10 @@
 import "server-only";
 import path from "path";
-import { createWriteStream } from "fs";
-import { mkdir, rename, rm, stat } from "fs/promises";
-import { pipeline } from "stream/promises";
+import { rm, stat } from "fs/promises";
 import yauzl from "yauzl";
 import { prisma } from "@/lib/prisma";
-import { UPLOAD_DIR } from "@/lib/uploads";
+import { contentTypeFor } from "@/lib/uploads";
+import { uploadToS3, publicUrlFor } from "@/lib/s3";
 import { normalizeRef, type ImageJobDTO, type ImageJobStatus } from "@/lib/image-import-job-types";
 
 export { distinctReferences, normalizeRef } from "@/lib/image-import-job-types";
@@ -62,8 +61,8 @@ function sanitizeSegment(seg: string): string {
   return cleaned || "file";
 }
 
-/** Disk path + public URL for one extracted entry, keeping the zip's folder layout. */
-function destinationFor(jobId: string, entryName: string): { filePath: string; url: string } {
+/** S3 key + public URL for one extracted entry, keeping the zip's folder layout. */
+function destinationFor(jobId: string, entryName: string): { key: string; url: string } {
   const parts = entryName.replace(/\\/g, "/").split("/").filter(Boolean);
   const last = parts.length - 1;
   const segments = parts.map((p, i) => {
@@ -71,8 +70,8 @@ function destinationFor(jobId: string, entryName: string): { filePath: string; u
     const ext = path.extname(p).toLowerCase();
     return sanitizeSegment(path.basename(p, path.extname(p))) + ext;
   });
-  const rel = ["variant-images", jobId, ...segments];
-  return { filePath: path.join(UPLOAD_DIR, ...rel), url: "/uploads/" + rel.map(encodeURIComponent).join("/") };
+  const key = ["variant-images", jobId, ...segments].map(encodeURIComponent).join("/");
+  return { key, url: publicUrlFor(key) };
 }
 
 function readAllEntries(zip: yauzl.ZipFile): Promise<yauzl.Entry[]> {
@@ -86,14 +85,6 @@ function readAllEntries(zip: yauzl.ZipFile): Promise<yauzl.Entry[]> {
     zip.once("error", reject);
     zip.readEntry();
   });
-}
-
-async function fileSize(p: string): Promise<number | null> {
-  try {
-    return (await stat(p)).size;
-  } catch {
-    return null;
-  }
 }
 
 async function extractJob(jobId: string): Promise<void> {
@@ -122,15 +113,14 @@ async function extractJob(jobId: string): Promise<void> {
       if (!entry || !IMAGE_EXTENSIONS.has(ext)) {
         missing.push(ref);
       } else {
-        const { filePath, url } = destinationFor(jobId, entry.fileName);
-        // Already copied by an earlier run of this job (e.g. before a server restart).
-        if ((await fileSize(filePath)) !== entry.uncompressedSize) {
-          await mkdir(path.dirname(filePath), { recursive: true });
-          const tmp = `${filePath}.part`;
-          await pipeline(await zip.openReadStreamPromise(entry), createWriteStream(tmp));
-          await rm(filePath, { force: true });
-          await rename(tmp, filePath);
-        }
+        const { key, url } = destinationFor(jobId, entry.fileName);
+        // No skip-if-already-copied check here (S3 has no cheap local stat to compare
+        // against) — a job resumed after a server restart just re-uploads entries it
+        // already copied. PutObject overwrite is idempotent, so this is harmless.
+        const stream = await zip.openReadStreamPromise(entry);
+        const chunks: Buffer[] = [];
+        for await (const chunk of stream) chunks.push(chunk as Buffer);
+        await uploadToS3(key, Buffer.concat(chunks), contentTypeFor(entry.fileName));
         resolved[normalizeRef(ref)] = url;
         copied++;
       }
