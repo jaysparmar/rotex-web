@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "placehold.co" },
       { protocol: "https", hostname: "cdn.rotex.com" },
       { protocol: "https", hostname: "rotex.ezzystack.com" },
+      ...(process.env.AWS_S3_BUCKET
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: `${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION ?? "us-east-1"}.amazonaws.com`,
+            },
+          ]
+        : []),
     ],
   },
   
