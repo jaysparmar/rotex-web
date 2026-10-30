@@ -7,6 +7,7 @@ import { getProductFamilyOptions } from "@/lib/products";
 import { cleanDownloadName, resolveDownloadColumns, type DownloadImportGrid } from "@/lib/download-grid";
 import type { DownloadCategoryMapping } from "@/lib/download-import";
 import type { ProductInput, VariantInput } from "@/app/admin/(dashboard)/products/actions";
+import { normalizeRef } from "@/lib/image-import-job-types";
 
 const ATTRIBUTE_KEYS = PRODUCT_ATTRIBUTES.map((a) => a.key);
 
@@ -57,6 +58,8 @@ export type VariableImportMapping = {
   industryReferences?: IndustryReferenceMapping[];
   subIndustryReferences?: SubIndustryReferenceMapping[];
   downloads?: { bannerRow: number; categories: DownloadCategoryMapping[] };
+  /** Column of zip-relative photo paths, resolved through a finished ImageImportJob. */
+  variantImages?: { column: number; jobId: string };
 };
 
 export type VariableImportRowError = { rowNumber: number; modelNumber: string | null; reason: string };
@@ -80,6 +83,7 @@ export type VariableImportSummary = {
   newSubIndustries: { reference: string; name: string; parentIndustryReference: string }[];
   errors: VariableImportRowError[];
   duplicates: VariableImportDuplicateDetail[];
+  images?: VariableImportImageSummary;
 };
 
 type StagedProduct = ProductInput & { modelNumber: string };
@@ -101,12 +105,17 @@ type StagedVariantData = Omit<VariantInput, "downloads" | "industryIds" | "subIn
 
 type StagedVariantUpdate = { variantId: string; data: StagedVariantData };
 
+/** Variant photo counts for the preview. `missing` = sheet paths the image job couldn't find. */
+export type VariableImportImageSummary = { matchedRows: number; rowsWithPath: number; missing: string[] };
+
 export type VariableImportPlan = {
   summary: VariableImportSummary;
   newProducts: StagedProduct[];
   variantsToCreate: Map<string, StagedVariantData[]>;
   variantsToUpdate: StagedVariantUpdate[];
   existingProductIdByModelNumber: Map<string, string>;
+  /** Variant photo URLs to merge into the gallery of products that already exist. */
+  productImageAdditions: Map<string, string[]>;
   newAttributeValueRows: { attribute: string; value: string; order: number }[];
   industryReferences: IndustryReferenceMapping[];
   subIndustryReferences: SubIndustryReferenceMapping[];
@@ -131,6 +140,7 @@ function emptyPlan(reason: string): VariableImportPlan {
     variantsToCreate: new Map(),
     variantsToUpdate: [],
     existingProductIdByModelNumber: new Map(),
+    productImageAdditions: new Map(),
     newAttributeValueRows: [],
     industryReferences: [],
     subIndustryReferences: [],
@@ -314,6 +324,27 @@ export async function analyzeVariableProductImport(
     mapping.classification.subIndustry.mode === "mapped" ? mapping.classification.subIndustry.column : null;
   const industryReferences = mapping.industryReferences ?? [];
   const subIndustryReferences = mapping.subIndustryReferences ?? [];
+
+  // Variant photos: sheet path -> uploaded URL, from the finished zip-copy job.
+  const variantImageCol = mapping.variantImages?.column ?? null;
+  let resolvedImages: Record<string, string> = {};
+  if (mapping.variantImages) {
+    const job = await prisma.imageImportJob.findUnique({ where: { id: mapping.variantImages.jobId } });
+    if (!job) return emptyPlan("The variant image job no longer exists — start a new one on the Upload step.");
+    if (job.status !== "done") return emptyPlan("The variant images haven't finished copying yet.");
+    resolvedImages = job.resolved as Record<string, string>;
+  }
+  // A sheet path that the job copied becomes its URL; anything else is kept as typed (legacy URLs).
+  const imageUrlFor = (raw: string): string | null => {
+    const value = raw.trim();
+    if (!value) return null;
+    return resolvedImages[normalizeRef(value)] ?? null;
+  };
+  const imageSummary: VariableImportImageSummary | undefined = mapping.variantImages
+    ? { matchedRows: 0, rowsWithPath: 0, missing: [] }
+    : undefined;
+  const missingImages = new Set<string>();
+  const productImageAdditions = new Map<string, string[]>();
 
   const dataRows = grid
     .slice(mapping.headerRow)
@@ -500,11 +531,23 @@ export async function analyzeVariableProductImport(
     }
 
     const name = (nameCol != null ? (firstRow[nameCol] ?? "").trim() : "") || modelNumber;
-    const image = imageCol != null ? (firstRow[imageCol] ?? "").trim() || null : null;
+    const rawProductImage = imageCol != null ? (firstRow[imageCol] ?? "").trim() : "";
+    const productImage = rawProductImage ? imageUrlFor(rawProductImage) ?? rawProductImage : null;
+    // Every distinct variant photo of this model, in sheet order, feeds the product gallery.
+    const variantImageUrls: string[] = [];
+    if (variantImageCol != null) {
+      for (const row of rows) {
+        const url = imageUrlFor(row.cells[variantImageCol] ?? "");
+        if (url && !variantImageUrls.includes(url)) variantImageUrls.push(url);
+      }
+    }
+    const galleryImages = [...new Set([productImage, ...variantImageUrls].filter((u): u is string => Boolean(u)))];
+    const image = galleryImages[0] ?? null;
 
     const existingProductId = existingProductIdByModelNumber.get(modelNumber);
     if (existingProductId) {
       productsReused++;
+      if (variantImageUrls.length) productImageAdditions.set(modelNumber, variantImageUrls);
     } else {
       newProducts.push({
         modelNumber,
@@ -515,7 +558,7 @@ export async function analyzeVariableProductImport(
         companyId,
         categoryId: category.id!,
         subCategoryId: subCategory.id,
-        images: image ? [image] : [],
+        images: galleryImages,
         // Industries/sub-industries live per-variant for variable products (see below) — the
         // product record itself never carries them.
         industryIds: [],
@@ -588,7 +631,19 @@ export async function analyzeVariableProductImport(
         }
       }
 
+      let image: string | null = null;
+      if (variantImageCol != null && imageSummary) {
+        const rawImage = (row.cells[variantImageCol] ?? "").trim();
+        if (rawImage) {
+          imageSummary.rowsWithPath++;
+          image = imageUrlFor(rawImage);
+          if (image) imageSummary.matchedRows++;
+          else missingImages.add(rawImage);
+        }
+      }
+
       const data: StagedVariantData = {
+        image,
         size: attrs.size,
         variantType: attrs.variantType,
         orifice: attrs.orifice,
@@ -662,11 +717,13 @@ export async function analyzeVariableProductImport(
       newSubIndustries,
       errors,
       duplicates,
+      images: imageSummary ? { ...imageSummary, missing: [...missingImages] } : undefined,
     },
     newProducts,
     variantsToCreate,
     variantsToUpdate,
     existingProductIdByModelNumber,
+    productImageAdditions,
     newAttributeValueRows,
     industryReferences,
     subIndustryReferences,
@@ -789,8 +846,24 @@ export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
         }
       }
 
+      // Existing products keep their gallery; new variant photos are appended once.
+      for (const [modelNumber, urls] of plan.productImageAdditions) {
+        const productId = plan.existingProductIdByModelNumber.get(modelNumber);
+        if (!productId) continue;
+        const current = await tx.product.findUnique({ where: { id: productId }, select: { image: true, images: true } });
+        if (!current) continue;
+        const existing = (current.images as string[] | null) ?? [];
+        const merged = [...new Set([...existing, ...urls])];
+        if (merged.length === existing.length && current.image) continue;
+        await tx.product.update({
+          where: { id: productId },
+          data: { images: merged, image: current.image ?? merged[0] ?? null },
+        });
+      }
+
       for (const { variantId, data } of plan.variantsToUpdate) {
         const {
+          image,
           size,
           variantType,
           orifice,
@@ -817,6 +890,8 @@ export async function applyVariableProductImportPlan(plan: VariableImportPlan) {
             features,
             description,
             specifications,
+            // Only overwrite the photo when this sheet actually supplies one.
+            ...(image ? { image } : {}),
             industries: { set: finalIndustryIds(data).map((id) => ({ id })) },
             subIndustries: { set: finalSubIndustryIds(data).map((id) => ({ id })) },
           },

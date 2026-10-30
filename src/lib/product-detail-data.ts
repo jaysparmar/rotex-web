@@ -21,6 +21,8 @@ export type ProductVariant = {
   maxPressure: string;
   flowFactor: string;
   power: string;
+  /** Variant-specific photo; the gallery shows it first when this variant is selected. */
+  image?: string;
   certificates: string[];
   features: string;
   specifications: SpecItem[];

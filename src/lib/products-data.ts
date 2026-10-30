@@ -336,6 +336,7 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
       maxPressure: v.maxOperatingTemp ?? "",
       flowFactor: v.flowFactor ?? "",
       power: v.power ?? "",
+      image: v.image ?? undefined,
       certificates: v.certificates as string[],
       features: v.features ?? "",
       specifications: v.specifications as SpecItem[],

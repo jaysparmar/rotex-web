@@ -46,6 +46,8 @@ export type VariantInput = ContentFields & {
   maxOperatingTemp: string | null;
   flowFactor: string | null;
   power: string | null;
+  /** Variant photo. Left out = keep whatever the variant already has. */
+  image?: string | null;
 };
 
 function connectIndustries(industryIds: string[], subIndustryIds: string[]) {

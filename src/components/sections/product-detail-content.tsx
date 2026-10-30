@@ -25,6 +25,12 @@ export function ProductDetailContent({
   );
   const [quoteOpen, setQuoteOpen] = useState(false);
 
+  // The selected variant's own photo leads the gallery, followed by the product's images.
+  const variantImage = selectedVariant?.image;
+  const galleryImages = variantImage
+    ? [variantImage, ...product.images.filter((img) => img !== variantImage)]
+    : product.images;
+
   const handleHeroQuoteClick = () => {
     if (isVariable) {
       setQuoteOpen(true);
@@ -130,7 +136,8 @@ export function ProductDetailContent({
         </div>
 
         <div className="order-1 lg:order-2 w-full lg:flex-1 lg:max-w-158">
-          <ProductGallery images={product.images} alt={product.name} />
+          {/* Remount on variant change so the gallery resets to the variant's photo. */}
+          <ProductGallery key={variantImage ?? "product"} images={galleryImages} alt={product.name} />
         </div>
       </div>
 

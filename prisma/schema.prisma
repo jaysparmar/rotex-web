@@ -79,6 +79,9 @@ model ProductVariant {
   flowFactor       String?
   power            String?
 
+  // Variant-specific photo (set by the product import from the images zip).
+  image String?
+
   industries    Industry[]
   subIndustries SubIndustry[]
 
@@ -500,3 +503,26 @@ model PartnerToolsSection {
   updatedAt DateTime @updatedAt
 }
 
+
+// Background job that copies the images referenced by an import sheet out of a zip.
+model ImageImportJob {
+  id             String   @id @default(cuid())
+  status         String // "uploading" | "queued" | "extracting" | "done" | "failed"
+  sourceType     String // "upload" | "server"
+  zipPath        String
+  originalName   String
+  totalBytes     Int      @default(0)
+  uploadedBytes  Int      @default(0)
+  /// [StringList]
+  references     Json     @default("[]")
+  totalItems     Int      @default(0)
+  processedItems Int      @default(0)
+  copiedCount    Int      @default(0)
+  /// [StringMap]
+  resolved       Json     @default("{}")
+  /// [StringList]
+  missing        Json     @default("[]")
+  error          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

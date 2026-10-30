@@ -33,6 +33,7 @@ import {
   Tag,
   Search,
   ListChecks,
+  FolderOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -53,6 +54,7 @@ export const NAV_ITEMS = [
   { href: "/admin/awards", label: "Awards", icon: Award },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/attributes", label: "Attributes", icon: SlidersHorizontal },
+  { href: "/admin/import-files", label: "Import Files", icon: FolderOpen },
   { href: "/admin/companies", label: "Companies", icon: Building2 },
   { href: "/admin/categories", label: "Categories", icon: Layers },
   { href: "/admin/industries", label: "Industries", icon: Factory },
@@ -84,7 +86,13 @@ function navItem(href: string) {
 export const NAV_GROUPS: { label: string; items: typeof NAV_ITEMS }[] = [
   {
     label: "Catalog",
-    items: ["/admin/products", "/admin/attributes", "/admin/companies", "/admin/categories"].map(navItem),
+    items: [
+      "/admin/products",
+      "/admin/attributes",
+      "/admin/companies",
+      "/admin/categories",
+      "/admin/import-files",
+    ].map(navItem),
   },
   {
     label: "Industries",

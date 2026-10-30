@@ -64,3 +64,6 @@ next-env.d.ts
 
 
 /docs
+# Staged zip uploads for the product image import
+/.import-tmp/
+/import-files/

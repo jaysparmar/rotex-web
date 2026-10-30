@@ -10,6 +10,7 @@ import { SaveBar } from "@/components/admin/section-form-shell";
 import { useSaveAction } from "@/hooks/use-save-action";
 import { createVariant, updateVariant, type VariantInput } from "@/app/admin/(dashboard)/products/actions";
 import { PRODUCT_ATTRIBUTES } from "@/lib/product-constants";
+import { ImageUrlField } from "@/components/admin/image-url-field";
 
 const NONE = "__none__";
 
@@ -21,6 +22,7 @@ type VariantFormValues = ProductContentFormValues & {
   maxOperatingTemp: string;
   flowFactor: string;
   power: string;
+  image: string;
 };
 
 type VariantRecord = {
@@ -32,6 +34,7 @@ type VariantRecord = {
   maxOperatingTemp: string | null;
   flowFactor: string | null;
   power: string | null;
+  image?: string | null;
   industries: { id: string }[];
   subIndustries: { id: string }[];
   certificates: unknown;
@@ -71,6 +74,7 @@ export function VariantEditForm({
       maxOperatingTemp: variant?.maxOperatingTemp ?? NONE,
       flowFactor: variant?.flowFactor ?? NONE,
       power: variant?.power ?? NONE,
+      image: variant?.image ?? "",
       industryIds: variant?.industries.map((i) => i.id) ?? [],
       subIndustryIds: variant?.subIndustries.map((s) => s.id) ?? [],
       certificates: (variant?.certificates as string[] | null) ?? [],
@@ -107,6 +111,7 @@ export function VariantEditForm({
       maxOperatingTemp: values.maxOperatingTemp === NONE ? null : values.maxOperatingTemp,
       flowFactor: values.flowFactor === NONE ? null : values.flowFactor,
       power: values.power === NONE ? null : values.power,
+      image: values.image.trim() || null,
       industryIds: values.industryIds,
       subIndustryIds: values.subIndustryIds,
       certificates: values.certificates,
@@ -163,6 +168,7 @@ export function VariantEditForm({
                 />
               ))}
             </FieldGrid>
+            <ImageUrlField name="image" label="Variant image" />
           </CardContent>
         </Card>
 

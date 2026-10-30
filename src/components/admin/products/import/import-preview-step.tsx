@@ -131,6 +131,31 @@ export function ImportPreviewStep({
             </div>
           )}
 
+          {summary.images && (
+            <div className="space-y-1.5">
+              <div className="text-sm font-medium">Variant images</div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <StatTile label="Rows with an image path" value={summary.images.rowsWithPath} />
+                <StatTile label="Rows matched to a photo" value={summary.images.matchedRows} />
+              </div>
+              {summary.images.missing.length > 0 && (
+                <details className="text-xs">
+                  <summary className="cursor-pointer text-amber-600">
+                    {summary.images.missing.length} path{summary.images.missing.length === 1 ? "" : "s"} with no
+                    photo — those variants are imported without an image
+                  </summary>
+                  <ul className="mt-2 max-h-40 space-y-0.5 overflow-auto font-mono text-muted-foreground">
+                    {summary.images.missing.slice(0, LIST_DISPLAY_LIMIT).map((m) => (
+                      <li key={m} className="break-all">
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
+          )}
+
           {(summary.newIndustries.length > 0 || summary.newSubIndustries.length > 0) && (
             <div className="space-y-1.5">
               <div className="text-sm font-medium">New industries/sub-industries that will be created</div>

@@ -9,6 +9,8 @@ import { Field } from "@/components/admin/form-fields";
 import { excelColumnLabel } from "@/lib/excel-columns";
 import { adminFetch } from "@/lib/admin-fetch";
 import type { DownloadImportGrid } from "@/lib/download-grid";
+import type { ImageJobDTO } from "@/lib/image-import-job-types";
+import { VariantImagesCard } from "./variant-images-card";
 
 export function ImportUploadStep({
   grid,
@@ -16,12 +18,22 @@ export function ImportUploadStep({
   onParsed,
   onHeaderRowChange,
   onNext,
+  imageColumn,
+  onImageColumnChange,
+  imageJob,
+  onImageJobChange,
+  error: stepError,
 }: {
   grid: string[][] | null;
   headerRow: number;
   onParsed: (grid: string[][], richGrid: DownloadImportGrid) => void;
   onHeaderRowChange: (row: number) => void;
   onNext: () => void;
+  imageColumn: number | null;
+  onImageColumnChange: (column: number | null) => void;
+  imageJob: ImageJobDTO | null;
+  onImageJobChange: (job: ImageJobDTO | null) => void;
+  error?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
@@ -137,13 +149,27 @@ export function ImportUploadStep({
               </table>
             </div>
 
-            <div className="flex justify-end">
-              <Button type="button" size="sm" onClick={onNext}>
-                Next: Defaults
-              </Button>
-            </div>
           </CardContent>
         </Card>
+      )}
+
+      <VariantImagesCard
+        grid={grid}
+        headerRow={headerRow}
+        imageColumn={imageColumn}
+        onImageColumnChange={onImageColumnChange}
+        job={imageJob}
+        onJobChange={onImageJobChange}
+      />
+
+      {stepError && <p className="text-sm text-destructive">{stepError}</p>}
+
+      {grid && (
+        <div className="flex justify-end">
+          <Button type="button" size="sm" onClick={onNext}>
+            Next: Defaults
+          </Button>
+        </div>
       )}
     </div>
   );

@@ -13,6 +13,7 @@ import {
 } from "@/lib/variable-product-import";
 import { resolveDownloadColumns, type CategoryColumnState, type DownloadCategoryOption, type DownloadImportGrid } from "@/lib/download-grid";
 import { Stepper, type StepperStep } from "@/components/ui/stepper";
+import { detectImageColumn, type ImageJobDTO } from "@/lib/image-import-job-types";
 import { ImportUploadStep } from "./import-upload-step";
 import { ImportBatchDefaultsStep } from "./import-batch-defaults-step";
 import { ImportColumnMappingStep } from "./import-column-mapping-step";
@@ -83,8 +84,12 @@ function buildMapping(
   subIndustryRows: SubIndustryReferenceRowState[],
   richGrid: DownloadImportGrid | null,
   downloadsBannerRow: number,
-  categoryColumns: CategoryColumnState[]
-): { mapping: VariableImportMapping } | { error: string; step: "defaults" | "columns" | "industries" | "downloads" } {
+  categoryColumns: CategoryColumnState[],
+  imageColumn: number | null,
+  imageJob: ImageJobDTO | null
+):
+  | { mapping: VariableImportMapping }
+  | { error: string; step: "upload" | "defaults" | "columns" | "industries" | "downloads" } {
   function findColumn(dest: ColumnDestination): number | undefined {
     for (const [col, d] of Object.entries(columnDestinations)) {
       if (d === dest) return Number(col);
@@ -205,6 +210,17 @@ function buildMapping(
     };
   }
 
+  let variantImages: VariableImportMapping["variantImages"];
+  if (imageJob && imageColumn != null) {
+    if (imageJob.status === "failed") {
+      return { error: "The variant image job failed — clear it or start a new one.", step: "upload" };
+    }
+    if (imageJob.status !== "done") {
+      return { error: "Wait for the variant images to finish copying before previewing.", step: "upload" };
+    }
+    variantImages = { column: imageColumn, jobId: imageJob.id };
+  }
+
   return {
     mapping: {
       headerRow,
@@ -222,6 +238,7 @@ function buildMapping(
       industryReferences,
       subIndustryReferences,
       downloads,
+      variantImages,
     },
   };
 }
@@ -249,6 +266,10 @@ export function VariableImportWizard({
   const [subIndustryRows, setSubIndustryRows] = useState<SubIndustryReferenceRowState[]>([]);
   const [downloadsBannerRow, setDownloadsBannerRow] = useState(0);
   const [categoryColumns, setCategoryColumns] = useState<CategoryColumnState[]>([]);
+  // "auto" = use the column whose header mentions "image" on the chosen header row.
+  const [imageColumnChoice, setImageColumnChoice] = useState<number | null | "auto">("auto");
+  const [imageJob, setImageJob] = useState<ImageJobDTO | null>(null);
+  const imageColumn = imageColumnChoice === "auto" ? detectImageColumn(grid, headerRow) : imageColumnChoice;
   const [classification, setClassification] = useState<ClassificationState>({
     category: { mode: "fixed", fixedValue: null },
     subCategory: { mode: "none", fixedValue: null },
@@ -281,6 +302,7 @@ export function VariableImportWizard({
     setSubIndustryRows([]);
     setDownloadsBannerRow(0);
     setCategoryColumns([]);
+    setImageColumnChoice("auto");
   }
 
   async function handleRunPreview() {
@@ -294,7 +316,9 @@ export function VariableImportWizard({
       subIndustryRows,
       richGrid,
       downloadsBannerRow,
-      categoryColumns
+      categoryColumns,
+      imageColumn,
+      imageJob
     );
     if ("error" in result) {
       setMappingError(result.error);
@@ -328,7 +352,9 @@ export function VariableImportWizard({
       subIndustryRows,
       richGrid,
       downloadsBannerRow,
-      categoryColumns
+      categoryColumns,
+      imageColumn,
+      imageJob
     );
     if ("error" in result) {
       toast.error(result.error);
@@ -366,6 +392,11 @@ export function VariableImportWizard({
           onParsed={handleParsed}
           onHeaderRowChange={setHeaderRow}
           onNext={() => setStep("defaults")}
+          imageColumn={imageColumn}
+          onImageColumnChange={setImageColumnChoice}
+          imageJob={imageJob}
+          onImageJobChange={setImageJob}
+          error={step === "upload" ? mappingError : undefined}
         />
       )}
 
