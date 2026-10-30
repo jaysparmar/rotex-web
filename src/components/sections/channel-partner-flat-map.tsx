@@ -77,7 +77,7 @@ function ChannelPartnerFlatMap({ pins }: { pins: Pin[] }) {
       {/* Lets mobile visitors drag/swipe to pan the map — otherwise pins near
           the edges (e.g. Asia, CIS Region) sit partly off the visible area
           with no way to reach them on a touch device. */}
-      <ZoomableGroup zoom={1} minZoom={1} maxZoom={4} center={[20, 15]}>
+      <ZoomableGroup zoom={1} minZoom={1} maxZoom={1} center={[20, 15]}>
         <Geographies geography={GEO_URL}>
           {({ geographies }) =>
             geographies.map((geo) => {
@@ -159,7 +159,7 @@ function ChannelPartnerFlatMap({ pins }: { pins: Pin[] }) {
                           exit={{ opacity: 0, y: -8, scale: 0.97 }}
                           transition={{ duration: 0.2, ease: "easeOut" }}
                           style={{ pointerEvents: "auto", transformOrigin: flip ? "top right" : "top left" }}
-                          className="w-64 max-h-80 overflow-y-auto rounded-lg bg-white p-3 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.25)]"
+                          className="no-scrollbar w-64 max-h-80 overflow-y-auto rounded-lg bg-white p-3 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.25)]"
                         >
                           <ul className="flex flex-col gap-2">
                             {rows.map((row, i) => (

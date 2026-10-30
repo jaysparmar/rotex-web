@@ -39,6 +39,7 @@ export function CountryList({
   pageSize,
   q,
   published,
+  existingRegions,
 }: {
   countries: Country[];
   total: number;
@@ -46,6 +47,7 @@ export function CountryList({
   pageSize: number;
   q: string;
   published: string;
+  existingRegions: string[];
 }) {
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<Country | null>(null);
@@ -111,6 +113,7 @@ export function CountryList({
         </div>
 
         <CountryFormDialog
+          existingRegions={existingRegions}
           trigger={
             <Button size="sm" className="gap-1.5">
               <Plus className="size-3.5" />
@@ -159,6 +162,7 @@ export function CountryList({
 
               <CountryFormDialog
                 country={country}
+                existingRegions={existingRegions}
                 trigger={
                   <Button variant="ghost" size="icon-sm">
                     <Pencil className="size-3.5" />

@@ -21,7 +21,7 @@ export default async function AdminCountriesPage({
     ...(published === "false" ? { published: false } : {}),
   };
 
-  const [countries, total] = await Promise.all([
+  const [countries, total, regionRows] = await Promise.all([
     prisma.country.findMany({
       where,
       orderBy: { createdAt: "asc" },
@@ -29,7 +29,14 @@ export default async function AdminCountriesPage({
       take: PAGE_SIZE,
     }),
     prisma.country.count({ where }),
+    prisma.country.findMany({
+      where: { region: { not: null } },
+      distinct: ["region"],
+      select: { region: true },
+      orderBy: { region: "asc" },
+    }),
   ]);
+  const existingRegions = regionRows.map((r) => r.region as string);
 
   return (
     <div className="space-y-6">
@@ -50,6 +57,7 @@ export default async function AdminCountriesPage({
         pageSize={PAGE_SIZE}
         q={q ?? ""}
         published={published ?? ""}
+        existingRegions={existingRegions}
       />
     </div>
   );

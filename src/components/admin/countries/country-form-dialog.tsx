@@ -29,6 +29,7 @@ type CountryFormValues = {
 
 export function CountryFormDialog({
   country,
+  existingRegions = [],
   trigger,
 }: {
   country?: {
@@ -41,6 +42,7 @@ export function CountryFormDialog({
     lng: number;
     published: boolean;
   };
+  existingRegions?: string[];
   trigger: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -85,7 +87,11 @@ export function CountryFormDialog({
 
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <TextField label="Country Name" {...form.register("name", { required: true })} />
+            <TextField
+              label="Country Name"
+              placeholder="e.g. Poland — not the region/group name"
+              {...form.register("name", { required: true })}
+            />
             <FieldGrid>
               <TextField label="State / City (optional)" {...form.register("stateOrCity")} />
               <TextField label="Partner Company (optional)" {...form.register("partnerCompany")} />
@@ -93,10 +99,16 @@ export function CountryFormDialog({
             <TextField
               label="Region (optional)"
               placeholder="e.g. Europe, CIS Region, Asia"
+              list="country-region-options"
               {...form.register("region")}
             />
+            <datalist id="country-region-options">
+              {existingRegions.map((r) => (
+                <option key={r} value={r} />
+              ))}
+            </datalist>
             <p className="-mt-2.5 text-xs text-muted-foreground">
-              Countries sharing the same region collapse into one map pin with a list popup. Leave blank for a standalone pin.
+              Countries sharing the same region collapse into one map pin with a list popup. Leave blank for a standalone pin. Pick an existing region from the list to avoid typos/duplicates.
             </p>
             <FieldGrid>
               <TextField
