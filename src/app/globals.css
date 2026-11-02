@@ -428,3 +428,8 @@
     font-size: 16px !important;
   }
 }
+
+
+.wa-btn-wrapper{
+  display: none!important;
+}
