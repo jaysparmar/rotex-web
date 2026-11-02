@@ -91,7 +91,7 @@ export function SearchModal({ open, onOpenChange }: { open: boolean; onOpenChang
             {products.map((p) => (
               <Link
                 key={p.slug}
-                href={term.trim() ? `/products/${p.slug}` : `/products?category=${p.slug}`}
+                href={term.trim() ? `/product/${p.slug}` : `/products?category=${p.slug}`}
                 onClick={() => onOpenChange(false)}
                 className="flex flex-col items-center gap-2 p-4 rounded-xl border border-neutral-200 hover:border-[#EF3E23] transition-colors"
               >

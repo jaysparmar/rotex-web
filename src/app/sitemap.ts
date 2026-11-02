@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { getPublishedResources } from "@/lib/resources";
 
-const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://rotex.ezzystack.com").replace(/\/$/, "");
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://rotexautomation.com").replace(/\/$/, "");
 
 const STATIC_PATHS = [
   "",
@@ -17,6 +17,7 @@ const STATIC_PATHS = [
   "/contact",
   "/join/career",
   "/join/channel-partner",
+  "/join/partner-sales-tools",
   "/join/supplier",
   "/privacy-policy",
   "/terms-and-conditions",

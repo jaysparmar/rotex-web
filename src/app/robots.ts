@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://rotex.ezzystack.com").replace(/\/$/, "");
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://rotexautomation.com").replace(/\/$/, "");
 
 export default function robots(): MetadataRoute.Robots {
   return {

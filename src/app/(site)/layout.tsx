@@ -48,6 +48,18 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script id="gtm-datalayer" strategy="beforeInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());`}
+        </Script>
+        <Script
+          id="gtm-script"
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-WNP2435"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body className={`${montserrat.variable} font-montserrat`} suppressHydrationWarning>
         {/* Only loaded once a real site key is configured — forms fall back to
             honeypot + timing + rate-limit checks alone until then. */}
