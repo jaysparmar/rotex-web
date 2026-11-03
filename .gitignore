@@ -67,3 +67,6 @@ next-env.d.ts
 # Staged zip uploads for the product image import
 /.import-tmp/
 /import-files/
+
+# archives / backups
+*.tar.gz

@@ -1,11 +1,13 @@
 import { headers } from "next/headers";
 import { unstable_rethrow } from "next/navigation";
 
+// Server-side calls go straight to this Next.js process instead of the public
+// domain, so they never depend on DNS (the domain may resolve elsewhere).
 async function getBaseUrl() {
-  const h = await headers();
-  const host = h.get("host") ?? "localhost:3000";
-  const protocol = host.startsWith("localhost") ? "http" : "https";
-  return `${protocol}://${host}`;
+  // headers() marks the route as dynamic so it isn't prerendered at build time.
+  await headers();
+  if (process.env.INTERNAL_API_URL) return process.env.INTERNAL_API_URL.replace(/\/$/, "");
+  return `http://127.0.0.1:${process.env.PORT ?? 5007}`;
 }
 
 /**

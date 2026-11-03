@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['rotex.ezzystack.com'],
+  allowedDevOrigins: ['rotexautomation.com'],
   reactCompiler: true,
   images: {
     remotePatterns: [
