@@ -20,7 +20,7 @@ export { browseRoot, resolveBrowsePath } from "@/lib/import-files";
 */
 
 /** Where browser-uploaded zips are staged while they upload and extract. Not public. */
-export const IMPORT_TMP_DIR = process.env.IMPORT_TMP_DIR ?? path.join(process.cwd(), ".import-tmp");
+export const IMPORT_TMP_DIR = process.env.IMPORT_TMP_DIR ?? path.join(/*turbopackIgnore: true*/ process.cwd(), ".import-tmp");
 
 const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"]);
 

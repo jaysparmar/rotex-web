@@ -6,12 +6,12 @@ import { mkdir, realpath } from "fs/promises";
   The server folder admins manage from Admin → Import Files, and the only place
   the import's "Choose from server" zip picker may read from.
 */
-export const IMPORT_BROWSE_ROOT = process.env.IMPORT_BROWSE_ROOT ?? path.join(process.cwd(), "import-files");
+export const IMPORT_BROWSE_ROOT = process.env.IMPORT_BROWSE_ROOT ?? path.join(/*turbopackIgnore: true*/ process.cwd(), "import-files");
 
 /** Real path of the root, creating the folder the first time it's needed. */
 export async function browseRoot(): Promise<string> {
-  await mkdir(IMPORT_BROWSE_ROOT, { recursive: true });
-  return realpath(IMPORT_BROWSE_ROOT);
+  await mkdir(/*turbopackIgnore: true*/ IMPORT_BROWSE_ROOT, { recursive: true });
+  return realpath(/*turbopackIgnore: true*/ IMPORT_BROWSE_ROOT);
 }
 
 function inside(root: string, target: string): boolean {
@@ -21,10 +21,10 @@ function inside(root: string, target: string): boolean {
 /** Resolves an existing path (absolute or root-relative), refusing anything outside the root. */
 export async function resolveBrowsePath(input: string | null | undefined): Promise<string | null> {
   const root = await browseRoot();
-  const target = path.resolve(root, input || ".");
+  const target = path.resolve(/*turbopackIgnore: true*/ root, input || ".");
   let real: string;
   try {
-    real = await realpath(target);
+    real = await realpath(/*turbopackIgnore: true*/ target);
   } catch {
     return null;
   }

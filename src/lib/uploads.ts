@@ -9,7 +9,7 @@ import path from "path";
   (or 404) on hosts that rebuild or use an ephemeral filesystem.
 */
 export const UPLOAD_DIR =
-  process.env.UPLOAD_DIR ?? path.join(process.cwd(), "public", "uploads");
+  process.env.UPLOAD_DIR ?? path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads");
 
 const CONTENT_TYPES: Record<string, string> = {
   ".jpg": "image/jpeg",
@@ -43,8 +43,8 @@ export function contentTypeFor(filename: string): string {
   (../, absolute paths, encoded traversal).
 */
 export function resolveUploadPath(segments: string[]): string | null {
-  const target = path.resolve(UPLOAD_DIR, ...segments);
-  const root = path.resolve(UPLOAD_DIR);
+  const target = path.resolve(/*turbopackIgnore: true*/ UPLOAD_DIR, ...segments);
+  const root = path.resolve(/*turbopackIgnore: true*/ UPLOAD_DIR);
 
   if (target !== root && !target.startsWith(root + path.sep)) return null;
   return target;

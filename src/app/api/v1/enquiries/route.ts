@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
   const fileUrls: string[] = [];
 
   if (files.length > 0) {
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "enquiries");
+    const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads", "enquiries");
     await mkdir(uploadDir, { recursive: true });
 
     for (const file of files) {

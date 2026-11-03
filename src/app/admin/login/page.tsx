@@ -9,8 +9,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const DEMO_EMAIL = "admin@rotex.com";
-const DEMO_PASSWORD = "changeme123";
+// Demo login helper is only shown in local development, never in production builds.
+const SHOW_DEMO = process.env.NODE_ENV === "development";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -42,8 +42,9 @@ export default function AdminLoginPage() {
   }
 
   function fillDemoCreds() {
-    setEmail(DEMO_EMAIL);
-    setPassword(DEMO_PASSWORD);
+    if (!SHOW_DEMO) return;
+    setEmail("admin@rotex.com");
+    setPassword("changeme123");
   }
 
   return (
@@ -111,15 +112,19 @@ export default function AdminLoginPage() {
               {loading ? "Signing in..." : "Sign in"}
             </Button>
 
-            <div className="flex items-center gap-3 py-1">
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-[11px] uppercase tracking-wide text-muted-foreground">or</span>
-              <div className="h-px flex-1 bg-border" />
-            </div>
+            {SHOW_DEMO && (
+              <>
+                <div className="flex items-center gap-3 py-1">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground">or</span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
 
-            <Button type="button" variant="outline" onClick={fillDemoCreds} className="h-10 w-full">
-              Use demo credentials
-            </Button>
+                <Button type="button" variant="outline" onClick={fillDemoCreds} className="h-10 w-full">
+                  Use demo credentials
+                </Button>
+              </>
+            )}
           </form>
         </CardContent>
       </Card>

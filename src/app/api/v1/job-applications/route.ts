@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       return apiError("TOO_LARGE", "Resume exceeds 5MB limit", 400);
     }
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "resumes");
+    const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads", "resumes");
     await mkdir(uploadDir, { recursive: true });
 
     const ext = path.extname(file.name) || "";

@@ -31,7 +31,7 @@ export async function GET(
   }
 
   try {
-    const info = await stat(filePath);
+    const info = await stat(/*turbopackIgnore: true*/ filePath);
     if (!info.isFile()) throw new Error("not a file");
 
     const contentType = contentTypeFor(filePath);
@@ -55,7 +55,7 @@ export async function GET(
         return new NextResponse(null, { status: 416, headers: { "Content-Range": `bytes */${info.size}` } });
       }
 
-      const stream = createReadStream(filePath, { start, end });
+      const stream = createReadStream(/*turbopackIgnore: true*/ filePath, { start, end });
       return new NextResponse(Readable.toWeb(stream) as ReadableStream, {
         status: 206,
         headers: {
@@ -66,7 +66,7 @@ export async function GET(
       });
     }
 
-    const stream = createReadStream(filePath);
+    const stream = createReadStream(/*turbopackIgnore: true*/ filePath);
     return new NextResponse(Readable.toWeb(stream) as ReadableStream, {
       headers: { ...baseHeaders, "Content-Length": String(info.size) },
     });
