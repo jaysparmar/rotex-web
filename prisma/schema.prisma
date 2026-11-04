@@ -270,6 +270,18 @@ model DownloadCategory {
   importReference String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  downloads       Download[]
+}
+
+model Download {
+  id         String            @id @default(cuid())
+  title      String
+  fileUrl    String
+  tab        String?
+  categoryId String?
+  category   DownloadCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
 }
 
 model Country {
