@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/admin/breadcrumb";
-import { ProductDownloadList, type ProductSourcedDownload } from "@/components/admin/downloads/product-download-list";
+import { ProductDownloadList, type AdminDownloadRow } from "@/components/admin/downloads/product-download-list";
 
 const PAGE_SIZE = 20;
 
@@ -24,7 +24,7 @@ export default async function AdminDownloadsPage({
   const { page: pageParam, q, categoryId } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
-  const [products, variants, downloadCategories] = await Promise.all([
+  const [products, variants, downloadCategories, standaloneDownloads] = await Promise.all([
     prisma.product.findMany({
       where: { productType: "simple" },
       select: { id: true, name: true, image: true, downloads: true },
@@ -44,11 +44,14 @@ export default async function AdminDownloadsPage({
       },
     }),
     prisma.downloadCategory.findMany({ orderBy: { name: "asc" } }),
+    prisma.download.findMany({
+      select: { id: true, title: true, fileUrl: true, tab: true, categoryId: true },
+    }),
   ]);
 
   const categoryNameById = new Map(downloadCategories.map((c) => [c.id, c.name]));
 
-  const fromProducts: ProductSourcedDownload[] = products.flatMap((p) =>
+  const fromProducts: AdminDownloadRow[] = products.flatMap((p) =>
     (p.downloads ?? [])
       .filter((d) => d.url)
       .map((d, i) => ({
@@ -60,11 +63,12 @@ export default async function AdminDownloadsPage({
         image: p.image,
         productName: p.name,
         variantLabel: null,
+        kind: "product" as const,
         editHref: `/admin/products/${p.id}`,
       }))
   );
 
-  const fromVariants: ProductSourcedDownload[] = variants.flatMap((v) =>
+  const fromVariants: AdminDownloadRow[] = variants.flatMap((v) =>
     (v.downloads ?? [])
       .filter((d) => d.url)
       .map((d, i) => ({
@@ -76,15 +80,30 @@ export default async function AdminDownloadsPage({
         image: v.product.image,
         productName: v.product.name,
         variantLabel: variantLabel(v) || null,
+        kind: "product" as const,
         editHref: `/admin/products/${v.product.id}/variants/${v.id}`,
       }))
   );
 
-  // No `Download` table backs this list — items are derived by flat-mapping the
-  // `downloads` JSON column off every simple Product and every ProductVariant.
-  // Filtering/pagination below is therefore over this in-memory derived array,
-  // not a Prisma `where`+`skip`/`take` query; there's no table to query.
-  const allItems = [...fromProducts, ...fromVariants];
+  const fromStandalone: AdminDownloadRow[] = standaloneDownloads.map((d) => ({
+    id: `standalone-${d.id}`,
+    title: d.title,
+    categoryId: d.categoryId ?? "",
+    categoryName: categoryNameById.get(d.categoryId ?? "") ?? "Uncategorized",
+    fileUrl: d.fileUrl,
+    image: null,
+    productName: "—",
+    variantLabel: null,
+    kind: "standalone" as const,
+    tab: d.tab,
+    downloadId: d.id,
+  }));
+
+  // Product/variant rows are derived by flat-mapping the `downloads` JSON
+  // column off every simple Product and every ProductVariant; standalone
+  // rows come from the `Download` table. Filtering/pagination below is over
+  // this in-memory merged array, not a single Prisma `where`+`skip`/`take`.
+  const allItems = [...fromProducts, ...fromVariants, ...fromStandalone];
 
   const tabCounts: Record<string, number> = {};
   for (const item of allItems) tabCounts[item.categoryId] = (tabCounts[item.categoryId] ?? 0) + 1;
