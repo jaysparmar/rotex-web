@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function DownloadsPage() {
   const seo = await getPageSeo("downloads");
-  const [products, variants, industries, downloadCategories] = await Promise.all([
+  const [products, variants, industries, downloadCategories, standaloneDownloads] = await Promise.all([
     prisma.product.findMany({
       select: {
         id: true,
@@ -43,9 +43,10 @@ export default async function DownloadsPage() {
     }),
     prisma.industry.findMany({ select: { name: true }, orderBy: { name: "asc" } }),
     prisma.downloadCategory.findMany({ select: { id: true, name: true } }),
+    prisma.download.findMany({ select: { id: true, title: true, fileUrl: true, tab: true, categoryId: true } }),
   ]);
 
-  const items = flattenDownloadItems({ products, variants, downloadCategories });
+  const items = flattenDownloadItems({ products, variants, downloadCategories, standalone: standaloneDownloads });
   const industryOptions = industries.map((i) => i.name);
 
   return (

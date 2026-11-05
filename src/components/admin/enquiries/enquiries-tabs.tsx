@@ -194,7 +194,7 @@ export function EnquiriesTabs({
           onChange={setDateRange}
         />
 
-        <ExportEnquiriesButton tabs={tabs} active={active} />
+        <ExportEnquiriesButton tabs={tabs} active={active} product={product} from={from} to={to} />
       </div>
 
       {enquiries.length === 0 ? (

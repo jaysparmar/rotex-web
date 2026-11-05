@@ -21,7 +21,19 @@ function downloadCsv(filename: string, csv: string) {
   URL.revokeObjectURL(url);
 }
 
-export function ExportEnquiriesButton({ tabs, active }: { tabs: string[]; active: string }) {
+export function ExportEnquiriesButton({
+  tabs,
+  active,
+  product,
+  from,
+  to,
+}: {
+  tabs: string[];
+  active: string;
+  product?: string;
+  from?: string;
+  to?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(() => new Set([active]));
   const [pending, startTransition] = useTransition();
@@ -43,7 +55,7 @@ export function ExportEnquiriesButton({ tabs, active }: { tabs: string[]; active
     }
     startTransition(async () => {
       try {
-        const { filename, csv } = await exportEnquiriesCsv(picked);
+        const { filename, csv } = await exportEnquiriesCsv(picked, product || undefined, { from, to });
         downloadCsv(filename, csv);
         toast.success(`Exported ${filename}`);
         setOpen(false);

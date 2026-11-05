@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { buildEnquiryWhere } from "@/lib/enquiry-filters";
+import { buildEnquiryWhere, type EnquiryDateRange } from "@/lib/enquiry-filters";
 
 const CSV_COLUMNS = [
   "Date",
@@ -37,7 +37,11 @@ function slugify(label: string): string {
 }
 
 /** Exports one or more enquiry tabs as CSV. A multi-tab export gets a leading "Tab" column. */
-export async function exportEnquiriesCsv(tabs: string[]): Promise<{ filename: string; csv: string }> {
+export async function exportEnquiriesCsv(
+  tabs: string[],
+  product?: string,
+  dateRange?: EnquiryDateRange
+): Promise<{ filename: string; csv: string }> {
   if (tabs.length === 0) throw new Error("Select at least one tab to export.");
 
   const industries = await prisma.industry.findMany({ select: { name: true } });
@@ -48,7 +52,7 @@ export async function exportEnquiriesCsv(tabs: string[]): Promise<{ filename: st
   const rows: string[] = [toCsvRow(columns)];
 
   for (const tab of tabs) {
-    const where = buildEnquiryWhere(tab, industryNames);
+    const where = buildEnquiryWhere(tab, industryNames, product, dateRange);
     const enquiries = await prisma.enquiry.findMany({ where, orderBy: { createdAt: "desc" } });
 
     for (const e of enquiries) {

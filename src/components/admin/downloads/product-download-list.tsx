@@ -173,7 +173,7 @@ export function ProductDownloadList({
               </div>
 
               {item.kind === "product" ? (
-                <Button variant="ghost" size="sm" className="gap-1.5" render={<Link href={item.editHref!} />}>
+                <Button variant="ghost" size="sm" className="gap-1.5" nativeButton={false} render={<Link href={item.editHref!} />}>
                   <ExternalLink className="size-3.5" />
                   Edit on product
                 </Button>

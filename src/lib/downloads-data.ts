@@ -58,14 +58,24 @@ export type VariantForDownloads = {
 
 type RawDownloadEntry = { title: string; url: string; tab?: string; categoryId: string };
 
+export type StandaloneDownloadForDownloads = {
+  id: string;
+  title: string;
+  fileUrl: string;
+  tab: string | null;
+  categoryId: string | null;
+};
+
 export function flattenDownloadItems({
   products,
   variants,
   downloadCategories,
+  standalone = [],
 }: {
   products: ProductForDownloads[];
   variants: VariantForDownloads[];
   downloadCategories: { id: string; name: string }[];
+  standalone?: StandaloneDownloadForDownloads[];
 }): DownloadItem[] {
   const categoryNameById = new Map(downloadCategories.map((c) => [c.id, c.name]));
   const defaultTab: DownloadTab = DOWNLOAD_TABS[0].id;
@@ -110,5 +120,21 @@ export function flattenDownloadItems({
       }))
   );
 
-  return [...fromProducts, ...fromVariants];
+  const fromStandalone: DownloadItem[] = standalone.map((d) => ({
+    id: `standalone-${d.id}`,
+    tab: (d.tab as DownloadTab) ?? defaultTab,
+    title: d.title,
+    language: "English",
+    fileType: fileTypeFromUrl(d.fileUrl),
+    fileSizeLabel: "",
+    fileUrl: d.fileUrl,
+    image: PLACEHOLDER_IMAGE,
+    product: "",
+    subCategory: "",
+    industries: [],
+    categoryName: categoryNameById.get(d.categoryId ?? "") ?? "",
+    modelNo: "",
+  }));
+
+  return [...fromProducts, ...fromVariants, ...fromStandalone];
 }
