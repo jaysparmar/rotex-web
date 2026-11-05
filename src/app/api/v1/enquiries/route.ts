@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiSuccess, apiError } from "@/lib/api-response";
 import { checkSpamProtection } from "@/lib/spam-protection";
+import { createSalesforceLead, toSalesforceLead } from "@/lib/salesforce";
 
 const schema = z.object({
   source: z.enum(["industry", "supplier", "contact", "product-quote", "channel-partner"]).default("industry"),
@@ -94,6 +95,11 @@ export async function POST(req: NextRequest) {
 
   const enquiry = await prisma.enquiry.create({
     data: { ...parsed.data, fileUrls },
+  });
+
+  // Fire-and-forget: a Salesforce outage must never block the enquiry from saving.
+  createSalesforceLead(toSalesforceLead(parsed.data)).catch((err) => {
+    console.error("Salesforce lead push failed", err);
   });
 
   return apiSuccess({ id: enquiry.id }, enquiry.createdAt);

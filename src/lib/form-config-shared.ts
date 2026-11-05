@@ -44,7 +44,7 @@ export const FORM_FIELDS: {
   { key: "enquiryType", label: "Enquiry Type" },
   { key: "productType", label: "Product Type" },
   { key: "quantity", label: "Quantity" },
-  { key: "consent", label: "Privacy Policy Consent Checkbox", contactOnly: true },
+  { key: "consent", label: "Privacy Policy Consent Checkbox" },
   { key: "message", label: "Message", locked: true },
   { key: "uploadFile", label: "Upload File" },
 ];

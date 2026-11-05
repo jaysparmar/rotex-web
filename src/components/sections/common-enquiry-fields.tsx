@@ -81,9 +81,9 @@ function Row({ children }: { children: React.ReactNode }) {
 
 function buildSchema(enabled: Record<FormFieldKey, boolean>, showEnquiryType: boolean, formKey: FormKey) {
   // Contact form only: split name, add Designation, require Company Name and
-  // (if shown) Quantity, and gate submission on the Privacy Policy consent
-  // checkbox when the admin has it enabled. Every other form keeps the
-  // original single Full Name field and optional Company Name/Quantity.
+  // (if shown) Quantity. Every other form keeps the original single Full Name
+  // field and optional Company Name/Quantity. Consent checkbox (when the
+  // admin enables it) gates submission on any form.
   const isContact = formKey === "contact";
   return z.object({
     fullName: isContact ? z.string().optional() : z.string().min(2, "Name must be at least 2 characters"),
@@ -100,10 +100,9 @@ function buildSchema(enabled: Record<FormFieldKey, boolean>, showEnquiryType: bo
     productType: enabled.productType ? z.string().min(1, "Please select a product type") : z.string().optional(),
     quantity: isContact && enabled.quantity ? z.string().min(1, "Quantity is required") : z.string().optional(),
     message: z.string().min(10, "Tell us a bit more (at least 10 characters)"),
-    consent:
-      isContact && enabled.consent
-        ? z.boolean().refine((v) => v === true, { message: "Please accept the Privacy Policy to continue" })
-        : z.boolean().optional(),
+    consent: enabled.consent
+      ? z.boolean().refine((v) => v === true, { message: "Please accept the Privacy Policy to continue" })
+      : z.boolean().optional(),
   });
 }
 
@@ -160,7 +159,7 @@ export function CommonEnquiryFields({
   const showFirstName = isContact && config.firstName;
   const showLastName = isContact && config.lastName;
   const showDesignation = isContact && config.designation;
-  const showConsent = isContact && config.consent;
+  const showConsent = config.consent;
   const schema = useMemo(() => buildSchema(config, showEnquiryType, formKey), [config, showEnquiryType, formKey]);
   const {
     register,
